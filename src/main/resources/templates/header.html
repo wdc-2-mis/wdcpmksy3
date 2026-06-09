@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+   
+</head>
+<body>
+    <div th:fragment="govHeader">
+        <div class="gov-header">
+            <div class="gov-left">
+                <img th:src="@{/images/ashok-stambh.png}" alt="Ashok Stambh">
+                <div>
+                    <h3>Watershed Development Component-Pradhan Mantri Krishi Sinchayee Yojana 3.0 - MIS</h3>
+                    <p>Department of Land Resources | MoRD | Govt. of India</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="gov-nav">
+            <div class="menu">
+                <a th:href="@{/}">Home</a>
+                <a th:href="@{/about}">About</a>
+                <a th:href="@{/dashboard}">Dashboard</a>
+                <a th:href="@{/reports}">Reports</a>
+                <a th:href="@{/map}">Map</a>
+            </div>
+            <div class="auth">
+                <a th:href="@{/login}" class="login">Login</a>
+                <a th:href="@{/register}" class="register">Registration</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+	

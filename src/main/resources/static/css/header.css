@@ -1,0 +1,60 @@
+ .gov-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 25px;
+            background: #fff;
+            border-bottom: 2px solid #0b6e4f;
+        }
+
+        .gov-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .gov-left img {
+            height: 80px;
+            filter: drop-shadow(0 0 6px #0b6e4f);
+            animation: glow 2.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 4px #0b6e4f); }
+            to   { filter: drop-shadow(0 0 14px #0b6e4f); }
+        }
+
+        .gov-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0b6e4f;
+            padding: 10px 20px;
+        }
+
+        .menu a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth a {
+            margin-left: 10px;
+            padding: 7px 16px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            backdrop-filter: blur(8px);
+        }
+
+        .register {
+            background: #ffc107;
+            color: black;
+        }
