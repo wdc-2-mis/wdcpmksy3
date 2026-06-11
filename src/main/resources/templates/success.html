@@ -1,33 +1,137 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
 <meta charset="UTF-8">
-<title>WDC-PMKSY 3.0</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<title>Welcome Page</title>
 
 <style>
-	
-	.registration-container {
-	        max-width: 500px;
-	        margin: 60px auto;
-	        background: #fff;
-	        border-radius: 15px;
-	        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-	        padding: 35px;
-	    }
 
-/* ================= BASIC ================= */
-body {
-    margin: 0;
-    font-family: "Segoe UI", sans-serif;
-    overflow-x: hidden;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
 }
 
-/* ================= HEADER ================= */
+body{
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+}
+
+/* Header */
+.header{
+    background:green;
+    
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.user-info{
+    font-size:15px;
+}
+
+/* Main Layout */
+.main-container{
+    flex:1;
+    display:flex;
+}
+
+/* Left Panel */
+.sidebar{
+    width:250px;
+    background:#f4f4f4;
+    border-right:1px solid #ddd;
+    padding:20px;
+}
+
+.sidebar h3{
+    margin-bottom:15px;
+    color:#1e3a8a;
+}
+
+.sidebar ul{
+    list-style:none;
+}
+
+.sidebar ul li{
+    margin:10px 0;
+}
+
+.sidebar ul li a{
+    text-decoration:none;
+    color:#333;
+    display:block;
+    padding:10px;
+    border-radius:5px;
+}
+
+.sidebar ul li a:hover{
+    background:#1e3a8a;
+    color:white;
+}
+
+/* Content Area */
+.content{
+    flex:1;
+    padding:30px;
+    background:#fafafa;
+}
+
+.welcome-card{
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0px 2px 8px rgba(0,0,0,0.1);
+}
+
+.welcome-card h2{
+    color:#1e3a8a;
+    margin-bottom:15px;
+}
+
+/* Footer */
+.footer{
+	background: #0b6e4f;
+	   color: white;
+	   text-align: center;
+	   padding: 20px;
+	   font-size: 13px;
+	   position: fixed;
+	   bottom: 0;
+	   left: 0;
+	   width: 100%;
+}
+footer {
+    background: #0b6e4f;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+/* Responsive */
+@media(max-width:768px){
+
+    .main-container{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        width:100%;
+    }
+}
 .gov-header {
     display: flex;
     align-items: center;
@@ -50,892 +154,147 @@ body {
     filter: drop-shadow(0 0 6px #0b6e4f);
     animation: glow 2.5s infinite alternate;
 }
-
-@keyframes glow {
-    from {
-        filter: drop-shadow(0 0 4px #0b6e4f);
-    }
-    to {
-        filter: drop-shadow(0 0 14px #0b6e4f);
-    }
-}
-
-.gov-title h1 {
-    margin: 0;
-    font-size: 20px;
-    color: #0b6e4f;
-    font-weight: bold;
-}
-
-.gov-title p {
-    margin: 0;
-    font-size: 13px;
-}
-
-/* ================= NAVBAR ================= */
-.gov-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #0b6e4f;
-    padding: 10px 20px;
-}
-
-/* LEFT MENU */
-.menu a {
-    color: white;
-    margin-right: 15px;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-/* RIGHT AUTH */
-.auth a {
-    margin-left: 10px;
-    padding: 7px 16px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-/* 🧊 GLASS EFFECT BUTTONS */
-.login {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    backdrop-filter: blur(8px);
-}
-
-.register {
-    background: #ffc107;
-    color: black;
-}
-
-/* ================= HERO ================= */
-.hero {
-    position: relative;
-    height: 85vh;
-    overflow: hidden;
-}
-
-/* VIDEO */
-.hero video {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* DARK LAYER */
-.overlay {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.55);
-}
-
-/* CONTENT */
-.hero-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    text-align: center;
-}
-
-/* TAGLINE SYSTEM */
-.tagline {
-    font-size: 14px;
-    color: #ffc107;
-    letter-spacing: 2px;
-    animation: fade 2s infinite alternate;
-}
-
-@keyframes fade {
-    from { opacity: 0.6; }
-    to { opacity: 1; }
-}
-
-.hero-content h1 {
-    font-size: 48px;
-    font-weight: bold;
-}
-
-/* ================= SCROLL DOWN ANIMATION ================= */
-.scroll-down {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    font-size: 13px;
-    animation: bounce 1.5s infinite;
-}
-
-@keyframes bounce {
-    0%,100% { transform: translate(-50%, 0); }
-    50% { transform: translate(-50%, 10px); }
-}
-
-/* ================= WATER PARTICLES ================= */
-.particle {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: rgba(0, 200, 255, 0.6);
-    border-radius: 50%;
-    animation: floatUp 8s linear infinite;
-}
-
-@keyframes floatUp {
-    0% {
-        transform: translateY(100vh);
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-10vh);
-        opacity: 0;
-    }
-}
-
-/* ================= FOOTER ================= */
-footer {
-    background: #0b6e4f;
-    color: white;
-    text-align: center;
-    padding: 20px;
-    font-size: 13px;
-}
-
-.skip-link{
-    position:absolute;
-    top:-40px;
-    left:0;
-    background:#000;
-    color:#fff;
-    padding:8px;
-    z-index:9999;
-}
-.skip-link:focus{
-    top:0;
-}
-
-.floating-panel{
-    position:fixed;
-    right:20px;
-    bottom:100px;
-    z-index:999;
-}
-
-.floating-panel button{
-    background:#0b6e4f;
-    color:white;
-    border:none;
-    padding:12px 16px;
-    border-radius:30px;
-}
-
-.alert-box{
-    display:none;
-    width:280px;
-    background:white;
-    margin-top:10px;
-    border-radius:10px;
-    padding:15px;
-    box-shadow:0 5px 20px rgba(0,0,0,.2);
-}
-
-/*photo css  */
-
-
-
-
-
-@keyframes fadeIn{
-    from{ opacity:0; }
-    to{ opacity:1; }
-}
-
-
-
-
-
-.kpi-section{
-     position:relative;
-
-    padding:80px 20px;
-
-    background:
-        linear-gradient(
-            rgba(255,255,255,0.92),
-            rgba(255,255,255,0.92)
-        ),
-        url('/images/gallery1.png');
-
-    background-size:cover;
-    background-position:center;
-    background-attachment:fixed;
-}
-
-/* CARD */
-.kpi-card{
-
-    position:relative;
-
-    overflow:hidden;
-
-    background:linear-gradient(
-        135deg,
-        #ffffff,
-        #f4fff9
-    );
-
-    border-radius:24px;
-
-    padding:30px 25px;
-
-    text-align:center;
-
-    border:1px solid rgba(11,110,79,.15);
-
-    box-shadow:
-        0 10px 25px rgba(0,0,0,.08),
-        0 0 0 1px rgba(255,255,255,.5) inset;
-
-    transition:all .4s ease;
-
-    transform-style:preserve-3d;
-
-    cursor:pointer;
-}
-
-.kpi-card::before{
-
-    content:"";
-
-    position:absolute;
-
-    top:0;
-    left:-100%;
-
-    width:100%;
-    height:4px;
-
-    background:linear-gradient(
-        90deg,
-        transparent,
-        #0b6e4f,
-        #00c896,
-        transparent
-    );
-
-    transition:1s;
-}
-
-.kpi-card:hover::before{
-
-    left:100%;
-}
-
-.kpi-card::after{
-
-    content:"";
-
-    position:absolute;
-
-    width:120px;
-    height:120px;
-
-    border-radius:50%;
-
-    background:rgba(11,110,79,.06);
-
-    top:-40px;
-    right:-40px;
-}
-
-/* HOVER 3D EFFECT */
-.kpi-card:hover{
-
-    transform:
-        perspective(1000px)
-        rotateX(5deg)
-        rotateY(-5deg)
-        translateY(-10px);
-
-    box-shadow:
-        0 25px 50px rgba(0,0,0,.15);
-}
-
-/* TITLE */
-.kpi-title{
-
-    font-size:15px;
-
-    font-weight:600;
-
-    color:#495057;
-
-    line-height:1.6;
-
-    min-height:70px;
-
-    margin-bottom:15px;
-}
-
-/* VALUE */
-.kpi-value{
-
-    font-size:38px;
-
-    font-weight:800;
-
-    color:#0b6e4f;
-
-    text-shadow:
-        0 2px 10px rgba(11,110,79,.2);
-}
-
-.kpi-unit{
-
-    display:block;
-
-    margin-top:5px;
-
-    font-size:12px;
-
-    color:#6c757d;
-}
-
-.photo-slider{
-    overflow:hidden;
-    width:100%;
-}
-
-.photo-track{
-
-    display:flex;
-
-    gap:20px;
-
-    animation:scrollPhotos 20s linear infinite;
-}
-
-.photo-track img{
-
-    width:90px;
-    height:90px;
-
-    border-radius:50%;
-
-    object-fit:cover;
-
-    border:3px solid #fff;
-
-    box-shadow:0 4px 10px rgba(0,0,0,.15);
-
-    transition:.3s;
-}
-
-.photo-track img:hover{
-
-    transform:scale(1.2);
-
-    animation-play-state:paused;
-}
-
-@keyframes scrollPhotos{
-
-    from{
-        transform:translateX(0);
-    }
-
-    to{
-        transform:translateX(-50%);
-    }
-}
- 
-
-.section-title{
-    color:#0b6e4f;
-    font-weight:700;
-    margin-bottom:20px;
-}
-
-.gov-link-card{
-
-    background:white;
-
-    padding:15px;
-
-    margin-bottom:15px;
-
-    border-radius:12px;
-
-    box-shadow:0 4px 12px rgba(0,0,0,.08);
-
-    transition:.3s;
-}
-
-.gov-link-card:hover{
-
-    transform:translateY(-3px);
-
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
-}
-
-.gov-link-card a{
-
-    text-decoration:none;
-
-    color:#0b6e4f;
-
-    font-weight:600;
-}
-
-.partner-section{
-
-    padding:40px 0;
-    background:#fff;
-}
-
-.partner-slider{
-
-    overflow:hidden;
-}
-
-.partner-track{
-
-    display:flex;
-    align-items:center;
-    gap:30px;
-
-    animation:partnerScroll 20s linear infinite;
-}
-
-.partner-slider:hover .partner-track{
-
-    animation-play-state:paused;
-}
-
-.partner-track a{
-
-    background:#fff;
-
-    min-width:220px;
-    height:120px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    border-radius:15px;
-
-    box-shadow:0 5px 15px rgba(0,0,0,.08);
-
-    transition:.3s;
-}
-
-.partner-track a:hover{
-
-    transform:translateY(-8px);
-}
-
-.partner-track img{
-
-    max-width:160px;
-    max-height:80px;
-}
-
-@keyframes partnerScroll {
-
-    from{
-        transform:translateX(0);
-    }
-
-    to{
-        transform:translateX(-50%);
-    }
-}
-/* .gov-grid{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:12px;
-} */
-
-.gov-card{
-    background:#f1f3f5;
-    padding:18px 10px;
-    text-align:center;
-    border-radius:10px;
-    text-decoration:none;
-    color:#0b6e4f;
-    font-weight:600;
-    font-size:13px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
-    transition:0.3s;
-}
-.gov-card:hover{
-    background:#e9ecef;
-    transform:translateY(-3px);
-}
-.gov-card img{
-    height:20px;
-    display:block;
-    margin:0 auto 5px;
-}
-.gov-slider{
-    overflow:hidden;
-    height:350px;
-    position:relative;
-}
-
-.gov-track{
-    display:flex;
-    flex-direction:column;
-    gap:15px;
-    animation:govSlide 10s infinite;
-}
-
-.gov-track a{
-    background:white;
-    padding:15px;
-    border-radius:12px;
-    text-decoration:none;
-    color:#0b6e4f;
-    font-weight:600;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    transition:0.3s;
-    text-align:center;
-}
-
-.gov-track a:hover{
-    transform:translateX(5px);
-}
-
-@keyframes govSlide{
-
-    0%{ transform:translateY(0); }
-
-    45%{ transform:translateY(0); }
-
-    55%{ transform:translateY(-45%); }
-
-    100%{ transform:translateY(-45%); }
-}
-
-.gallery-frame {
-    max-height: 320px;   /* enough for 4 circles */
-  overflow-y: auto;    /* scroll down for more */
-  border: 2px solid #ddd;
-  padding: 10px;
-  border-radius: 10px;
-  }
-
-.frame-box {
-  height: 360px;   /* fixed height for both */
-  overflow-y: auto;    /* scroll if content exceeds */
-  border: 2px solid #ddd;
-  padding: 15px;
-  border-radius: 12px;
-  background: #fafafa;
-}
-
-  .gallery-grid {
-   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  }
-
-
-  .gallery-grid img {
-   width: 160px;   /* increased size */
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.3s;
-  }
-
-  .gallery-grid img:hover {
-    transform: scale(1.1);
-  }
-
-  /* Government portals grid */
-  /* .gov-frame {
-    max-height: 300px;
-    overflow: hidden;
-    border: 2px solid #ddd;
-    padding: 10px;
-    border-radius: 10px;
-  } */
-  .gov-grid {
-   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-   
-  }
-
-  .gov-grid .portal {
-    width: 45%;
-    text-align: center;
-    display: none;
-  }
-
-  
-  .gov-grid img {
-   width: 100px;   /* fixed logo size */
-  height: 60px;   /* fixed height for rectangle shape */
-  object-fit: contain; /* keeps aspect ratio inside rectangle */
-  border-radius: 8px;  /* rectangle with slightly rounded corners */
-  margin-bottom: 8px;
-  transition: transform 0.3s;
-  }
-  
-   .lightbox {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.lightbox img {
-  max-width: 90%;
-  max-height: 90%;
-  border: 4px solid #fff;
-  border-radius: 10px;
-  animation: zoomIn 0.5s forwards;
-}
-
-.lightbox .close-btn {
-  position: absolute;
-  top: 20px; right: 30px;
-  font-size: 28px;
-  color: white;
-  cursor: pointer;
-}
-
-@keyframes zoomIn {
-  from { transform: scale(0.7); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-.portal {
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-.portal[style*="display: block"] {
-  opacity: 1;
-} 
-.gov-grid img:hover {
-  transform: scale(1.1);
-}
 </style>
 
-<script>
- // Lightbox with close button
-function openImage(src) {
-  const lightbox = document.createElement('div');
-  lightbox.className = 'lightbox';
-  lightbox.innerHTML = `
-    <span class="close-btn">&times;</span>
-    <img src="${src}">
-  `;
-  document.body.appendChild(lightbox);
 
-  // Close on click
-  lightbox.querySelector('.close-btn').onclick = () => document.body.removeChild(lightbox);
-  lightbox.onclick = (e) => {
-    if (e.target === lightbox) document.body.removeChild(lightbox);
-  };
-}
-
-// Government portals auto-cycle
-window.onload = function() {
-const govGrid = document.getElementById('govGrid');
-const portals = govGrid.querySelectorAll('.portal');
-let cycle = 0; // 0 = first 5, 1 = next 3
-
-function showPortals() {
-  // Hide all first
-  portals.forEach(p => p.style.display = 'none');
-
-  if (cycle === 0) {
-    // Show first 5
-    portals.forEach((p, i) => {
-      if (i < 5) p.style.display = 'block';
-    });
-    cycle = 1;
-  } else {
-    // Show next 3
-    portals.forEach((p, i) => {
-      if (i >= 5 && i < 8) p.style.display = 'block';
-    });
-    cycle = 0;
-  }
-}
-
-// Initial load
-showPortals();
-
-// Auto change every 4 seconds
-setInterval(showPortals, 4000);
-};
-function closeImage(){
-    document.getElementById("imageModal").style.display = "none";
-}
-
-function scrollToExplore() {
-    const section = document.getElementById("explore");
-
-    if (!section) {
-        console.error("Explore section not found!");
-        return;
+<script th:inline="javascript">
+    let seconds = [[${timeoutSeconds}]];
+	alert(seconds);
+    function updateTimer() {
+        let minutes = Math.floor(seconds / 60);
+        let remainingSeconds = seconds % 60;
+		alert(remainingSeconds);
+		document.getElementById("sessionTimer").innerHTML =
+		    minutes + ":" + String(remainingSeconds).padStart(2, '0');
+			alert(minutes + ":" + String(remainingSeconds).padStart(2, '0'));
+        if (seconds > 0) {
+            seconds--;
+        } else {
+            alert("Session Expired!");
+            window.location.href = "/login";
+        }
     }
 
-    section.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
-}
-
-document.querySelectorAll(".kpi-card").forEach(card => {
-
-    let isDown = false;
-
-    let startX, startY;
-
-    card.addEventListener("mousedown", (e) => {
-        isDown = true;
-        startX = e.clientX;
-        startY = e.clientY;
-    });
-
-    document.addEventListener("mouseup", () => {
-        isDown = false;
-        card.style.transform = "";
-    });
-
-    document.addEventListener("mousemove", (e) => {
-
-        if(!isDown) return;
-
-        let moveX = (e.clientX - startX) / 20;
-        let moveY = (e.clientY - startY) / 20;
-
-        card.style.transform =
-            `translate(${moveX}px, ${moveY}px)
-             rotateX(${moveY}deg)
-             rotateY(${moveX}deg)`;
-
-    });
-
-});
-
-
+    updateTimer();
+    setInterval(updateTimer, 1000);
 </script>
 
-<script>
-
-const counters = document.querySelectorAll('.counter');
-
-counters.forEach(counter => {
-
-    const update = () => {
-
-        const target = +counter.getAttribute("data-target");
-        const current = +counter.innerText.replace(/,/g,'');
-
-        const step = target / 100;
-
-        if(current < target){
-
-            counter.innerText =
-                Math.ceil(current + step).toLocaleString();
-
-            setTimeout(update, 20);
-
-        } else {
-            counter.innerText = target.toLocaleString();
-        }
-    };
-
-    update();
-});
-
-function togglePanel(){
-
-    const panel =
-        document.getElementById("alertBox");
-
-    panel.style.display =
-        panel.style.display === "block"
-        ? "none"
-        : "block";
-}
 
 
-</script>
+
 </head>
 
 <body>
-<a href="#explore" class="skip-link">Skip to main content</a>
-<!-- ================= HEADER ================= -->
-<div class="gov-header">
 
-    <div class="gov-left">
-        <img th:src="@{/images/ashok-stambh.png}" alt="Ashok Stambh">
+    <!-- Header -->
+    <header class="header">
+		<div class="gov-header">
 
-        <div>
-            <h3>Watershed Development Component-Pradhan Mantri Krishi Sinchayee Yojana 3.0 - MIS</h3>
-            <p>Department of Land Resources | MoRD | Govt. of India</p>
+		    <div class="gov-left">
+		        <img th:src="@{/images/ashok-stambh.png}" alt="Ashok Stambh">
+
+		        <div>
+		            <h3>Watershed Development Component-Pradhan Mantri Krishi Sinchayee Yojana 3.0 - MIS</h3>
+		            <p>Department of Land Resources | MoRD | Govt. of India</p>
+		        </div>
+		    </div>
+
+		</div>
+
+        <div class="user-info">		<!--<p>
+		    Session expires in:
+		    <span id="sessionTimer"></span>
+		</p>-->
+
+            Welcome &nbsp;
+            <span th:text="${email}"></span>
         </div>
+    </header>
+
+    <!-- Main Section -->
+    <div class="main-container">
+
+        <!-- Left Menu -->
+        <aside class="sidebar">
+
+            <h3>Menu Bar</h3>
+
+            <ul>
+                <li>
+                    <a th:href="@{/dashboard}">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a th:href="@{/profile}">
+                        Profile
+                    </a>
+                </li>
+
+                <li>
+                    <a th:href="@{/reports}">
+                        Reports
+                    </a>
+                </li>
+
+                <li>
+                    <a th:href="@{/settings}">
+                        Settings
+                    </a>
+                </li>
+
+                <li>
+                    <a th:href="@{/logout}">
+                        Logout
+                    </a>
+                </li>
+            </ul>
+
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+
+            <div class="welcome-card">
+
+                <h2>Welcome </h2>
+
+                <p>
+                    This is the main content area of your application.
+                    You can display charts, reports, user details,
+                    notifications, and other modules here.
+                </p>
+
+                <br>
+
+                <h3>Logged-in User Information</h3>
+
+                <p>
+                    Name:
+                    <strong th:text="${username}">
+                        John Doe
+                    </strong>
+                </p>
+
+                <p>
+                    Email:
+                    <strong th:text="${email}">
+                        user@example.com
+                    </strong>
+                </p>
+
+            </div>
+
+        </main>
+
     </div>
 
-</div>
-
-<!-- ================= NAVBAR ================= -->
-<div class="gov-nav">
-
-    <!-- LEFT MENU -->
-    <div class="menu">
-        <a >Welcome</a>
-        
-    </div>
-
-    <!-- RIGHT AUTH -->
-    <div class="auth">
-        
-    </div>
-
-</div>
-<div class="registration-container">
-    <h2 style="text-align: center;">Welcome</h2>
-	</br> </br>
-	
-  
-	
-	
-	
-	
-	
-</div>
-
-</br>
-<!-- ================= FOOTER ================= -->
-<footer>
-    Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
-    Website hosted and maintained by National Informatics Center.
-</footer>
+    <!-- Footer -->
+	<footer>
+	    Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
+	    Website hosted and maintained by National Informatics Center.
+	</footer>
 
 </body>
 </html>

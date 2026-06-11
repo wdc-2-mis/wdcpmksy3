@@ -5,14 +5,15 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import gov.dolr.wdcpmksy3.entity.UserReg;
+import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
+
 
 
 
 @Repository
-public interface UserRepository extends JpaRepository<UserReg, Long> {
+public interface UserRepository extends JpaRepository<IwmpUserReg, Long> {
 
-    Optional<UserReg> findByEmail(String email);
+    Optional<IwmpUserReg> findByEmail(String email);
     
     boolean existsByEmail(String email);
 }

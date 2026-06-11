@@ -9,11 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import gov.dolr.wdcpmksy3.service.OtpService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 
 
 @Controller
 public class EmailController {
+	
+	HttpSession session;
 	
 	@Autowired
     private OtpService otpService;
@@ -50,16 +54,41 @@ public class EmailController {
     @PostMapping("/verifyOtp")
     public String verifyOtp(@RequestParam String email,
                             @RequestParam String otp,
+                            HttpSession session,
                             Model model) {
 
         if (otpService.verifyOtp(email, otp)) {
+        	
+        	session.setAttribute("useremail", email);
+            session.setMaxInactiveInterval(30 * 60); // 30 minutes
+        	model.addAttribute("email", email);
+        	session.setAttribute("user", email);
+        	model.addAttribute("timeoutSeconds", session.getMaxInactiveInterval());
+        	
             return "success";
         }
+        
+        else {
+        	model.addAttribute("error", "Invalid OTP");
+        	return "login";
+        }
 
-        model.addAttribute("error", "Invalid OTP");
-        model.addAttribute("email", email);
+        
+       
 
-        return "verifyOtp";
+        
+    }
+    
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, Model model) {
+
+        HttpSession session = request.getSession(true);
+
+        if (session != null) {
+            session.invalidate(); // destroy session
+        }
+
+        return "redirect:/login";
     }
 
 }

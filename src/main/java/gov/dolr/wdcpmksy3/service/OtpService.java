@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gov.dolr.wdcpmksy3.entity.UserReg;
+import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 
 
@@ -30,8 +30,8 @@ public class OtpService {
 
         String otp = generateOtp();
 
-        UserReg user = userRepository.findByEmail(email)
-                .orElseGet(UserReg::new);
+        IwmpUserReg user = userRepository.findByEmail(email)
+                .orElseGet(IwmpUserReg::new);
 
         user.setEmail(email);
         user.setOtp(otp);
@@ -52,12 +52,12 @@ public class OtpService {
 
     public boolean verifyOtp(String email, String otp) {
 
-        Optional<UserReg> optionalUser =
+        Optional<IwmpUserReg> optionalUser =
                 userRepository.findByEmail(email);
 
         if(optionalUser.isPresent()) {
 
-        	UserReg user = optionalUser.get();
+        	IwmpUserReg user = optionalUser.get();
 
             return otp.equals(user.getOtp())
                     && user.getOtpExpiry().isAfter(LocalDateTime.now());
