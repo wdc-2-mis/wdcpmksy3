@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>Registration | WDC-PMKSY 3.0</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet">
+
+<link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+
+<body>
+
+<div th:replace="header :: govHeader"></div>
+<section class="register-section">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-8">
+
+                <div class="register-card">
+
+                    <div class="register-title">
+
+                        <h2>Create New Account</h2>
+
+                        <p>
+                            Join Watershed Development Component -
+                            Pradhan Mantri Krishi Sinchayee Yojana 3.0 MIS
+                        </p>
+
+                    </div>
+
+                    <form>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    First Name
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       placeholder="Enter First Name">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Last Name
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       placeholder="Enter Last Name">
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Email Address
+                            </label>
+
+                            <input type="email"
+                                   class="form-control"
+                                   placeholder="Enter Email">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Mobile Number
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Enter Mobile Number">
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    State
+                                </label>
+
+                                <select class="form-select">
+                                    <option>Select State</option>
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    District
+                                </label>
+
+                                <select class="form-select">
+                                    <option>Select District</option>
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                User Role
+                            </label>
+
+                            <select class="form-select">
+
+                                <option>Select Role</option>
+
+                                <option>Administrator</option>
+
+                                <option>State User</option>
+
+                                <option>District User</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Password
+                                </label>
+
+                                <input type="password"
+                                       class="form-control">
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Confirm Password
+                                </label>
+
+                                <input type="password"
+                                       class="form-control">
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-check mb-4">
+
+                            <input class="form-check-input"
+                                   type="checkbox">
+
+                            <label class="form-check-label">
+
+                                I agree to Terms &
+                                Conditions
+
+                            </label>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn register-btn w-100">
+
+                            Create Account
+
+                        </button>
+
+                    </form>
+
+                    <div class="login-link">
+
+                        Already have an account?
+
+                        <a th:href="@{/login}">
+                            Login Here
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</body>
+</html>
