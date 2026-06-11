@@ -1,0 +1,71 @@
+package gov.dolr.wdcpmksy3.service;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import gov.dolr.wdcpmksy3.entity.UserReg;
+import gov.dolr.wdcpmksy3.repository.UserRepository;
+
+
+
+@Service
+public class OtpService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    public String generateOtp() {
+        return String.valueOf(
+                (int)(Math.random() * 900000) + 100000
+        );
+    }
+
+    public void sendOtp(String email) {
+
+        String otp = generateOtp();
+
+        UserReg user = userRepository.findByEmail(email)
+                .orElseGet(UserReg::new);
+
+        user.setEmail(email);
+        user.setOtp(otp);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+
+        userRepository.save(user);
+        
+    /*    UserReg user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setOtp(otp);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+
+        userRepository.save(user);   */
+
+        emailService.sendOtp(email, otp);
+    }
+
+    public boolean verifyOtp(String email, String otp) {
+
+        Optional<UserReg> optionalUser =
+                userRepository.findByEmail(email);
+
+        if(optionalUser.isPresent()) {
+
+        	UserReg user = optionalUser.get();
+
+            return otp.equals(user.getOtp())
+                    && user.getOtpExpiry().isAfter(LocalDateTime.now());
+        }
+
+        return false;
+    }
+    public boolean checkEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+}
