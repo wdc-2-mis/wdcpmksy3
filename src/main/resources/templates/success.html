@@ -159,14 +159,14 @@ footer {
 
 <script th:inline="javascript">
     let seconds = [[${timeoutSeconds}]];
-	alert(seconds);
+	//alert(seconds);
     function updateTimer() {
         let minutes = Math.floor(seconds / 60);
         let remainingSeconds = seconds % 60;
-		alert(remainingSeconds);
+	//	alert(remainingSeconds);
 		document.getElementById("sessionTimer").innerHTML =
 		    minutes + ":" + String(remainingSeconds).padStart(2, '0');
-			alert(minutes + ":" + String(remainingSeconds).padStart(2, '0'));
+		//	alert(minutes + ":" + String(remainingSeconds).padStart(2, '0'));
         if (seconds > 0) {
             seconds--;
         } else {
@@ -206,8 +206,11 @@ footer {
 		    <span id="sessionTimer"></span>
 		</p>-->
 
-            Welcome &nbsp;
-            <span th:text="${email}"></span>
+           
+			<b>Welcome</b> &nbsp;: &nbsp;
+			<span th:text="${email}" style="color: white; background-color: darkblue; font-weight: bold; padding: 3px;"></span> 
+			<br/><br/>&nbsp;
+			<a th:href="@{/logout}" style="color: white; background-color: crimson; font-weight: bold; padding: 3px; float: right;">Logout</a>
         </div>
     </header>
 
@@ -219,7 +222,7 @@ footer {
 
             <h3>Menu Bar</h3>
 
-            <ul>
+          <!--  <ul>
                 <li>
                     <a th:href="@{/dashboard}">
                         Dashboard
@@ -245,11 +248,9 @@ footer {
                 </li>
 
                 <li>
-                    <a th:href="@{/logout}">
-                        Logout
-                    </a>
+                   
                 </li>
-            </ul>
+            </ul>-->
 
         </aside>
 
@@ -257,33 +258,20 @@ footer {
         <main class="content">
 
             <div class="welcome-card">
-
-                <h2>Welcome </h2>
-
-                <p>
-                    This is the main content area of your application.
-                    You can display charts, reports, user details,
-                    notifications, and other modules here.
-                </p>
-
-                <br>
-
-                <h3>Logged-in User Information</h3>
-
-                <p>
-                    Name:
-                    <strong th:text="${username}">
-                        John Doe
-                    </strong>
-                </p>
-
-                <p>
-                    Email:
-                    <strong th:text="${email}">
-                        user@example.com
-                    </strong>
-                </p>
-
+				<table th:each="user : ${userList}" cellspacing="20">
+				    <tr>
+				        <td>User Name: </td> <td th:text="${user[8]}"></td>
+				        <td>User Type: </td> <td><span th:if="${user[9] == 'PI'}">PIA</span></td>
+				    </tr>
+				    <tr>
+				        <td>Mobile: </td> <td th:text="${user[5]}"></td>
+				        <td>Email: </td> <td th:text="${user[4]}"></td>
+				    </tr>
+				    <tr>
+				        <td>Address: </td> <td th:text="${user[1]}"></td>
+				    </tr>
+				</table>
+				
             </div>
 
         </main>

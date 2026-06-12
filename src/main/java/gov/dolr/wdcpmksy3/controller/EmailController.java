@@ -1,5 +1,7 @@
 package gov.dolr.wdcpmksy3.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -64,6 +66,30 @@ public class EmailController {
         	model.addAttribute("email", email);
         	session.setAttribute("user", email);
         	model.addAttribute("timeoutSeconds", session.getMaxInactiveInterval());
+        	
+        	model.addAttribute("userList", otpService.getUserList(email));
+        	
+        	List<Object[]> rows = otpService.getUserList(email);
+
+        	for (Object[] row : rows) {
+        	    
+        		Integer regid = (Integer) row[0];
+        		session.setAttribute("regid", regid);
+        	    String address = (String) row[1];
+        	    String department = (String) row[2];
+        	    String mobile = (String) row[5];
+        	    String statename = (String) row[13];
+        	    String usertype = (String) row[9];
+        	    
+        	    session.setAttribute("usertype", usertype);
+        	    session.setAttribute("stcode", regid);
+        	    session.setAttribute("statename", statename);
+        	    session.setAttribute("mobile", mobile);
+
+        	  //  System.out.println("ID: " + regid + ", address: " + address + ", department: " + department);
+        	}
+        	
+        	
         	
             return "success";
         }

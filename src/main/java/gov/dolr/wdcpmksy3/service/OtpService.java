@@ -1,6 +1,7 @@
 package gov.dolr.wdcpmksy3.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,9 @@ public class OtpService {
         IwmpUserReg user = userRepository.findByEmail(email)
                 .orElseGet(IwmpUserReg::new);
 
-        user.setEmail(email);
+    //    user.setEmail(email);
         user.setOtp(otp);
-        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(30));
 
         userRepository.save(user);
         
@@ -66,6 +67,16 @@ public class OtpService {
         return false;
     }
     public boolean checkEmailExists(String email) {
+    	
         return userRepository.existsByEmail(email);
     }
+    
+    public List<Object[]> getUserList(String emailid) {
+    	
+        return userRepository.getUserList(emailid);
+    }
+    
+    
+    
+    
 }
