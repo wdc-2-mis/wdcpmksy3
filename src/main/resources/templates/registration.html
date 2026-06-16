@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <head>
 <meta charset="UTF-8">
@@ -9,6 +10,207 @@
       rel="stylesheet">
 
 <link rel="stylesheet" th:href="@{/css/header.css}">
+<link rel="stylesheet" th:href="@{/css/registration.css}">
+
+<style>
+footer {
+    background: #0b6e4f;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+}
+
+
+
+</style>
+
+<script type="text/javascript">
+function show(id){
+    document.getElementById(id).classList.add("show");
+}
+
+function hide(id){
+    document.getElementById(id).classList.remove("show");
+}
+
+function resetAll() {
+
+    hide("districtBox");
+
+    hide("nameField");
+    hide("deptField");
+    hide("desgField");
+
+    hide("ngoNameField");
+    hide("ngoIdField");
+    hide("ngoRegField");
+}
+
+function handleUserTypeChange(type) {
+
+    const state = document.getElementById("userState");
+    const district = document.getElementById("userDistrict");
+    const title = document.getElementById("orgSectionTitle");
+
+    state.value = "";
+    state.disabled = true;
+
+    if (district) {
+        district.value = "";
+    }
+    
+    if (type === "DOLR") {
+        state.multiple = true;
+        state.size = 8;
+        state.name = "userState";     // or "userState[]" if required
+    } else {
+        // All other users -> Single State Selection
+        state.multiple = false;
+        state.size = 1;
+        state.name = "userState";
+    }
+    
+    district.innerHTML = '<option value="">--Select District--</option>';
+    district.value = "";
+
+     if (type === "PIA" || type === "WCDC" || type === "NGO") {
+
+        state.disabled = false;
+
+    } else {
+        state.disabled = false;
+    }
+
+    resetAll();
+
+    show("nameField");
+    show("deptField");
+    show("desgField");
+    title.innerHTML = "Organization Details";
+    if (type === "PIA" || type === "WCDC" || type === "NGO") {
+        show("districtBox");
+    }
+
+    if (type === "NGO") {
+    
+    title.innerHTML = "NGO Details";
+
+        hide("nameField");
+        hide("deptField");
+        hide("desgField");
+
+        show("ngoNameField");
+        show("ngoIdField");
+        show("ngoRegField");
+    }
+}
+
+window.onload = function() {
+
+    // Default form
+    show("nameField");
+    show("deptField");
+    show("desgField");
+
+    // Hide NGO fields
+    hide("ngoNameField");
+    hide("ngoIdField");
+    hide("ngoRegField");
+
+    // Hide district
+    hide("districtBox");
+
+    // Default title
+    document.getElementById("orgSectionTitle").innerHTML =
+        "Organization Details";
+};
+
+function recaptchaVerified() {
+
+    const btn = document.getElementById("registerBtn");
+
+    btn.disabled = false;
+    btn.innerHTML = "Register";
+}
+
+function recaptchaExpired() {
+
+    const btn = document.getElementById("registerBtn");
+
+    btn.disabled = true;
+    btn.innerHTML = "Verify reCAPTCHA to Register";
+}
+
+function loadDistricts(stateCode) {
+
+    const district = document.getElementById("userDistrict");
+
+    // CLEAR EVERYTHING FIRST
+    district.innerHTML = '<option value="">--Select District--</option>';
+
+    if (!stateCode) return;
+
+    fetch('/register/districts/' + stateCode)
+        .then(res => res.json())
+        .then(data => {
+
+            let options = '<option value="">--Select District--</option>';
+
+            data.forEach(d => {
+                options += `
+                    <option value="${d.distCode}">
+                        ${d.distName}
+                    </option>
+                `;
+            });
+
+            district.innerHTML = options;
+        });
+}
+
+function validateForm() {
+
+    let valid = true;
+    let type = document.getElementById("userType").value;
+
+    // CLEAR OLD ERRORS
+    document.querySelectorAll(".error-text").forEach(e => e.innerText = "");
+
+    let state = document.getElementById("userState").value;
+    let district = document.getElementById("userDistrict").value;
+    let name = document.getElementById("userName").value;
+
+    // STATE validation (all users)
+    if (!state) {
+        document.getElementById("stateError").innerText =
+            "Please select state";
+        valid = false;
+    }
+
+    // DISTRICT validation (PIA/WCDC/NGO)
+    if (type === "PIA" || type === "WCDC" || type === "NGO") {
+        if (!district) {
+            document.getElementById("districtError").innerText =
+                "Please select district";
+            valid = false;
+        }
+    }
+
+    // NAME validation (non-NGO)
+    if (type !== "NGO") {
+        if (!name) {
+            document.getElementById("nameError").innerText =
+                "Please enter name";
+            valid = false;
+        }
+    }
+
+    return valid;
+}
+
+
+</script>
 </head>
 
 <body>
@@ -16,191 +218,225 @@
 <div th:replace="header :: govHeader"></div>
 <section class="register-section">
 
-    <div class="container">
+   <div class="container-fluid bg-gradient py-4">
 
-        <div class="row justify-content-center">
+<div class="row justify-content-center">
 
-            <div class="col-lg-8">
+<div class="col-lg-8 col-md-10">
 
-                <div class="register-card">
+<div class="card shadow-lg registration-card">
 
-                    <div class="register-title">
+<!-- HEADER -->
+<div class="card-header text-center bg-success text-white">
+<h5 class="mb-0">User Registration - WDC PMKSY 3.0 MIS</h5>
+</div>
 
-                        <h2>Create New Account</h2>
+<div class="card-body">
 
-                        <p>
-                            Join Watershed Development Component -
-                            Pradhan Mantri Krishi Sinchayee Yojana 3.0 MIS
-                        </p>
+<form:form id="regForm" modelAttribute="userBean" action="register" method="post" autocomplete="off">
 
-                    </div>
+<!-- USER TYPE -->
+<div class="section-title">Account Type</div>
 
-                    <form>
+<div class="row">
 
-                        <div class="row">
+<div class="col-md-6 mb-3">
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    First Name
-                                </label>
+<label>User Type *</label>
 
-                                <input type="text"
-                                       class="form-control"
-                                       placeholder="Enter First Name">
-                            </div>
+<select id="userType"
+name="userType"
+class="form-control form-control-sm"
+onchange="handleUserTypeChange(this.value)">
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Last Name
-                                </label>
+<option value="">--Select User Type--</option>
 
-                                <input type="text"
-                                       class="form-control"
-                                       placeholder="Enter Last Name">
-                            </div>
+<option value="DOLR">DOLR</option>
+<option value="SLNA">SLNA</option>
+<option value="WCDC">WCDC</option>
+<option value="PIA">PIA</option>
+<option value="NGO">NGO</option>
 
-                        </div>
+</select>
 
-                        <div class="mb-3">
+</div>
 
-                            <label class="form-label">
-                                Email Address
-                            </label>
+<!-- LOCATION SECTION -->
+<div class="section-title">Location Details</div>
 
-                            <input type="email"
-                                   class="form-control"
-                                   placeholder="Enter Email">
+<div class="row">
 
-                        </div>
+    <!-- STATE (ALWAYS VISIBLE) -->
+    <div class="col-md-6 mb-3">
+      <label>State *</label>
+     
+    <select id="userState" name="userState" class="form-control form-control-sm"  onchange="loadDistricts(this.value)">
+       <option value="">--Select State--</option>
+    <th:block th:each="state : ${stateList}">
+        <option th:value="${state.stCode}"
+                th:text="${state.stName}">
+        </option>
+    </th:block>
+    </select>
+    <small class="text-danger" id="stateError"></small>
+    </div>
 
-                        <div class="mb-3">
+    <!-- DISTRICT (CONDITIONAL) -->
+   <div class="col-md-6 mb-3 fade-section" id="districtBox">
 
-                            <label class="form-label">
-                                Mobile Number
-                            </label>
+        <label>District *</label>
+   <small class="text-danger" id="districtError"></small>
+        <select id="userDistrict"
+                name="userDistrict"
+                class="form-control form-control-sm">
 
-                            <input type="text"
-                                   class="form-control"
-                                   placeholder="Enter Mobile Number">
+            <option value="">--Select District--</option>
 
-                        </div>
+            <c:forEach items="${districtList}" var="lists">
+                <option value="${lists.key}">
+                    ${lists.value}
+                </option>
+            </c:forEach>
 
-                        <div class="row">
-
-                            <div class="col-md-6 mb-3">
-
-                                <label class="form-label">
-                                    State
-                                </label>
-
-                                <select class="form-select">
-                                    <option>Select State</option>
-                                </select>
-
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-
-                                <label class="form-label">
-                                    District
-                                </label>
-
-                                <select class="form-select">
-                                    <option>Select District</option>
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                User Role
-                            </label>
-
-                            <select class="form-select">
-
-                                <option>Select Role</option>
-
-                                <option>Administrator</option>
-
-                                <option>State User</option>
-
-                                <option>District User</option>
-
-                            </select>
-
-                        </div>
-
-                        <div class="row">
-
-                            <div class="col-md-6 mb-3">
-
-                                <label class="form-label">
-                                    Password
-                                </label>
-
-                                <input type="password"
-                                       class="form-control">
-
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-
-                                <label class="form-label">
-                                    Confirm Password
-                                </label>
-
-                                <input type="password"
-                                       class="form-control">
-
-                            </div>
-
-                        </div>
-
-                        <div class="form-check mb-4">
-
-                            <input class="form-check-input"
-                                   type="checkbox">
-
-                            <label class="form-check-label">
-
-                                I agree to Terms &
-                                Conditions
-
-                            </label>
-
-                        </div>
-
-                        <button type="submit"
-                                class="btn register-btn w-100">
-
-                            Create Account
-
-                        </button>
-
-                    </form>
-
-                    <div class="login-link">
-
-                        Already have an account?
-
-                        <a th:href="@{/login}">
-                            Login Here
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
+        </select>
 
     </div>
 
+</div>
+
+</div>
+
+<!-- ORGANIZATION SECTION -->
+<div class="section-title" id="orgSectionTitle">
+    Organization Details
+</div>
+
+<div class="row">
+
+<!-- NAME -->
+<div class="col-md-6 mb-3 fade-section" id="nameField">
+<label>Name *</label>
+<small class="text-danger" id="nameError"></small>
+<input type="text"
+class="form-control form-control-sm"
+id="userName"
+name="userName">
+</div>
+
+<!-- DEPARTMENT -->
+<div class="col-md-6 mb-3 fade-section" id="deptField">
+<label>Department *</label>
+<input type="text"
+class="form-control form-control-sm"
+id="userDepartment"
+name="userDepartment">
+</div>
+
+<!-- DESIGNATION -->
+<div class="col-md-6 mb-3 fade-section" id="desgField">
+<label>Designation *</label>
+<input type="text"
+class="form-control form-control-sm"
+id="userDesignation"
+name="userDesignation">
+</div>
+
+<!-- NGO NAME -->
+<div class="col-md-6 mb-3 fade-section" id="ngoNameField">
+<label>NGO Name *</label>
+<input type="text"
+class="form-control form-control-sm"
+id="userNameNgo"
+name="userNameNgo">
+</div>
+
+<!-- NGO ID -->
+<div class="col-md-6 mb-3 fade-section" id="ngoIdField">
+<label>NGO ID *</label>
+<input type="text"
+class="form-control form-control-sm"
+id="userNgoid"
+name="userNgoid">
+</div>
+
+<!-- REGISTERED WITH -->
+<div class="col-md-6 mb-3  fade-section" id="ngoRegField">
+<label>Registered With *</label>
+<input type="text"
+class="form-control form-control-sm"
+id="userRegwith"
+name="userRegwith">
+</div>
+
+</div>
+
+<!-- CONTACT -->
+<div class="section-title">Contact Details</div>
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+<label>Email *</label>
+<input type="text"
+class="form-control form-control-sm"
+name="userEmailId">
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Mobile *</label>
+<input type="text"
+class="form-control form-control-sm"
+name="userMobileNo">
+</div>
+
+</div>
+
+<!-- ADDRESS -->
+<div class="mb-3">
+<label>Address *</label>
+<textarea class="form-control"
+rows="3"
+name="userAddres"></textarea>
+</div>
+
+<!-- CAPTCHA -->
+<div class="mb-4 text-center">
+            <div class="g-recaptcha" 
+                 data-sitekey="6LfYFwQsAAAAAAVxzTr3vCHseqAtbLiD53hfgJc7" 
+                 data-callback="recaptchaVerified"
+                 data-expired-callback="recaptchaExpired"></div>
+            </div>
+
+<!-- <div class="mb-4 text-center">
+            <div class="g-recaptcha" 
+                 data-sitekey="6LdaWgQsAAAAAMDyEMhJ1Tan4-C8B6cOkRLXZgDv" 
+                 data-callback="recaptchaVerified"
+                 data-expired-callback="recaptchaExpired"></div>
+            <div class="error-text text-center" id="captchaError">Please verify you are not a robot.</div>
+        </div>
+SUBMIT -->
+<div class="text-center mt-3">
+
+<button id="registerBtn" class="btn btn-success px-5" type="submit" onclick="return validateForm();" disabled>Verify reCAPTCHA to Register</button>
+</div>
+
+</form:form>
+
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </section>
+<div id="toast" class="toast-message"></div>
+<footer>
+    Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
+    Website hosted and maintained by National Informatics Center.
+</footer>
 
 </body>
 </html>

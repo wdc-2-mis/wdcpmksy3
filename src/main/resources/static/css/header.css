@@ -6,7 +6,7 @@
     justify-content: space-between;
     padding: 10px 25px; /* Keep original */
     background: #fff;
-    border-bottom: 2px solid #0b6e4f;
+    border-bottom: 2px solid #000080;
 }
 
 .gov-left {
@@ -67,6 +67,7 @@
     text-decoration: none;
     font-weight: 500;
     white-space: nowrap;
+    transition: all 0.3s ease;
 }
 
 .auth {
@@ -80,6 +81,7 @@
     border-radius: 25px;
     text-decoration: none;
     font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .login {
@@ -94,14 +96,43 @@
     color: black;
 }
 
+/* ================= INTERACTIONS ================= */
+
+/* Hover effects */
+.menu a:hover {
+    color: #ffc107;
+    text-decoration: underline;
+}
+
+.auth a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Active (click) effects */
+.menu a:active,
+.auth a:active {
+    transform: scale(0.95);
+    background: rgba(255,255,255,0.25);
+    border-radius: 5px;
+}
+
+/* Focus (after click) effects */
+.menu a:focus,
+.auth a:focus {
+    outline: none;
+    background: linear-gradient(90deg, #ffc107, #ff9800);
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 8px rgba(255,193,7,0.8);
+}
+
 /* ================= TABLET ================= */
 
 @media (max-width: 992px) {
-
     .gov-left img {
         height: 65px;
     }
-
     .gov-left h3 {
         font-size: 20px;
     }
@@ -110,37 +141,29 @@
 /* ================= MOBILE ================= */
 
 @media (max-width: 768px) {
-
     .gov-header {
         padding: 8px 15px;
     }
-
     .gov-left {
         gap: 10px;
     }
-
     .gov-left img {
         height: 55px;
     }
-
     .gov-left h3 {
         font-size: 16px;
     }
-
     .gov-left p {
         font-size: 12px;
     }
-
     .gov-nav {
         flex-direction: column;
         gap: 10px;
         padding: 8px 15px;
     }
-
     .menu {
         justify-content: center;
     }
-
     .auth {
         justify-content: center;
     }
@@ -149,29 +172,23 @@
 /* ================= SMALL MOBILE ================= */
 
 @media (max-width: 480px) {
-
     .gov-left {
         flex-direction: column;
         text-align: center;
     }
-
     .gov-left img {
         height: 50px;
     }
-
     .gov-left h3 {
         font-size: 14px;
     }
-
     .gov-left p {
         font-size: 11px;
     }
-
     .menu a {
         margin-right: 10px;
         font-size: 13px;
     }
-
     .auth a {
         padding: 6px 12px;
         font-size: 12px;

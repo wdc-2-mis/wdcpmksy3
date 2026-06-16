@@ -30,7 +30,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.55);
+    /* background: rgba(0,0,0,0); */
 }
 
 /* CONTENT */
@@ -51,6 +51,16 @@
     animation: fade 2s infinite alternate;
 }
 
+.btn-delayed {
+    opacity: 0; /* start hidden */
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 2s; /* appear after 3 seconds */
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
 @keyframes fade {
     from { opacity: 0.6; }
     to { opacity: 1; }
@@ -796,7 +806,7 @@ function togglePanel(){
 <section class="hero">
 
     <video autoplay muted loop playsinline>
-        <source th:src="@{/video/watershed.mp4}" type="video/mp4">
+        <source th:src="@{/video/watershed5.mp4}" type="video/mp4">
     </video>
 
     <div class="overlay"></div>
@@ -815,9 +825,9 @@ function togglePanel(){
 
        
 
-        <button class="btn btn-warning mt-3 px-4 fw-bold">
-             About WDCPMKSY
-        </button>
+        <button class="btn btn-warning mt-3 px-4 fw-bold btn-delayed">
+        About WDCPMKSY
+    </button>
 
 
     </div>

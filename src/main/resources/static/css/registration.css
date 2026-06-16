@@ -1,0 +1,220 @@
+
+/* ================= PAGE BACKGROUND ================= */
+
+.register-section{
+    min-height:100vh;
+    padding:40px 15px;
+
+    background: linear-gradient(
+        135deg,
+        #e0f7fa,
+        #f1f8e9
+    );
+
+    position: relative;
+    overflow: hidden;
+}
+
+/* animated glow blobs */
+.register-section::before,
+.register-section::after{
+
+    content:"";
+    position:absolute;
+
+    width:300px;
+    height:300px;
+
+    border-radius:50%;
+    filter: blur(80px);
+
+    opacity:0.5;
+    animation: floatBlob 10s infinite ease-in-out;
+}
+
+.register-section::before{
+    background:#81c784;
+    top:10%;
+    left:10%;
+}
+
+.error-text {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
+}
+
+.toast-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #dc3545;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 8px;
+    display: none;
+    z-index: 9999;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.register-section::after{
+    background:#64b5f6;
+    bottom:10%;
+    right:10%;
+}
+
+@keyframes floatBlob{
+    0%,100% { transform: translateY(0px); }
+    50% { transform: translateY(-30px); }
+}
+/* ================= CARD ================= */
+
+.register-card,
+.registration-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 35px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.08);
+    border-top: 5px solid #0b6e4f;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease-in-out;
+}
+
+/* ================= ANIMATION ================= */
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+/* ================= FORM CONTROLS (UNIFIED) ================= */
+
+.form-control,
+.form-select,
+textarea.form-control {
+    height: 42px;
+    border-radius: 6px;
+    border: 1px solid #d9e3dd;
+    transition: all 0.25s ease-in-out;
+    font-size: 14px;
+}
+
+/* Focus effect */
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+    border-color: #0b6e4f;
+    box-shadow: 0 0 0 0.15rem rgba(11,110,79,.15);
+    transform: translateY(-1px);
+}
+
+/* Hover */
+.form-control:hover,
+.form-select:hover {
+    border-color: #0b6e4f;
+}
+
+/* ================= SECTION TITLE ================= */
+
+.section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0b6e4f;
+    border-left: 4px solid #0b6e4f;
+    padding-left: 8px;
+    margin: 18px 0 10px;
+}
+
+/* ================= BUTTON ================= */
+
+.register-btn,
+.btn-success {
+    background: #0b6e4f;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.register-btn:hover,
+.btn-success:hover {
+    background: #09563d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(11,110,79,.25);
+}
+
+/* ================= CAPTCHA ================= */
+
+.captcha-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.captcha-row img {
+    height: 38px;
+    border: 1px solid #ccc;
+}
+
+/* ================= ANIMATED SHOW/HIDE ================= */
+
+.fade-section {
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all .35s ease;
+}
+
+.fade-section.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+#registerBtn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* ================= HEADER TEXT ================= */
+
+.card-header {
+    font-weight: 600;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+
+@media (max-width: 768px) {
+
+    .register-card,
+    .registration-card {
+        padding: 20px;
+    }
+}
