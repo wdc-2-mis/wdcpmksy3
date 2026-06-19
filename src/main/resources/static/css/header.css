@@ -4,9 +4,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 25px; /* Keep original */
-    background: #fff;
+    padding: 10px 25px;
+    background: linear-gradient(90deg, #87CEFA, #000080); /* Light Blue → Dark Blue */
     border-bottom: 2px solid #000080;
+    color: white;
 }
 
 .gov-left {
@@ -24,7 +25,7 @@
 
 .gov-left h3 {
     margin: 0;
-    color: #0b6e4f;
+    color: #fff; /* White text for contrast */
     font-size: 24px;
     font-weight: 700;
     line-height: 1.3;
@@ -32,7 +33,7 @@
 
 .gov-left p {
     margin: 4px 0 0;
-    color: #666;
+    color: #f0f0f0; /* Softer white */
     font-size: 14px;
 }
 
@@ -51,9 +52,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #0b6e4f;
-    padding: 3px 20px; /* Keep original */
+    background: linear-gradient(90deg, #000080, #4682B4); /* Dark Blue → Steel Blue */
+    padding: 3px 20px;
+
+    position: sticky;   /* keeps it visible */
+    top: 0;             /* sticks to top of screen */
+    z-index: 1000;      /* ensures it stays above other content */
 }
+
 
 .menu {
     display: flex;
@@ -62,7 +68,7 @@
 }
 
 .menu a {
-    color: white;
+    color: #fff;
     margin-right: 15px;
     text-decoration: none;
     font-weight: 500;
@@ -77,23 +83,52 @@
 
 .auth a {
     margin-left: 10px;
-    padding: 7px 16px; /* Keep original */
+    padding: 7px 16px;
     border-radius: 25px;
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
+    color: #fff;
 }
 
 .login {
     background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.3);
-    color: white;
     backdrop-filter: blur(8px);
 }
 
 .register {
     background: #ffc107;
-    color: black;
+    color: #000;
+}
+
+/* Language bar fixed below header */
+.language-bar {
+  position: fixed;   /* stays visible */
+  top: 200px;        /* adjust based on header height */
+  right: 20px;       /* right side of screen */
+  z-index: 1100;     /* above other content */
+  background: #ffc107; /* alert-style background */
+  padding: 6px 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.language-bar select {
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  /* color: #000080;	 */
+}
+
+.language-bar select option[value="en"] {
+  color: #000080; /* navy for English */
+}
+
+.language-bar select option[value="hi"] {
+  color: #d32f2f; /* red for Hindi */
 }
 
 /* ================= INTERACTIONS ================= */

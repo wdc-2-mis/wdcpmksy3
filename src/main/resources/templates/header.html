@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-   
+ 
 </head>
 <body>
     <div th:fragment="govHeader">
@@ -28,6 +28,13 @@
                 <a th:href="@{/register}" class="register">Registration</a>
             </div>
         </div>
+        <div class="language-bar">
+  <select id="languageSelect" onchange="changeLanguage(this.value)">
+    <option value="en">English</option>
+    <option value="hi">हिन्दी</option>
+  </select>
+</div>
+        
     </div>
 </body>
 </html>

@@ -7,8 +7,8 @@
 
     background: linear-gradient(
         135deg,
-        #e0f7fa,
-        #f1f8e9
+        #e6f2ff,
+        #cce0ff
     );
 
     position: relative;
@@ -33,7 +33,7 @@
 }
 
 .register-section::before{
-    background:#81c784;
+    background:#87cefa;
     top:10%;
     left:10%;
 }
@@ -74,7 +74,7 @@
 }
 
 .register-section::after{
-    background:#64b5f6;
+    background:#4682b4;
     bottom:10%;
     right:10%;
 }
@@ -90,8 +90,8 @@
     background: #fff;
     border-radius: 8px;
     padding: 35px;
-    box-shadow: 0 10px 35px rgba(0,0,0,.08);
-    border-top: 5px solid #0b6e4f;
+    box-shadow: 0 10px 35px rgba(70, 130, 180, 0.25); /* steel blue shadow */
+    border-top: 5px solid #4682b4;
     overflow: hidden;
     animation: fadeUp 0.5s ease-in-out;
 }
@@ -127,15 +127,15 @@ textarea.form-control {
 .form-control:focus,
 .form-select:focus,
 textarea.form-control:focus {
-    border-color: #0b6e4f;
-    box-shadow: 0 0 0 0.15rem rgba(11,110,79,.15);
+    border-color: #4682b4;
+    box-shadow: 0 0 0 0.15rem rgba(70,130,180,.25);
     transform: translateY(-1px);
 }
 
 /* Hover */
 .form-control:hover,
 .form-select:hover {
-    border-color: #0b6e4f;
+    border-color: #4682b4;
 }
 
 /* ================= SECTION TITLE ================= */
@@ -143,8 +143,8 @@ textarea.form-control:focus {
 .section-title {
     font-size: 13px;
     font-weight: 700;
-    color: #0b6e4f;
-    border-left: 4px solid #0b6e4f;
+    color: #1e3a8a;
+    border-left: 4px solid #4682b4;
     padding-left: 8px;
     margin: 18px 0 10px;
 }
@@ -153,19 +153,20 @@ textarea.form-control:focus {
 
 .register-btn,
 .btn-success {
-    background: #0b6e4f;
+    background: #1e90ff;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     font-size: 15px;
     transition: all 0.3s ease;
+    color: #fff;
 }
 
 .register-btn:hover,
 .btn-success:hover {
-    background: #09563d;
+    background: #1565c0;
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(11,110,79,.25);
+    box-shadow: 0 6px 15px rgba(21,101,192,.25);
 }
 
 /* ================= CAPTCHA ================= */
@@ -204,7 +205,11 @@ textarea.form-control:focus {
 /* ================= HEADER TEXT ================= */
 
 .card-header {
+     background: linear-gradient(90deg, #4682b4, #1e90ff); /* Steel Blue → Dodger Blue */
+    color: #fff;
     font-weight: 600;
+    text-align: center;
+    border-bottom: 3px solid #1565c0
 }
 
 

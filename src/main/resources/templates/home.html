@@ -74,11 +74,11 @@
 /* ================= SCROLL DOWN ANIMATION ================= */
 .scroll-down {
     position: absolute;
-    bottom: 20px;
+    bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
-    color: white;
-    font-size: 13px;
+    color: blue;
+    font-size: 18px;
     animation: bounce 1.5s infinite;
 }
 
@@ -112,41 +112,55 @@
 }
 
 /* ================= FOOTER ================= */
+/* ================= FOOTER ================= */
+
 footer {
-    background: #0b6e4f;
+    background: linear-gradient(90deg, #87CEFA, #000080); /* Light Blue → Dark Blue */
     color: white;
     text-align: center;
     padding: 20px;
     font-size: 13px;
+    border-top: 2px solid #000080;
 }
 
-.skip-link{
-    position:absolute;
-    top:-40px;
-    left:0;
-    background:#000;
-    color:#fff;
-    padding:8px;
-    z-index:9999;
+/* Skip link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    z-index: 9999;
 }
-.skip-link:focus{
-    top:0;
-}
-
-.floating-panel{
-    position:fixed;
-    right:20px;
-    bottom:100px;
-    z-index:999;
+.skip-link:focus {
+    top: 0;
 }
 
-.floating-panel button{
-    background:#0b6e4f;
-    color:white;
-    border:none;
-    padding:12px 16px;
-    border-radius:30px;
+/* Floating panel */
+.floating-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 100px;
+    z-index: 999;
 }
+
+.floating-panel button {
+    background: linear-gradient(90deg, #000080, #4682B4); /* Dark Blue → Steel Blue */
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+/* Hover effect for floating button */
+.floating-panel button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    background: linear-gradient(90deg, #4682B4, #000080); /* Reverse gradient on hover */
+}
+
 
 .alert-box{
     display:none;
@@ -161,9 +175,6 @@ footer {
 /*photo css  */
 
 
-
-
-
 @keyframes fadeIn{
     from{ opacity:0; }
     to{ opacity:1; }
@@ -173,21 +184,26 @@ footer {
 
 
 
-.kpi-section{
-     position:relative;
-
-    padding:80px 20px;
-
-    background:
-        linear-gradient(
-            rgba(255,255,255,0.92),
-            rgba(255,255,255,0.92)
-        ),
+.kpi-section {
+    padding: 80px 20px;
+    background: 
+        linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)),
         url('/images/gallery1.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
 
-    background-size:cover;
-    background-position:center;
-    background-attachment:fixed;
+@media (max-width: 992px) {
+    .kpi-section {
+        grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 per row on tablets */
+    }
+}
+
+@media (max-width: 576px) {
+    .kpi-section {
+        grid-template-columns: 1fr; /* 1 per row on mobile */
+    }
 }
 
 /* CARD */
@@ -200,7 +216,7 @@ footer {
     background:linear-gradient(
         135deg,
         #ffffff,
-        #f4fff9
+        #f0f8ff
     );
 
     border-radius:24px;
@@ -209,7 +225,7 @@ footer {
 
     text-align:center;
 
-    border:1px solid rgba(11,110,79,.15);
+    border:1px solid rgba(0,0,128,.15);
 
     box-shadow:
         0 10px 25px rgba(0,0,0,.08),
@@ -237,8 +253,8 @@ footer {
     background:linear-gradient(
         90deg,
         transparent,
-        #0b6e4f,
-        #00c896,
+        #000080,
+        #4682B4,
         transparent
     );
 
@@ -261,7 +277,7 @@ footer {
 
     border-radius:50%;
 
-    background:rgba(11,110,79,.06);
+    background:rgba(0,0,128,.06);
 
     top:-40px;
     right:-40px;
@@ -287,7 +303,7 @@ footer {
 
     font-weight:600;
 
-    color:#495057;
+    color:#1c3d5a;
 
     line-height:1.6;
 
@@ -303,10 +319,10 @@ footer {
 
     font-weight:800;
 
-    color:#0b6e4f;
+    color:#000080;
 
     text-shadow:
-        0 2px 10px rgba(11,110,79,.2);
+        0 2px 10px rgba(0,0,128,.2);
 }
 
 .kpi-unit{
@@ -370,7 +386,7 @@ footer {
  
 
 .section-title{
-    color:#0b6e4f;
+    color:#000080;
     font-weight:700;
     margin-bottom:20px;
 }
@@ -535,6 +551,73 @@ footer {
     55%{ transform:translateY(-45%); }
 
     100%{ transform:translateY(-45%); }
+}
+
+.media-section {
+  width: 100%;
+  padding: 60px 0;
+  background:
+    /* Base gradient */
+    linear-gradient(135deg, #e6f2ff, #cce0ff),
+
+    /* Horizontal lines */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 128, 0.3) 0px,   /* navy horizontal line */
+      rgba(0, 0, 128, 0.3) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+
+    /* Vertical lines */
+    repeating-linear-gradient(
+      to right,
+      rgba(70, 130, 180, 0.3) 0px, /* steelblue vertical line */
+      rgba(70, 130, 180, 0.3) 1px,
+      transparent 1px,
+      transparent 40px
+    );
+}
+
+
+.gallery-slider {
+  overflow: hidden;
+  width: 100%;
+  height: 400px; /* taller than half screen */
+  border: 2px solid #000080;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #87CEFA, #000080);
+  padding: 15px;
+}
+
+.gallery-track {
+  display: flex;
+  gap: 30px;
+  animation: scrollGallery 25s linear infinite;
+}
+
+.gallery-item {
+  perspective: 1000px; /* needed for 3D flip */
+}
+
+.gallery-item img {
+  width: 220px;
+  height: 220px;
+  border-radius: 12px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+/* Flip on hover */
+.gallery-item:hover img {
+  transform: rotateY(180deg);
+}
+
+@keyframes scrollGallery {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 .gallery-frame {
@@ -848,7 +931,7 @@ function togglePanel(){
     <div class="row g-4">
 
         <!-- CARD 1 -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="kpi-card">
 
                 <div class="kpi-title">
@@ -863,7 +946,7 @@ function togglePanel(){
         </div>
 
         <!-- CARD 2 -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="kpi-card">
 
                 <div class="kpi-title">
@@ -878,7 +961,7 @@ function togglePanel(){
         </div>
 
         <!-- CARD 3 -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="kpi-card">
 
                 <div class="kpi-title">
@@ -892,7 +975,7 @@ function togglePanel(){
             </div>
         </div>
         
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="kpi-card">
 
                 <div class="kpi-title">
@@ -906,7 +989,7 @@ function togglePanel(){
             </div>
         </div>
 
-         <div class="col-md-4">
+         <div class="col-md-3">
             <div class="kpi-card">
 
                 <div class="kpi-title">
@@ -920,7 +1003,7 @@ function togglePanel(){
             </div>
         </div>
         
-         <div class="col-md-4">
+         <div class="col-md-3">
             <div class="kpi-card">
 
                 <div class="kpi-title">
@@ -933,7 +1016,7 @@ function togglePanel(){
 
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="kpi-card">
 
                 <div class="kpi-title">
@@ -978,21 +1061,20 @@ function togglePanel(){
 
       <!-- ================= LEFT GALLERY ================= -->
       <div class="col-md-8">
-        <div class="frame-box">
-        <h4 class="section-title text-center mt-2">Watershed Photo Gallery</h4>
-          <div class="gallery-grid">
-            <img src="/images/gallery1.png" onclick="openImage(this.src)">
-            <img src="/images/gallery2.png" onclick="openImage(this.src)">
-            <img src="/images/gallery3.jpg" onclick="openImage(this.src)">
-            <img src="/images/gallery4.jpg" onclick="openImage(this.src)">
-            <img src="/images/gallery3.jpg" onclick="openImage(this.src)">
-            <img src="/images/gallery4.jpg" onclick="openImage(this.src)">
-            <img src="/images/gallery2.png" onclick="openImage(this.src)">
-          </div>
-          
-        </div>
-        
-      </div>
+  <div class="frame-box gallery-slider">
+    <h4 class="section-title text-center mt-2">Watershed Photo Gallery</h4>
+    <div class="gallery-track">
+      <div class="gallery-item"><img src="/images/gallery1.png"></div>
+      <div class="gallery-item"><img src="/images/gallery2.png"></div>
+      <div class="gallery-item"><img src="/images/gallery3.jpg"></div>
+      <div class="gallery-item"><img src="/images/gallery4.jpg"></div>
+      <div class="gallery-item"><img src="/images/gallery3.jpg"></div>
+      <div class="gallery-item"><img src="/images/gallery4.jpg"></div>
+      <div class="gallery-item"><img src="/images/gallery2.png"></div>
+    </div>
+  </div>
+</div>
+
 
       <!-- ================= RIGHT GOV PORTALS ================= -->
       <div class="col-md-4">
@@ -1016,7 +1098,7 @@ function togglePanel(){
     </div>
   </div>
 </section>
-</br>
+
 <!-- ================= FOOTER ================= -->
 <footer>
     Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
@@ -1024,4 +1106,5 @@ function togglePanel(){
 </footer>
 
 </body>
+<script src="/js/language.js"></script>
 </html>
