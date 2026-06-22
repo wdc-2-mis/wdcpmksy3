@@ -1,5 +1,6 @@
 package gov.dolr.wdcpmksy3.controller;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import gov.dolr.wdcpmksy3.dto.MenuMap;
+import gov.dolr.wdcpmksy3.service.MenuService;
 import gov.dolr.wdcpmksy3.service.OtpService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -23,11 +26,14 @@ public class EmailController {
 	
 	@Autowired
     private OtpService otpService;
+	
+	@Autowired
+	private MenuService menuService;
 
-    @GetMapping("/login")
+    @GetMapping("/emaillogin")
     public String loginPage() {
     	
-        return "login";
+        return "emaillogin";
        
     }
     
@@ -43,7 +49,7 @@ public class EmailController {
     	
     	 if (email == null || email.trim().isEmpty()) {
     		 model.addAttribute("email", "Enter Correct Email-Id");
-    	        return "login";
+    	        return "emaillogin";
     	 }
 
         otpService.sendOtp(email);
@@ -74,19 +80,23 @@ public class EmailController {
         	for (Object[] row : rows) {
         	    
         		Integer regid = (Integer) row[0];
-        		session.setAttribute("regid", regid);
         	    String address = (String) row[1];
         	    String department = (String) row[2];
         	    String mobile = (String) row[5];
         	    String statename = (String) row[13];
         	    String usertype = (String) row[9];
+        	    String username = (String) row[8];
         	    
+        	    model.addAttribute("username", username);
+        	    session.setAttribute("regid", regid);
+        	    session.setAttribute("username", username);
         	    session.setAttribute("usertype", usertype);
         	    session.setAttribute("stcode", regid);
         	    session.setAttribute("statename", statename);
         	    session.setAttribute("mobile", mobile);
 
-        	  //  System.out.println("ID: " + regid + ", address: " + address + ", department: " + department);
+        	    model.addAttribute("menus", menuService.getMenuUserId(regid));
+        	  
         	}
         	
         	
@@ -96,7 +106,7 @@ public class EmailController {
         
         else {
         	model.addAttribute("error", "Invalid OTP");
-        	return "login";
+        	return "emaillogin";
         }
 
         
@@ -105,16 +115,6 @@ public class EmailController {
         
     }
     
-    @GetMapping("/logout")
-    public String logout(HttpServletRequest request, Model model) {
-
-        HttpSession session = request.getSession(true);
-
-        if (session != null) {
-            session.invalidate(); // destroy session
-        }
-
-        return "redirect:/login";
-    }
+    
 
 }

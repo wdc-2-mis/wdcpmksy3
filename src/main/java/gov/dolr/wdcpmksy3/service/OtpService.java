@@ -51,10 +51,10 @@ public class OtpService {
         emailService.sendOtp(email, otp);
     }
 
-    public boolean verifyOtp(String email, String otp) {
+    public boolean verifyOtp(String userId, String otp) {
 
         Optional<IwmpUserReg> optionalUser =
-                userRepository.findByEmail(email);
+                userRepository.findByUserId(userId);
 
         if(optionalUser.isPresent()) {
 
@@ -71,12 +71,30 @@ public class OtpService {
         return userRepository.existsByEmail(email);
     }
     
-    public List<Object[]> getUserList(String emailid) {
+    public List<Object[]> getUserList(String userId) {
     	
-        return userRepository.getUserList(emailid);
+        return userRepository.getUserList(userId);
     }
     
+    public boolean verifyUserOtp(String userid, String otp) {
+
+        Optional<IwmpUserReg> optionalUser =userRepository.findByUserId(userid);
+
+        if(optionalUser.isPresent()) {
+
+        	IwmpUserReg user = optionalUser.get();
+
+            return otp.equals(user.getOtp())
+                    && user.getOtpExpiry().isAfter(LocalDateTime.now());
+        }
+
+        return false;
+    }
     
+    public List<Object[]> getUserVerify(String userId) {
+    	
+        return userRepository.getUserVerify(userId);
+    }
     
     
 }

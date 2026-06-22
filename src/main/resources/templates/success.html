@@ -158,7 +158,7 @@ footer {
 
 
 <script th:inline="javascript">
-    let seconds = [[${timeoutSeconds}]];
+    let seconds = 1800;
 	//alert(seconds);
     function updateTimer() {
         let minutes = Math.floor(seconds / 60);
@@ -177,7 +177,61 @@ footer {
 
     updateTimer();
     setInterval(updateTimer, 1000);
+	
+	
+	
+	$(document).ready(function() {
+
+	    $.ajax({
+	        url : "/fetchMenu",
+	        type : "POST",
+
+	        success : function(data) {
+			alert(data);
+	            var menuContainer =
+	                    $("#navbarDropdownAfterLogin");
+
+	            $.each(data, function(parent, submenus) {
+
+	                let html = `
+	                    <li class="nav-item dropdown">
+	                        <a class="nav-link dropdown-toggle"
+	                           data-bs-toggle="dropdown"
+	                           href="#">
+	                           ${parent}
+	                        </a>
+
+	                        <ul class="dropdown-menu">
+	                `;
+
+	                $.each(submenus, function(i, submenu) {
+
+	                    html += `
+	                       <li>
+	                          <a class="dropdown-item"
+	                             href="${submenu.target}">
+	                             ${submenu.menuName}
+	                          </a>
+	                       </li>
+	                    `;
+	                });
+
+	                html += `
+	                        </ul>
+	                    </li>
+	                `;
+
+	                menuContainer.append(html);
+	            });
+	        }
+	    });
+	});
+	
+	
+	
+	
 </script>
+
 
 
 
@@ -202,15 +256,15 @@ footer {
 		</div>
 
         <div class="user-info">		<!--<p>
-		    Session expires in:
+		    Session expires in:  <p>Your User ID is: <span th:text="${session.userid}"></span></p>
 		    <span id="sessionTimer"></span>
 		</p>-->
 
            
 			<b>Welcome</b> &nbsp;: &nbsp;
-			<span th:text="${email}" style="color: white; background-color: darkblue; font-weight: bold; padding: 3px;"></span> 
+			<span th:text="${username}" style="color: white; background-color: darkblue; font-weight: bold; padding: 3px;"></span> 
 			<br/><br/>&nbsp;
-			<a th:href="@{/logout}" style="color: white; background-color: crimson; font-weight: bold; padding: 3px; float: right;">Logout</a>
+			<a th:href="@{/customLogout}" style="color: white; background-color: crimson; font-weight: bold; padding: 3px; float: right;">Logout</a>
         </div>
     </header>
 
@@ -220,7 +274,59 @@ footer {
         <!-- Left Menu -->
         <aside class="sidebar">
 
-            <h3>Menu Bar</h3>
+            <h3>Menu Bar </h3>
+			
+			<!--<ul>
+			    <li th:each="menu : ${menus}">
+			        <span th:text="${menu.key}"></span>
+				   <strong th:text="${menu.key}"></strong>
+			        <ul>
+			            <li th:each="sub : ${menu.value}">
+			                <a th:href="${sub.target}"
+			                   th:text="${sub.submenu_name}">
+			                </a>
+			            </li>
+			        </ul>
+			    </li>
+			</ul>
+-->
+
+<ul>
+    <li th:each="menu : ${menus}">
+        <strong th:text="${menu.key}" class="menu-toggle" style="cursor:pointer;"></strong>
+        <ul class="submenu" style="display:none;">
+            <li th:each="sub : ${menu.value}">
+                <a th:href="@{${sub.target}}"
+                   th:text="${sub.submenu_name}">
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Attach click handler to all menu-toggle elements
+        document.querySelectorAll(".menu-toggle").forEach(function(toggle) {
+            toggle.addEventListener("click", function() {
+                // Find the next sibling <ul> (submenu)
+                let submenu = this.nextElementSibling;
+                if (submenu.style.display === "none" || submenu.style.display === "") {
+                    submenu.style.display = "block";
+                } else {
+                    submenu.style.display = "none";
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
 
           <!--  <ul>
                 <li>
@@ -258,17 +364,122 @@ footer {
         <main class="content">
 
             <div class="welcome-card">
+				
+							<table cellspacing="20">
+								<tr>
+								    <td>State:</td>
+								    <td>
+
+								        <!-- ADMIN -->
+								        <select th:if="${userType == 'ADMIN'}"
+								                id="userState"
+								                name="userState"
+								                style="height:100px;"
+								                class="form-control form-control-sm"
+								                multiple="multiple">
+
+								            <option value="">--Select--</option>
+
+								            <th:block th:if="${listm != null}">
+								                <th:block th:each="list : ${listm}">
+								                    <option th:each="stateList : ${list.value}"
+								                            th:value="${stateList.statecode}"
+								                            th:selected="${stateList.selected == 'selected'}"
+								                            th:text="${stateList.statename}">
+								                    </option>
+								                </th:block>
+								            </th:block>
+								        </select>
+
+								        <!-- DL -->
+								        <select th:if="${userType == 'DL'}"
+								                id="userState"
+								                role="DL"
+								                name="userState"
+								                style="height:100px;"
+								                class="form-control form-control-sm"
+								                multiple>
+
+								            <option value="">--Select--</option>
+
+								            <th:block th:if="${listm != null}">
+								                <th:block th:each="list : ${listm}">
+								                    <option th:each="stateList : ${list.value}"
+								                            th:value="${stateList.statecode}"
+								                            th:selected="${stateList.selected == 'selected'}"
+								                            th:text="${stateList.statename}">
+								                    </option>
+								                </th:block>
+								            </th:block>
+								        </select>
+
+								        <!-- SL -->
+								        <th:block th:if="${userType == 'SL'}">
+								            <th:block th:if="${listm != null}">
+								                <th:block th:each="list : ${listm}">
+								                    <th:block th:each="stateList : ${list.value}">
+								                        <span th:text="${stateList.statename}"></span>
+								                    </th:block>
+								                </th:block>
+								            </th:block>
+								        </th:block>
+
+								        <!-- DI -->
+								        <th:block th:if="${userType == 'DI'}">
+								            <th:block th:if="${listm != null}">
+								                <th:block th:each="list : ${listm}">
+								                    <th:block th:each="stateList : ${list.value}">
+								                        <span th:text="${stateList.statename}"></span>
+								                    </th:block>
+								                </th:block>
+								            </th:block>
+								        </th:block>
+
+								        <!-- PI (First Record Only) -->
+								        <th:block th:if="${userType == 'PI'}">
+								            <th:block th:if="${listm != null}">
+								                <th:block th:each="list : ${listm}">
+								                    <span th:if="${!#lists.isEmpty(list.value)}"
+								                          th:text="${list.value[0].statename}">
+								                    </span>
+								                </th:block>
+								            </th:block>
+								        </th:block>
+
+								    </td>
+
+								    <td>District:</td>
+
+								    <td>
+								        <th:block th:if="${listm != null}">
+								            <th:block th:each="list : ${listm}">
+								                <span th:if="${!#lists.isEmpty(list.value)}"
+								                      th:text="${list.value[0].districtname}">
+								                </span>
+								            </th:block>
+								        </th:block>
+								    </td>
+								</tr>
+								        
+								    
+							</table>
+				
+				
+				
+				
+				
 				<table th:each="user : ${userList}" cellspacing="20">
 				    <tr>
-				        <td>User Name: </td> <td th:text="${user[8]}"></td>
-				        <td>User Type: </td> <td><span th:if="${user[9] == 'PI'}">PIA</span></td>
+				        <td>User Name: </td> <td th:text="${user[0]}"></td>
+						<td>User Type: </td> <td th:text="${user[11]}"></td>
 				    </tr>
 				    <tr>
-				        <td>Mobile: </td> <td th:text="${user[5]}"></td>
-				        <td>Email: </td> <td th:text="${user[4]}"></td>
+						<td>Email: </td> <td th:text="${user[5]}"></td>
+				        <td>Mobile: </td> <td th:text="${user[6]}"></td>
+				        
 				    </tr>
 				    <tr>
-				        <td>Address: </td> <td th:text="${user[1]}"></td>
+				        <td>Address: </td> <td th:text="${user[2]}"></td>
 				    </tr>
 				</table>
 				

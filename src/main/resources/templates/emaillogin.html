@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>WDC-PMKSY 3.0</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="stylesheet" th:href="@{/css/header.css}">
+<style>
+
+/* ================= HERO ================= */
+
+/* ================= FOOTER ================= */
+footer {
+    background: #0b6e4f;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+
+.email-container {
+		max-height: 300px;
+		max-width: 500px;
+		margin: 60px auto;
+		background: #fff;
+		border-radius: 15px;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		padding: 35px;
+	}	
+</style>
+
+<script>
+ // Lightbox with close button
+function openImage(src) {
+  const lightbox = document.createElement('div');
+  lightbox.className = 'lightbox';
+  lightbox.innerHTML = `
+    <span class="close-btn">&times;</span>
+    <img src="${src}">
+  `;
+  document.body.appendChild(lightbox);
+
+  // Close on click
+  lightbox.querySelector('.close-btn').onclick = () => document.body.removeChild(lightbox);
+  lightbox.onclick = (e) => {
+    if (e.target === lightbox) document.body.removeChild(lightbox);
+  };
+}
+
+// Government portals auto-cycle
+window.onload = function() {
+const govGrid = document.getElementById('govGrid');
+const portals = govGrid.querySelectorAll('.portal');
+let cycle = 0; // 0 = first 5, 1 = next 3
+
+function showPortals() {
+  // Hide all first
+  portals.forEach(p => p.style.display = 'none');
+
+  if (cycle === 0) {
+    // Show first 5
+    portals.forEach((p, i) => {
+      if (i < 5) p.style.display = 'block';
+    });
+    cycle = 1;
+  } else {
+    // Show next 3
+    portals.forEach((p, i) => {
+      if (i >= 5 && i < 8) p.style.display = 'block';
+    });
+    cycle = 0;
+  }
+}
+
+// Initial load
+showPortals();
+
+// Auto change every 4 seconds
+setInterval(showPortals, 4000);
+};
+function closeImage(){
+    document.getElementById("imageModal").style.display = "none";
+}
+
+function scrollToExplore() {
+    const section = document.getElementById("explore");
+
+    if (!section) {
+        console.error("Explore section not found!");
+        return;
+    }
+
+    section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+document.querySelectorAll(".kpi-card").forEach(card => {
+
+    let isDown = false;
+
+    let startX, startY;
+
+    card.addEventListener("mousedown", (e) => {
+        isDown = true;
+        startX = e.clientX;
+        startY = e.clientY;
+    });
+
+    document.addEventListener("mouseup", () => {
+        isDown = false;
+        card.style.transform = "";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+
+        if(!isDown) return;
+
+        let moveX = (e.clientX - startX) / 20;
+        let moveY = (e.clientY - startY) / 20;
+
+        card.style.transform =
+            `translate(${moveX}px, ${moveY}px)
+             rotateX(${moveY}deg)
+             rotateY(${moveX}deg)`;
+
+    });
+
+});
+
+
+</script>
+
+<script>
+
+const counters = document.querySelectorAll('.counter');
+
+counters.forEach(counter => {
+
+    const update = () => {
+
+        const target = +counter.getAttribute("data-target");
+        const current = +counter.innerText.replace(/,/g,'');
+
+        const step = target / 100;
+
+        if(current < target){
+
+            counter.innerText =
+                Math.ceil(current + step).toLocaleString();
+
+            setTimeout(update, 20);
+
+        } else {
+            counter.innerText = target.toLocaleString();
+        }
+    };
+
+    update();
+});
+
+function togglePanel(){
+
+    const panel =
+        document.getElementById("alertBox");
+
+    panel.style.display =
+        panel.style.display === "block"
+        ? "none"
+        : "block";
+}
+
+
+
+</script>
+
+
+<script>
+    function checkEmail() {
+        var email = $("#email").val();
+		//alert('kdy'+email);
+        if(email){
+            $.ajax({
+                url: "checkemail",
+                type: "GET",
+                data: { email: email },
+                success: function(response) {
+                    if(response){
+                        $("#emailMessage").text("")
+                    } else {
+						$("#email").val("");
+                        $("#emailMessage").text("User is not register ❌ ").css("color","red");
+                    }
+                }
+            });
+        }
+    }
+</script>
+
+
+
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<div th:replace="header :: govHeader"></div>
+
+<!-- ================= HERO ================= -->
+</br>
+
+<div class="email-container">
+    <h2 style="text-align: center;">Email OTP Login</h2>
+	</br> </br>
+	
+    <form action="/sendOtp" method="post">
+		<div th:if="${email}" th:text="${email}" style="color:red;"></div>
+        <!-- Email -->
+		<div style="text-align:center;">
+        <label>Email Id <span style="color: red;">*</span></label>&nbsp;
+        <input type="email" id="email" name="email" placeholder="Enter Email Id" onblur="checkEmail()"  autocomplete="off" style="width:300px; height:40px;">
+		</br>
+		<span id="emailMessage"></span>
+		<!--<div id="emailError" class="form-text text-danger">Please enter Email Id</div>-->
+		</br> </br>
+        <!--<button type="button" class="btn-primary"  id="signInBtn">Send OTP</button>-->
+		<div style="text-align:center;">
+		  <button type="submit">Send OTP</button>
+		</div>
+		<!--<button type="submit" style="text-align:center;"> Send OTP </button>-->
+		</br>
+
+	</form>
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+</br></br></br></br></br></br></br></br> 
+
+<!-- ================= FOOTER ================= -->
+<footer>
+    Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
+    Website hosted and maintained by National Informatics Center.
+</footer>
+
+</body>
+</html>

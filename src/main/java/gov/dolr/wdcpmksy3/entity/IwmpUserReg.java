@@ -91,6 +91,12 @@ public class IwmpUserReg {
 
     @Column(name = "otp_expiry")
     private  LocalDateTime otpExpiry;
+    
+    @Column(name = "otp_mobile", length = 255)
+    private String otpMobile;
+
+    @Column(name = "otp_mobile_expiry")
+    private  LocalDateTime otpMobileExpiry;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
@@ -291,6 +297,19 @@ public class IwmpUserReg {
 	public void setUserMappings(List<IwmpUserMap> userMappings) {
 		this.userMappings = userMappings;
 	}
+	public String getOtpMobile() {
+		return otpMobile;
+	}
+	public void setOtpMobile(String otpMobile) {
+		this.otpMobile = otpMobile;
+	}
+	public LocalDateTime getOtpMobileExpiry() {
+		return otpMobileExpiry;
+	}
+	public void setOtpMobileExpiry(LocalDateTime otpMobileExpiry) {
+		this.otpMobileExpiry = otpMobileExpiry;
+	}
 
+	
    
 }

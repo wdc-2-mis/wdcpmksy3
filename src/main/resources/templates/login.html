@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <head>
 <meta charset="UTF-8">
 <title>WDC-PMKSY 3.0</title>
@@ -8,33 +8,70 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="stylesheet" th:href="@{/css/header.css}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!--<script src="/js/login.js"></script>-->
+<!--<script th:src="@{/js/login.js}"></script>
+<script th:src="@{/js/SHA512.js.js}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha512.js"></script>-->
 <style>
 
 /* ================= HERO ================= */
 
 /* ================= FOOTER ================= */
 footer {
-    background: #0b6e4f;
+    background: linear-gradient(90deg, #87CEFA, #000080); /* Light Blue → Dark Blue */
     color: white;
     text-align: center;
     padding: 20px;
     font-size: 13px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    border-top: 2px solid #000080;
+}
+	
+</style>
+
+<style>
+body{
+    background:#f5f5f5;
+    font-family:Arial, sans-serif;
 }
 
+.box1{
+    width:400px;
+    margin:auto;
+    background:#2c3e50;
+    padding:30px;
+    border-radius:10px;
+    color:white;
+}
 
-.email-container {
-		max-height: 300px;
-		max-width: 500px;
-		margin: 60px auto;
-		background: #fff;
-		border-radius: 15px;
-		box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-		padding: 35px;
-	}	
+.inputBox{
+    position:relative;
+    margin-bottom:20px;
+}
+
+.inputBox input{
+    width:100%;
+    padding:10px;
+    border:none;
+    outline:none;
+}
+
+.inputBox label{
+    display:block;
+    margin-bottom:5px;
+}
+
+.btn-info{
+    padding:10px 30px;
+    background:#17a2b8;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+a{
+    color:white;
+}
 </style>
 
 <script>
@@ -54,7 +91,14 @@ function openImage(src) {
     if (e.target === lightbox) document.body.removeChild(lightbox);
   };
 }
+function recaptchaVerified() {
+    $('#nextBtn').fadeIn();
+    $('#captchaError').hide();
+}
 
+function recaptchaExpired() {
+    $('#nextBtn').fadeOut();
+}
 // Government portals auto-cycle
 window.onload = function() {
 const govGrid = document.getElementById('govGrid');
@@ -204,6 +248,60 @@ function togglePanel(){
             });
         }
     }
+	
+</script>
+
+<script>
+	
+	document.addEventListener("DOMContentLoaded", function () {
+
+	    document.querySelectorAll('input[name="loginMethod"]').forEach((radio) => {
+
+	        radio.addEventListener('change', function () {
+
+	            const div1 = document.getElementById('pass');
+	            const div2 = document.getElementById('otpe');
+	            const div3 = document.getElementById('otp1');
+
+	            if (this.value === 'pass') {
+
+	                div1.style.display = 'block';
+	                div2.style.display = 'none';
+	                div3.style.display = 'none';
+
+	            } else {
+
+	                div1.style.display = 'none';
+	                div2.style.display = 'block';
+	                div3.style.display = 'block';
+	            }
+	        });
+
+	    });
+
+	});
+	
+	function sendValue(selectedValue) {
+		var userid = $("#userId").val();
+		if (userid === '' || typeof userid === 'undefined') {
+				alert('Please Enter UserId');
+				$('#userId').focus();
+				return false;
+		}
+		else{
+			fetch('/getEmailandGenerateotp?value=' + userid)
+			    .then(response => response.text())
+			    .then(email => {
+					$("#dimail").text(email);
+			      	document.getElementById("emailid").value = email;
+			        $("#emailMessage").text("OTP sent to registered email").css("color", "green");
+			    })
+			    .catch(error => {
+			        console.error(error);
+			        $("#emailMessage").text("Unable to send OTP").css("color", "red");
+			    });
+	}
+	}
 </script>
 
 
@@ -218,33 +316,97 @@ function togglePanel(){
 <!-- ================= HERO ================= -->
 </br>
 
-<div class="email-container">
-    <h2 style="text-align: center;">Email OTP Login</h2>
-	</br> </br>
-	
-    <form action="/sendOtp" method="post">
-		<div th:if="${email}" th:text="${email}" style="color:red;"></div>
-        <!-- Email -->
-		<div style="text-align:center;">
-        <label>Email Id <span style="color: red;">*</span></label>&nbsp;
-        <input type="email" id="email" name="email" placeholder="Enter Email Id" onblur="checkEmail()"  autocomplete="off" style="width:300px; height:40px;">
-		</br>
-		<span id="emailMessage"></span>
-		<!--<div id="emailError" class="form-text text-danger">Please enter Email Id</div>-->
-		</br> </br>
-        <!--<button type="button" class="btn-primary"  id="signInBtn">Send OTP</button>-->
-		<div style="text-align:center;">
-		  <button type="submit">Send OTP</button>
-		</div>
-		<!--<button type="submit" style="text-align:center;"> Send OTP </button>-->
-		</br>
+<div class="container">
 
-	</form>
+    <div class="box1">
+
+         <h2 style="text-align: center;">Login</h2>
+
+        <form th:action="@{/loginSuccess}" th:object="${login}" method="post" id="loginForm" name="loginForm">
+
+            <label class="text-danger" th:text="${error}"></label>
+
+            <div class="inputBox">
+                <label>Username</label>
+                <input type="text" th:field="*{userId}"
+                       autocomplete="off"
+                       maxlength="10" required >
+            </div>
+			<div>
+				<label>Authentication Type</label>
+						<br>
+							<label><input type="radio" name="loginMethod"  value="pass" /> &nbsp;Password</label> &nbsp;&nbsp;
+							<label><input type="radio" name="loginMethod"  value="otp" onclick="sendValue(this.value)"/>&nbsp; OTP</label>
+			</div>
+			<br>
+			<span id="emailMessage"></span>
+            <div class="inputBox" id="pass" style="display:none;">
+				
+                <label>Password</label>
+                <input type="password"
+                       th:field="*{encrypted_pass}" maxlength="200">
+					   
+					   <input type="hidden" th:field="*{emailid}"  >	   
+            </div>
+			<div class="inputBox" id="otpe" style="display:none;">
+			    <!-- <label>Email-Id / Mobile</label>-->
+			     <input type="hidden" th:field="*{emailid}"  >
+			   <span id="dimail"></span>  
+			 </div>
+			<div class="inputBox" id="otp1" style="display:none;">
+				<label>OTP</label>
+				<input type="text"
+					th:field="*{otp}"autocomplete="off"
+					 maxlength="10" >
+			</div>
+
+			<div class="mb-4 text-center">
+			            <div class="g-recaptcha" 
+			                 data-sitekey="6LfYFwQsAAAAAAVxzTr3vCHseqAtbLiD53hfgJc7" 
+			                 data-callback="recaptchaVerified"
+			                 data-expired-callback="recaptchaExpired"></div>
+			</div>
+			
+			
+            <!--<div class="inputBox">
+                <img id="captcha_id"
+                     th:src="@{/captcha.jpg}"
+                     alt="Captcha">
+
+                <a href="javascript:void(0)"
+                   onclick="refreshCaptcha()">
+                    <img th:src="@{/images/refresh.png}"
+                         width="25">
+                </a>
+            </div>
+
+            <div class="inputBox">
+                <label>Security Code</label>
+                <input type="text"
+                       th:field="*{captcha}"
+                       autocomplete="off"
+                       maxlength="10">
+            </div>
+
+            <div style="text-align:right;">
+                <a th:href="@{/forgotpassword}">
+                    Forgot Password?
+                </a>
+            </div> -->
+
+            <center>
+                <button type="submit" class="btn-info" id="login">Login</button>
+            </center>
+
+        </form>
+
+    </div>
+
 </div>
 
 
 <!-- ================= FOOTER ================= -->
-</br></br></br></br></br></br></br></br> 
+</br></br></br></br></br>
 
 <!-- ================= FOOTER ================= -->
 <footer>
@@ -253,4 +415,5 @@ function togglePanel(){
 </footer>
 
 </body>
+<script src="/js/language.js"></script>
 </html>
