@@ -59,8 +59,14 @@ public class LoginController {
 	
 	
 	@GetMapping("/login")
-    public String loginPage(Model model) {
+    public String loginPage(HttpSession session, Model model) {
 
+		String userId = (String) session.getAttribute("userid");
+		
+		if(userId !=null)
+			System.out.println("already login with same login id"+userId);
+			session.invalidate();
+		
         model.addAttribute("login", new LoginDTO());
 
         return "login";
@@ -204,7 +210,8 @@ public class LoginController {
 				model.addAttribute("regId",regid);
 				model.addAttribute("userType",usertype);
 				model.addAttribute("userId",userId);
-            	
+				//model.addAttribute("sessionTimeout", 1800);
+				model.addAttribute("sessionTimeout",session.getMaxInactiveInterval());
             	
                 return "success";
             }
@@ -356,16 +363,19 @@ public class LoginController {
  				model.addAttribute("regId",regid);
  				model.addAttribute("userType",usertype);
  				model.addAttribute("userId",userId);
-     			
-     			
+ 				//model.addAttribute("sessionTimeout", 1800);
+ 				model.addAttribute("sessionTimeout",session.getMaxInactiveInterval());
      			model.addAttribute("userList", otpService.getUserVerify(userid));
+     			
+     			
+     			
      			return "success";
     			
     			
     		}
     		else {
     			
-    			 model.addAttribute("error", "Invalid Password");
+    			 model.addAttribute("error", "Invalid Credential");
     			 loginserv.insertloginlog(userId, "Fail", request);
   	            return "login";
     		}
@@ -375,7 +385,7 @@ public class LoginController {
         }
         else {
         	loginserv.insertloginlog(userId, "Fail", request);
-	        model.addAttribute("error", "Invalid Username or Password");
+	        model.addAttribute("error", "Invalid UserId or Password");
 	        return "login";
         }
     }

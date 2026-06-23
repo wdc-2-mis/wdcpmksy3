@@ -24,7 +24,7 @@ public class ProjectProposeController {
         String hash = encoder.encode("kdy123");
         System.out.println("kdy" +hash); // true
         
-        boolean isValid = encoder.matches("Nic*614", hash);
+        boolean isValid = encoder.matches("kdy123", hash);
         System.out.println(isValid); // true
 
 

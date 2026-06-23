@@ -2,8 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Welcome Page</title>
-
+<title>Welcome </title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
 
 *{
@@ -154,30 +154,117 @@ footer {
     filter: drop-shadow(0 0 6px #0b6e4f);
     animation: glow 2.5s infinite alternate;
 }
+
+.header-strip{
+    width:100%;
+    background:rgb(64, 128, 128);
+    padding:6px 15px;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:15px;
+}
+
+.username{
+    color:white;
+    background:darkblue;
+    padding:3px 8px;
+    font-weight:bold;
+}
+
+.logout-btn{
+    color:white;
+    background:crimson;
+    padding:3px 8px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.timer,
+.welcome{
+    white-space:nowrap;
+}
+
 </style>
 
 
 <script th:inline="javascript">
-    let seconds = 1800;
-	//alert(seconds);
-    function updateTimer() {
-        let minutes = Math.floor(seconds / 60);
-        let remainingSeconds = seconds % 60;
-	//	alert(remainingSeconds);
-		document.getElementById("sessionTimer").innerHTML =
-		    minutes + ":" + String(remainingSeconds).padStart(2, '0');
-		//	alert(minutes + ":" + String(remainingSeconds).padStart(2, '0'));
-        if (seconds > 0) {
-            seconds--;
-        } else {
-            alert("Session Expired!");
-            window.location.href = "/login";
-        }
-    }
-
-    updateTimer();
-    setInterval(updateTimer, 1000);
 	
+	//var sessionTimeout = 1800;
+	var sessionTimeout = [[${sessionTimeout}]];
+	var originalSessionTimeout = sessionTimeout;
+	var endTime = new Date().getTime() + sessionTimeout * 1000;
+
+	var timerInterval;
+	var alertDisplayed = false;
+	var alertInterval;
+
+	$(document).ready(function () {
+
+	    timerInterval = setInterval(Timer, 1000);
+
+	    // Show timer immediately
+	    Timer();
+
+	});
+
+	function Timer() {
+
+	    var now = new Date().getTime();
+	    var remainingTime = Math.max(0, Math.floor((endTime - now) / 1000));
+
+	    var minutes = Math.floor(remainingTime / 60);
+	    var seconds = remainingTime % 60;
+
+	    if (seconds < 10) {
+	        seconds = "0" + seconds;
+	    }
+
+	    $("#session-timer").text(minutes + ":" + seconds);
+
+	    if (remainingTime <= 0) {
+	        clearInterval(timerInterval);
+	        alert("Session has expired!");
+	        window.location.href = "/customLogout";
+	    }
+
+	    if (remainingTime <= 120 && !alertDisplayed) {
+	        alertDisplayed = true;
+	        $('#sessionAlertModal').modal('show');
+	        showAlertWithTimer(remainingTime);
+	    }
+	}
+
+	function showAlertWithTimer(remainingTime) {
+
+	    clearInterval(alertInterval);
+
+	    var alertEndTime = new Date().getTime() + remainingTime * 1000;
+
+	    alertInterval = setInterval(function () {
+
+	        var now = new Date().getTime();
+	        var remainingAlertTime =
+	            Math.max(0, Math.floor((alertEndTime - now) / 1000));
+
+	        var minutes = Math.floor(remainingAlertTime / 60);
+	        var seconds = remainingAlertTime % 60;
+
+	        if (seconds < 10) {
+	            seconds = "0" + seconds;
+	        }
+
+	        $("#alert-timer").text(minutes + ":" + seconds);
+
+	        if (remainingAlertTime <= 0) {
+	            clearInterval(alertInterval);
+	            $('#sessionAlertModal').modal('hide');
+	            alert("Session has expired!");
+	            window.location.href = "/customLogout";
+	        }
+
+	    }, 1000);
+	}
 	
 	
 	$(document).ready(function() {
@@ -210,7 +297,7 @@ footer {
 	                       <li>
 	                          <a class="dropdown-item"
 	                             href="${submenu.target}">
-	                             ${submenu.menuName}
+	                             ${submenu.submenu_name}
 	                          </a>
 	                       </li>
 	                    `;
@@ -255,41 +342,39 @@ footer {
 
 		</div>
 
-        <div class="user-info">		<!--<p>
-		    Session expires in:  <p>Your User ID is: <span th:text="${session.userid}"></span></p>
-		    <span id="sessionTimer"></span>
-		</p>-->
-
-           
+       <!-- <div class="user-info">				
+			<div class="alert alert-info">
+					    Remaining Time:
+					    <strong id="session-timer">00:00</strong>
+			</div>
 			<b>Welcome</b> &nbsp;: &nbsp;
 			<span th:text="${username}" style="color: white; background-color: darkblue; font-weight: bold; padding: 3px;"></span> 
 			<br/><br/>&nbsp;
 			<a th:href="@{/customLogout}" style="color: white; background-color: crimson; font-weight: bold; padding: 3px; float: right;">Logout</a>
-        </div>
+        </div>-->
     </header>
+	<div class="header-strip">
 
+	    <span class="timer">
+	        Remaining Time: <strong id="session-timer">00:00</strong>
+	    </span>
+
+	    <span class="welcome">
+	        Welcome :
+	        <span class="username" th:text="${username}"></span>
+	    </span>
+
+	    <a th:href="@{/customLogout}" class="logout-btn">Logout</a>
+
+	</div>
     <!-- Main Section -->
     <div class="main-container">
 
         <!-- Left Menu -->
         <aside class="sidebar">
 
-            <h3>Menu Bar </h3>
-			
-			<!--<ul>
-			    <li th:each="menu : ${menus}">
-			        <span th:text="${menu.key}"></span>
-				   <strong th:text="${menu.key}"></strong>
-			        <ul>
-			            <li th:each="sub : ${menu.value}">
-			                <a th:href="${sub.target}"
-			                   th:text="${sub.submenu_name}">
-			                </a>
-			            </li>
-			        </ul>
-			    </li>
-			</ul>
--->
+          <!--  <h3>Menu Bar </h3>-->
+	
 
 <ul>
     <li th:each="menu : ${menus}">
@@ -323,40 +408,6 @@ footer {
 
 
 
-
-
-
-
-
-          <!--  <ul>
-                <li>
-                    <a th:href="@{/dashboard}">
-                        Dashboard
-                    </a>
-                </li>
-
-                <li>
-                    <a th:href="@{/profile}">
-                        Profile
-                    </a>
-                </li>
-
-                <li>
-                    <a th:href="@{/reports}">
-                        Reports
-                    </a>
-                </li>
-
-                <li>
-                    <a th:href="@{/settings}">
-                        Settings
-                    </a>
-                </li>
-
-                <li>
-                   
-                </li>
-            </ul>-->
 
         </aside>
 
@@ -447,9 +498,8 @@ footer {
 								        </th:block>
 
 								    </td>
-
+									<th:block th:if="${userType == 'DI' or userType == 'PI'}">
 								    <td>District:</td>
-
 								    <td>
 								        <th:block th:if="${listm != null}">
 								            <th:block th:each="list : ${listm}">
@@ -459,14 +509,11 @@ footer {
 								            </th:block>
 								        </th:block>
 								    </td>
+									</th:block>
 								</tr>
 								        
 								    
 							</table>
-				
-				
-				
-				
 				
 				<table th:each="user : ${userList}" cellspacing="20">
 				    <tr>

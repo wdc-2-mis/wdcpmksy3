@@ -51,6 +51,11 @@
 	
 </style>
 
+
+
+
+
+
 </head>
 <body>
 
@@ -76,7 +81,7 @@
 		</div>
 		
 		
-        <h2 class="heading">Project Propose</h2>
+        <h2 class="heading">Project Proposal</h2>
 
         <form th:action="@{/projectPropose/save}" method="post" th:object="${project}">
 
@@ -165,6 +170,31 @@
 				</div>
 				
 				<div class="section-title">
+								    GIS Information
+								</div>
+
+								<div class="row">
+									
+									<div class="col-md-4 mb-3">
+										<label>GIS Reference No.</label>
+										<input type="text" class="form-control" name="gisRefNo">
+									</div>
+
+								    <div class="col-md-4 mb-3">
+								        <label>Latitude</label>
+								        <input type="text" class="form-control" name="latitude">
+								    </div>
+
+								    <div class="col-md-4 mb-3">
+								        <label>Longitude</label>
+								        <input type="text" class="form-control" name="longitude">
+								    </div>
+
+								    
+
+								</div>
+				
+				<div class="section-title">
 				    Area Details
 				</div>
 
@@ -198,29 +228,29 @@
 
 				<div class="row">
 
-				    <div class="col-md-3 mb-3">
+				    <div class="col-md-4 mb-3">
 				        <label>Project Cost</label>
 				        <input type="number" class="form-control" name="projectCost">
 				    </div>
 
-				    <div class="col-md-3 mb-3">
+				    <div class="col-md-4 mb-3">
 				        <label>Central Share</label>
 				        <input type="number" class="form-control" name="centralShare">
 				    </div>
 
-				    <div class="col-md-3 mb-3">
+				    <div class="col-md-4 mb-3">
 				        <label>State Share</label>
 				        <input type="number" class="form-control" name="stateShare">
 				    </div>
 
-				    <div class="col-md-3 mb-3">
+				   <!-- <div class="col-md-3 mb-3">
 				        <label>Community Share</label>
 				        <input type="number" class="form-control" name="communityShare">
-				    </div>
+				    </div>-->
 
 				</div>
 				
-				<div class="section-title">
+				<!--<div class="section-title">
 				    Beneficiary Details
 				</div>
 
@@ -246,30 +276,9 @@
 				        <input type="number" class="form-control" name="womenBeneficiaries">
 				    </div>
 
-				</div>
+				</div>-->
 				
-				<div class="section-title">
-				    GIS Information
-				</div>
-
-				<div class="row">
-
-				    <div class="col-md-4 mb-3">
-				        <label>Latitude</label>
-				        <input type="text" class="form-control" name="latitude">
-				    </div>
-
-				    <div class="col-md-4 mb-3">
-				        <label>Longitude</label>
-				        <input type="text" class="form-control" name="longitude">
-				    </div>
-
-				    <div class="col-md-4 mb-3">
-				        <label>GIS Reference No.</label>
-				        <input type="text" class="form-control" name="gisRefNo">
-				    </div>
-
-				</div>
+				
 				
 				<div class="section-title">
 				    Project Objective & Remarks
@@ -283,11 +292,11 @@
 				                  name="projectObjective"></textarea>
 				    </div>
 
-				    <div class="col-md-12 mb-3">
+				 <!--   <div class="col-md-12 mb-3">
 				        <label>Expected Outcome</label>
 				        <textarea class="form-control" rows="3"
 				                  name="expectedOutcome"></textarea>
-				    </div>
+				    </div>-->
 
 				    <div class="col-md-12 mb-3">
 				        <label>Remarks</label>
