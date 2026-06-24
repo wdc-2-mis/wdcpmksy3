@@ -185,6 +185,57 @@ footer {
     white-space:nowrap;
 }
 
+.user-menu{
+    position:relative;
+    display:inline-block;
+}
+
+.welcome{
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+}
+
+.dropdown-menu{
+    display:none;
+    position:absolute;
+    right:0;
+    top:100%;
+    min-width:150px;
+    background:white;
+    border:1px solid #ccc;
+    list-style:none;
+    padding:0;
+    margin:5px 0 0 0;
+    z-index:1000;
+}
+
+.dropdown-menu li{
+    border-bottom:1px solid #eee;
+}
+
+.dropdown-menu li:last-child{
+    border-bottom:none;
+}
+
+.dropdown-menu a{
+    display:block;
+    padding:10px;
+    text-decoration:none;
+    color:black;
+}
+
+.dropdown-menu a:hover{
+    background:#f5f5f5;
+}
+
+.dropdown-menu.show{
+    display:block;
+}
+
+
+
+
 </style>
 
 
@@ -274,7 +325,7 @@ footer {
 	        type : "POST",
 
 	        success : function(data) {
-			alert(data);
+			//alert(data);
 	            var menuContainer =
 	                    $("#navbarDropdownAfterLogin");
 
@@ -319,7 +370,22 @@ footer {
 	
 </script>
 
+<script>
+function toggleMenu() {
+    document.getElementById("userDropdown")
+            .classList.toggle("show");
+}
 
+// Close dropdown when clicking outside
+document.addEventListener("click", function(event) {
+    const menu = document.querySelector(".user-menu");
+
+    if (!menu.contains(event.target)) {
+        document.getElementById("userDropdown")
+                .classList.remove("show");
+    }
+});
+</script>
 
 
 
@@ -359,12 +425,21 @@ footer {
 	        Remaining Time: <strong id="session-timer">00:00</strong>
 	    </span>
 
-	    <span class="welcome">
-	        Welcome :
-	        <span class="username" th:text="${username}"></span>
-	    </span>
+	    <div class="user-menu">
+	        <span class="welcome" onclick="toggleMenu()">
+	            Welcome :
+	            <span class="username" th:text="${username}"></span> ▼
+	        </span>
 
-	    <a th:href="@{/customLogout}" class="logout-btn">Logout</a>
+	        <ul id="userDropdown" class="dropdown-menu">
+	            <li>
+	                <a th:href="@{/updateProfile}">Update Profile</a>
+	            </li>
+	            <li>
+	                <a th:href="@{/customLogout}">Logout</a>
+	            </li>
+	        </ul>
+	    </div>
 
 	</div>
     <!-- Main Section -->
