@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 @Controller
 public class LoginController {
+
+    private final HomeController homeController;
 	
 	@Autowired
     private OtpService otpService;
@@ -56,29 +59,49 @@ public class LoginController {
     private PasswordGenerator pwdgen;
 	
 	private LinkedHashMap<Integer, String> stateList;
+
+
+    LoginController(HomeController homeController) {
+        this.homeController = homeController;
+    }
 	
 	
-	@GetMapping("/login")
+    @GetMapping("/login")
     public String loginPage(HttpSession session, Model model) {
 
-		String userId = (String) session.getAttribute("userid");
-		
-		if(userId !=null)
-			System.out.println("already login with same login id"+userId);
-			session.invalidate();
-		
         model.addAttribute("login", new LoginDTO());
-
         return "login";
     }
 
+    @GetMapping("/success")
+    public String success(HttpSession session, Model model) {
+
+        Integer regid = (Integer) session.getAttribute("regid");
+
+        if(regid == null){
+            return "redirect:/login";
+        }
+
+        String userid = (String) session.getAttribute("userid");
+        String usertype = (String) session.getAttribute("usertype");
+
+        model.addAttribute("userList",
+                otpService.getUserVerify(userid));
+
+        model.addAttribute("listm",
+                profileService.getMapState(regid, usertype));
+
+        model.addAttribute("userType", usertype);
+
+        return "success";
+    }
+    
     @PostMapping("/loginSuccess")
     public String authenticate(@ModelAttribute("login") LoginDTO login,  HttpSession session, HttpServletRequest request,
     		@RequestParam String userId, @RequestParam String encrypted_pass, Model model) {
 
-    	//session = request.getSession(true);
-    	// System.out.println("kdy "+userId+ " pwd = "+password);
-    	boolean valid =false; //= loginserv.userAuthenticate(userId, password);
+    	
+    	boolean valid =false; 
     	String logintype=login.getLoginMethod();
     	String otp=login.getOtp();
     	String email=login.getEmailid();
@@ -86,12 +109,9 @@ public class LoginController {
     	String usertype =null;
     	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-       //  String hash = encoder.encode("abc");
-      //   System.out.println("kdy "+hash);
-        
+    	System.out.println("Login Session = " + session.getId());
     	
-    	
-    	if(logintype.equalsIgnoreCase("otp"))
+    	if ("otp".equalsIgnoreCase(logintype))
     	{
     		if (otpService.verifyOtp(userId, otp)) {
             	
@@ -115,12 +135,12 @@ public class LoginController {
             	    usertype = (String) row[1];
             	    String username = (String) row[0];
             	    String user_id = (String) row[8];
-            	    
+            	    Integer stCode = (Integer) row[9];
             	    model.addAttribute("username", username);
             	    session.setAttribute("regid", regid);
             	    session.setAttribute("username", username);
             	    session.setAttribute("usertype", usertype);
-            	    session.setAttribute("stcode", regid);
+            	    session.setAttribute("stcode", stCode);
             	    session.setAttribute("statename", statename);
             	    session.setAttribute("mobile", mobile);
             	    session.setAttribute("userid", user_id);
@@ -226,8 +246,7 @@ public class LoginController {
             }
 
     	}	
-    	if(logintype.equalsIgnoreCase("pass")) {
-    		
+    	if ("pass".equalsIgnoreCase(logintype)) {
     		String userid=login.getUserId();
     		String planpwd=login.getEncrypted_pass();
     		boolean isValid =false;
@@ -267,12 +286,13 @@ public class LoginController {
              	    usertype = (String) row[1];
              	    String username = (String) row[0];
              	    String user_id = (String) row[8];
+             	    Integer stCode = (Integer) row[9];
              	    
              	    model.addAttribute("username", username);
              	    session.setAttribute("regid", regid);
              	    session.setAttribute("username", username);
              	    session.setAttribute("usertype", usertype);
-             	    session.setAttribute("stcode", regid);
+             	    session.setAttribute("stcode", stCode);
              	    session.setAttribute("statename", statename);
              	    session.setAttribute("mobile", mobile);
              	    session.setAttribute("userid", user_id);
@@ -392,13 +412,23 @@ public class LoginController {
 	
     @GetMapping("/getEmailandGenerateotp")
     @ResponseBody
-    public String getEmailandGenerateotp(@RequestParam String value) {
-        
-    	String email = loginserv.getEmailandGenerateotp(value);
-    	
-    	otpService.sendOtp(email);
-    	
-        return email;
+    public ResponseEntity<String> getEmailandGenerateotp(
+            @RequestParam String value) {
+
+        String email = loginserv.getEmailandGenerateotp(value);
+
+        if(email == null || email.isBlank()) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body("USER_NOT_FOUND");
+
+        }
+
+        otpService.sendOtp(email);
+
+        return ResponseEntity.ok(email);
+
     }
     
     @GetMapping("/customLogout")

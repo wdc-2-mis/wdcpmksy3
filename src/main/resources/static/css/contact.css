@@ -1,0 +1,500 @@
+/* ===========================================
+   BODY
+=========================================== */
+body{
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    margin:0;
+    padding:0;
+    color:#1e293b;
+    overflow-x:hidden;
+
+    background:
+    url("../images/contact-bg.png") no-repeat center center fixed,
+    radial-gradient(circle at 10% 20%,rgba(59,130,246,.15),transparent 35%),
+    radial-gradient(circle at 90% 10%,rgba(139,92,246,.15),transparent 40%),
+    radial-gradient(circle at 50% 90%,rgba(16,185,129,.15),transparent 35%),
+    #f8fafc;
+    background-size: cover;
+}
+
+/* ===========================================
+   CONTAINER
+=========================================== */
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px 20px;
+}
+
+
+/* ===========================================
+   MAIN LAYOUT
+=========================================== */
+.contact-wrapper{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:40px;   /* reduced */
+    flex-wrap:wrap;
+}
+
+.hero-section{
+    flex:1;
+    position:relative;
+    min-width:350px;
+}
+
+.right-section{
+    flex:1;
+    min-width:320px;
+}
+
+
+/* ===========================================
+   PHONE
+=========================================== */
+
+
+.mobile-phone{
+    width:280px;
+    height:580px;
+    background:#111827;
+    border-radius:40px;
+    padding:12px;
+    margin:auto;
+
+    box-shadow:
+        0 30px 70px rgba(0,0,0,.25);
+
+    transform-origin:center;
+
+    animation:floatPhone 4s ease-in-out infinite;
+}
+
+.logo-title{
+    text-align:center;
+    color:#1d4ed8;
+    font-size:28px;
+    font-weight:700;
+}
+
+.blink-box{
+    animation: blinkSoft 2s infinite;
+    border-left: 5px solid #ef4444;
+}
+
+.escalation-card{
+    transition: all 0.3s ease;
+}
+
+.escalation-card:hover{
+    transform: scale(1.02);
+    box-shadow: 0 15px 35px rgba(239,68,68,0.2);
+}
+
+.mobile-header{
+    background:linear-gradient(135deg,#1d4ed8,#003f91);
+    color:white;
+    padding:18px 15px;
+    border-radius:25px 25px 0 0;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.app-title{
+    font-size:20px;
+    font-weight:700;
+}
+
+.app-subtitle{
+    font-size:11px;
+    margin-top:5px;
+    opacity:0.9;
+    line-height:1.4;
+
+    /* FIX alignment */
+    white-space:normal;
+    word-break:keep-all;
+    text-align:center;
+}
+
+.mobile-footer{
+    margin-top:90px;
+    padding:10px;
+    text-align:center;
+    background:#ffffff;
+    border-radius:15px;
+}
+.mobile-footer img{
+    height:35px;
+    width:auto;
+    object-fit:contain;
+}
+
+.blink-text{
+    animation: softBlink 1.8s infinite;
+}
+
+@keyframes softBlink{
+    0%{
+        color:#dc2626;
+    }
+    25%{
+        color:#1d4ed8;
+    }
+    50%{
+        color:#16a34a;
+    }
+    75%{
+        color:#9333ea;
+    }
+    100%{
+        color:#dc2626;
+    }
+}
+
+@keyframes blinkSoft{
+    0%{
+        background:#fef2f2;
+        transform: translateY(0);
+    }
+    25%{
+        background:#fff7ed;
+    }
+    50%{
+        background:#eff6ff;
+    }
+    75%{
+        background:#f0fdf4;
+    }
+    100%{
+        background:#fef2f2;
+        transform: translateY(-2px);
+    }
+}
+
+@keyframes blinkColor{
+    0%{
+        background:#fef3c7;
+        color:#1e293b;
+    }
+    25%{
+        background:#fee2e2;
+    }
+    50%{
+        background:#dbeafe;
+    }
+    75%{
+        background:#dcfce7;
+    }
+    100%{
+        background:#fef3c7;
+    }
+}
+
+.mobile-screen{
+    background:#ffffff;
+    border-radius:35px;
+}
+
+.mobile-screen h2{
+    text-align:center;
+    color:#003f91;
+    margin-bottom:30px;
+}
+
+
+/* ===========================================
+   PHONE CARDS
+=========================================== */
+.phone-card{
+    background:#f8fafc;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:20px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.07);
+}
+
+.phone-card span{
+    display:block;
+    color:#1d4ed8;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.phone-card small{
+    color:#475569;
+    font-size:14px;
+}
+
+
+/* ===========================================
+   SECURE BOX
+=========================================== */
+.secure-box{
+    margin-top:25px;
+    padding:25px;
+    border-radius:20px;
+    text-align:center;
+    color:white;
+    font-weight:600;
+
+    background:
+        linear-gradient(135deg,#2563eb,#1d4ed8);
+}
+
+
+/* ===========================================
+   FLOAT PHONE ANIMATION
+=========================================== */
+@keyframes floatPhone{
+
+    0%{
+        transform:
+            perspective(1200px)
+            rotateY(18deg)
+            rotateZ(-2deg)
+            translateY(0);
+    }
+
+    50%{
+        transform:
+            perspective(1200px)
+            rotateY(18deg)
+            rotateZ(-2deg)
+            translateY(-15px);
+    }
+
+    100%{
+        transform:
+            perspective(1200px)
+            rotateY(18deg)
+            rotateZ(-2deg)
+            translateY(0);
+    }
+
+}
+
+
+/* ===========================================
+   FLOATING ICONS
+=========================================== */
+.floating-icon{
+    position:absolute;
+
+    width:90px;
+    height:90px;
+will-change: transform;
+    border-radius:50%;
+
+    background:rgba(255,255,255,.85);
+
+    backdrop-filter:blur(20px);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:40px;
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.12);
+
+    animation:floating 5s ease-in-out infinite;
+}
+
+
+.email-icon{
+    top:80px;
+    left:0;
+}
+
+.phone-icon{
+    top:340px;
+    left:10px;
+}
+
+.support-icon{
+    top:120px;
+    right:0;
+}
+
+.clock-icon{
+    bottom:120px;
+    right:0;
+}
+
+
+@keyframes floating{
+
+    0%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-15px);
+    }
+
+    100%{
+        transform:translateY(0);
+    }
+
+}
+
+
+/* ===========================================
+   RIGHT SIDE TITLE
+=========================================== */
+.right-section h1{
+    font-size:48px;
+    line-height:1.1;
+    color:#0f3ea8;
+    text-shadow:0 2px 10px rgba(255,255,255,.7);
+
+    margin-bottom:20px;
+}
+
+.right-section h1 span{
+    color:#003f91;
+}
+
+
+.subtitle{
+    font-size:18px;
+    color:#64748b;
+
+    margin-bottom:25px;
+}
+
+
+/* ===========================================
+   TEAM CARDS
+=========================================== */
+.team-card{
+    background:rgba(255,255,255,.88);
+
+    backdrop-filter:blur(10px);
+
+    border-radius:25px;
+
+    padding:25px;
+
+    margin-bottom:20px;
+
+    box-shadow:
+        0 15px 30px rgba(0,0,0,.08);
+
+    transition:.4s;
+}
+
+.team-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:
+        0 20px 40px rgba(37,99,235,.20);
+}
+
+.team-card h3{
+    margin:0 0 12px;
+    color:#1d4ed8;
+}
+
+.team-card p{
+    color:#64748b;
+    margin-bottom:15px;
+}
+
+
+/* ===========================================
+   EMAIL BADGE
+=========================================== */
+.email{
+    display:inline-block;
+
+    background:#eff6ff;
+
+    color:#2563eb;
+
+    padding:8px 16px;
+
+    border-radius:30px;
+
+    font-weight:600;
+}
+
+
+/* ===========================================
+   FOOTER
+=========================================== */
+footer{
+    background:linear-gradient(90deg,#87CEFA,#000080);
+
+    color:white;
+
+    text-align:center;
+
+    padding:20px;
+
+    font-size:13px;
+
+    border-top:2px solid #000080;
+}
+
+
+/* ===========================================
+   TABLET
+=========================================== */
+@media(max-width:992px){
+
+    .contact-wrapper{
+        flex-direction:column;
+        gap:50px;
+    }
+
+    .right-section{
+        text-align:center;
+    }
+
+    .right-section h1{
+        font-size:50px;
+    }
+
+}
+
+
+/* ===========================================
+   MOBILE
+=========================================== */
+@media(max-width:576px){
+
+    .container{
+        padding:30px 15px;
+    }
+
+    .mobile-phone{
+        width:280px;
+        height:580px;
+    }
+
+    .right-section{
+        min-width:auto;
+    }
+
+    .right-section h1{
+        font-size:38px;
+    }
+
+    .subtitle{
+        font-size:18px;
+    }
+
+    .floating-icon{
+        width:70px;
+        height:70px;
+        font-size:30px;
+    }
+
+}

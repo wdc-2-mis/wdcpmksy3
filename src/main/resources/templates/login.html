@@ -1,419 +1,301 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <head>
+
 <meta charset="UTF-8">
-<title>WDC-PMKSY 3.0</title>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login | WDC-PMKSY 3.0</title>
+
+<link rel="icon" href="/favicon.ico">
+
+<!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<!-- Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Header -->
 <link rel="stylesheet" th:href="@{/css/header.css}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<!--<script src="/js/login.js"></script>-->
-<!--<script th:src="@{/js/login.js}"></script>
-<script th:src="@{/js/SHA512.js.js}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha512.js"></script>-->
-<style>
 
-/* ================= HERO ================= */
+<!-- Login CSS -->
+<link rel="stylesheet" th:href="@{/css/login.css}">
 
-/* ================= FOOTER ================= */
-footer {
-    background: linear-gradient(90deg, #87CEFA, #000080); /* Light Blue → Dark Blue */
-    color: white;
-    text-align: center;
-    padding: 20px;
-    font-size: 13px;
-    border-top: 2px solid #000080;
-}
-	
-</style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<style>
-body{
-    background:#f5f5f5;
-    font-family:Arial, sans-serif;
-}
-
-.box1{
-    width:400px;
-    margin:auto;
-    background:#2c3e50;
-    padding:30px;
-    border-radius:10px;
-    color:white;
-}
-
-.inputBox{
-    position:relative;
-    margin-bottom:20px;
-}
-
-.inputBox input{
-    width:100%;
-    padding:10px;
-    border:none;
-    outline:none;
-}
-
-.inputBox label{
-    display:block;
-    margin-bottom:5px;
-}
-
-.btn-info{
-    padding:10px 30px;
-    background:#17a2b8;
-    color:white;
-    border:none;
-    cursor:pointer;
-}
-
-a{
-    color:white;
-}
-</style>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <script>
- // Lightbox with close button
-function openImage(src) {
-  const lightbox = document.createElement('div');
-  lightbox.className = 'lightbox';
-  lightbox.innerHTML = `
-    <span class="close-btn">&times;</span>
-    <img src="${src}">
-  `;
-  document.body.appendChild(lightbox);
-
-  // Close on click
-  lightbox.querySelector('.close-btn').onclick = () => document.body.removeChild(lightbox);
-  lightbox.onclick = (e) => {
-    if (e.target === lightbox) document.body.removeChild(lightbox);
-  };
-}
-function recaptchaVerified() {
-    $('#nextBtn').fadeIn();
-    $('#captchaError').hide();
-}
-
-function recaptchaExpired() {
-    $('#nextBtn').fadeOut();
-}
-// Government portals auto-cycle
-window.onload = function() {
-const govGrid = document.getElementById('govGrid');
-const portals = govGrid.querySelectorAll('.portal');
-let cycle = 0; // 0 = first 5, 1 = next 3
-
-function showPortals() {
-  // Hide all first
-  portals.forEach(p => p.style.display = 'none');
-
-  if (cycle === 0) {
-    // Show first 5
-    portals.forEach((p, i) => {
-      if (i < 5) p.style.display = 'block';
-    });
-    cycle = 1;
-  } else {
-    // Show next 3
-    portals.forEach((p, i) => {
-      if (i >= 5 && i < 8) p.style.display = 'block';
-    });
-    cycle = 0;
-  }
-}
-
-// Initial load
-showPortals();
-
-// Auto change every 4 seconds
-setInterval(showPortals, 4000);
-};
-function closeImage(){
-    document.getElementById("imageModal").style.display = "none";
-}
-
-function scrollToExplore() {
-    const section = document.getElementById("explore");
-
-    if (!section) {
-        console.error("Explore section not found!");
-        return;
-    }
-
-    section.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
-}
-
-document.querySelectorAll(".kpi-card").forEach(card => {
-
-    let isDown = false;
-
-    let startX, startY;
-
-    card.addEventListener("mousedown", (e) => {
-        isDown = true;
-        startX = e.clientX;
-        startY = e.clientY;
-    });
-
-    document.addEventListener("mouseup", () => {
-        isDown = false;
-        card.style.transform = "";
-    });
-
-    document.addEventListener("mousemove", (e) => {
-
-        if(!isDown) return;
-
-        let moveX = (e.clientX - startX) / 20;
-        let moveY = (e.clientY - startY) / 20;
-
-        card.style.transform =
-            `translate(${moveX}px, ${moveY}px)
-             rotateX(${moveY}deg)
-             rotateY(${moveX}deg)`;
-
-    });
-
-});
-
-
-</script>
-
-<script>
-
-const counters = document.querySelectorAll('.counter');
-
-counters.forEach(counter => {
-
-    const update = () => {
-
-        const target = +counter.getAttribute("data-target");
-        const current = +counter.innerText.replace(/,/g,'');
-
-        const step = target / 100;
-
-        if(current < target){
-
-            counter.innerText =
-                Math.ceil(current + step).toLocaleString();
-
-            setTimeout(update, 20);
-
-        } else {
-            counter.innerText = target.toLocaleString();
-        }
-    };
-
-    update();
-});
-
-function togglePanel(){
-
-    const panel =
-        document.getElementById("alertBox");
-
-    panel.style.display =
-        panel.style.display === "block"
-        ? "none"
-        : "block";
-}
+/*=========================================================
+    WDC-PMKSY 3.0 LOGIN PAGE
+=========================================================*/
 
 
 
 </script>
-
-
-<script>
-    function checkEmail() {
-        var email = $("#email").val();
-		//alert('kdy'+email);
-        if(email){
-            $.ajax({
-                url: "checkemail",
-                type: "GET",
-                data: { email: email },
-                success: function(response) {
-                    if(response){
-                        $("#emailMessage").text("")
-                    } else {
-						$("#email").val("");
-                        $("#emailMessage").text("User is not register ❌ ").css("color","red");
-                    }
-                }
-            });
-        }
-    }
-	
-</script>
-
-<script>
-	
-	document.addEventListener("DOMContentLoaded", function () {
-
-	    document.querySelectorAll('input[name="loginMethod"]').forEach((radio) => {
-
-	        radio.addEventListener('change', function () {
-
-	            const div1 = document.getElementById('pass');
-	            const div2 = document.getElementById('otpe');
-	            const div3 = document.getElementById('otp1');
-
-	            if (this.value === 'pass') {
-
-	                div1.style.display = 'block';
-	                div2.style.display = 'none';
-	                div3.style.display = 'none';
-
-	            } else {
-
-	                div1.style.display = 'none';
-	                div2.style.display = 'block';
-	                div3.style.display = 'block';
-	            }
-	        });
-
-	    });
-
-	});
-	
-	function sendValue(selectedValue) {
-		var userid = $("#userId").val();
-		if (userid === '' || typeof userid === 'undefined') {
-				alert('Please Enter UserId');
-				$('#userId').focus();
-				return false;
-		}
-		else{
-			fetch('/getEmailandGenerateotp?value=' + userid)
-			    .then(response => response.text())
-			    .then(email => {
-					$("#dimail").text(email);
-			      	document.getElementById("emailid").value = email;
-			        $("#emailMessage").text("OTP sent to registered email").css("color", "green");
-			    })
-			    .catch(error => {
-			        console.error(error);
-			        $("#emailMessage").text("Unable to send OTP").css("color", "red");
-			    });
-	}
-	}
-</script>
-
-
-
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
-<div th:replace="header :: govHeader"></div>
+<!-- ====================================================== -->
+<!-- Header -->
+<!-- ====================================================== -->
 
-<!-- ================= HERO ================= -->
-</br>
+<div th:replace="~{header :: govHeader}"></div>
+
+<!-- ====================================================== -->
+<!-- Background -->
+<!-- ====================================================== -->
+
+<div class="login-background">
+
+<div class="bg-circle one"></div>
+<div class="bg-circle two"></div>
+<div class="bg-circle three"></div>
 
 <div class="container">
 
-    <div class="box1">
+<div class="row justify-content-center align-items-center">
 
-         <h2 style="text-align: center;">Login</h2>
+<!-- ====================================================== -->
+<!-- LEFT PANEL -->
+<!-- ====================================================== -->
 
-        <form th:action="@{/loginSuccess}" th:object="${login}" method="post" id="loginForm" name="loginForm">
+<div class="col-lg-6">
 
-            <label class="text-danger" th:text="${error}"></label>
+<div class="welcome-panel">
 
-            <div class="inputBox">
-                <label>Username</label>
-                <input type="text" th:field="*{userId}"
-                       autocomplete="off"
-                       maxlength="10" required >
-            </div>
-			<div>
-				<label>Authentication Type</label>
-						<br>
-							<label><input type="radio" name="loginMethod"  value="pass" /> &nbsp;Password</label> &nbsp;&nbsp;
-							<label><input type="radio" name="loginMethod"  value="otp" onclick="sendValue(this.value)"/>&nbsp; OTP</label>
-			</div>
-			<br>
-			<span id="emailMessage"></span>
-            <div class="inputBox" id="pass" style="display:none;">
-				
-                <label>Password</label>
-                <input type="password"
-                       th:field="*{encrypted_pass}" maxlength="200">
-					   
-					   <input type="hidden" th:field="*{emailid}"  >	   
-            </div>
-			<div class="inputBox" id="otpe" style="display:none;">
-			    <!-- <label>Email-Id / Mobile</label>-->
-			     <input type="hidden" th:field="*{emailid}"  >
-			   <span id="dimail"></span>  
-			 </div>
-			<div class="inputBox" id="otp1" style="display:none;">
-				<label>OTP</label>
-				<input type="text"
-					th:field="*{otp}"autocomplete="off"
-					 maxlength="10" >
-			</div>
+<!-- <div class="welcome-icon">
 
-			<div class="mb-4 text-center">
-			            <div class="g-recaptcha" 
-			                 data-sitekey="6LfYFwQsAAAAAAVxzTr3vCHseqAtbLiD53hfgJc7" 
-			                 data-callback="recaptchaVerified"
-			                 data-expired-callback="recaptchaExpired"></div>
-			</div>
-			
-			
-            <!--<div class="inputBox">
-                <img id="captcha_id"
-                     th:src="@{/captcha.jpg}"
-                     alt="Captcha">
+<i class="fa-solid fa-droplet"></i>
 
-                <a href="javascript:void(0)"
-                   onclick="refreshCaptcha()">
-                    <img th:src="@{/images/refresh.png}"
-                         width="25">
-                </a>
-            </div>
+</div> -->
 
-            <div class="inputBox">
-                <label>Security Code</label>
-                <input type="text"
-                       th:field="*{captcha}"
-                       autocomplete="off"
-                       maxlength="10">
-            </div>
+<div class="welcome-icon"> <i class="fa-solid fa-droplet"></i></div>
 
-            <div style="text-align:right;">
-                <a th:href="@{/forgotpassword}">
-                    Forgot Password?
-                </a>
-            </div> -->
+<h2 class="portal-title"> Secure Government Portal </h2>
 
-            <center>
-                <button type="submit" class="btn-info" id="login">Login</button>
-            </center>
+<p class="portal-desc">Access project monitoring, reporting and watershed management services through a secure authentication system.</p>
 
-        </form>
+<div class="feature-list">
+
+<div class="feature">
+
+<i class="fa-solid fa-circle-check"></i>
+
+<span>Secure Government Portal</span>
+
+</div>
+
+<div class="feature">
+
+<i class="fa-solid fa-shield-halved"></i>
+
+<span>NIC Hosted Infrastructure</span>
+
+</div>
+
+<div class="feature">
+
+<i class="fa-solid fa-envelope-circle-check"></i>
+
+<span>Password & OTP Login</span>
+
+</div>
+
+<div class="feature">
+
+<i class="fa-solid fa-lock"></i>
+
+<span>Secure Password Encryption</span>
+
+</div>
+
+<div class="feature">
+
+<i class="fa-solid fa-user-shield"></i>
+
+<span>Role Based Access</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- LOGIN CARD -->
+<!-- ====================================================== -->
+
+<div class="col-lg-5">
+
+<div class="login-card">
+
+<div class="login-header">
+
+<div class="login-logo">
+
+<i class="fa-solid fa-user-lock"></i>
+
+</div>
+
+<h2>Secure Login</h2>
+
+<p> Sign in using your registered credentials </p>
+
+</div>
+
+<!-- <form th:action="@{/loginSuccess}" th:object="${login}" method="post" id="loginForm">
+ -->
+<form id="loginForm" th:object="${login}" th:action="@{/loginSuccess}" method="post">
+
+<div th:if="${error}" class="alert alert-danger"> <span th:text="${error}"></span> </div>
+
+<!-- USER ID -->
+
+<div class="input-group-custom">
+
+<label> User ID </label>
+
+<div class="input-wrapper"> <i class="fa-solid fa-user"></i> <input type="text" th:field="*{userId}" maxlength="10" autocomplete="off" required> </div>
+<div class="field-error" id="userIdError"></div>
+</div>
+
+<!-- AUTH TYPE -->
+
+<div class="authentication-title"> Authentication Method </div>
+
+<div class="login-option-group">
+
+<label class="login-option">
+
+<input type="radio" th:field="*{loginMethod}" value="pass"> <div class="option-card"> <i class="fa-solid fa-key"></i> Password </div>
+<div class="field-error" id="passwordError"></div>
+</label>
+
+<label class="login-option otp-option">
+
+<input type="radio" th:field="*{loginMethod}" value="otp">
+
+<div class="option-card"> <i class="fa-solid fa-envelope"></i> OTP Login </div>
+<div class="field-error" id="otpError"></div>
+</label>
+
+</div>
+
+<!-- OTP Status -->
+<div id="otpStatus" class="otp-status" style="display:none;"></div>
+
+<!-- OTP Success Message -->
+<div id="emailMessage" style="display:none;">
+
+    <div class="otp-success-title"></div>
+
+    <div class="otp-email">
+
+        <div id="dimail"></div>
+
+        <button id="resendOtpBtn" type="button" class="btn btn-outline-primary btn-sm mt-2" style="display:none;"> Resend OTP </button>
 
     </div>
 
 </div>
 
 
-<!-- ================= FOOTER ================= -->
-</br></br></br></br></br>
 
-<!-- ================= FOOTER ================= -->
+<!-- PASSWORD -->
+
+<div class="input-group-custom" id="pass" style="display:none;"> <label> Password </label>
+
+<div class="input-wrapper">
+
+<i class="fa-solid fa-lock"></i>
+
+<input type="password" id="encrypted_pass" th:field="*{encrypted_pass}">
+
+<input type="hidden" th:field="*{emailid}">
+</div>
+
+</div>
+
+<!-- OTP -->
+
+<div id="otpe" style="display:none;">
+
+<input type="hidden" th:field="*{emailid}">
+
+<!-- <div class="otp-email">
+<i class="fa-solid fa-envelope-open-text"></i>
+<span id="dimail"></span>
+
+</div> -->
+
+</div>
+
+<div
+class="input-group-custom" id="otp1" style="display:none;"> <label> OTP </label>
+
+<div class="input-wrapper">
+
+<i class="fa-solid fa-mobile-screen"></i>
+
+<input type="text" id="otp" th:field="*{otp}" maxlength="10">
+
+</div>
+
+</div>
+
+<!-- CAPTCHA -->
+
+<div class="captcha-box">
+
+<div class="g-recaptcha" data-sitekey="6LfYFwQsAAAAAAVxzTr3vCHseqAtbLiD53hfgJc7" data-callback="recaptchaVerified" data-expired-callback="recaptchaExpired"> </div>
+
+</div>
+<div class="field-error" id="captchaError"></div>
+
+<button type="submit" class="login-btn" id="login"> <i class="fa-solid fa-right-to-bracket"></i> Login </button>
+
+
+<div class="security-note">
+<i class="fa-solid fa-circle-info"></i>
+For security reasons, never share your password or OTP with anyone.
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- Footer -->
+<!-- ====================================================== -->
+
 <footer>
     Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
     Website hosted and maintained by National Informatics Center.
 </footer>
 
-</body>
 <script src="/js/language.js"></script>
+
+<script src="/js/login.js"></script>
+
+</body>
+
 </html>

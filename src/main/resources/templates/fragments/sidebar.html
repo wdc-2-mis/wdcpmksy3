@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<aside th:fragment="sidebar"
+       class="sidebar"
+       id="sidebar">
+
+
+    <div class="sidebar-header">
+
+        <button id="toggleSidebar" class="toggle-btn">
+
+            <i class="fas fa-bars"></i>
+
+        </button>
+
+
+    </div>
+
+
+
+    <div class="sidebar-menu">
+
+
+        <ul class="menu">
+
+
+            <li th:each="menu : ${menus}">
+
+
+                <div class="menu-toggle">
+
+                   <div class="menu-left">
+
+                  <i class="fas fa-folder menu-icon"></i>
+                  
+
+                     <span th:text="${menu.key}"></span>
+
+                 </div>
+
+    <i class="fas fa-chevron-down"></i>
+
+</div>
+
+
+
+                <ul class="submenu">
+
+
+                    <li th:each="sub : ${menu.value}"
+    th:classappend="${currentUri == sub.target} ? 'active-submenu'">
+
+    <a th:href="@{${sub.target}}">
+        <i class="fas fa-angle-right"></i>
+        <span th:text="${sub.submenu_name}"></span>
+    </a>
+
+</li>
+
+
+                </ul>
+
+
+            </li>
+
+
+        </ul>
+
+
+    </div>
+
+
+</aside>
+
+
+</body>
+
+</html>

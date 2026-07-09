@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="govHeader">
+
+    <!-- ===================== TOP HEADER ===================== -->
+    <header class="top-header">
+
+        <div class="container-fluid">
+
+            <div class="row align-items-center">
+
+                <!-- Left -->
+                <div class="col-lg-6 col-md-6 d-flex align-items-center">
+
+                    <img th:src="@{/images/watershed-logo.png}" class="gov-logo">
+
+                    <div class="portal-info">
+
+                        <h6>Government of India</h6>
+
+                        <span>Department of Land Resources</span>
+
+                        <p>Watershed Development Component (WDC-PMKSY 3.0)</p>
+
+                    </div>
+
+                </div>
+
+                <!-- Right -->
+                <div class="col-lg-6 col-md-6">
+
+                    <div class="header-right">
+
+                        <!-- Session -->
+                        <div class="session-box">
+
+                            <i class="fa-regular fa-clock"></i>
+
+                            <div>
+
+                                <small>Session</small>
+
+                                <strong id="sessionTimer">30:00</strong>
+
+                            </div>
+
+                        </div>
+
+                        <!-- User -->
+                        <div class="dropdown">
+
+                            <a class="user-box dropdown-toggle"
+                               href="#"
+                               data-bs-toggle="dropdown">
+
+                                <div class="avatar">
+
+                                    <i class="fa-solid fa-user"></i>
+
+                                </div>
+
+                                <strong th:text="${username}"></strong>
+
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+
+                                <li>
+
+                                    <a class="dropdown-item"
+                                       th:href="@{/profile}">
+
+                                        <i class="fa-solid fa-id-card"></i>
+
+                                        Profile
+
+                                    </a>
+
+                                </li>
+
+                                <li>
+
+                                    <a class="dropdown-item text-danger"
+                                       th:href="@{/customLogout}">
+
+                                        <i class="fa-solid fa-right-from-bracket"></i>
+
+                                        Logout
+
+                                    </a>
+
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ===================== BODY ===================== -->
+
+    <div class="dashboard-layout">
+
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar" id="sidebar">
+
+            <!-- Sidebar Header -->
+
+            <div class="sidebar-header">
+
+                <button id="toggleSidebar" class="toggle-btn">
+
+                    <i class="fas fa-bars"></i>
+
+                </button>
+
+                <!-- <span class="sidebar-title">
+
+                    Navigation
+
+                </span> -->
+
+            </div>
+
+
+            <!-- Menu -->
+
+            <div class="sidebar-menu">
+
+                <ul class="menu">
+
+                    <li th:each="menu : ${menus}">
+
+                        <!-- Parent -->
+
+                        <div class="menu-toggle">
+
+                            <div class="menu-left">
+
+                                <i class="fas fa-folder-open"></i>
+
+                                <span th:text="${menu.key}"></span>
+
+                            </div>
+
+                            <i class="fas fa-chevron-down"></i>
+
+                        </div>
+
+                        <!-- Child -->
+
+                        <ul class="submenu">
+
+                            <li th:each="sub : ${menu.value}">
+
+                                <a th:href="@{${sub.target}}">
+
+                                    <i class="fas fa-angle-right"></i>
+
+                                    <span th:text="${sub.submenu_name}"></span>
+
+                                </a>
+
+                            </li>
+
+                        </ul>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================= RIGHT SIDE ================= -->
+
+        <div class="content-wrapper">
+
+            <!-- Sub Header -->
+
+            <div class="sub-header">
+
+                <div class="sub-header-content">
+
+                    <div class="dashboard-title">
+
+                        <i class="fa-solid fa-circle-user"></i>
+
+                        Welcome
+
+                        <span th:text="${username}"></span>
+
+                    </div>
+
+                    <div class="server-time">
+
+                        <i class="fa-solid fa-calendar-days"></i>
+
+                        <span id="serverTime"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!--
+            Every page content starts after including this fragment.
+            -->
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

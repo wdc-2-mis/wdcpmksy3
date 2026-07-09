@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title>PIA Project Notification</title>
+    <link rel="stylesheet" th:href="@{/css/pialocation.css}">
+</head>
+
+<body>
+
+
+
+
+
+<div layout:fragment="content">
+
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                PIA Project Notification
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <form th:action="@{/savePiaNotification}"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <div class="row g-4">
+
+                    <!-- State -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            State Name
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                name="stateName"
+                                th:value="${stateName}"
+                                readonly>
+
+                    </div>
+
+                    <!-- Type of SLNA -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Type of SLNA
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                name="slnaType"
+                                placeholder="Enter Type of SLNA">
+
+                    </div>
+
+                    <!-- Date -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Date of Notification
+                        </label>
+
+                        <input
+                                type="date"
+                                class="form-control"
+                                name="notificationDate">
+
+                    </div>
+
+                    <!-- Upload -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Upload Notification
+                        </label>
+
+                        <input
+                                type="file"
+                                class="form-control"
+                                name="notificationFile">
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-end gap-3">
+
+                    <button
+                            type="submit"
+                            name="action"
+                            value="draft"
+                            class="btn btn-warning">
+
+                        <i class="fas fa-save"></i>
+
+                        Save Draft
+
+                    </button>
+
+                    <button
+                            type="submit"
+                            name="action"
+                            value="submit"
+                            class="btn btn-success">
+
+                        <i class="fas fa-paper-plane"></i>
+
+                        Submit
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

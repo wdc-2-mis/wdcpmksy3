@@ -31,8 +31,10 @@ public class OtpService {
 
         String otp = generateOtp();
 
-        IwmpUserReg user = userRepository.findByEmail(email)
-                .orElseGet(IwmpUserReg::new);
+        IwmpUserReg user = userRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                    new RuntimeException("User not found"));
 
     //    user.setEmail(email);
         user.setOtp(otp);

@@ -1,621 +1,163 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
 <head>
-<meta charset="UTF-8">
-<title>Welcome </title>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<style>
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-
-body{
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-}
-
-/* Header */
-.header{
-    background:green;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | WDC-PMKSY 3.0</title>
+    <link rel="icon" href="/favicon.ico">
     
-    padding:15px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.logo{
-    font-size:24px;
-    font-weight:bold;
-}
-
-.user-info{
-    font-size:15px;
-}
-
-/* Main Layout */
-.main-container{
-    flex:1;
-    display:flex;
-}
-
-/* Left Panel */
-.sidebar{
-    width:250px;
-    background:#f4f4f4;
-    border-right:1px solid #ddd;
-    padding:20px;
-}
-
-.sidebar h3{
-    margin-bottom:15px;
-    color:#1e3a8a;
-}
-
-.sidebar ul{
-    list-style:none;
-}
-
-.sidebar ul li{
-    margin:10px 0;
-}
-
-.sidebar ul li a{
-    text-decoration:none;
-    color:#333;
-    display:block;
-    padding:10px;
-    border-radius:5px;
-}
-
-.sidebar ul li a:hover{
-    background:#1e3a8a;
-    color:white;
-}
-
-/* Content Area */
-.content{
-    flex:1;
-    padding:30px;
-    background:#fafafa;
-}
-
-.welcome-card{
-    background:white;
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0px 2px 8px rgba(0,0,0,0.1);
-}
-
-.welcome-card h2{
-    color:#1e3a8a;
-    margin-bottom:15px;
-}
-
-/* Footer */
-.footer{
-	background: #0b6e4f;
-	   color: white;
-	   text-align: center;
-	   padding: 20px;
-	   font-size: 13px;
-	   position: fixed;
-	   bottom: 0;
-	   left: 0;
-	   width: 100%;
-}
-footer {
-    background: #0b6e4f;
-    color: white;
-    text-align: center;
-    padding: 20px;
-    font-size: 13px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-}
-
-/* Responsive */
-@media(max-width:768px){
-
-    .main-container{
-        flex-direction:column;
-    }
-
-    .sidebar{
-        width:100%;
-    }
-}
-.gov-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 25px;
-    background: #fff;
-    border-bottom: 2px solid #0b6e4f;
-}
-
-/* LEFT */
-.gov-left {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-/* 🔥 ANIMATED ASHOK STAMBH GLOW */
-.gov-left img {
-    height: 80px;
-    filter: drop-shadow(0 0 6px #0b6e4f);
-    animation: glow 2.5s infinite alternate;
-}
-
-.header-strip{
-    width:100%;
-    background:rgb(64, 128, 128);
-    padding:6px 15px;
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:15px;
-}
-
-.username{
-    color:white;
-    background:darkblue;
-    padding:3px 8px;
-    font-weight:bold;
-}
-
-.logout-btn{
-    color:white;
-    background:crimson;
-    padding:3px 8px;
-    text-decoration:none;
-    font-weight:bold;
-}
-
-.timer,
-.welcome{
-    white-space:nowrap;
-}
-
-.user-menu{
-    position:relative;
-    display:inline-block;
-}
-
-.welcome{
-    cursor:pointer;
-    color:white;
-    font-weight:bold;
-}
-
-.dropdown-menu{
-    display:none;
-    position:absolute;
-    right:0;
-    top:100%;
-    min-width:150px;
-    background:white;
-    border:1px solid #ccc;
-    list-style:none;
-    padding:0;
-    margin:5px 0 0 0;
-    z-index:1000;
-}
-
-.dropdown-menu li{
-    border-bottom:1px solid #eee;
-}
-
-.dropdown-menu li:last-child{
-    border-bottom:none;
-}
-
-.dropdown-menu a{
-    display:block;
-    padding:10px;
-    text-decoration:none;
-    color:black;
-}
-
-.dropdown-menu a:hover{
-    background:#f5f5f5;
-}
-
-.dropdown-menu.show{
-    display:block;
-}
-
-
-
-
-</style>
-
-
-<script th:inline="javascript">
-	
-	//var sessionTimeout = 1800;
-	var sessionTimeout = [[${sessionTimeout}]];
-	var originalSessionTimeout = sessionTimeout;
-	var endTime = new Date().getTime() + sessionTimeout * 1000;
-
-	var timerInterval;
-	var alertDisplayed = false;
-	var alertInterval;
-
-	$(document).ready(function () {
-
-	    timerInterval = setInterval(Timer, 1000);
-
-	    // Show timer immediately
-	    Timer();
-
-	});
-
-	function Timer() {
-
-	    var now = new Date().getTime();
-	    var remainingTime = Math.max(0, Math.floor((endTime - now) / 1000));
-
-	    var minutes = Math.floor(remainingTime / 60);
-	    var seconds = remainingTime % 60;
-
-	    if (seconds < 10) {
-	        seconds = "0" + seconds;
-	    }
-
-	    $("#session-timer").text(minutes + ":" + seconds);
-
-	    if (remainingTime <= 0) {
-	        clearInterval(timerInterval);
-	        alert("Session has expired!");
-	        window.location.href = "/customLogout";
-	    }
-
-	    if (remainingTime <= 120 && !alertDisplayed) {
-	        alertDisplayed = true;
-	        $('#sessionAlertModal').modal('show');
-	        showAlertWithTimer(remainingTime);
-	    }
-	}
-
-	function showAlertWithTimer(remainingTime) {
-
-	    clearInterval(alertInterval);
-
-	    var alertEndTime = new Date().getTime() + remainingTime * 1000;
-
-	    alertInterval = setInterval(function () {
-
-	        var now = new Date().getTime();
-	        var remainingAlertTime =
-	            Math.max(0, Math.floor((alertEndTime - now) / 1000));
-
-	        var minutes = Math.floor(remainingAlertTime / 60);
-	        var seconds = remainingAlertTime % 60;
-
-	        if (seconds < 10) {
-	            seconds = "0" + seconds;
-	        }
-
-	        $("#alert-timer").text(minutes + ":" + seconds);
-
-	        if (remainingAlertTime <= 0) {
-	            clearInterval(alertInterval);
-	            $('#sessionAlertModal').modal('hide');
-	            alert("Session has expired!");
-	            window.location.href = "/customLogout";
-	        }
-
-	    }, 1000);
-	}
-	
-	
-	$(document).ready(function() {
-
-	    $.ajax({
-	        url : "/fetchMenu",
-	        type : "POST",
-
-	        success : function(data) {
-			//alert(data);
-	            var menuContainer =
-	                    $("#navbarDropdownAfterLogin");
-
-	            $.each(data, function(parent, submenus) {
-
-	                let html = `
-	                    <li class="nav-item dropdown">
-	                        <a class="nav-link dropdown-toggle"
-	                           data-bs-toggle="dropdown"
-	                           href="#">
-	                           ${parent}
-	                        </a>
-
-	                        <ul class="dropdown-menu">
-	                `;
-
-	                $.each(submenus, function(i, submenu) {
-
-	                    html += `
-	                       <li>
-	                          <a class="dropdown-item"
-	                             href="${submenu.target}">
-	                             ${submenu.submenu_name}
-	                          </a>
-	                       </li>
-	                    `;
-	                });
-
-	                html += `
-	                        </ul>
-	                    </li>
-	                `;
-
-	                menuContainer.append(html);
-	            });
-	        }
-	    });
-	});
-	
-	
-	
-	
-</script>
-
-<script>
-function toggleMenu() {
-    document.getElementById("userDropdown")
-            .classList.toggle("show");
-}
-
-// Close dropdown when clicking outside
-document.addEventListener("click", function(event) {
-    const menu = document.querySelector(".user-menu");
-
-    if (!menu.contains(event.target)) {
-        document.getElementById("userDropdown")
-                .classList.remove("show");
-    }
-});
-</script>
-
-
+     <link rel="stylesheet" th:href="@{/css/success.css}">
 
 </head>
 
 <body>
 
-    <!-- Header -->
-    <header class="header">
-		<div class="gov-header">
 
-		    <div class="gov-left">
-		        <img th:src="@{/images/ashok-stambh.png}" alt="Ashok Stambh">
+<div layout:fragment="content">
 
-		        <div>
-		            <h3>Watershed Development Component-Pradhan Mantri Krishi Sinchayee Yojana 3.0 - MIS</h3>
-		            <p>Department of Land Resources | MoRD | Govt. of India</p>
-		        </div>
-		    </div>
+    <div class="container-fluid">
 
-		</div>
+        <div class="dashboard-card">
 
-       <!-- <div class="user-info">				
-			<div class="alert alert-info">
-					    Remaining Time:
-					    <strong id="session-timer">00:00</strong>
-			</div>
-			<b>Welcome</b> &nbsp;: &nbsp;
-			<span th:text="${username}" style="color: white; background-color: darkblue; font-weight: bold; padding: 3px;"></span> 
-			<br/><br/>&nbsp;
-			<a th:href="@{/customLogout}" style="color: white; background-color: crimson; font-weight: bold; padding: 3px; float: right;">Logout</a>
-        </div>-->
-    </header>
-	<div class="header-strip">
+            <div class="card-header">
 
-	    <span class="timer">
-	        Remaining Time: <strong id="session-timer">00:00</strong>
-	    </span>
+                <div>
 
-	    <div class="user-menu">
-	        <span class="welcome" onclick="toggleMenu()">
-	            Welcome :
-	            <span class="username" th:text="${username}"></span> ▼
-	        </span>
+                    <h3>
+                        <i class="fa-solid fa-user-circle"></i>
+                        User Profile
+                    </h3>
 
-	        <ul id="userDropdown" class="dropdown-menu">
-	            <li>
-	                <a th:href="@{/updateProfile}">Update Profile</a>
-	            </li>
-	            <li>
-	                <a th:href="@{/customLogout}">Logout</a>
-	            </li>
-	        </ul>
-	    </div>
+                </div>
 
-	</div>
-    <!-- Main Section -->
-    <div class="main-container">
-
-        <!-- Left Menu -->
-        <aside class="sidebar">
-
-          <!--  <h3>Menu Bar </h3>-->
-	
-
-<ul>
-    <li th:each="menu : ${menus}">
-        <strong th:text="${menu.key}" class="menu-toggle" style="cursor:pointer;"></strong>
-        <ul class="submenu" style="display:none;">
-            <li th:each="sub : ${menu.value}">
-                <a th:href="@{${sub.target}}"
-                   th:text="${sub.submenu_name}">
-                </a>
-            </li>
-        </ul>
-    </li>
-</ul>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Attach click handler to all menu-toggle elements
-        document.querySelectorAll(".menu-toggle").forEach(function(toggle) {
-            toggle.addEventListener("click", function() {
-                // Find the next sibling <ul> (submenu)
-                let submenu = this.nextElementSibling;
-                if (submenu.style.display === "none" || submenu.style.display === "") {
-                    submenu.style.display = "block";
-                } else {
-                    submenu.style.display = "none";
-                }
-            });
-        });
-    });
-</script>
-
-
-
-
-        </aside>
-
-        <!-- Content Area -->
-        <main class="content">
-
-            <div class="welcome-card">
-				
-							<table cellspacing="20">
-								<tr>
-								    <td>State:</td>
-								    <td>
-
-								        <!-- ADMIN -->
-								        <select th:if="${userType == 'ADMIN'}"
-								                id="userState"
-								                name="userState"
-								                style="height:100px;"
-								                class="form-control form-control-sm"
-								                multiple="multiple">
-
-								            <option value="">--Select--</option>
-
-								            <th:block th:if="${listm != null}">
-								                <th:block th:each="list : ${listm}">
-								                    <option th:each="stateList : ${list.value}"
-								                            th:value="${stateList.statecode}"
-								                            th:selected="${stateList.selected == 'selected'}"
-								                            th:text="${stateList.statename}">
-								                    </option>
-								                </th:block>
-								            </th:block>
-								        </select>
-
-								        <!-- DL -->
-								        <select th:if="${userType == 'DL'}"
-								                id="userState"
-								                role="DL"
-								                name="userState"
-								                style="height:100px;"
-								                class="form-control form-control-sm"
-								                multiple>
-
-								            <option value="">--Select--</option>
-
-								            <th:block th:if="${listm != null}">
-								                <th:block th:each="list : ${listm}">
-								                    <option th:each="stateList : ${list.value}"
-								                            th:value="${stateList.statecode}"
-								                            th:selected="${stateList.selected == 'selected'}"
-								                            th:text="${stateList.statename}">
-								                    </option>
-								                </th:block>
-								            </th:block>
-								        </select>
-
-								        <!-- SL -->
-								        <th:block th:if="${userType == 'SL'}">
-								            <th:block th:if="${listm != null}">
-								                <th:block th:each="list : ${listm}">
-								                    <th:block th:each="stateList : ${list.value}">
-								                        <span th:text="${stateList.statename}"></span>
-								                    </th:block>
-								                </th:block>
-								            </th:block>
-								        </th:block>
-
-								        <!-- DI -->
-								        <th:block th:if="${userType == 'DI'}">
-								            <th:block th:if="${listm != null}">
-								                <th:block th:each="list : ${listm}">
-								                    <th:block th:each="stateList : ${list.value}">
-								                        <span th:text="${stateList.statename}"></span>
-								                    </th:block>
-								                </th:block>
-								            </th:block>
-								        </th:block>
-
-								        <!-- PI (First Record Only) -->
-								        <th:block th:if="${userType == 'PI'}">
-								            <th:block th:if="${listm != null}">
-								                <th:block th:each="list : ${listm}">
-								                    <span th:if="${!#lists.isEmpty(list.value)}"
-								                          th:text="${list.value[0].statename}">
-								                    </span>
-								                </th:block>
-								            </th:block>
-								        </th:block>
-
-								    </td>
-									<th:block th:if="${userType == 'DI' or userType == 'PI'}">
-								    <td>District:</td>
-								    <td>
-								        <th:block th:if="${listm != null}">
-								            <th:block th:each="list : ${listm}">
-								                <span th:if="${!#lists.isEmpty(list.value)}"
-								                      th:text="${list.value[0].districtname}">
-								                </span>
-								            </th:block>
-								        </th:block>
-								    </td>
-									</th:block>
-								</tr>
-								        
-								    
-							</table>
-				
-				<table th:each="user : ${userList}" cellspacing="20">
-				    <tr>
-				        <td>User Name: </td> <td th:text="${user[0]}"></td>
-						<td>User Type: </td> <td th:text="${user[11]}"></td>
-				    </tr>
-				    <tr>
-						<td>Email: </td> <td th:text="${user[5]}"></td>
-				        <td>Mobile: </td> <td th:text="${user[6]}"></td>
-				        
-				    </tr>
-				    <tr>
-				        <td>Address: </td> <td th:text="${user[2]}"></td>
-				    </tr>
-				</table>
-				
             </div>
 
-        </main>
+            <!-- Region Details -->
+
+            <div class="info-section">
+            
+
+                <h5>
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                    Region Information
+
+                </h5>
+
+                <div class="row">
+
+                    <div class="col-lg-6">
+
+                        <label class="form-label">
+<th:block th:each="list : ${listm}">
+                      State: <td th:text="${list.value[0].statename}"></td>
+
+</th:block>
+
+                        </label>
+
+                        <!-- Paste your existing State Thymeleaf code here exactly as it is -->
+
+                    </div>
+
+                    <th:block th:if="${userType == 'DI' or userType == 'PI'}">
+
+                        <div class="col-lg-6">
+
+                            <label class="form-label">
+<th:block th:each="list : ${listm}">
+                                District: <td th:text="${list.value[0].districtname}"></td>
+</th:block>
+
+                            </label>
+
+                            <!-- Paste your District Thymeleaf code here -->
+
+                        </div>
+
+                    </th:block>
+
+                </div>
+
+
+            </div>
+
+            <!-- User Information -->
+
+            <div class="info-section mt-4">
+
+                <h5>
+
+                    <i class="fa-solid fa-address-card"></i>
+
+                    User Information
+
+                </h5>
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered dashboard-table">
+
+                        <tbody>
+
+                        <tr th:each="user : ${userList}">
+
+                            <th>User Name</th>
+
+                            <td th:text="${user[0]}"></td>
+
+                            <th>User Type</th>
+
+                            <td th:text="${user[11]}"></td>
+
+                        </tr>
+
+                        <tr th:each="user : ${userList}">
+
+                            <th>Email</th>
+
+                            <td th:text="${user[5]}"></td>
+
+                            <th>Mobile</th>
+
+                            <td th:text="${user[6]}"></td>
+
+                        </tr>
+
+                        <tr th:each="user : ${userList}">
+
+                            <th>Address</th>
+
+                            <td colspan="3" th:text="${user[2]}"></td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
-    <!-- Footer -->
-	<footer>
-	    Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
-	    Website hosted and maintained by National Informatics Center.
-	</footer>
+
+</div>
+
+
+
+<!-- Bootstrap -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/success.js"></script>
 
 </body>
 </html>

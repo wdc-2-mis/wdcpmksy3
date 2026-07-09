@@ -13,6 +13,7 @@ function changeLanguage(lang) {
     menuLinks[2].textContent = "डैशबोर्ड";
     menuLinks[3].textContent = "रिपोर्ट्स";
     menuLinks[4].textContent = "मानचित्र";
+	menuLinks[5].textContent = "संपर्क करें";
     menuLinks2[0].textContent = "लॉग इन";
     menuLinks2[1].textContent = "पंजीकरण";
  	  
@@ -24,6 +25,7 @@ function changeLanguage(lang) {
     menuLinks[2].textContent = "Dashboard";
     menuLinks[3].textContent = "Reports";
     menuLinks[4].textContent = "Map";
+	menuLinks[5].textContent = "Contact Us";
     menuLinks2[0].textContent = "Login";
     menuLinks2[1].textContent = "Registration";
     
@@ -197,7 +199,145 @@ function changeLanguage(lang) {
 						const addressLabel = document.querySelector('#addressField label');
 						if (addressLabel) {
 						  addressLabel.textContent = lang === 'hi' ? "पता *" : "Address *";
-						}			
+						}	
+						
+						// CONTACT US PAGE TRANSLATIONS
+
+						// Header title
+						const appTitle = document.querySelector('.app-title');
+						if (appTitle) {
+						  appTitle.textContent = lang === 'hi'
+						    ? "डब्ल्यूडीसी-पीएमकेएसवाई 3.0"
+						    : "WDC-PMKSY 3.0";
+						}
+
+						const appSubtitle = document.querySelector('.app-subtitle');
+						if (appSubtitle) {
+						  appSubtitle.textContent = lang === 'hi'
+						    ? "वाटरशेड विकास घटक\nप्रधानमंत्री कृषि सिंचाई योजना"
+						    : "Watershed Development Component\nPradhan Mantri Krishi Sinchayee Yojana";
+						}
+
+						const contactHeading = document.querySelector('h2');
+						if (contactHeading) {
+						  contactHeading.textContent = lang === 'hi'
+						    ? "संपर्क करें"
+						    : "CONTACT US";
+						}
+
+						
+						
+						// Email Support card
+						const emailSupportLabel = document.getElementById('emailSupportLabel');
+						if (emailSupportLabel) {
+						  emailSupportLabel.textContent = lang === 'hi'
+						    ? "📧 ईमेल सहायता"
+						    : "📧 Email Support";
+						}
+
+						
+						const emailSupportText = document.getElementById('emailSupportText');
+						if (emailSupportText) {
+						  emailSupportText.textContent = lang === 'hi'
+						    ? "support-wdcpmksy[at]nic[dot]in" // stays same
+						    : "support-wdcpmksy[at]nic[dot]in";
+						}
+						// Escalation Notice
+						const noticeLabel = document.getElementById('noticeLabel');
+						if (noticeLabel) {
+						  noticeLabel.textContent = lang === 'hi'
+						    ? "⚠ महत्वपूर्ण सूचना"
+						    : "⚠ Important Notice";
+						}
+
+						const noticeText = document.getElementById('noticeText');
+						if (noticeText) {
+						  noticeText.textContent = lang === 'hi'
+						    ? "यदि समस्या कुछ दिनों बाद भी बनी रहती है,"
+						    : "If problem remains unresolved after a few days,";
+						}
+
+						// CONTACT US EMAIL SUPPORT CARD
+
+						
+						const escalationEmail = document.getElementById('escalationEmail');
+						if (escalationEmail) {
+						  escalationEmail.textContent = lang === 'hi'
+						    ? "संपर्क करें: officer1.lris-2[at]nic[dot]in"
+						    : "contact: officer1.lris-2[at]nic[dot]in";
+						}
+						
+						// CONTACT US RIGHT SECTION TRANSLATIONS
+
+						// Heading
+						const rightHeading = document.querySelector('.right-section h2');
+						if (rightHeading) {
+						  rightHeading.innerHTML = lang === 'hi'
+						    ? "हम यहाँ हैं <span>आपकी मदद करने के लिए!</span>"
+						    : "WE ARE HERE TO <span>HELP YOU!</span>";
+						}
+
+						const subtitle = document.querySelector('.right-section .subtitle');
+						if (subtitle) {
+						  subtitle.textContent = lang === 'hi'
+						    ? "हमारी सहायता टीम हमेशा आपकी मदद के लिए तैयार है।"
+						    : "Our support team is always ready to assist you.";
+						}
+
+						// Officer 1
+						const officer1Name = document.querySelector('.team-card:nth-of-type(1) h3');
+						if (officer1Name) {
+						  officer1Name.textContent = lang === 'hi'
+						    ? "👨‍💼 श्री अजय माधुकर जोशी"
+						    : "👨‍💼 Sh. Ajay Madhukar Joshi";
+						}
+
+						const officer1Role = document.querySelector('.team-card:nth-of-type(1) p');
+						if (officer1Role) {
+						  officer1Role.textContent = lang === 'hi'
+						    ? "उप महानिदेशक एवं समूह प्रमुख, एलआरआईएसडी, एनआईसी"
+						    : "DDG & Head of Group, LRISD, NIC";
+						}
+
+						// Officer 2
+						const officer2Name = document.querySelector('.team-card:nth-of-type(2) h3');
+						if (officer2Name) {
+						  officer2Name.textContent = lang === 'hi'
+						    ? "👨‍💼 श्री गणेश खडंगा"
+						    : "👨‍💼 Sh. Ganesh Khadanga";
+						}
+
+						const officer2Role = document.querySelector('.team-card:nth-of-type(2) p');
+						if (officer2Role) {
+						  officer2Role.textContent = lang === 'hi'
+						    ? "वरिष्ठ तकनीकी निदेशक-प्रमुख, एलआरआईएसडी, एनआईसी"
+						    : "Senior Technical Director-HoD, LRISD, NIC";
+						}
+
+						// Officer 3
+						const officer3Name = document.querySelector('.team-card:nth-of-type(3) h3');
+						if (officer3Name) {
+						  officer3Name.textContent = lang === 'hi'
+						    ? "👩‍💼 सुश्री ओमलता"
+						    : "👩‍💼 Ms. Omlata";
+						}
+
+						const officer3Role = document.querySelector('.team-card:nth-of-type(3) p');
+						if (officer3Role) {
+						  officer3Role.textContent = lang === 'hi'
+						    ? "वैज्ञानिक डी, एनआईसी-डोलर कंप्यूटर सेल"
+						    : "Scientist D, NIC-DoLR Computer Cell";
+						}
+						
+						//login page start
+						
+						const loginLabel = document.getElementById('loginName');
+																		if (loginLabel) {
+																		  loginLabel.textContent = lang === 'hi'
+																		    ? "लॉग इन करें"
+																		    : "Login";
+																		}
+					
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -213,3 +353,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+let currentSize = 100; // percentage
+
+function changeFontSize(action) {
+  if (action === 'increase') {
+    currentSize += 10;
+  } else if (action === 'decrease') {
+    currentSize -= 10;
+  } else if (action === 'normal') {
+    currentSize = 100;
+  }
+  document.documentElement.style.fontSize = currentSize + '%';
+}

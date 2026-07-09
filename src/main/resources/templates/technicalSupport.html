@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - WDC PMKSY 3.0</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/contact.css}">
+    <script src="/js/language.js"></script>
+</head>
+
+<body>
+
+<div th:replace="~{header :: govHeader}"></div>
+
+<div class="container">
+
+    <div class="contact-wrapper">
+
+        <!-- LEFT SIDE -->
+        <div class="hero-section">
+
+            <div class="floating-icon email-icon">✉</div>
+            <div class="floating-icon phone-icon">☎</div>
+            <div class="floating-icon support-icon">🎧</div>
+            <div class="floating-icon clock-icon">🕒</div>
+
+            <div class="mobile-phone">
+
+                <div class="mobile-screen">
+
+    <!-- 🔵 MOBILE HEADER -->
+    <div class="mobile-header">
+        <div class="app-title">WDC-PMKSY 3.0</div>
+        <div class="app-subtitle">
+            Watershed Development Component<br>
+            Pradhan Mantri Krishi Sinchayee Yojana
+        </div>
+    </div>
+
+    <h2>CONTACT US</h2>
+
+    <!-- EMAIL -->
+    <div class="phone-card" id="emailSupportCard">
+        <span id="emailSupportLabel">📧 Email Support</span>
+        <small id="emailSupportText">support-wdcpmksy[at]nic[dot]in</small>
+    </div>
+
+    <!-- ESCALATION (ONLY BLINK TEXT) -->
+    <div class="phone-card" id="importantNoticeCard">
+    <span id="noticeLabel">⚠ Important Notice</span>
+    <small class="blink-text" id="noticeText">
+        If problem remains unresolved after a few days,
+    </small>
+    <br>
+    <small id="escalationEmail">contact: officer1.lris-2[at]nic[dot]in</small>
+</div>
+
+    <!-- 📱 MOBILE FOOTER -->
+    <div class="mobile-footer">
+    <img src="/images/nic-logo1.jpg" alt="NIC Logo">
+</div>
+
+</div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right-section">
+
+            <h2>
+                WE ARE HERE TO
+                <span>HELP YOU!</span>
+            </h2>
+
+            <p class="subtitle">
+                Our support team is always ready to assist you.
+            </p>
+
+            <!-- Officer 1 -->
+            <div class="team-card">
+                <h3>👨‍💼 Sh. Ajay Madhukar Joshi</h3>
+                <p>DDG & Head of Group, LRISD, NIC</p>
+                <div class="email">✉ hog-lris-2[at]nic[dot]in</div>
+            </div>
+
+            <!-- Officer 2 -->
+            <div class="team-card">
+                <h3>👨‍💼 Sh. Ganesh Khadanga</h3>
+                <p>Senior Technical Director-HoD, LRISD, NIC</p>
+                <div class="email">✉ ganesh[at]nic[dot]in</div>
+            </div>
+
+            <!-- Officer 3 -->
+            <div class="team-card">
+                <h3>👩‍💼 Ms. Omlata</h3>
+                <p>Scientist D, NIC-DoLR Computer Cell</p>
+                <div class="email">✉ officer1.lris-2[at]nic[dot]in</div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.
+    <br><br>
+    Website hosted and maintained by National Informatics Centre (NIC).
+</footer>
+
+</body>
+</html>

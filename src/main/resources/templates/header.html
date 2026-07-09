@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+ <script>
  
+ 
+ 
+ </script>
 </head>
 <body>
     <div th:fragment="govHeader">
@@ -22,6 +26,7 @@
                 <a th:href="@{/dashboard}">Dashboard</a>
                 <a th:href="@{/reports}">Reports</a>
                 <a th:href="@{/map}">Map</a>
+                <a th:href="@{/technicalsupport}">Contact Us</a>
             </div>
             <div class="auth">
                 <a th:href="@{/login}" class="login">Login</a>
@@ -34,6 +39,13 @@
     <option value="hi">हिन्दी</option>
   </select>
 </div>
+
+<div class="accessibility-bar">
+  <button onclick="changeFontSize('increase')">A+</button>
+  <button onclick="changeFontSize('normal')">A</button>
+  <button onclick="changeFontSize('decrease')">A-</button>
+</div>
+
         
     </div>
 </body>

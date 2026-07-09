@@ -144,12 +144,49 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
+.accessibility-bar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+}
+
+.accessibility-bar button {
+  background: #0b6e4f;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.accessibility-bar button:hover {
+  background: #095c40;
+}
+
 /* Active (click) effects */
 .menu a:active,
 .auth a:active {
     transform: scale(0.95);
     background: rgba(255,255,255,0.25);
     border-radius: 5px;
+}
+
+.field-error{
+
+    color:#dc3545;
+
+    font-size:12px;
+
+    margin-top:5px;
+
+    margin-left:4px;
+
+    display:none;
+
 }
 
 /* Focus (after click) effects */

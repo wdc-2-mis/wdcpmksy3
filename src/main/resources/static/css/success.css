@@ -1,0 +1,110 @@
+
+
+.form-label{
+
+    font-weight:600;
+
+    color:#555;
+
+}
+
+.dashboard-table{
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+}
+
+.dashboard-table th{
+
+    width:180px;
+
+    background:#f1f6fb;
+
+    color:#0B4F6C;
+
+    vertical-align:middle;
+
+}
+
+.dashboard-table td{
+
+    vertical-align:middle;
+
+}
+
+select[multiple]{
+
+    min-height:140px;
+
+}
+
+/*=========================================================
+            FOOTER
+=========================================================*/
+
+.dashboard-footer{
+    background:#0b4f71;
+    color:#fff;
+    padding:18px;
+    text-align:center;
+    font-size:14px;
+}
+
+/*=========================================================
+            RESPONSIVE
+=========================================================*/
+
+@media(max-width:992px){
+
+    .sidebar{
+        position:fixed;
+        left:-280px;
+        top:0;
+        height:100%;
+        z-index:9999;
+    }
+
+    .sidebar.show{
+        left:0;
+    }
+
+    .main-content{
+        width:100%;
+        padding:20px;
+    }
+
+    .welcome-card{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+    }
+
+    .welcome-right{
+        width:100%;
+        justify-content:space-between;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .dashboard-cards{
+        grid-template-columns:1fr;
+    }
+
+    .welcome-right{
+        flex-direction:column;
+    }
+
+    .role-box,
+    .state-box{
+        width:100%;
+    }
+
+    .content-body{
+        padding:40px 20px;
+    }
+
+}

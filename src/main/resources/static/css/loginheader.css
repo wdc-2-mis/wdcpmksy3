@@ -1,0 +1,1316 @@
+/*=====================================================
+        WDC-PMKSY 3.0 Dashboard
+        Part 1
+======================================================*/
+
+:root{
+
+    --primary:#0B4F6C;
+    --primary-dark:#083B50;
+    --primary-light:#1E88E5;
+
+    --secondary:#1565C0;
+
+    --success:#28a745;
+    --warning:#ff9800;
+    --danger:#dc3545;
+
+    --white:#ffffff;
+
+    --light:#f5f7fb;
+    --light-blue:#eef5fb;
+
+    --border:#dce5ee;
+
+    --text:#2d3748;
+    --text-light:#64748b;
+
+    --sidebar-width:330px;
+
+    --radius:14px;
+
+    --shadow:
+        0 10px 30px rgba(0,0,0,.08);
+
+    --transition:.35s ease;
+
+}
+
+/*=====================================================
+                    BODY
+======================================================*/
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+body{
+
+    background:var(--light);
+
+    font-family:'Poppins',sans-serif;
+
+    color:var(--text);
+
+    overflow-x:hidden;
+
+}
+
+/*=====================================================
+                TOP HEADER
+======================================================*/
+
+.top-header{
+
+    background:
+        linear-gradient(
+        135deg,
+        #0B4F6C,
+        #145374,
+        #1C6E8C);
+
+    color:#fff;
+
+    padding:14px 28px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,.18);
+
+    position:relative;
+
+    z-index:1000;
+
+}
+
+/*=====================================================
+                    LOGO
+======================================================*/
+
+.gov-logo{
+
+    width:72px;
+
+    height:72px;
+
+    object-fit:contain;
+
+    margin-right:18px;
+
+}
+
+.portal-info{
+
+    line-height:1.3;
+
+}
+
+.portal-info h6{
+
+    margin:0;
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+.portal-info span{
+
+    font-size:15px;
+
+    opacity:.95;
+
+}
+
+.portal-info p{
+
+    margin-top:4px;
+
+    font-size:14px;
+
+    opacity:.85;
+
+}
+
+/*=====================================================
+                RIGHT HEADER
+======================================================*/
+
+.header-right{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    align-items:center;
+
+    gap:18px;
+
+    flex-wrap:wrap;
+
+}
+
+/*=====================================================
+                SESSION BOX
+======================================================*/
+
+.session-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    background:
+        rgba(255,255,255,.14);
+
+    padding:10px 18px;
+
+    border-radius:16px;
+
+    backdrop-filter:blur(6px);
+
+    transition:var(--transition);
+
+}
+
+.session-box:hover{
+
+    transform:translateY(-2px);
+
+    background:
+        rgba(255,255,255,.22);
+
+}
+
+.session-box i{
+
+    font-size:22px;
+
+}
+
+.session-box small{
+
+    display:block;
+
+    font-size:12px;
+
+    opacity:.9;
+
+}
+
+#sessionTimer{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#8df400;
+
+    letter-spacing:1px;
+
+}
+
+/*=====================================================
+                USER BOX
+======================================================*/
+
+.user-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:8px 18px;
+
+    border-radius:16px;
+
+    text-decoration:none;
+
+    background:
+        rgba(255,255,255,.14);
+
+    transition:var(--transition);
+
+}
+
+.user-box:hover{
+
+    background:
+        rgba(255,255,255,.25);
+
+}
+
+.user-box strong{
+
+    color:#fff;
+
+    font-size:15px;
+
+}
+
+.avatar{
+
+    width:46px;
+
+    height:46px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#fff;
+
+    color:var(--primary);
+
+    font-size:20px;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.18);
+
+}
+
+/*=====================================================
+                DASHBOARD LAYOUT
+======================================================*/
+
+.dashboard-layout{
+
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    min-height: calc(100vh - 130px);
+
+}
+
+/*=====================================================
+                    SIDEBAR
+======================================================*/
+
+.sidebar{
+
+    width:var(--sidebar-width);
+
+    background:
+        linear-gradient(
+        180deg,
+        #083B50,
+        #0B4F6C,
+        #145374);
+
+    color:#fff;
+
+    display:flex;
+
+    flex-direction:column;
+
+    transition:var(--transition);
+
+    box-shadow:
+        6px 0 18px rgba(0,0,0,.12);
+
+    overflow:hidden;
+    
+
+}
+
+/*=====================================================
+            SIDEBAR HEADER
+======================================================*/
+
+.sidebar-header{
+
+    height:64px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 18px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.15);
+
+}
+
+.sidebar-title{
+
+    font-size:17px;
+
+    font-weight:600;
+
+    letter-spacing:.5px;
+
+}
+
+/*=====================================================
+                TOGGLE BUTTON
+======================================================*/
+
+.toggle-btn{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    background:
+        rgba(255,255,255,.12);
+
+    color:#fff;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:var(--transition);
+
+}
+
+.toggle-btn:hover{
+
+    background:#fff;
+
+    color:var(--primary);
+
+    transform:rotate(90deg);
+
+}
+
+/*=====================================================
+                MENU CONTAINER
+======================================================*/
+
+.sidebar-menu{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    padding:18px 14px;
+
+}
+
+/*=====================================================
+                SCROLLBAR
+======================================================*/
+
+.sidebar-menu::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb{
+
+    background:
+        rgba(255,255,255,.25);
+
+    border-radius:20px;
+
+}
+
+.sidebar-menu::-webkit-scrollbar-track{
+
+    background:transparent;
+
+}
+
+/*=====================================================
+                MENU
+======================================================*/
+
+.menu{
+
+    list-style:none;
+
+    margin:0;
+
+    padding:0;
+
+}
+
+.menu > li{
+
+    margin-bottom:12px;
+
+}
+
+
+.menu-left span,
+.sidebar-title{
+
+    transition:opacity .25s ease;
+
+}
+
+/*=====================================================
+            PARENT MENU
+======================================================*/
+
+.menu-toggle{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    padding:15px 18px;
+
+    border-radius:14px;
+
+    background:
+        rgba(255,255,255,.06);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    transition:all .35s ease;
+
+    user-select:none;
+
+}
+
+.menu-toggle:hover{
+
+    background:
+        linear-gradient(
+        90deg,
+        rgba(255,255,255,.18),
+        rgba(255,255,255,.08));
+
+    transform:translateX(6px);
+
+    box-shadow:
+        0 10px 20px rgba(0,0,0,.18);
+
+}
+
+/*=====================================================
+            LEFT SIDE OF MENU
+======================================================*/
+
+.menu-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+.menu-left i{
+
+    width:38px;
+
+    height:38px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border-radius:12px;
+
+    background:
+        rgba(255,255,255,.12);
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+.menu-toggle:hover .menu-left i{
+
+    background:#fff;
+
+    color:var(--primary);
+
+    transform:rotate(-10deg);
+
+}
+
+.menu-left span{
+
+    font-size:15px;
+
+    font-weight:600;
+
+    letter-spacing:.3px;
+
+}
+
+/*=====================================================
+            CHEVRON ICON
+======================================================*/
+
+.menu-toggle .fa-chevron-down{
+
+    font-size:14px;
+
+    transition:.35s;
+
+}
+
+.menu > li.active > .menu-toggle .fa-chevron-down{
+
+    transform:rotate(180deg);
+
+}
+
+/*=====================================================
+            ACTIVE PARENT MENU
+======================================================*/
+
+.menu > li.active > .menu-toggle{
+
+    background:
+        linear-gradient(
+        90deg,
+        #1E88E5,
+        #42A5F5);
+
+    color:#fff;
+
+    box-shadow:
+        0 10px 24px rgba(30,136,229,.35);
+
+}
+
+/*=====================================================
+                SUBMENU
+======================================================*/
+
+.submenu{
+
+    list-style:none;
+
+    margin:10px 0 0 18px;
+
+    padding:0;
+
+    display:none;
+
+    border-left:
+        2px solid rgba(255,255,255,.15);
+
+}
+
+/*=====================================================
+            SUBMENU ITEMS
+======================================================*/
+
+.submenu li{
+
+    margin:7px 0;
+
+}
+
+/*=====================================================
+            SUBMENU LINKS
+======================================================*/
+
+.submenu a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    text-decoration:none;
+
+    color:#dce9f6;
+
+    padding:11px 16px;
+
+    border-radius:10px;
+
+    transition:all .30s ease;
+
+    position:relative;
+
+    overflow:hidden;
+
+    font-size:14px;
+
+}
+
+/*=====================================================
+            SUBMENU ICON
+======================================================*/
+
+.submenu a i{
+
+    width:24px;
+
+    text-align:center;
+
+    transition:.3s;
+
+}
+
+/*=====================================================
+            SUBMENU HOVER
+======================================================*/
+
+.submenu a:hover{
+
+    background:
+        rgba(255,255,255,.12);
+
+    color:#fff;
+
+    transform:translateX(8px);
+
+}
+
+.submenu a:hover i{
+
+    color:#FFD54F;
+
+    transform:scale(1.2);
+
+}
+
+/*=====================================================
+            ACTIVE SUBMENU
+======================================================*/
+
+.submenu a.active{
+
+    background:#ffffff;
+
+    color:var(--primary);
+
+    font-weight:600;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.15);
+
+}
+
+.submenu a.active i{
+
+    color:var(--primary);
+
+}
+
+/*=====================================================
+            LEFT BORDER EFFECT
+======================================================*/
+
+.submenu a::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:0;
+
+    width:4px;
+
+    height:100%;
+
+    background:#42A5F5;
+
+    transform:scaleY(0);
+
+    transition:.3s;
+
+}
+
+.submenu a:hover::before{
+
+    transform:scaleY(1);
+
+}
+
+.submenu a.active::before{
+
+    transform:scaleY(1);
+
+}
+
+/*=====================================================
+            OPEN SUBMENU
+======================================================*/
+
+.menu > li.active > .submenu{
+
+    display:block;
+
+    animation:slideDown .35s ease;
+
+}
+
+.active-submenu > a{
+
+    background:#ffffff22;
+
+    color:#fff;
+
+    border-left:4px solid #ffc107;
+
+    font-weight:600;
+
+}
+/*=====================================================
+            ANIMATION
+======================================================*/
+
+@keyframes slideDown{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(-8px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/*=====================================================
+            MENU SPACING
+======================================================*/
+
+.menu > li:last-child{
+
+    margin-bottom:0;
+
+}
+
+/*=====================================================
+                CONTENT WRAPPER
+======================================================*/
+
+.content-wrapper{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    background:#f5f7fb;
+
+    min-width:0;
+
+    overflow:hidden;
+
+}
+
+/*=====================================================
+                SUB HEADER
+======================================================*/
+
+.sub-header{
+
+    height:68px;
+
+    background:#ffffff;
+
+    display:flex;
+
+    align-items:center;
+
+    border-bottom:1px solid #e2e8f0;
+
+    box-shadow:0 3px 12px rgba(0,0,0,.05);
+
+    z-index:5;
+
+}
+
+.sub-header-content{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 25px;
+
+}
+
+/*=====================================================
+            DASHBOARD TITLE
+======================================================*/
+
+.dashboard-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    color:var(--primary);
+
+    font-size:20px;
+
+    font-weight:600;
+
+}
+
+.dashboard-title i{
+
+    width:45px;
+
+    height:45px;
+
+    border-radius:50%;
+
+    background:rgba(30,136,229,.10);
+
+    color:#1E88E5;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:20px;
+    gap:12px;
+
+}
+
+.welcome-icon{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#e3f2fd;
+    color:var(--primary);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:18px;
+}
+
+.dashboard-title span{
+
+    color:#1565C0;
+
+}
+
+/*=====================================================
+            SERVER TIME
+======================================================*/
+
+.server-time{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:#64748b;
+
+    font-size:15px;
+
+    font-weight:600;
+
+}
+
+.server-time i{
+
+    color:#1E88E5;
+
+    font-size:18px;
+
+}
+
+.dashboard-title small{
+    display:block;
+    color:#64748b;
+    font-size:12px;
+    font-weight:500;
+}
+
+.dashboard-title strong{
+    color:var(--primary);
+    font-size:18px;
+    font-weight:700;
+}
+
+/*=====================================================
+                MAIN CONTENT
+======================================================*/
+
+.main-content{
+
+    flex:1;
+
+    padding:25px;
+
+    overflow:auto;
+
+}
+
+/*=====================================================
+                CONTENT CARD
+======================================================*/
+
+.content-card{
+
+    background:#ffffff;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+
+}
+
+/*=====================================================
+            COLLAPSED SIDEBAR
+======================================================*/
+
+/* Collapsed Sidebar */
+.sidebar.collapsed{
+
+    width:80px;
+
+}
+
+.sidebar.collapsed .sidebar-title{
+    display:none;
+}
+
+.sidebar.collapsed .menu-toggle{
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:15px 0;
+
+}
+
+.sidebar.collapsed .menu-toggle span{
+
+    display:none;
+
+}
+
+.sidebar.collapsed .menu-toggle .fa-chevron-down{
+
+    display:none;
+
+}
+
+.sidebar.collapsed .submenu{
+
+    display:none !important;
+
+}
+.content-wrapper{
+
+    flex:1;
+
+    transition:all .35s ease;
+
+}
+.content-wrapper.expanded{
+
+    width:100%;
+
+}
+/*=====================================================
+                SMOOTH TRANSITION
+======================================================*/
+
+.sidebar,
+.content-wrapper,
+.menu-toggle,
+.submenu,
+.dashboard-title,
+.server-time{
+
+    transition:all .35s ease;
+
+}
+
+/*=====================================================
+                TABLETS
+======================================================*/
+
+@media(max-width:992px){
+
+    .dashboard-layout{
+
+        flex-direction:column;
+
+    }
+
+    
+
+    .sub-header-content{
+
+        padding:0 20px;
+
+    }
+
+    .dashboard-title{
+
+        font-size:19px;
+
+    }
+
+}
+
+/*=====================================================
+                MOBILE
+======================================================*/
+
+@media(max-width:768px){
+
+    .top-header{
+
+        padding:15px;
+
+        text-align:center;
+
+    }
+
+    .header-right{
+
+        justify-content:center;
+
+        margin-top:15px;
+
+    }
+
+    .gov-logo{
+
+        width:60px;
+
+        height:60px;
+
+    }
+
+    .portal-info h6{
+
+        font-size:18px;
+
+    }
+
+    .portal-info span{
+
+        font-size:13px;
+
+    }
+
+    .portal-info p{
+
+        font-size:12px;
+
+    }
+
+    .sub-header{
+
+        height:auto;
+
+        padding:15px 0;
+
+    }
+
+    .sub-header-content{
+
+        flex-direction:column;
+
+        gap:10px;
+
+        text-align:center;
+
+    }
+
+    .dashboard-title{
+
+        font-size:18px;
+
+    }
+
+    .server-time{
+
+        font-size:14px;
+
+    }
+
+    .main-content{
+
+        padding:15px;
+
+    }
+
+}
+
+/*=====================================================
+            SMALL MOBILE
+======================================================*/
+
+@media(max-width:576px){
+
+    .session-box,
+
+    .user-box{
+
+        width:100%;
+
+        justify-content:center;
+
+    }
+
+    .header-right{
+
+        gap:12px;
+
+    }
+
+    .dashboard-title{
+
+        font-size:16px;
+
+    }
+
+    .dashboard-title i{
+
+        width:38px;
+
+        height:38px;
+
+        font-size:16px;
+
+    }
+
+    .server-time{
+
+        display:none;
+
+    }
+
+}
+
+/*=====================================================
+            NICE SCROLLBAR
+======================================================*/
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+    height:10px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#b7c4d6;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#8da3bd;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#edf2f7;
+
+}
+
+/*=====================================================
+                DROPDOWN
+======================================================*/
+
+.dropdown-menu{
+
+    border:none;
+
+    border-radius:15px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+
+    overflow:hidden;
+
+    padding:8px;
+
+}
+
+.dropdown-item{
+
+    border-radius:10px;
+
+    padding:10px 15px;
+
+    transition:.3s;
+
+    font-size:14px;
+
+}
+
+.dropdown-item:hover{
+
+    background:#e3f2fd;
+
+    color:#1565C0;
+
+}
+
+.dropdown-item i{
+
+    width:22px;
+
+}
+
+/*=====================================================
+                SELECTION
+======================================================*/
+
+::selection{
+
+    background:#1565C0;
+
+    color:#fff;
+
+}

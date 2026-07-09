@@ -15,62 +15,84 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
-
     }
-    
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
         http
+
             .csrf(csrf -> csrf.disable())
+
             .authorizeHttpRequests(auth -> auth
+
                 .requestMatchers(
-                    "/","/login", "/register","/emaillogin","/sendOtp","/verifyOtp","/getEmailandGenerateotp", "/customLogout", "/fetchMenu", 
-                    "/loginSuccess", "/checkemail",  "/projectPropose", "/projectProposSave", "/gisDetails",
-            		
-                    
-                    // Static resources
-                    "/css/**",
-                    "/js/**",
-                    "/images/**",
-                    "/fonts/**",
-                    "/webjars/**",
-                    "/video/**"
+
+                        "/",
+
+                        "/login",
+
+                        "/loginSuccess",
+                        
+                        "/getEmailandGenerateotp",
+
+                        "/verifyOtp",
+                        
+                        "/piaPjtNotLocatiaon",
+
+                        "/css/**",
+
+                        "/js/**",
+
+                        "/images/**",
+
+                        "/fonts/**",
+
+                        "/video/**"
+
                 ).permitAll()
+
                 .anyRequest().authenticated()
+
             )
+
             .formLogin(form -> form
-                .loginPage("/login")
-                .permitAll()
-            );
-				/*
-				 * .logout(logout -> logout .logoutUrl("/logout")
-				 * .logoutSuccessUrl("/login?logout") .invalidateHttpSession(true) // destroys
-				 * session .deleteCookies("JSESSIONID") // removes session cookie )
-				
-                .sessionManagement(session -> session
-                    .maximumSessions(1)            // restricts concurrent sessions
-                    .maxSessionsPreventsLogin(false)
-            		)   */
 
-        return http.build();
-    }
-    
-   /* @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                    .loginPage("/login")
 
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register" , "/getEmailandGenerateotp", "/logout", "/fetchMenu", "/login" , "/emaillogin", "/checkemail"
-                		, "/sendOtp", "/verifyOtp", "/").permitAll()
-                .anyRequest().authenticated()
+                    .permitAll()
+
             )
-            .httpBasic(Customizer.withDefaults());
+
+            .logout(logout -> logout
+
+                    .logoutUrl("/logout")
+
+                    .logoutSuccessUrl("/login?logout")
+
+                    .invalidateHttpSession(true)
+
+                    .deleteCookies("JSESSIONID")
+
+                    .clearAuthentication(true)
+
+            )
+            
+            .sessionManagement(session -> session
+
+                    .sessionFixation(fix -> fix.migrateSession())
+
+                    .maximumSessions(1)
+
+                    .maxSessionsPreventsLogin(false)
+
+            );
 
         return http.build();
-    }  */
+
+    }
+
 }
