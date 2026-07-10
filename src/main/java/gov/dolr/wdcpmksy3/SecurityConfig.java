@@ -51,7 +51,10 @@ public class SecurityConfig {
 
                         "/fonts/**",
 
-                        "/video/**"
+                        "/video/**",
+                        "/register",
+                        "/register/**",
+                        "/technicalsupport"
 
                 ).permitAll()
 
