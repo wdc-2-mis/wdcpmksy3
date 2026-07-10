@@ -5,12 +5,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="slna_institutional_structure")
+@Table(name="ppr_slna_institutional_structure")
 public class InstitutionalStructure {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer institutional_id;
+    private Integer ppr_inst_str_id;
 
     private Integer st_code;
 
@@ -48,18 +48,16 @@ public class InstitutionalStructure {
 
     //Getters and Setters
 
-    public Integer getInstitutional_id() {
-		return institutional_id;
+    public Integer getPpr_inst_str_id() {
+		return ppr_inst_str_id;
 	}
-
-	public void setInstitutional_id(Integer institutional_id) {
-		this.institutional_id = institutional_id;
+	public void setPpr_inst_str_id(Integer ppr_inst_str_id) {
+		this.ppr_inst_str_id = ppr_inst_str_id;
 	}
 
 	public Integer getSt_code() {
 		return st_code;
 	}
-
 	public void setSt_code(Integer st_code) {
 		this.st_code = st_code;
 	}
