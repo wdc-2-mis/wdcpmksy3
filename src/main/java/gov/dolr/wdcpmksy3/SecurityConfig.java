@@ -31,30 +31,17 @@ public class SecurityConfig {
 
                 .requestMatchers(
 
-                        "/",
-
-                        "/login",
-
-                        "/loginSuccess",
+                        "/", "/login", "/loginSuccess", "/getEmailandGenerateotp", "/verifyOtp", "/piaPjtNotLocatiaon", "/ppr1", "/saveInstitutionalStructure",  
+                        "/register", "/register/**", "/technicalsupport",
                         
-                        "/getEmailandGenerateotp",
-
-                        "/verifyOtp",
                         
-                        "/piaPjtNotLocatiaon",
 
                         "/css/**",
-
                         "/js/**",
-
                         "/images/**",
-
                         "/fonts/**",
-
-                        "/video/**",
-                        "/register",
-                        "/register/**",
-                        "/technicalsupport"
+                        "/video/**"
+                       
 
                 ).permitAll()
 
