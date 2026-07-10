@@ -64,11 +64,19 @@ document.querySelectorAll(".menu-toggle").forEach(menu => {
 
         const current = this.parentElement;
 
-        if(current.querySelector(".active-submenu")){
+        // if already open, close it
+        if(current.classList.contains("active")){
+            current.classList.remove("active");
             return;
         }
 
-        current.classList.toggle("active");
+        // close others
+        document.querySelectorAll(".menu > li").forEach(item=>{
+            item.classList.remove("active");
+        });
+
+        // open current
+        current.classList.add("active");
 
     });
 

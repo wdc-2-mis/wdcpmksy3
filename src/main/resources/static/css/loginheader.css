@@ -766,15 +766,14 @@ body{
 }
 
 .active-submenu > a{
-
-    background:#ffffff22;
-
-    color:#fff;
-
-    border-left:4px solid #ffc107;
-
+    background:#ffffff;
+    color:#0B4F6C !important;
+    border-radius:8px;
     font-weight:600;
+}
 
+.active-submenu > a i{
+    color:#0B4F6C;
 }
 /*=====================================================
             ANIMATION
