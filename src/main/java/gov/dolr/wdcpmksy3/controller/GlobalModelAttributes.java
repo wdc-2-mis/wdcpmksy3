@@ -16,20 +16,27 @@ public class GlobalModelAttributes {
     private MenuService menuService;
 
     @ModelAttribute
-    public void addCommonAttributes(HttpServletRequest request,
-                                    HttpSession session,
-                                    Model model) {
+    public void addCommonAttributes(HttpServletRequest request, HttpSession session, Model model) {
 
-        Integer regid = (Integer) session.getAttribute("regid");
+    	String currentUri = request.getRequestURI();
 
-        model.addAttribute("currentUri", request.getRequestURI());
+        
+        model.addAttribute("currentUri", currentUri);
+    	
+    	Integer regid = (Integer) session.getAttribute("regid");
 
-        model.addAttribute("username", session.getAttribute("username"));
-        model.addAttribute("stateName", session.getAttribute("statename"));
-        model.addAttribute("timeoutSeconds", session.getMaxInactiveInterval());
+        model.addAttribute("timeoutSeconds",
+                session.getMaxInactiveInterval());
+
+        model.addAttribute("username",
+                session.getAttribute("username"));
+
+        model.addAttribute("stateName",
+                session.getAttribute("statename"));
 
         if (regid != null) {
-            model.addAttribute("menus", menuService.getMenuUserId(regid));
+            model.addAttribute("menus",
+                    menuService.getMenuUserId(regid));
         }
     }
 }
