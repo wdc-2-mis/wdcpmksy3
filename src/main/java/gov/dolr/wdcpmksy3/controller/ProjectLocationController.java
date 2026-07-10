@@ -14,10 +14,15 @@ public class ProjectLocationController {
 	@GetMapping("/piaPjtNotLocatiaon")
 	public String piaPjtNotLocatiaon(HttpSession session,
 	                                 Model model) {
-		System.out.println("PIA Session = " + session.getId());
-	    model.addAttribute("stateName",
+		
+		if(session.getAttribute("userid")==null){
+		    return "redirect:/login";
+		}
+		else {
+		model.addAttribute("stateName",
 	            session.getAttribute("statename"));
 
 	    return "pialocation";
+		}
 	}
 }

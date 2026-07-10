@@ -4,8 +4,12 @@
       layout:decorate="~{layout/layout}">
 
 <head>
-    <title>PIA Project Notification</title>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPR1</title>
     <link rel="stylesheet" th:href="@{/css/pialocation.css}">
+    
+    
 </head>
 
 <body>
@@ -21,7 +25,7 @@
 
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">
-                PIA Project Notification
+               Institutional Structure
             </h4>
         </div>
 
@@ -95,6 +99,31 @@
                                 name="notificationFile">
 
                     </div>
+                    
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Date of MoU with DoLR
+                        </label>
+
+                        <input
+                                type="date"
+                                class="form-control"
+                                name="mouDate">
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Upload MoU
+                        </label>
+
+                        <input
+                                type="file"
+                                class="form-control"
+                                name="mouFile">
+
+                    </div>
 
                 </div>
 
@@ -136,5 +165,6 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
