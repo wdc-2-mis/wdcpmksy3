@@ -28,6 +28,9 @@ public class InstitutionalStructure {
 
     @Column(name="mou_file")
     private String mouFile;
+    
+    @Column(name="common_slna_sldc")
+    private Boolean common_slna_sldc;
 
     private String status;
     
@@ -102,10 +105,16 @@ public class InstitutionalStructure {
         this.mouFile = mouFile;
     }
 
-    public String getStatus() {
+    public Boolean getCommon_slna_sldc() {
+		return common_slna_sldc;
+	}
+	public void setCommon_slna_sldc(Boolean common_slna_sldc) {
+		this.common_slna_sldc = common_slna_sldc;
+	}
+	
+	public String getStatus() {
         return status;
     }
-
     public void setStatus(String status) {
         this.status = status;
     }

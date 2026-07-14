@@ -2,11 +2,19 @@ package gov.dolr.wdcpmksy3.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
+import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -28,6 +37,9 @@ public class PPR1Controller {
 
     @Autowired
     private InstitutionalStructureService service;
+    
+    @Autowired
+    private InstitutionalStructureServiceImpl isserv;
 	
 	@GetMapping("/ppr1")
     public String ppr1(HttpSession session, Model model) {
@@ -42,14 +54,15 @@ public class PPR1Controller {
 
             return "redirect:/login";
         }
+        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
         return "ppr1";
     }
 	
 
-    @PostMapping("/saveInstitutionalStructure")
-    public String saveInstitutionalStructure(HttpSession session, Model model, HttpServletRequest request,
+    @PostMapping("/saveInstitutionalStructurePPR1")
+    public String saveInstitutionalStructurePPR1(HttpSession session, Model model, HttpServletRequest request,
 
             @RequestParam Integer stcode,
             @RequestParam String stateName,
@@ -72,9 +85,9 @@ public class PPR1Controller {
 	            dir.mkdirs();
 	        }
 	
-	        String notificationFileName = UUID.randomUUID() + "_"+ notificationFile.getOriginalFilename();
+	        String notificationFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ notificationFile.getOriginalFilename();
 	
-	        String mouFileName = UUID.randomUUID() + "_"+ mouFile.getOriginalFilename();
+	        String mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ mouFile.getOriginalFilename();
 	
 	        notificationFile.transferTo(new File(uploadPath + notificationFileName));
 	
@@ -85,9 +98,9 @@ public class PPR1Controller {
 	        obj.setSt_code(stcode);
 	        obj.setSlnaType(slnaType);
 	        obj.setNotificationDate(notificationDate);
-	        obj.setNotificationFile(notificationFileName);
+	        obj.setNotificationFile(uploadPath+notificationFileName);
 	        obj.setMouDate(mouDate);
-	        obj.setMouFile(mouFileName);
+	        obj.setMouFile(uploadPath+mouFileName);
 	        obj.setStatus(action);
 	        obj.setCreatedBy(userid);
 	        obj.setCreatedDate(LocalDateTime.now());
@@ -96,6 +109,8 @@ public class PPR1Controller {
 	        service.save(obj);
 	
 	        redirectAttributes.addFlashAttribute("success","Record Saved Successfully.");
+	        
+	        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
 	
 	        return "redirect:/ppr1";
 		}
@@ -104,6 +119,172 @@ public class PPR1Controller {
 		}
 		
 		
+    }
+    
+    @GetMapping("/viewPdf1")
+    public ResponseEntity<Resource> viewPdf(@RequestParam String path) throws IOException {
+
+        Path filePath = Paths.get(path);
+
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            return ResponseEntity.notFound().build();
+        }
+        // server 
+      //  return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
+             //   .header(HttpHeaders.CONTENT_DISPOSITION,"inline; filename=/"" + resource.getFilename() + "/"").body(resource);
+        // local
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,"inline; filename=\"" + resource.getFilename() + "\"").body(resource);
+    }
+    
+    @GetMapping("/viewPdf")
+    public ResponseEntity<Resource> viewPdf(@RequestParam Long id,
+            @RequestParam String type) throws IOException {
+
+    		InstitutionalStructure data = isserv.getById(id);
+
+    		if (data == null) {
+    			return ResponseEntity.notFound().build();
+    		}
+
+    		String filePath = null;
+
+    		if ("notification".equalsIgnoreCase(type)) 
+    		{
+    			filePath = data.getNotificationFile();
+    		} 
+    		else if ("mou".equalsIgnoreCase(type)) 
+    		{
+    			filePath = data.getMouFile();
+    		} 
+    		else {
+    			return ResponseEntity.badRequest().build();
+    		}
+
+    		Path path = Paths.get(filePath);
+
+    		Resource resource = new UrlResource(path.toUri());
+
+    		if (!resource.exists() || !resource.isReadable()) {
+    			return ResponseEntity.notFound().build();
+    		}
+
+    		return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
+    				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(resource);
+    }
+    
+    
+    
+    
+    
+    @GetMapping("/deletePPR1")
+    public String deletePPR1(HttpSession session, Model model, @RequestParam("id") Long id,  RedirectAttributes redirectAttributes) {
+
+		
+		System.out.println("PPR1 ID = " + id);
+		String statename=session.getAttribute("statename").toString();
+		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+		try {
+			
+			
+			
+        if(userid==null){
+
+            return "redirect:/login";
+        }
+        
+            InstitutionalStructure data = isserv.getById(id);
+
+            if (data == null) {
+                redirectAttributes.addFlashAttribute("error", "Record not found.");
+                return "redirect:/ppr1";
+            }
+
+            // Notification PDF
+            deleteFile(data.getNotificationFile());
+
+            // MoU PDF
+            deleteFile(data.getMouFile());
+
+            // Delete record
+            isserv.delete(id);
+
+            redirectAttributes.addFlashAttribute("success", "Record deleted successfully.");
+            
+            model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+    		model.addAttribute("statename", statename);
+    		model.addAttribute("stcode", stcode);
+
+        } 
+        catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+
+            e.printStackTrace();
+        }
+        
+       
+        return "ppr1";
+    }
+    
+    private void deleteFile(String filePath) {
+
+        if (filePath != null && !filePath.isBlank()) {
+
+            try {
+
+                Path path = Paths.get(filePath);
+
+                if (Files.exists(path)) {
+                    Files.delete(path);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    @GetMapping("/completePPR1")
+    public String completePPR1(HttpSession session, Model model, @RequestParam("id") Long id,  RedirectAttributes redirectAttributes) {
+
+		
+		System.out.println("PPR1 ID = " + id);
+		String statename=session.getAttribute("statename").toString();
+		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+		 	try {
+
+		 		if(userid==null){
+
+		            return "redirect:/login";
+		        }
+		 		
+		        boolean updated = isserv.completeRecordPPR1(id);
+
+		        if (updated) {
+		            redirectAttributes.addFlashAttribute("success", "Record completed successfully.");
+		        } 
+		        else {
+		            redirectAttributes.addFlashAttribute("success", "Record not found.");
+		        }
+		        
+		        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+	    		model.addAttribute("statename", statename);
+	    		model.addAttribute("stcode", stcode);
+
+
+		    } 
+		 	catch (Exception e) {
+
+		        redirectAttributes.addFlashAttribute("success", "Unable to complete record.");
+		    }
+        
+       
+        return "ppr1";
     }
     
     public static String getClientIpAddr(HttpServletRequest request) {  
