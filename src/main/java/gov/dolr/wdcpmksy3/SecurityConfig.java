@@ -32,8 +32,8 @@ public class SecurityConfig {
                 .requestMatchers(
 
                         "/", "/login", "/loginSuccess", "/getEmailandGenerateotp", "/verifyOtp", "/piaPjtNotLocatiaon", "/ppr1", "/saveInstitutionalStructurePPR1",  
-                        "/register", "/register/**", "/technicalsupport", "/customLogout", "/download/**","/viewPdf", "/deletePPR1", "/completePPR1",
-                        
+                        "/register", "/register/**", "/technicalsupport", "/customLogout", "/download/**","/viewPdf", "/deletePPR1", "/completePPR1", "/editPPR1",
+                        "/updateInstitutionalStructurePPR1",
                         
 
                         "/css/**",

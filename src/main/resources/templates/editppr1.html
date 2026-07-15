@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // Allow only PDF files
 document.addEventListener("DOMContentLoaded", function () {
 
-    const form = document.getElementById("institutionForm");
 	const notificationFile = document.getElementById("notificationFile");
 	const mouFile = document.getElementById("mouFile");
 
@@ -81,94 +80,6 @@ document.addEventListener("DOMContentLoaded", function () {
 	        }
 	    });
 	
-	
-	
-	
-	
-
-    form.addEventListener("submit", function (e) {
-
-        const slnaType = document.getElementsByName("slnaType")[0];
-        const notificationDate = document.getElementsByName("notificationDate")[0];
-        const mouDate = document.getElementsByName("mouDate")[0];
-        const notificationFile = document.getElementsByName("notificationFile")[0];
-        const mouFile = document.getElementsByName("mouFile")[0];
-
-        // Type of SLNA
-        if (slnaType.value.trim() === "") {
-            alert("Please enter Type of SLNA.");
-            slnaType.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // Notification Date
-        if (notificationDate.value === "") {
-            alert("Please select Date of Notification.");
-            notificationDate.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // Notification PDF
-        if (notificationFile.files.length === 0) {
-            alert("Please upload Notification PDF.");
-            notificationFile.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // MoU Date
-        if (mouDate.value === "") {
-            alert("Please select Date of MoU.");
-            mouDate.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // MoU PDF
-        if (mouFile.files.length === 0) {
-            alert("Please upload MoU PDF.");
-            mouFile.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // Validate PDF type
-        const file1 = notificationFile.files[0];
-        const file2 = mouFile.files[0];
-
-        if (!file1.name.toLowerCase().endsWith(".pdf")) {
-            alert("Notification file must be a PDF.");
-            notificationFile.value = "";
-            notificationFile.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        if (!file2.name.toLowerCase().endsWith(".pdf")) {
-            alert("MoU file must be a PDF.");
-            mouFile.value = "";
-            mouFile.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // Same file validation
-        if (file1.name.toLowerCase() === file2.name.toLowerCase()
-                && file1.size === file2.size) {
-
-            alert("Notification PDF and MoU PDF cannot be the same file.");
-
-            mouFile.value = "";
-            mouFile.focus();
-
-            e.preventDefault();
-            return false;
-        }
-
-    });
-
 });
 
 </script>
@@ -188,19 +99,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">
-               Institutional Structure
+               Update Institutional Structure
             </h4>
         </div>
 		
-		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-				    <span th:text="${success}"></span>
-
-				    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-				</div>
-
         <div class="card-body">
 
-             <form id="institutionForm" th:action="@{/saveInstitutionalStructurePPR1}" method="post" enctype="multipart/form-data" novalidate>
+             <form id="institutionForm" th:action="@{/updateInstitutionalStructurePPR1}" method="post" enctype="multipart/form-data" novalidate>
 
                 <div class="row g-4">
 
@@ -209,12 +114,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="col-md-6">
 
                         <label class="form-label">
-                           <b> State Name </b><span class="required">*</span>
+                           <b> State Name </b>
                         </label>
 
 						<input type="text" class="form-control" name="stateName"  th:value="${statename}" readonly>
 											
-						<input type="hidden" name="stcode"  th:value="${stcode}" >
+						<input type="hidden" name="pprid" id="pprid" th:value="${editData?.ppr_inst_str_id}">
 
                     </div>
 
@@ -223,11 +128,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="col-md-6">
 
                         <label class="form-label">
-                           <b> Type of SLNA </b><span class="required">*</span>
+                           <b> Type of SLNA </b>
                         </label>
 
 						<input type="text" class="form-control"name="slnaType"
-						        th:value="${slnaType}" placeholder="Enter Type of SLNA" required>
+						         th:value="${editData != null ? editData.slnaType : ''}" >
 
                     </div>
 
@@ -236,11 +141,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="col-md-6">
 
                         <label class="form-label">
-                          <b>  Date of Notification </b><span class="required">*</span>
+                          <b>  Date of Notification </b>
                         </label>
 
 						<input type="date" class="form-control" name="notificationDate"
-						            min="2026-01-01" th:value="${notificationDate}" required>
+						            min="2026-01-01" th:value="${editData != null ? editData.notificationDate : ''}" >
 
                     </div>
 
@@ -249,40 +154,38 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="col-md-6">
 
                         <label class="form-label">
-                           <b> Upload Notification </b> <span class="required">*</span>
+                           <b> Upload Notification </b> 
                         </label>
 
 						<input type="file"
 						       id="notificationFile"
 						       name="notificationFile"
 						       class="form-control"
-						       accept=".pdf,application/pdf"
-						       required>
+						       accept=".pdf,application/pdf">
                   <small class="form-text text-muted">Only PDF file is allowed.</small>
                     </div>
                     
                     <div class="col-md-6">
 
                         <label class="form-label">
-                          <b>  Date of MoU with DoLR </b> <span class="required">*</span>
+                          <b>  Date of MoU with DoLR </b>
                         </label>
 
 						<input type="date" class="form-control" name="mouDate"
-						          min="2026-01-01" th:value="${mouDate}" required>
+						          min="2026-01-01" th:value="${editData != null ? editData.mouDate : ''}" >
 
                     </div>
                     <div class="col-md-6">
 
                         <label class="form-label">
-                           <b> Upload MoU </b> <span class="required">*</span>
+                           <b> Upload MoU </b> 
                         </label>
 
 						<input type="file"
 						       id="mouFile"
 						       name="mouFile"
 						       class="form-control"
-						       accept=".pdf,application/pdf"
-						       required>
+						       accept=".pdf,application/pdf">
 											   
 						<small class="form-text text-muted">Only PDF file is allowed.</small>
                     </div>
@@ -293,11 +196,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 <div >
 					<center>
-					<button type="submit" name="action"  value="D" class="btn btn-warning">
+					<button type="submit" name="action"  value="D" class="btn btn-primary btn-sm">
 
                         <i class="fas fa-save"></i>
 
-                        Save as Draft
+                        Edit
 
                     </button>
 					</center>
@@ -326,62 +229,47 @@ document.addEventListener("DOMContentLoaded", function () {
 		                        </tr>
 								</tbody>
 		                       <!--  <tr th:each="user : ${ppr1List}">
-
 		                           <td th:text="${user[2]}"></td>-->
 									
 								   <tr th:each="user, stat : ${ppr1List}">
-								       <td th:text="${stat.first ? user[2] : ''}"></td>
+								       	<td th:text="${stat.first ? user[2] : ''}"></td>
 									
-									
-		                            <td th:text="${user[3]}"></td>
-									<td th:text="${user[4]}"></td>
-									<td>
-										<!--<a th:href="@{/viewPdf(path=${user[5]})}" target="_blank">
-										        View Uploaded
-										</a>-->
-										
-										<a th:href="@{/viewPdf(id=${user[0]},type='notification')}" target="_blank">
-										    View Uploaded
-										</a>
-										
-									</td>
-
-									<td th:text="${user[6]}"></td>
-
-									<td>
-										<a th:href="@{/viewPdf(id=${user[0]},type='mou')}" target="_blank">
-												View Uploaded
-										</a>
-									</td>
-									
-									<td>
-										<a th:if="${user[8] == 'D'}"
-										   th:href="@{/deletePPR1(id=${user[0]})}"
-										   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-										    Delete
-										</a>
-										&nbsp; &nbsp; 
-										<a th:if="${user[8] == 'D'}"
-										   th:href="@{/editPPR1(id=${user[0]})}"
-										   class="btn btn-primary btn-sm"
-										   onclick="return confirm('Are you sure you want to edit this record?');">
-										    Edit
-										</a>
-										&nbsp; &nbsp; 
-									    <a th:if="${user[8] == 'D'}"
-										th:href="@{/completePPR1(id=${user[0]})}"
-									            class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-									        Complete
-									     </a>
-									</td>
-									
+			                            <td th:text="${user[3]}"></td>
+										<td th:text="${user[4]}"></td>
+										<td>
+											<a th:href="@{/viewPdf(id=${user[0]},type='notification')}" target="_blank">
+											    	View Uploaded
+											</a>
+										</td>
+										<td th:text="${user[6]}"></td>
+										<td>
+											<a th:href="@{/viewPdf(id=${user[0]},type='mou')}" target="_blank">
+													View Uploaded
+											</a>
+										</td>
+										<td>
+											<a th:if="${user[8] == 'D'}"
+											   th:href="@{/deletePPR1(id=${user[0]})}"
+											   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+											    Delete
+											</a>
+											&nbsp; &nbsp; 
+											<a th:if="${user[8] == 'D'}"
+											   th:href="@{/editPPR1(id=${user[0]})}"
+											   class="btn btn-primary btn-sm"
+											   onclick="return confirm('Are you sure you want to edit this record?');">
+											    Edit
+											</a>
+											&nbsp; &nbsp; 
+										    <a th:if="${user[8] == 'D'}"
+											th:href="@{/completePPR1(id=${user[0]})}"
+										            class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
+										        Complete
+										     </a>
+										</td>
 		                        </tr>
-
 		                    </table>
-
 		                </div>
-		
-		
 
     </div>
 
