@@ -33,7 +33,7 @@ public class SecurityConfig {
 
                         "/", "/login", "/loginSuccess", "/getEmailandGenerateotp", "/verifyOtp", "/piaPjtNotLocatiaon", "/institutionalStructurePPR1", "/saveInstitutionalStructurePPR1", "/updateInstitutionalStructurePPR1",
                         "/register", "/register/**", "/technicalsupport", "/customLogout", "/download/**","/viewPdfInstitutionalStructure", "/deleteInstitutionalStructurePPR1", "/completeInstitutionalStructurePPR1", 
-                        "/editInstitutionalStructurePPR1",
+                        "/editInstitutionalStructurePPR1", "/slnaFunctionariesPPR3", "/SaveSLNAFunctionariesPPR3",
                         
                         
 

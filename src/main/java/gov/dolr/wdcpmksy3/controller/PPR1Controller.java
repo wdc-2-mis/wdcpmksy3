@@ -440,5 +440,27 @@ public class PPR1Controller {
 	    }  
 	    return ip;  
 	}
+    
+    @GetMapping("/slnaFunctionariesPPR3")
+    public String slnaFunctionariesPPR3(HttpSession session, Model model) 
+	{
+		
+		String statename=session.getAttribute("statename").toString();
+		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+
+        if(userid==null){
+
+            return "redirect:/login";
+        }
+        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+		model.addAttribute("statename", statename);
+		model.addAttribute("stcode", stcode);
+        return "slnaFunctionariesPPR3";
+    } 
+    
+    
+    
+    
 
 }
