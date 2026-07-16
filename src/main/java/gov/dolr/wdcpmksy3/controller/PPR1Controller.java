@@ -47,7 +47,7 @@ public class PPR1Controller {
     @Autowired
     InstitutionalStructureRepository repository;
 	
-	@GetMapping("/ppr1")
+	@GetMapping("/institutionalStructurePPR1")
     public String ppr1(HttpSession session, Model model) 
 	{
 		System.out.println("PPR1 Session ID = " + session.getId());
@@ -125,7 +125,7 @@ public class PPR1Controller {
 	        
 	        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
 	
-	        return "redirect:/ppr1";
+	        return "redirect:/institutionalStructurePPR1";
 		}
 		else {
 			return "redirect:/login";
@@ -181,7 +181,7 @@ public class PPR1Controller {
     				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(resource);
     }
     
-    @GetMapping("/viewPdf")
+    @GetMapping("/viewPdfInstitutionalStructure")
     public ResponseEntity<Resource> viewPdf(@RequestParam Long id,
                         @RequestParam String type) throws IOException {
 
@@ -229,7 +229,7 @@ public class PPR1Controller {
         //        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=/"" + fileName + "/"").body(resource);
     }
     
-    @GetMapping("/deletePPR1")
+    @GetMapping("/deleteInstitutionalStructurePPR1")
     public String deletePPR1(HttpSession session, Model model, @RequestParam("id") Long id,  
     		RedirectAttributes redirectAttributes) {
 
@@ -246,7 +246,7 @@ public class PPR1Controller {
             InstitutionalStructure data = isserv.getById(id);
             if (data == null) {
                 redirectAttributes.addFlashAttribute("error", "Record not found.");
-                return "redirect:/ppr1";
+                return "redirect:/institutionalStructurePPR1";
             }
             
             deleteFile(data.getNotificationFile());
@@ -283,7 +283,7 @@ public class PPR1Controller {
         }
     }
     
-    @GetMapping("/completePPR1")
+    @GetMapping("/completeInstitutionalStructurePPR1")
     public String completePPR1(HttpSession session, Model model, @RequestParam("id") Long id,  
     		RedirectAttributes redirectAttributes) {
 
@@ -315,7 +315,7 @@ public class PPR1Controller {
         return "ppr1";
     }
     
-    @GetMapping("/editPPR1")
+    @GetMapping("/editInstitutionalStructurePPR1")
     public String editPPR1(@RequestParam Long id, Model model, HttpSession session) {
 
     	InstitutionalStructure data = isserv.getById(id);
@@ -392,7 +392,7 @@ public class PPR1Controller {
 	        
 	        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
 	
-	        return "redirect:/ppr1";
+	        return "redirect:/institutionalStructurePPR1";
 		}
 		else {
 			return "redirect:/login";

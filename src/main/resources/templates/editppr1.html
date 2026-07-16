@@ -237,32 +237,32 @@ document.addEventListener("DOMContentLoaded", function () {
 			                            <td th:text="${user[3]}"></td>
 										<td th:text="${user[4]}"></td>
 										<td>
-											<a th:href="@{/viewPdf(id=${user[0]},type='notification')}" target="_blank">
+											<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]},type='notification')}" target="_blank">
 											    	View Uploaded
 											</a>
 										</td>
 										<td th:text="${user[6]}"></td>
 										<td>
-											<a th:href="@{/viewPdf(id=${user[0]},type='mou')}" target="_blank">
+											<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]},type='mou')}" target="_blank">
 													View Uploaded
 											</a>
 										</td>
 										<td>
 											<a th:if="${user[8] == 'D'}"
-											   th:href="@{/deletePPR1(id=${user[0]})}"
+											   th:href="@{/deleteInstitutionalStructurePPR1(id=${user[0]})}"
 											   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
 											    Delete
 											</a>
 											&nbsp; &nbsp; 
 											<a th:if="${user[8] == 'D'}"
-											   th:href="@{/editPPR1(id=${user[0]})}"
+											   th:href="@{/editInstitutionalStructurePPR1(id=${user[0]})}"
 											   class="btn btn-primary btn-sm"
 											   onclick="return confirm('Are you sure you want to edit this record?');">
 											    Edit
 											</a>
 											&nbsp; &nbsp; 
 										    <a th:if="${user[8] == 'D'}"
-											th:href="@{/completePPR1(id=${user[0]})}"
+											th:href="@{/completeInstitutionalStructurePPR1(id=${user[0]})}"
 										            class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
 										        Complete
 										     </a>
