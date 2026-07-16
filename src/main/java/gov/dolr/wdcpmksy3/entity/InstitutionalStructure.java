@@ -8,11 +8,13 @@ import java.time.LocalDateTime;
 @Table(name="ppr_slna_institutional_structure")
 public class InstitutionalStructure {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ppr_inst_str_id;
-
-    private Integer st_code;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "ppr_inst_str_id")
+	private Integer pprInstStrId;
+	
+    @Column(name = "st_code")
+    private Integer stCode;
 
     @Column(name="slna_type")
     private String slnaType;
@@ -50,22 +52,21 @@ public class InstitutionalStructure {
     private String requestIp;
 
     //Getters and Setters
-
-    public Integer getPpr_inst_str_id() {
-		return ppr_inst_str_id;
+    
+	public Integer getPprInstStrId() {
+		return pprInstStrId;
 	}
-	public void setPpr_inst_str_id(Integer ppr_inst_str_id) {
-		this.ppr_inst_str_id = ppr_inst_str_id;
+	public void setPprInstStrId(Integer pprInstStrId) {
+		this.pprInstStrId = pprInstStrId;
 	}
-
-	public Integer getSt_code() {
-		return st_code;
+	
+	public Integer getStCode() {
+		return stCode;
 	}
-	public void setSt_code(Integer st_code) {
-		this.st_code = st_code;
+	public void setStCode(Integer stCode) {
+		this.stCode = stCode;
 	}
-
-    public String getSlnaType() {
+	public String getSlnaType() {
         return slnaType;
     }
 

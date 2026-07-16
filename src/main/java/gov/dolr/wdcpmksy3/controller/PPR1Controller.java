@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
+import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +43,9 @@ public class PPR1Controller {
     
     @Autowired
     private InstitutionalStructureServiceImpl isserv;
+    
+    @Autowired
+    InstitutionalStructureRepository repository;
 	
 	@GetMapping("/ppr1")
     public String ppr1(HttpSession session, Model model) 
@@ -81,6 +85,11 @@ public class PPR1Controller {
 	        if (!dir.exists()) {
 	            dir.mkdirs();
 	        }
+	        boolean exists =false;
+	        
+	        exists = repository.existsByStCode(stcode);
+	        
+	        if (!exists) {
 	
 	        String notificationFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ notificationFile.getOriginalFilename();
 	
@@ -92,7 +101,7 @@ public class PPR1Controller {
 	
 	        InstitutionalStructure obj = new InstitutionalStructure();
 	
-	        obj.setSt_code(stcode);
+	        obj.setStCode(stcode);
 	        obj.setSlnaType(slnaType);
 	        obj.setNotificationDate(notificationDate);
 	        obj.setNotificationFile(uploadPath+notificationFileName);
@@ -104,8 +113,15 @@ public class PPR1Controller {
 	        obj.setRequestIp(getClientIpAddr(request));
 	        
 	        service.save(obj);
-	
+	        
 	        redirectAttributes.addFlashAttribute("success","Record Saved Successfully.");
+	        }
+	        else {
+	        	
+	        	redirectAttributes.addFlashAttribute("error","Record already Exists, Only one entry allow.");
+	        }
+	
+	        
 	        
 	        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
 	
@@ -217,7 +233,7 @@ public class PPR1Controller {
     public String deletePPR1(HttpSession session, Model model, @RequestParam("id") Long id,  
     		RedirectAttributes redirectAttributes) {
 
-		System.out.println("PPR1 ID = " + id);
+		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
@@ -293,7 +309,7 @@ public class PPR1Controller {
 		    } 
 		 	catch (Exception e) {
 
-		        redirectAttributes.addFlashAttribute("success", "Unable to complete record.");
+		        redirectAttributes.addFlashAttribute("error", "Unable to complete record.");
 		    }
        
         return "ppr1";
@@ -315,7 +331,7 @@ public class PPR1Controller {
 		model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
  		model.addAttribute("statename", statename);
  		model.addAttribute("stcode", stcode);
- 		model.addAttribute("stcode", data.getPpr_inst_str_id());
+ 	//	model.addAttribute("stcode", data.getPpr_inst_str_id());
 
         return "editppr1";
     }

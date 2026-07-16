@@ -23,5 +23,9 @@ public interface InstitutionalStructureRepository extends JpaRepository<Institut
 	    @Transactional
 	    @Query("UPDATE InstitutionalStructure i SET i.status = 'C' WHERE i.id = :id")
 	    int completeRecordPPR1(@Param("id") Long id);
+	    
+	    boolean existsByStCode(Integer stCode);
+	    
+	    
 
 }
