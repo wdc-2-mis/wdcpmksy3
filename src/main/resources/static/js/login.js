@@ -10,7 +10,7 @@
 
 let captchaVerified = false;
 let loginMethod = "";
-let resendSeconds = 30;
+let resendSeconds = 60;
 let resendTimer = null;
 
 /*-------------------------------------------------------------
@@ -45,7 +45,7 @@ function initializePage() {
 
 function startResendCountdown() {
 
-    resendSeconds = 30;
+    resendSeconds = 60;
 
     $("#resendOtpBtn")
         .show()

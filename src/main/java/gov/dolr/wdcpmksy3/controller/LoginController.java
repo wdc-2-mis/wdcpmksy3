@@ -108,6 +108,7 @@ public class LoginController {
     	Integer regid =0;
     	String usertype =null;
     	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+    	int i =1;
 
     	System.out.println("Login Session = " + session.getId());
     	
@@ -116,7 +117,7 @@ public class LoginController {
     		if (otpService.verifyOtp(userId, otp)) {
             	
             	session.setAttribute("useremail", email);
-                session.setMaxInactiveInterval(30 * 60); // 30 minutes
+                session.setMaxInactiveInterval(30 * 60); 
             	model.addAttribute("email", email);
             	session.setAttribute("user", email);
             	model.addAttribute("timeoutSeconds", session.getMaxInactiveInterval());
@@ -151,10 +152,10 @@ public class LoginController {
             	//String userType = session.getAttribute("userType").toString();
             	LinkedHashMap<Integer, List<ProfileBean>> map = new LinkedHashMap<Integer, List<ProfileBean>>();
     			
-            	List<IwmpState> lists = stateService.getAllStates();
+            	List<IwmpState> lists = stateService.getAllStates(i);
             	LinkedHashMap<Integer, String> stateList = new LinkedHashMap<>();
 
-            	for (IwmpState state : stateService.getAllStates()) {
+            	for (IwmpState state : stateService.getAllStates(i)) {
             	    stateList.put(state.getStCode(), state.getStName());
             	}
 
@@ -304,10 +305,10 @@ public class LoginController {
              	//String userType = session.getAttribute("userType").toString();
              	LinkedHashMap<Integer, List<ProfileBean>> map = new LinkedHashMap<Integer, List<ProfileBean>>();
      			
-             	List<IwmpState> lists = stateService.getAllStates();
+             	List<IwmpState> lists = stateService.getAllStates(i);
              	LinkedHashMap<Integer, String> stateList = new LinkedHashMap<>();
 
-             	for (IwmpState state : stateService.getAllStates()) {
+             	for (IwmpState state : stateService.getAllStates(i)) {
              	    stateList.put(state.getStCode(), state.getStName());
              	}
 
@@ -413,7 +414,7 @@ public class LoginController {
     @GetMapping("/getEmailandGenerateotp")
     @ResponseBody
     public ResponseEntity<String> getEmailandGenerateotp(
-            @RequestParam String value) {
+            @RequestParam String value, HttpServletRequest request) {
 
         String email = loginserv.getEmailandGenerateotp(value);
 
@@ -425,24 +426,23 @@ public class LoginController {
 
         }
 
-        otpService.sendOtp(email);
+        otpService.sendOtp(email, request);
 
         return ResponseEntity.ok(email);
 
     }
     
     @GetMapping("/customLogout")
-    public String logout(HttpServletRequest request, HttpSession session) {
-
-        String userId = (String) session.getAttribute("userid");
-     //   System.out.println("kdy=" + userId);
-        loginserv.insertloginlog(userId,"Logout Successful",request);
-        SecurityContextHolder.clearContext();
-
-        // Destroy Session
+    public String logout(HttpServletRequest request) {
+    	System.out.println("session value start");
+        HttpSession session = request.getSession(false);
+System.out.println("session value" +session);
         if (session != null) {
+            System.out.println("Logout Session = " + session.getId());
             session.invalidate();
         }
+
+        SecurityContextHolder.clearContext();
 
         return "redirect:/login";
     }

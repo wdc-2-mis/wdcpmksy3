@@ -49,8 +49,10 @@ public interface UserRepository extends JpaRepository<IwmpUserReg, Long> {
     		+ "where upper(ureg.user_id) = upper(:userId) and Lower(status)=Lower('ACTIVE') "
     		+ "and (iwmp_user_app_role_map.role_id=rolemap.role_id) and iwmp_user_app_role_map.reg_id=ureg.reg_id",nativeQuery = true)
     List<Object[]> getUserVerify(@Param("userId") String userId);
+
+    @Query("select max(u.regId) from IwmpUserReg u")
+    Integer findMaxRegId();
     
-   
 
     
    

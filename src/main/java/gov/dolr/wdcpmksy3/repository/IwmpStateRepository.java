@@ -10,5 +10,5 @@ import gov.dolr.wdcpmksy3.entity.IwmpState;
 @Repository
 public interface IwmpStateRepository extends JpaRepository<IwmpState, Integer> {
 
-    List<IwmpState> findAllByOrderByStNameAsc();
+    List<IwmpState> findAllByWdcpmksyOrderByStNameAsc(int i);
 }

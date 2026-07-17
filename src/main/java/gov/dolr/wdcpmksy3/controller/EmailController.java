@@ -43,21 +43,19 @@ public class EmailController {
         return ResponseEntity.ok(exists);
     }
 
-    @PostMapping("/sendOtp")
-    public String sendOtp(@RequestParam String email,
-                          Model model) {
-    	
-    	 if (email == null || email.trim().isEmpty()) {
-    		 model.addAttribute("email", "Enter Correct Email-Id");
-    	        return "emaillogin";
-    	 }
-
-        otpService.sendOtp(email);
-
-        model.addAttribute("email", email);
-
-        return "verifyOtp";
-    }
+	/*
+	 * @PostMapping("/sendOtp") public String sendOtp(@RequestParam String email,
+	 * Model model) {
+	 * 
+	 * if (email == null || email.trim().isEmpty()) { model.addAttribute("email",
+	 * "Enter Correct Email-Id"); return "emaillogin"; }
+	 * 
+	 * otpService.sendOtp(email);
+	 * 
+	 * model.addAttribute("email", email);
+	 * 
+	 * return "verifyOtp"; }
+	 */
 
     @PostMapping("/verifyOtp")
     public String verifyOtp(@RequestParam String email,

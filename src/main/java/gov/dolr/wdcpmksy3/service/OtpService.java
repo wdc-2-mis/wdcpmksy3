@@ -3,12 +3,20 @@ package gov.dolr.wdcpmksy3.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import gov.dolr.wdcpmksy3.dto.OtpResponse;
+import gov.dolr.wdcpmksy3.dto.SendOtpRequest;
+import gov.dolr.wdcpmksy3.dto.VerifyOtpRequest;
 import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 
@@ -17,57 +25,67 @@ public class OtpService {
 
     @Autowired
     private UserRepository userRepository;
-
+    
     @Autowired
-    private EmailService emailService;
+    private RestTemplate restTemplate;
 
-    public String generateOtp() {
-        return String.valueOf(
-                (int)(Math.random() * 900000) + 100000
-        );
-    }
+    @Value("${otp.service.url}")
+    private String otpServiceUrl;
 
-    public void sendOtp(String email) {
+	/*
+	 * @Autowired private EmailService emailService;
+	 */
+   
 
-        String otp = generateOtp();
+    public void sendOtp(String email,
+            HttpServletRequest request) {
 
-        IwmpUserReg user = userRepository
-                .findByEmail(email)
-                .orElseThrow(() ->
-                    new RuntimeException("User not found"));
+            SendOtpRequest otpRequest = new SendOtpRequest();
 
-    //    user.setEmail(email);
-        user.setOtp(otp);
-        user.setOtpExpiry(LocalDateTime.now().plusMinutes(30));
+            otpRequest.setEmail(email);
 
-        userRepository.save(user);
-        
-    /*    UserReg user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            otpRequest.setModuleName("LOGIN");
 
-        user.setOtp(otp);
-        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+            otpRequest.setReferenceId(UUID.randomUUID().toString());
 
-        userRepository.save(user);   */
+            otpRequest.setRequestIp(RegistrationService.getClientIpAddr(request));
 
-        emailService.sendOtp(email, otp);
-    }
+            otpRequest.setFromEmail("support-wdcpmksy@nic.in");
+
+            otpRequest.setFromName("WDC-PMKSY 3.0");
+
+            otpRequest.setSubject("Login OTP");
+
+            otpRequest.setMessage(
+             "Dear User,\n\n"
+             + "Your Login OTP is {{OTP}}.\n"
+             + "It is valid for 5 minutes.\n\n"
+             + "Regards,\n"
+             + "WDC-PMKSY 3.0");
+
+            ResponseEntity<OtpResponse> response = restTemplate.postForEntity(otpServiceUrl + "/sendWDCOTP", otpRequest, OtpResponse.class);
+
+            if (response.getBody() == null || !"SUCCESS".equalsIgnoreCase(response.getBody().getStatus())) {
+
+           throw new RuntimeException("Unable to send OTP");
+           }
+         }
 
     public boolean verifyOtp(String userId, String otp) {
 
-        Optional<IwmpUserReg> optionalUser =
-                userRepository.findByUserId(userId);
+         Optional<IwmpUserReg> optionalUser = userRepository.findByUserId(userId);
+         if (optionalUser.isEmpty()) {
+          return false;
+          }
 
-        if(optionalUser.isPresent()) {
-
-        	IwmpUserReg user = optionalUser.get();
-
-            return otp.equals(user.getOtp())
-                    && user.getOtpExpiry().isAfter(LocalDateTime.now());
-        }
-
-        return false;
-    }
+       VerifyOtpRequest request = new VerifyOtpRequest();
+       request.setEmail(optionalUser.get().getEmail());
+       request.setOtp(otp);
+       ResponseEntity<OtpResponse> response = restTemplate.postForEntity(otpServiceUrl + "/verifyWDC", request, OtpResponse.class);
+       OtpResponse otpResponse = response.getBody();
+       return otpResponse != null && "VERIFIED".equalsIgnoreCase(otpResponse.getStatus());
+     }
+    
     public boolean checkEmailExists(String email) {
     	
         return userRepository.existsByEmail(email);

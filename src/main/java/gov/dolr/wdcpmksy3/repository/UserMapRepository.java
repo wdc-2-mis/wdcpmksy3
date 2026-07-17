@@ -61,4 +61,14 @@ public interface UserMapRepository extends JpaRepository<IwmpUserMap, Integer> {
             nativeQuery = true)
     List<ProfileProjection> getMapProject(@Param("regid") Integer regid);
 
+
+    @Query("SELECT MAX(m.mapId) FROM IwmpUserMap m")
+    Integer findMaxMapId();
+
+
+	
+
+
+ 
+
 }

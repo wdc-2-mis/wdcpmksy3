@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script src="/js/language.js"></script>
+<script src="/js/registration.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <head>
 
@@ -10,7 +12,7 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="stylesheet" th:href="@{/css/header.css}">
 <link rel="stylesheet" th:href="@{/css/registration.css}">
 
@@ -28,207 +30,7 @@ footer {
 
 </style>
 
-<script type="text/javascript">
-function show(id){
-    document.getElementById(id).classList.add("show");
-}
 
-function hide(id){
-    document.getElementById(id).classList.remove("show");
-}
-
-function resetAll() {
-
-    hide("districtBox");
-
-    hide("nameField");
-    hide("deptField");
-    hide("desgField");
-
-    hide("ngoNameField");
-    hide("ngoIdField");
-    hide("ngoRegField");
-}
-
-function handleUserTypeChange(type) {
-
-    const state = document.getElementById("userState");
-    const district = document.getElementById("userDistrict");
-    const title = document.getElementById("orgSectionTitle");
-
-    state.value = "";
-    state.disabled = true;
-
-    if (district) {
-        district.value = "";
-    }
-    
-    if (type === "DOLR") {
-        state.multiple = true;
-        state.size = 8;
-        state.name = "userState";     // or "userState[]" if required
-    } else {
-        // All other users -> Single State Selection
-        state.multiple = false;
-        state.size = 1;
-        state.name = "userState";
-    }
-    
-    district.innerHTML = '<option value="">--Select District--</option>';
-    district.value = "";
-
-     if (type === "PIA" || type === "WCDC" || type === "NGO") {
-
-        state.disabled = false;
-
-    } else {
-        state.disabled = false;
-    }
-
-    resetAll();
-
-    show("nameField");
-    show("deptField");
-    show("desgField");
-    const savedLang = localStorage.getItem("siteLanguage") || "en";
-
-    // Default title based on language
-    if (title) {
-        title.textContent = savedLang === "hi"
-          ? "संगठन विवरण"
-          : "Organization Details";
-    }
-    if (type === "PIA" || type === "WCDC" || type === "NGO") {
-        show("districtBox");
-    }
-
-    if (type === "NGO") {
-    
-     title.textContent = savedLang === "hi"
-          ? "NGO की जानकारी"
-          : "NGO Details";
-
-        hide("nameField");
-        hide("deptField");
-        hide("desgField");
-
-        show("ngoNameField");
-        show("ngoIdField");
-        show("ngoRegField");
-    }
-}
-
-window.onload = function() {
-
-    // Default form
-    show("nameField");
-    show("deptField");
-    show("desgField");
-
-    // Hide NGO fields
-    hide("ngoNameField");
-    hide("ngoIdField");
-    hide("ngoRegField");
-
-    // Hide district
-    hide("districtBox");
-
-    // Default title
-    const orgTitle = document.getElementById("orgSectionTitle");
-    const savedLang = localStorage.getItem("siteLanguage") || "en";
-    if (orgTitle) {
-        orgTitle.textContent = savedLang === "hi"
-          ? "संगठन विवरण"
-          : "Organization Details";
-    }
-};
-
-function recaptchaVerified() {
-
-    const btn = document.getElementById("registerBtn");
-
-    btn.disabled = false;
-    btn.innerHTML = "Register";
-}
-
-function recaptchaExpired() {
-
-    const btn = document.getElementById("registerBtn");
-
-    btn.disabled = true;
-    btn.innerHTML = "Verify reCAPTCHA to Register";
-}
-
-function loadDistricts(stateCode) {
-
-    const district = document.getElementById("userDistrict");
-
-    // CLEAR EVERYTHING FIRST
-    district.innerHTML = '<option value="">--Select District--</option>';
-
-    if (!stateCode) return;
-
-    fetch('/register/districts/' + stateCode)
-        .then(res => res.json())
-        .then(data => {
-
-            let options = '<option value="">--Select District--</option>';
-
-            data.forEach(d => {
-                options += `
-                    <option value="${d.distCode}">
-                        ${d.distName}
-                    </option>
-                `;
-            });
-
-            district.innerHTML = options;
-        });
-}
-
-function validateForm() {
-
-    let valid = true;
-    let type = document.getElementById("userType").value;
-
-    // CLEAR OLD ERRORS
-    document.querySelectorAll(".error-text").forEach(e => e.innerText = "");
-
-    let state = document.getElementById("userState").value;
-    let district = document.getElementById("userDistrict").value;
-    let name = document.getElementById("userName").value;
-
-    // STATE validation (all users)
-    if (!state) {
-        document.getElementById("stateError").innerText =
-            "Please select state";
-        valid = false;
-    }
-
-    // DISTRICT validation (PIA/WCDC/NGO)
-    if (type === "PIA" || type === "WCDC" || type === "NGO") {
-        if (!district) {
-            document.getElementById("districtError").innerText =
-                "Please select district";
-            valid = false;
-        }
-    }
-
-    // NAME validation (non-NGO)
-    if (type !== "NGO") {
-        if (!name) {
-            document.getElementById("nameError").innerText =
-                "Please enter name";
-            valid = false;
-        }
-    }
-
-    return valid;
-}
-
-
-
-</script>
 </head>
 
 <body>
@@ -251,7 +53,7 @@ function validateForm() {
 
 <div class="card-body">
 
-<form:form id="regForm" modelAttribute="userBean" action="register" method="post" autocomplete="off">
+<form:form id="regForm">
 
 <!-- USER TYPE -->
 <div class="section-title" id="accountTypeTitle">Account Type</div>
@@ -269,14 +71,14 @@ onchange="handleUserTypeChange(this.value)">
 
 <option value="">--Select User Type--</option>
 
-<option value="DOLR">DOLR</option>
-<option value="SLNA">SLNA</option>
-<option value="WCDC">WCDC</option>
-<option value="PIA">PIA</option>
+<option value="DL">DOLR</option>
+<option value="SL">SLNA</option>
+<option value="DI">WCDC</option>
+<option value="PI">PIA</option>
 <option value="NGO">NGO</option>
 
 </select>
-
+<small class="text-danger error-text" id="userError"></small>
 </div>
 
 <!-- LOCATION SECTION -->
@@ -296,14 +98,14 @@ onchange="handleUserTypeChange(this.value)">
         </option>
     </th:block>
     </select>
-    <small class="text-danger" id="stateError"></small>
+    <small class="text-danger error-text" id="stateError"></small>
     </div>
 
     <!-- DISTRICT (CONDITIONAL) -->
    <div class="col-md-6 mb-3 fade-section" id="districtBox">
 
         <label>District *</label>
-   <small class="text-danger" id="districtError"></small>
+   
         <select id="userDistrict"
                 name="userDistrict"
                 class="form-control form-control-sm">
@@ -311,13 +113,15 @@ onchange="handleUserTypeChange(this.value)">
             <option value="">--Select District--</option>
 
             <c:forEach items="${districtList}" var="lists">
-                <option value="${lists.key}">
-                    ${lists.value}
-                </option>
-            </c:forEach>
+
+<option value="${lists.key}">
+${lists.value}
+</option>
+
+</c:forEach>
 
         </select>
-
+<small class="text-danger error-text" id="districtError"></small>
     </div>
 
 </div>
@@ -326,7 +130,7 @@ onchange="handleUserTypeChange(this.value)">
 
 <!-- ORGANIZATION SECTION -->
 <div class="section-title" id="orgSectionTitle">
-    Organization Details
+    User Details
 </div>
 
 <div class="row">
@@ -334,56 +138,44 @@ onchange="handleUserTypeChange(this.value)">
 <!-- NAME -->
 <div class="col-md-6 mb-3 fade-section" id="nameField">
 <label>Name *</label>
-<small class="text-danger" id="nameError"></small>
-<input type="text"
-class="form-control form-control-sm"
-id="userName"
-name="userName">
+
+<input type="text" class="form-control form-control-sm" id="userName" name="userName">
+<small class="text-danger error-text" id="nameError"></small>
 </div>
 
 <!-- DEPARTMENT -->
 <div class="col-md-6 mb-3 fade-section" id="deptField">
 <label>Department *</label>
-<input type="text"
-class="form-control form-control-sm"
-id="userDepartment"
-name="userDepartment">
+<input type="text" class="form-control form-control-sm" id="userDepartment" name="userDepartment">
+<small class="text-danger error-text" id="departmentError"></small>
 </div>
 
 <!-- DESIGNATION -->
 <div class="col-md-6 mb-3 fade-section" id="desgField">
 <label>Designation *</label>
-<input type="text"
-class="form-control form-control-sm"
-id="userDesignation"
-name="userDesignation">
+<input type="text" class="form-control form-control-sm" id="userDesignation" name="userDesignation">
+<small class="text-danger error-text" id="designationError"></small>
 </div>
 
 <!-- NGO NAME -->
 <div class="col-md-6 mb-3 fade-section" id="ngoNameField">
 <label>NGO Name *</label>
-<input type="text"
-class="form-control form-control-sm"
-id="userNameNgo"
-name="userNameNgo">
+<input type="text" class="form-control form-control-sm" id="userNameNgo" name="userNameNgo">
+<small class="text-danger error-text" id="ngonameError"></small>
 </div>
 
 <!-- NGO ID -->
 <div class="col-md-6 mb-3 fade-section" id="ngoIdField">
 <label>NGO ID *</label>
-<input type="text"
-class="form-control form-control-sm"
-id="userNgoid"
-name="userNgoid">
+<input type="text" class="form-control form-control-sm" id="userNgoid" name="userNgoid">
+<small class="text-danger error-text" id="ngoidError"></small>
 </div>
 
 <!-- REGISTERED WITH -->
 <div class="col-md-6 mb-3  fade-section" id="ngoRegField">
 <label>Registered With *</label>
-<input type="text"
-class="form-control form-control-sm"
-id="userRegwith"
-name="userRegwith">
+<input type="text" class="form-control form-control-sm" id="userRegwith" name="userRegwith">
+<small class="text-danger error-text" id="registeredError"></small>
 </div>
 
 </div>
@@ -393,37 +185,30 @@ name="userRegwith">
 
 <div class="row">
 
-<div class="col-md-6 mb-3" id="emailField">
-<label>Email *</label>
-<input type="text"
-class="form-control form-control-sm"
-name="userEmailId">
+<div class="col-md-6 mb-3"> <label>Email *</label>
+    <input type="email" id="emailField" class="form-control form-control-sm" name="userEmailId" onblur="validateEmail()">
+    <small class="text-danger error-text" id="emailError"></small>
+    
 </div>
 
-<div class="col-md-6 mb-3" id="mobileField">
-<label>Mobile *</label>
-<input type="text"
-class="form-control form-control-sm"
-name="userMobileNo">
+<div class="col-md-6 mb-3"><label>Mobile *</label>
+<input type="text" id="mobileField" class="form-control form-control-sm" name="userMobileNo" maxlength="10" oninput="validateMobile()">
+
+    <small class="text-danger error-text" id="mobileError"></small>
 </div>
 
 </div>
 
 <!-- ADDRESS -->
-<div class="mb-3" id="addressField">
+<div class="mb-3">
 <label>Address *</label>
-<textarea class="form-control"
-rows="3"
-name="userAddres"></textarea>
+<textarea id="addressField" class="form-control" rows="3" name="userAddres" oninput="validateAddress()"></textarea>
+<small class="text-danger error-text" id="addressError"></small>
 </div>
 
 <!-- CAPTCHA -->
-<div class="mb-4 text-center">
-            <div class="g-recaptcha" 
-                 data-sitekey="6LfYFwQsAAAAAAVxzTr3vCHseqAtbLiD53hfgJc7" 
-                 data-callback="recaptchaVerified"
-                 data-expired-callback="recaptchaExpired"></div>
-            </div>
+<div class="mb-4 text-center"> <div class="g-recaptcha" data-sitekey="6LfYFwQsAAAAAAVxzTr3vCHseqAtbLiD53hfgJc7" data-callback="recaptchaVerified" data-expired-callback="recaptchaExpired"></div>
+ </div>
 
 <!-- <div class="mb-4 text-center">
             <div class="g-recaptcha" 
@@ -435,7 +220,7 @@ name="userAddres"></textarea>
 SUBMIT -->
 <div class="text-center mt-3">
 
-<button id="registerBtn" class="btn btn-success px-5" type="submit" onclick="return validateForm();" disabled>Verify reCAPTCHA to Register</button>
+<button id="registerBtn" class="btn btn-success px-5" type="button" onclick="sendOtp()" disabled> Verify reCAPTCHA to Register </button>
 </div>
 
 </form:form>
@@ -455,6 +240,105 @@ SUBMIT -->
     Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
     Website hosted and maintained by National Informatics Center.
 </footer>
+
+<div class="modal fade" id="otpModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+
+                <h5 class="modal-title">
+                    Email Verification
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"> </button>
+                
+
+            </div>
+
+            <div class="modal-body">
+                <p>Enter the OTP sent to <b id="otpEmail"></b></p>
+
+                <input type="text" id="enteredOtp" maxlength="6" class="form-control" placeholder="Enter OTP" oninput="this.value=this.value.replace(/\D/g,'')">
+
+                <div id="otpError" class="text-danger mt-2"> </div>
+
+                <div class="mt-3">
+
+                <button id="verifyOtpBtn" class="btn btn-success" type="button" onclick="verifyOtp()"> Verify OTP</button>
+
+                    <button id="resendOtpBtn" type="button" class="btn btn-link" onclick="resendOtp()">Resend OTP </button>
+
+                    <span id="timer" class="text-muted"> </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade" id="successModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+
+                <h5 class="modal-title">
+                    Registration Successful
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body text-center">
+
+                <i class="bi bi-check-circle-fill text-success"
+                   style="font-size:60px;"></i>
+
+                <h4 class="text-success mt-3">
+                    Registration Successful
+                </h4>
+
+                <p class="mt-3">
+                    Your email has been successfully verified and your registration request has been submitted successfully.
+                </p>
+
+                <p>
+                    Your account is currently pending approval.
+                </p>
+
+                <p>
+                    Kindly contact your respective <strong>SLNA Administrator</strong> for approval.
+                    After approval, your User ID and login credentials will be sent to your registered email address.
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-success"
+                        onclick="window.location.href='/register'">
+                    OK
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 </body>
 </html>

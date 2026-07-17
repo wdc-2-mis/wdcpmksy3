@@ -14,7 +14,9 @@ public class StateService {
     @Autowired
     private IwmpStateRepository stateRepo;
 
-    public List<IwmpState> getAllStates() {
-        return stateRepo.findAllByOrderByStNameAsc();
+    public List<IwmpState> getAllStates(int i) {
+        return stateRepo.findAllByWdcpmksyOrderByStNameAsc(i);
     }
+
+	
 }
