@@ -27,7 +27,7 @@ public class SlnaFunctionary {
     @Column(name = "qualification_id")
     private Integer qualificationId;
 
-    @Column(name = "slna_fun_name")
+    @Column(name = "slna_fun_name", length = 50)
     private String slnaFunName;
 
     @Column(name = "work_allocation", length = 1000)
@@ -48,16 +48,16 @@ public class SlnaFunctionary {
     @Column(name = "status")
     private Character status;
 
-    @Column(name = "request_ip")
+    @Column(name = "request_ip", length = 20)
     private String requestIp;
 
-    @Column(name = "created_by")
+    @Column(name = "created_by", length = 20)
     private String createdBy;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
-    @Column(name = "updated_by")
+    @Column(name = "updated_by", length = 20)
     private String updatedBy;
 
     @Column(name = "updated_date")

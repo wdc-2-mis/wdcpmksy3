@@ -18,10 +18,10 @@ public class SlnaFunctionaryWorkExperience {
     @JoinColumn(name = "ppr_slna_fun_id")
     private SlnaFunctionary functionary;
 
-    @Column(name = "office_name")
+    @Column(name = "office_name", length = 200)
     private String officeName;
 
-    @Column(name = "address")
+    @Column(name = "address", length = 200)
     private String address;
 
     @Column(name = "work_exp_yrs")
@@ -33,16 +33,16 @@ public class SlnaFunctionaryWorkExperience {
     @Column(name = "work_details", length = 1000)
     private String workDetails;
 
-    @Column(name = "request_ip")
+    @Column(name = "request_ip", length = 20)
     private String requestIp;
 
-    @Column(name = "created_by")
+    @Column(name = "created_by", length = 20)
     private String createdBy;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
-    @Column(name = "updated_by")
+    @Column(name = "updated_by", length = 20)
     private String updatedBy;
 
     @Column(name = "updated_date")

@@ -18,7 +18,7 @@ public class InstitutionalStructure {
     @Column(name = "st_code")
     private Integer stCode;
 
-    @Column(name="slna_type")
+    @Column(name="slna_type", length = 500)
     private String slnaType;
 
     @Column(name="notification_date")
@@ -39,7 +39,7 @@ public class InstitutionalStructure {
     @Column(name="status" , length = 1)
     private Character status;
     
-    @Column(name="created_by")
+    @Column(name="created_by", length = 20)
     private String createdBy;
 
     @Column(name="created_date")
