@@ -27,7 +27,7 @@ public class SlnaFunctionary {
     @Column(name = "qualification_id")
     private Integer qualificationId;
 
-    @Column(name = "slna_fun_name", length = 50)
+    @Column(name = "slna_fun_name", length = 100)
     private String slnaFunName;
 
     @Column(name = "work_allocation", length = 1000)
