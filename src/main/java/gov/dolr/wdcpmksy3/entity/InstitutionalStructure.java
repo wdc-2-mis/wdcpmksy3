@@ -3,6 +3,8 @@ package gov.dolr.wdcpmksy3.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="ppr_slna_institutional_structure")
@@ -34,7 +36,8 @@ public class InstitutionalStructure {
     @Column(name="common_slna_sldc")
     private Boolean common_slna_sldc;
 
-    private String status;
+    @Column(name="status" , length = 1)
+    private Character status;
     
     @Column(name="created_by")
     private String createdBy;
@@ -50,6 +53,10 @@ public class InstitutionalStructure {
 
     @Column(name = "request_ip", length = 20)
     private String requestIp;
+    
+    @OneToMany(mappedBy = "institutionalStructure", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<SlnaFunctionary> functionaries = new ArrayList<SlnaFunctionary>();
+
 
     //Getters and Setters
     
@@ -113,10 +120,10 @@ public class InstitutionalStructure {
 		this.common_slna_sldc = common_slna_sldc;
 	}
 	
-	public String getStatus() {
+	public Character getStatus() {
         return status;
     }
-    public void setStatus(String status) {
+    public void setStatus(Character status) {
         this.status = status;
     }
 
@@ -158,6 +165,13 @@ public class InstitutionalStructure {
 
 	public void setRequestIp(String requestIp) {
 		this.requestIp = requestIp;
+	}
+	
+	public List<SlnaFunctionary> getFunctionaries() {
+		return functionaries;
+	}
+	public void setFunctionaries(List<SlnaFunctionary> functionaries) {
+		this.functionaries = functionaries;
 	}
 
     

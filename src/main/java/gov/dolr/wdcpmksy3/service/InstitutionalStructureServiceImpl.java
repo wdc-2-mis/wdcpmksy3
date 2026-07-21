@@ -49,7 +49,7 @@ public class InstitutionalStructureServiceImpl implements InstitutionalStructure
         if (optional.isPresent()) {
 
             InstitutionalStructure data = optional.get();
-            data.setStatus("C");
+            data.setStatus('C');
             repository.save(data);
 
             return true;

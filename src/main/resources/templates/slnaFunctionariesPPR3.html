@@ -46,95 +46,168 @@
 
 <script>
 
-// Allow only PDF files
-document.addEventListener("DOMContentLoaded", function () {
+	document.addEventListener("DOMContentLoaded", function () {
 
-    const form = document.getElementById("institutionForm");
+	    const form = document.getElementById("slnaFunctionaries");
 
-    form.addEventListener("submit", function (e) {
+	    form.addEventListener("submit", function (e) {
 
-        const slnaType = document.getElementsByName("slnaType")[0];
-        const notificationDate = document.getElementsByName("notificationDate")[0];
-        const mouDate = document.getElementsByName("mouDate")[0];
-        const notificationFile = document.getElementsByName("notificationFile")[0];
-        const mouFile = document.getElementsByName("mouFile")[0];
+	        const name = document.getElementById("name");
+	        const designation = document.getElementById("designation");
+	        const qualification = document.getElementById("qualification");
+	        const workallocation = document.getElementById("workallocation");
 
-        // Type of SLNA
-        if (slnaType.value.trim() === "") {
-            alert("Please enter Type of SLNA.");
-            slnaType.focus();
-            e.preventDefault();
-            return false;
-        }
+	        const slr = document.getElementById("slr");
+	        const slnr = document.getElementById("slnr");
+	        const dlr = document.getElementById("dlr");
+	        const dlnr = document.getElementById("dlnr");
 
-        // Notification Date
-        if (notificationDate.value === "") {
-            alert("Please select Date of Notification.");
-            notificationDate.focus();
-            e.preventDefault();
-            return false;
-        }
+	        // Name
+	        if (name.value.trim() === "") {
+	            alert("Please enter Name.");
+	            name.focus();
+	            e.preventDefault();
+	            return;
+	        }
 
-        // Notification PDF
-        if (notificationFile.files.length === 0) {
-            alert("Please upload Notification PDF.");
-            notificationFile.focus();
-            e.preventDefault();
-            return false;
-        }
+	        // Designation
+	        if (designation.value === "") {
+	            alert("Please select Designation.");
+	            designation.focus();
+	            e.preventDefault();
+	            return;
+	        }
 
-        // MoU Date
-        if (mouDate.value === "") {
-            alert("Please select Date of MoU.");
-            mouDate.focus();
-            e.preventDefault();
-            return false;
-        }
+	        // Qualification
+	        if (qualification.value === "") {
+	            alert("Please select Qualification.");
+	            qualification.focus();
+	            e.preventDefault();
+	            return;
+	        }
 
-        // MoU PDF
-        if (mouFile.files.length === 0) {
-            alert("Please upload MoU PDF.");
-            mouFile.focus();
-            e.preventDefault();
-            return false;
-        }
+	        // Work Allocation
+	        if (workallocation.value.trim() === "") {
+	            alert("Please enter Work Allocation.");
+	            workallocation.focus();
+	            e.preventDefault();
+	            return;
+	        }
 
-        // Validate PDF type
-        const file1 = notificationFile.files[0];
-        const file2 = mouFile.files[0];
+	        // Amount Validation (Only Number and 2 Decimal Places)
+	        function validateAmount(field, message) {
 
-        if (!file1.name.toLowerCase().endsWith(".pdf")) {
-            alert("Notification file must be a PDF.");
-            notificationFile.value = "";
-            notificationFile.focus();
-            e.preventDefault();
-            return false;
-        }
+	            const value = field.value.trim();
 
-        if (!file2.name.toLowerCase().endsWith(".pdf")) {
-            alert("MoU file must be a PDF.");
-            mouFile.value = "";
-            mouFile.focus();
-            e.preventDefault();
-            return false;
-        }
+	            if (value === "") {
+	                alert(message);
+	                field.focus();
+	                e.preventDefault();
+	                return false;
+	            }
 
-        // Same file validation
-        if (file1.name.toLowerCase() === file2.name.toLowerCase()
-                && file1.size === file2.size) {
+	            if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+	                alert(message + " must be a valid number with up to 2 decimal places.");
+	                field.focus();
+	                e.preventDefault();
+	                return false;
+	            }
 
-            alert("Notification PDF and MoU PDF cannot be the same file.");
+	            return true;
+	        }
 
-            mouFile.value = "";
-            mouFile.focus();
+	        if (!validateAmount(slr, "Please Enter Recurring Budget of SLNA")) return;
+	        if (!validateAmount(slnr, "Please Enter Non-Recurring Budget of SLNA")) return;
+	        if (!validateAmount(dlr, "Please Enter Recurring Funding Expected from DoLR")) return;
+	        if (!validateAmount(dlnr, "Please Enter Non-Recurring Funding Expected from DoLR")) return;
 
-            e.preventDefault();
-            return false;
-        }
+	        // Experience Table Validation
+	        const rows = document.querySelectorAll("#experienceTable tr");
 
-    });
+	        for (let i = 0; i < rows.length; i++) {
 
-});
+	            const office = rows[i].querySelector("input[name='officename[]']");
+	            const address = rows[i].querySelector("input[name='address[]']");
+	            const year = rows[i].querySelector("input[name='yr[]']");
+	            const day = rows[i].querySelector("input[name='day[]']");
+	            const work = rows[i].querySelector("textarea[name='workdetail[]']");
+
+	            if (office.value.trim() === "") {
+	                alert("Please enter Office Name in Row " + (i + 1));
+	                office.focus();
+	                e.preventDefault();
+	                return;
+	            }
+
+	            if (address.value.trim() === "") {
+	                alert("Please enter Address in Row " + (i + 1));
+	                address.focus();
+	                e.preventDefault();
+	                return;
+	            }
+
+	            if (year.value.trim() === "") {
+	                alert("Please enter Experience Year in Row " + (i + 1));
+	                year.focus();
+	                e.preventDefault();
+	                return;
+	            }
+
+	            if (!/^\d+$/.test(year.value.trim())) {
+	                alert("Experience Year must be numeric in Row " + (i + 1));
+	                year.focus();
+	                e.preventDefault();
+	                return;
+	            }
+
+	            if (day.value.trim() === "") {
+	                alert("Please enter Experience Day in Row " + (i + 1));
+	                day.focus();
+	                e.preventDefault();
+	                return;
+	            }
+
+	            if (!/^\d+$/.test(day.value.trim())) {
+	                alert("Experience Day must be numeric in Row " + (i + 1));
+	                day.focus();
+	                e.preventDefault();
+	                return;
+	            }
+
+	            if (work.value.trim() === "") {
+	                alert("Please enter Work Details in Row " + (i + 1));
+	                work.focus();
+	                e.preventDefault();
+	                return;
+	            }
+	        }
+
+	    });
+
+	    // Restrict input while typing (Budget Fields)
+	    const amountFields = ["slr", "slnr", "dlr", "dlnr"];
+
+	    amountFields.forEach(function(id) {
+
+	        document.getElementById(id).addEventListener("input", function() {
+
+	            this.value = this.value
+	                .replace(/[^0-9.]/g, '')         // allow only digits and dot
+	                .replace(/(\..*)\./g, '$1');     // only one dot
+
+	            const match = this.value.match(/^\d+(\.\d{0,2})?/);
+
+	            if (match) {
+	                this.value = match[0];
+	            } else {
+	                this.value = "";
+	            }
+
+	        });
+
+	    });
+
+	});
 
 document.addEventListener("click", function (e) {
 
@@ -196,7 +269,7 @@ document.addEventListener("click", function (e) {
 
         <div class="card-body">
 
-             <form id="slnaFunctionaries" th:action="@{/SaveSLNAFunctionariesPPR3}" method="post" novalidate>
+             <form id="slnaFunctionaries" th:action="@{/saveSLNAFunctionariesPPR3}" method="post">
 
 				
 
@@ -214,10 +287,12 @@ document.addEventListener("click", function (e) {
 								</div>
 								<div class="col-md-5">
 									<select class="form-select" name="designation" id="designation" >
-									<option>Select</option>
-									<option>Programmer</option>
-									<option>Engineer</option>
-									<option>Accountant</option>
+										<option value="">--Select Designation--</option>
+										<th:block th:each="des : ${designationList}">
+										        <option th:value="${des.designationId}"
+										                th:text="${des.designationName}">
+										        </option>
+										 </th:block>
 									</select>
 								</div>
 							</div>
@@ -227,10 +302,12 @@ document.addEventListener("click", function (e) {
 								</div>
 								<div class="col-md-5">
 									<select class="form-select" name="qualification" id="qualification">
-									<option>Select</option>
-									<option>B.Tech</option>
-									<option>M.Tech</option>
-									<option>MCA</option>
+										<option value="">--Select Qualification--</option>
+										<th:block th:each="qua : ${qualificationList}">
+											<option th:value="${qua.qualificationId}"
+												th:text="${qua.qualificationName}">
+											</option>
+										</th:block>
 									</select>
 								</div>
 							</div>
@@ -261,10 +338,10 @@ document.addEventListener("click", function (e) {
 									Total Budget of SLNA<span class="required">*</span>
 								</div>
 								<div class="col-md-3">
-									<input type="text" name="slr" id="slr" style="height:40px; width: 120px;">
+									<input type="text" name="slr" id="slr" maxlength="11" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
 								</div>
 								<div class="col-md-3">
-									<input type="text" name="slnr" id="slnr" style="height:40px; width: 120px;">
+									<input type="text" name="slnr" id="slnr" maxlength="11" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
 								</div>
 							</div>
 							<div class="row mb-4">
@@ -272,10 +349,10 @@ document.addEventListener("click", function (e) {
 									Funding Expected from DoLR <span class="required">*</span>
 								</div>
 								<div class="col-md-3">
-								<input type="text" name="dlr" id="dlr" style="height:40px; width: 120px;">
+								<input type="text" name="dlr" id="dlr" maxlength="11" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
 								</div>
 								<div class="col-md-3">
-								<input type="text" name="dlnr" id="dlnr" style="height:40px; width: 120px;">
+								<input type="text" name="dlnr" id="dlnr" maxlength="11" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
 								</div>
 							</div>
 							
@@ -293,34 +370,7 @@ document.addEventListener("click", function (e) {
 									<th width="10%">Action</th>
 								</tr>
 							</thead>
-							<!--<tbody>
-								<tr>
-									<td>
-										<input type="text" name="officename" id="officename" class="form-control">
-									</td>
-									<td>
-										<input type="text" name="address" id="address" class="form-control">
-									</td>
-									<td>
-										<input type="text" name="yr" id="yr" style="height:40px; width: 80px;" placeholder="Year" />  &nbsp; &nbsp;
-										<input type="text" name="day" id="day" style="height:40px; width: 80px;" placeholder="Day" />
-									</td>
-									<td>
-										<textarea class="form-control"
-										       id="workdetail" name="workdetail" rows="4"
-										       placeholder="Enter Work Details">
-										</textarea>
-									</td>
-									<td>
-										<button class="btn btn-success btn-sm">
-										+
-										</button>
-										<button class="btn btn-danger btn-sm">
-										×
-										</button>
-									</td>
-								</tr>
-							</tbody>-->
+						
 							<tbody id="experienceTable">
 							<tr>
 							    <td><input type="text" name="officename[]" class="form-control"></td>
@@ -328,11 +378,11 @@ document.addEventListener("click", function (e) {
 							    <td><input type="text" name="address[]" class="form-control"></td>
 
 							    <td>
-							        <input type="text" name="yr[]" class="form-control d-inline-block"
-							               style="width:80px;" placeholder="Year">
+							        <input type="text" name="yr[]" class="form-control d-inline-block" maxlength="2" minlength="1"
+											style="width:80px;" placeholder="Year" oninput="this.value=this.value.replace(/[^0-9]/g,'')" >
 
-							        <input type="text" name="day[]" class="form-control d-inline-block ms-2"
-							               style="width:80px;" placeholder="Day">
+							        <input type="text" name="day[]" class="form-control d-inline-block ms-2" maxlength="3" minlength="1"
+							               style="width:80px;" placeholder="Day" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 							    </td>
 
 							    <td>
@@ -361,78 +411,87 @@ document.addEventListener("click", function (e) {
 
         </div>
 		
-						<div class="table-responsive" th:if="${#lists.size(ppr1List) > 0}">
-		                    <table class="table table-bordered">
-								<h4>
-								      <b> <centre> List of  Institutional Structure </centre>  </b>
-								 </h4>
-								 <br/>
-		                        <tbody>
-		                        <tr>
-		                            <th class="table-primary">State Name</th>
-		                            <th class="table-primary">Type of SLNA</th>
-									<th class="table-primary">Date of Notification</th>
-									<th class="table-primary">Uploaded Notification</th>
-									<th class="table-primary">Date of MoU with DoLR</th>
-									<th class="table-primary">Upload MoU</th>
-									<th class="table-primary">Action</th>
-		                        </tr>
-								</tbody>
-		                       <!--  <tr th:each="user : ${ppr1List}">
+		<div class="table-responsive mt-4"
+		     th:if="${#lists.size(functionariesList) > 0}">
+			 <h4>
+			 <b> <centre> List of   Functionaries of SLNA </centre>  </b>
+			</h4>
+			<br/>
+		<table class="table table-bordered table-striped" style="min-width:1700px;">
 
-		                           <td th:text="${user[2]}"></td>-->
-									
-								   <tr th:each="user, stat : ${ppr1List}">
-								       <td th:text="${stat.first ? user[2] : ''}"></td>
-									
-									
-		                            <td th:text="${user[3]}"></td>
-									<td th:text="${user[4]}"></td>
-									<td>
-										<!--<a th:href="@{/viewPdf(path=${user[5]})}" target="_blank">
-										        View Uploaded
-										</a>-->
-										
-										<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]},type='notification')}" target="_blank">
-										    View Uploaded
-										</a>
-										
-									</td>
+		    <thead class="table-primary">
+		    <tr>
+		        <th class="table-primary">Name</th>
+		        <th class="table-primary">Designation</th>
+		        <th class="table-primary">Qualification</th>
+		        <th class="table-primary">Work Allocation</th>
+				
+		        <th class="table-primary">SLNA Budget (R)</th>
+		        <th class="table-primary">SLNA Budget (NR)</th>
+		        <th class="table-primary">DoLR (R)</th>
+		        <th class="table-primary">DoLR (NR)</th>
+				
+		        <th class="table-primary">Office</th>
+		        <th class="table-primary">Address</th>
+		        <th class="table-primary">Year</th>
+		        <th class="table-primary">Day</th>
+		        <th class="table-primary">Work Details</th>
+				<th class="table-primary">Action</th>
+		    </tr>
+		    </thead>
 
-									<td th:text="${user[6]}"></td>
+		    <tbody>
 
-									<td>
-										<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]},type='mou')}" target="_blank">
-												View Uploaded
-										</a>
-									</td>
-									
-									<td>
-										<a th:if="${user[8] == 'D'}"
-										   th:href="@{/deleteInstitutionalStructurePPR1(id=${user[0]})}"
-										   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-										    Delete
-										</a>
-										&nbsp; &nbsp; 
-										<a th:if="${user[8] == 'D'}"
-										   th:href="@{/editInstitutionalStructurePPR1(id=${user[0]})}"
-										   class="btn btn-primary btn-sm"
-										   onclick="return confirm('Are you sure you want to edit this record?');">
-										    Edit
-										</a>
-										&nbsp; &nbsp; 
-									    <a th:if="${user[8] == 'D'}"
-										th:href="@{/completeInstitutionalStructurePPR1(id=${user[0]})}"
-									            class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-									        Complete
-									     </a>
-									</td>
-									
-		                        </tr>
+		    <tr th:each="row, stat : ${functionariesList}">
 
-		                    </table>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[3] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>
 
-		                </div>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}"></td>
+
+		        <td th:text="${row[12]}"></td>
+		        <td th:text="${row[13]}"></td>
+		        <td th:text="${row[14]}"></td>
+		        <td th:text="${row[15]}"></td>
+		        <td th:text="${row[16]}"></td>
+				
+				<td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
+					
+					
+					
+						<a th:if="${row[10].toString().equals('D')}"
+							th:href="@{/deleteInstitutionalStructurePPR1(id=${row[0]})}"
+							class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+							 <i class="fas fa-trash"></i>
+						</a>
+						&nbsp; &nbsp; 
+						<a th:if="${row[10].toString().equals('D')}"
+							th:href="@{/editInstitutionalStructurePPR1(id=${row[0]})}"
+							class="btn btn-primary btn-sm"
+							onclick="return confirm('Are you sure you want to edit this record?');">
+							 <i class="fas fa-edit"></i>
+						</a>
+						&nbsp; &nbsp; 
+						<a th:if="${row[10].toString().equals('D')}"
+							th:href="@{/completeInstitutionalStructurePPR1(id=${row[0]})}"
+							class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
+							 <i class="fas fa-check"></i>
+						</a>	
+				</td>
+				<td th:unless="${stat.first || row[0] != functionariesList[stat.index-1][0]}"></td>
+		    </tr>
+
+		    </tbody>
+
+		</table>
+
+		</div>
+		
 		
 		
 

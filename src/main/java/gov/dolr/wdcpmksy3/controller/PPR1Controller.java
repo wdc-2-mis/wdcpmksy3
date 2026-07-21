@@ -2,11 +2,14 @@ package gov.dolr.wdcpmksy3.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +30,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
+import gov.dolr.wdcpmksy3.service.DesignationService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
+import gov.dolr.wdcpmksy3.service.QualificationService;
+import gov.dolr.wdcpmksy3.service.SlnaFunctionaryServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -46,6 +52,15 @@ public class PPR1Controller {
     
     @Autowired
     InstitutionalStructureRepository repository;
+    
+    @Autowired
+    DesignationService dserv;
+    
+    @Autowired
+    QualificationService qserv;
+    
+    @Autowired
+    SlnaFunctionaryServiceImpl  slnaFunctionaryService;
 	
 	@GetMapping("/institutionalStructurePPR1")
     public String ppr1(HttpSession session, Model model) 
@@ -107,7 +122,7 @@ public class PPR1Controller {
 	        obj.setNotificationFile(uploadPath+notificationFileName);
 	        obj.setMouDate(mouDate);
 	        obj.setMouFile(uploadPath+mouFileName);
-	        obj.setStatus(action);
+	        obj.setStatus(action.charAt(0));
 	        obj.setCreatedBy(userid);
 	        obj.setCreatedDate(LocalDateTime.now());
 	        obj.setRequestIp(getClientIpAddr(request));
@@ -448,18 +463,74 @@ public class PPR1Controller {
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
+		
+		List<Object[]> list = isserv.getPPR1List(stcode);
+		for (Object[] row : list) {
 
+		    Integer id = (Integer) row[0];
+		    System.out.println("Id : " + id);
+		}
+		
         if(userid==null){
 
             return "redirect:/login";
         }
-        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+        model.addAttribute("functionariesList", slnaFunctionaryService.getFunctionariesList(stcode));
+        model.addAttribute("designationList", dserv.getAllDesignationDetails());
+        model.addAttribute("qualificationList", qserv.getAllQualification());
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
         return "slnaFunctionariesPPR3";
     } 
     
-    
+    @PostMapping("/saveSLNAFunctionariesPPR3")
+    public String saveFunctionaries(HttpSession session, Model model, HttpServletRequest request,
+            @RequestParam String name,
+            @RequestParam Integer designation,
+            @RequestParam Integer qualification,
+            @RequestParam String workallocation,
+            @RequestParam BigDecimal slr,
+            @RequestParam BigDecimal slnr,
+            @RequestParam BigDecimal dlr,
+            @RequestParam BigDecimal dlnr,
+            @RequestParam("officename[]") String[] officename,
+            @RequestParam("address[]") String[] address,
+            @RequestParam("yr[]") Integer[] yr,
+            @RequestParam("day[]") Integer[] day,
+            @RequestParam("workdetail[]") String[] workdetail,
+            @RequestParam String action) {
+   
+    		System.out.println("i am in........");
+	    	String statename=session.getAttribute("statename").toString();
+			Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+			String userid=(String)session.getAttribute("userid");
+			try {
+			 if(userid==null){
+
+		            return "redirect:/login";
+		     }
+			Integer pprInstStrId =0;
+	    	List<Object[]> list = isserv.getPPR1List(stcode);
+			for (Object[] row : list) {
+	
+			    pprInstStrId = (Integer) row[0];
+			    System.out.println("Id : " + pprInstStrId);
+			}
+
+			slnaFunctionaryService.saveFunctionary(pprInstStrId, name, designation, qualification, workallocation, slr,
+                slnr, dlr,dlnr,officename, address, yr, day, workdetail, action, userid, request.getRemoteAddr());
+
+			model.addAttribute( "success", "Functionary saved successfully.");
+
+        
+			}
+			catch (Exception e) {
+
+				e.printStackTrace();
+		     //   redirectAttributes.addFlashAttribute("error", "Unable to saved record.");
+			}
+			return "redirect:/slnaFunctionariesPPR3";	
+    }
     
     
 
