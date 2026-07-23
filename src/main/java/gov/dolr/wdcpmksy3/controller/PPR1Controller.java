@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,11 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +33,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
+import gov.dolr.wdcpmksy3.entity.SlnaFunctionary;
+import gov.dolr.wdcpmksy3.entity.SlnaFunctionaryWorkExperience;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
+import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryRepository;
+import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryWorkExperienceRepository;
 import gov.dolr.wdcpmksy3.service.DesignationService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
@@ -61,6 +69,12 @@ public class PPR1Controller {
     
     @Autowired
     SlnaFunctionaryServiceImpl  slnaFunctionaryService;
+    
+    @Autowired
+    SlnaFunctionaryRepository slnafuncrep;
+    
+    @Autowired
+    SlnaFunctionaryWorkExperienceRepository exprep;
 	
 	@GetMapping("/institutionalStructurePPR1")
     public String ppr1(HttpSession session, Model model) 
@@ -475,7 +489,31 @@ public class PPR1Controller {
 
             return "redirect:/login";
         }
-        model.addAttribute("functionariesList", slnaFunctionaryService.getFunctionariesList(stcode));
+        List<Object[]> functionariesList = slnaFunctionaryService.getFunctionariesList(stcode);
+
+        List<Object[]> finalList = new ArrayList<>();
+
+        int srNo = 1;
+        Integer previousId = null;
+
+        for (Object[] row : functionariesList) {
+
+            Integer currentId = ((Number) row[0]).intValue();
+
+            // Create a new array with one extra column for serial number
+            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+            if (previousId == null || !previousId.equals(currentId)) {
+                newRow[row.length] = srNo++;   // Serial No.
+            } else {
+                newRow[row.length] = "";       // Blank for duplicate rows
+            }
+            finalList.add(newRow);
+            previousId = currentId;
+        }
+
+        model.addAttribute("functionariesList", finalList);
+      //  model.addAttribute("functionariesList", slnaFunctionaryService.getFunctionariesList(stcode));
         model.addAttribute("designationList", dserv.getAllDesignationDetails());
         model.addAttribute("qualificationList", qserv.getAllQualification());
 		model.addAttribute("statename", statename);
@@ -484,7 +522,7 @@ public class PPR1Controller {
     } 
     
     @PostMapping("/saveSLNAFunctionariesPPR3")
-    public String saveFunctionaries(HttpSession session, Model model, HttpServletRequest request,
+    public String saveSLNAFunctionariesPPR3(HttpSession session, Model model, HttpServletRequest request,
             @RequestParam String name,
             @RequestParam Integer designation,
             @RequestParam Integer qualification,
@@ -498,9 +536,10 @@ public class PPR1Controller {
             @RequestParam("yr[]") Integer[] yr,
             @RequestParam("day[]") Integer[] day,
             @RequestParam("workdetail[]") String[] workdetail,
-            @RequestParam String action) {
+            @RequestParam String action,
+            RedirectAttributes redirectAttributes) {
    
-    		System.out.println("i am in........");
+    		
 	    	String statename=session.getAttribute("statename").toString();
 			Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 			String userid=(String)session.getAttribute("userid");
@@ -514,22 +553,202 @@ public class PPR1Controller {
 			for (Object[] row : list) {
 	
 			    pprInstStrId = (Integer) row[0];
-			    System.out.println("Id : " + pprInstStrId);
+			   // System.out.println("Id : " + pprInstStrId);
 			}
 
 			slnaFunctionaryService.saveFunctionary(pprInstStrId, name, designation, qualification, workallocation, slr,
                 slnr, dlr,dlnr,officename, address, yr, day, workdetail, action, userid, request.getRemoteAddr());
 
-			model.addAttribute( "success", "Functionary saved successfully.");
-
+			redirectAttributes.addFlashAttribute( "success", "Functionary saved successfully.");
         
 			}
 			catch (Exception e) {
 
 				e.printStackTrace();
-		     //   redirectAttributes.addFlashAttribute("error", "Unable to saved record.");
+		        redirectAttributes.addFlashAttribute("error", "Unable to saved record.");
 			}
 			return "redirect:/slnaFunctionariesPPR3";	
+    }
+    
+    @GetMapping("/deleteSLNAFunctionariesPPR3")
+    public String deleteSLNAFunctionariesPPR3(HttpSession session, Model model, @RequestParam("id") Integer id,  
+    		RedirectAttributes redirectAttributes) {
+
+		
+		String userid=(String)session.getAttribute("userid");
+		try {
+			
+	        if(userid==null){
+	
+	            return "redirect:/login";
+	        }
+            SlnaFunctionary data = slnafuncrep.findById(id).orElse(null);
+            if (data == null) {
+                redirectAttributes.addFlashAttribute("error", "Record not found.");
+                return "redirect:/slnaFunctionariesPPR3";
+            }
+            
+            if (slnafuncrep.existsById(id)) {
+            	slnafuncrep.deleteById(id);
+            	redirectAttributes.addFlashAttribute("success", "Record deleted successfully.");
+            }
+            else {}
+            
+
+            
+        } 
+        catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+            e.printStackTrace();
+        }
+		return "redirect:/slnaFunctionariesPPR3";
+    }
+    
+    @GetMapping("/completeSLNAFunctionariesPPR3")
+    public String completeSLNAFunctionariesPPR3(HttpSession session, Model model, @RequestParam("id") Integer id,  
+    		RedirectAttributes redirectAttributes) {
+
+		String statename=session.getAttribute("statename").toString();
+		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+		 	try {
+		 		int updated =0;
+		 		if(userid==null){
+
+		            return "redirect:/login";
+		        }
+		 		slnaFunctionaryService.completeRecord(id);
+		        
+		        redirectAttributes.addFlashAttribute("success", "Record completed successfully.");
+		       
+		    } 
+		 	catch (Exception e) {
+		 		e.printStackTrace();
+		        redirectAttributes.addFlashAttribute("error", "Unable to complete record.");
+		    }
+       
+        return "redirect:/slnaFunctionariesPPR3";
+    }
+    
+    @GetMapping("/editSLNAFunctionariesPPR3")
+    public String editSLNAFunctionariesPPR3(@RequestParam Integer id, Model model, HttpSession session) {
+
+    	
+		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+
+		if(userid==null){
+
+		    return "redirect:/login";
+		}
+		SlnaFunctionary functionary = slnafuncrep.findById(id).orElseThrow(() -> new RuntimeException("Record not found"));
+
+	    List<SlnaFunctionaryWorkExperience> experiences =exprep.findByFunctionaryPprSlnaFunId(id);
+	    
+	    List<Object[]> functionariesList = slnaFunctionaryService.getFunctionariesList(stcode);
+
+        List<Object[]> finalList = new ArrayList<>();
+
+        int srNo = 1;
+        Integer previousId = null;
+
+        for (Object[] row : functionariesList) {
+
+            Integer currentId = ((Number) row[0]).intValue();
+
+            // Create a new array with one extra column for serial number
+            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+            if (previousId == null || !previousId.equals(currentId)) {
+                newRow[row.length] = srNo++;   // Serial No.
+            } else {
+                newRow[row.length] = "";       // Blank for duplicate rows
+            }
+            finalList.add(newRow);
+            previousId = currentId;
+        }
+
+        model.addAttribute("functionariesList", finalList);
+	    model.addAttribute("functionary", functionary);
+	    model.addAttribute("experiences", experiences);
+	//	model.addAttribute("functionariesList", slnaFunctionaryService.getFunctionariesList(stcode));
+        model.addAttribute("designationList", dserv.getAllDesignationDetails());
+        model.addAttribute("qualificationList", qserv.getAllQualification());
+
+        return "editSlnaFunctionary";
+    }
+    
+    @PostMapping("/updateSLNAFunctionariesPPR3")
+    public String updateFunctionary(HttpSession session, Model model, HttpServletRequest request,
+            @RequestParam Integer pprSlnaFunId, @RequestParam String name, @RequestParam Integer designation,
+            @RequestParam Integer qualification,  @RequestParam String workallocation, @RequestParam BigDecimal slr,
+            @RequestParam BigDecimal slnr,  @RequestParam BigDecimal dlr, @RequestParam BigDecimal dlnr,
+            @RequestParam("officename[]") String[] office,
+            @RequestParam("address[]") String[] address,
+            @RequestParam("yr[]") Integer[] year,
+            @RequestParam("day[]") Integer[] day,
+            @RequestParam("workdetail[]") String[] workdetail,
+            @RequestParam Character action,  
+    		RedirectAttributes redirectAttributes ) {
+    	
+    
+    	Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+		try {
+			
+			 if(userid==null){
+	
+		            return "redirect:/login";
+		     }
+			 SlnaFunctionary functionary = slnafuncrep.findById(pprSlnaFunId).get();
+
+		        functionary.setSlnaFunFname(name);
+		        functionary.setDesignationId(designation);
+		        functionary.setQualificationId(qualification);
+		        functionary.setWorkAllocation(workallocation);
+		
+		        functionary.setTotBudgetSlnaRecurring(slr);
+		        functionary.setTotBudgetSlnaNonRecurring(slnr);
+		        functionary.setDolrFundRecurring(dlr);
+		        functionary.setDolrFundNonRecurring(dlnr);
+		        functionary.setStatus(action);
+		        functionary.setUpdatedBy(userid);
+		        functionary.setUpdatedDate(LocalDate.now());
+
+		        slnafuncrep.save(functionary);
+
+		        exprep.deleteByFunctionaryPprSlnaFunId(pprSlnaFunId);
+
+		        for(int i=0;i<office.length;i++){
+		
+		            if(office[i]==null || office[i].trim().isEmpty())
+		                continue;
+		
+		            SlnaFunctionaryWorkExperience exp = new SlnaFunctionaryWorkExperience();
+		
+		            exp.setFunctionary(functionary);
+		            exp.setOfficeName(office[i]);
+		            exp.setAddress(address[i]);
+		            exp.setWorkExpYrs(year[i]);
+		            exp.setWorkExpDays(day[i]);
+		            exp.setWorkDetails(workdetail[i]);
+		            exp.setUpdatedBy(userid);
+		            exp.setRequestIp(request.getRemoteAddr());
+		            exp.setUpdatedDate(LocalDate.now());
+		
+		            exprep.save(exp);
+		            
+		        }
+		        redirectAttributes.addFlashAttribute("success", "Record update successfully.");
+		}
+		catch (Exception e) {
+
+			e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("error", "Unable to Update record.");
+		}
+
+        return "redirect:/slnaFunctionariesPPR3";	
     }
     
     

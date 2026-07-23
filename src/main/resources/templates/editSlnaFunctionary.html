@@ -254,7 +254,7 @@ document.addEventListener("click", function (e) {
 
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">
-               Functionaries of SLNA
+              Update Functionaries of SLNA
             </h4>
         </div>
 		
@@ -269,7 +269,7 @@ document.addEventListener("click", function (e) {
 
         <div class="card-body">
 
-             <form id="slnaFunctionaries" th:action="@{/saveSLNAFunctionariesPPR3}" method="post">
+             <form id="slnaFunctionaries" th:action="@{/updateSLNAFunctionariesPPR3}" method="post">
 
 				
 
@@ -278,7 +278,8 @@ document.addEventListener("click", function (e) {
 									<label>Name</label><span class="required">*</span>
 								</div>
 								<div class="col-md-5">
-								<input type="text" name="name" id="name" class="form-control">
+								<input type="text" name="name" id="name" class="form-control" th:value="${functionary.slnaFunName}">
+								<input type="hidden" name="pprSlnaFunId" th:value="${functionary.pprSlnaFunId}">
 								</div>
 							</div>
 							<div class="row mb-3">
@@ -288,11 +289,11 @@ document.addEventListener("click", function (e) {
 								<div class="col-md-5">
 									<select class="form-select" name="designation" id="designation" >
 										<option value="">--Select Designation--</option>
-										<th:block th:each="des : ${designationList}">
-										        <option th:value="${des.designationId}"
-										                th:text="${des.designationName}">
-										        </option>
-										 </th:block>
+										<option th:each="des:${designationList}"
+										           th:value="${des.designationId}"
+										           th:text="${des.designationName}"
+										           th:selected="${des.designationId==functionary.designationId}">
+										   </option>
 									</select>
 								</div>
 							</div>
@@ -303,11 +304,11 @@ document.addEventListener("click", function (e) {
 								<div class="col-md-5">
 									<select class="form-select" name="qualification" id="qualification">
 										<option value="">--Select Qualification--</option>
-										<th:block th:each="qua : ${qualificationList}">
-											<option th:value="${qua.qualificationId}"
-												th:text="${qua.qualificationName}">
-											</option>
-										</th:block>
+										<option th:each="qua:${qualificationList}"
+										           th:value="${qua.qualificationId}"
+										           th:text="${qua.qualificationName}"
+										           th:selected="${qua.qualificationId==functionary.qualificationId}">
+										 </option>
 									</select>
 								</div>
 							</div>
@@ -316,7 +317,7 @@ document.addEventListener("click", function (e) {
 									<label>Work Allocation</label><span class="required">*</span>
 								</div>
 								<div class="col-md-5">
-									<textarea name="workallocation" id="workallocation" class="form-control" rows="3"></textarea>
+									<textarea name="workallocation" id="workallocation" class="form-control" rows="3"  th:text="${functionary.workAllocation}"></textarea>
 									<!--<input type="text" name="workallocation" id="workallocation" class="form-control">-->
 								</div>
 							</div>
@@ -338,10 +339,10 @@ document.addEventListener("click", function (e) {
 									Total Budget of SLNA<span class="required">*</span>
 								</div>
 								<div class="col-md-3">
-									<input type="text" name="slr" id="slr" maxlength="11" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+									<input type="text" name="slr" id="slr" maxlength="11" th:value="${functionary.totBudgetSlnaRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
 								</div>
 								<div class="col-md-3">
-									<input type="text" name="slnr" id="slnr" maxlength="11" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+									<input type="text" name="slnr" id="slnr" maxlength="11" th:value="${functionary.totBudgetSlnaNonRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
 								</div>
 							</div>
 							<div class="row mb-4">
@@ -349,10 +350,10 @@ document.addEventListener("click", function (e) {
 									Funding Expected from DoLR <span class="required">*</span>
 								</div>
 								<div class="col-md-3">
-								<input type="text" name="dlr" id="dlr" maxlength="11" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+								<input type="text" name="dlr" id="dlr" maxlength="11" th:value="${functionary.dolrFundRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
 								</div>
 								<div class="col-md-3">
-								<input type="text" name="dlnr" id="dlnr" maxlength="11" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+								<input type="text" name="dlnr" id="dlnr" maxlength="11" th:value="${functionary.dolrFundNonRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
 								</div>
 							</div>
 							
@@ -372,27 +373,83 @@ document.addEventListener("click", function (e) {
 							</thead>
 						
 							<tbody id="experienceTable">
-							<tr>
-							    <td><input type="text" name="officename[]" class="form-control"></td>
 
-							    <td><input type="text" name="address[]" class="form-control"></td>
+							<tr th:each="exp, iterStat : ${experiences}">
 
 							    <td>
-							        <input type="text" name="yr[]" class="form-control d-inline-block" maxlength="2" minlength="1" max="30"
-											style="width:80px;" placeholder="Year" oninput="this.value=this.value.replace(/[^0-9]/g,'')" >
-
-							        <input type="text" name="day[]" class="form-control d-inline-block ms-2" maxlength="3" minlength="1" max="364"
-							               style="width:80px;" placeholder="Day" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+							        <input type="text"
+							               name="officename[]"
+							               class="form-control"
+							               th:value="${exp.officeName}">
 							    </td>
 
 							    <td>
-							        <textarea name="workdetail[]" class="form-control" rows="3"></textarea>
+							        <input type="text"
+							               name="address[]"
+							               class="form-control"
+							               th:value="${exp.address}">
 							    </td>
 
 							    <td>
-							        <button type="button" class="btn btn-success btn-sm addRow">+</button>
+							        <input type="text" maxlength="2" minlength="1" max="30"
+							               name="yr[]" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+							               class="form-control d-inline-block"
+							               style="width:80px;"
+							               th:value="${exp.workExpYrs}">
+
+							        <input type="text" maxlength="3" minlength="1" max="364"
+							               name="day[]" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+							               class="form-control d-inline-block ms-2"
+							               style="width:80px;"
+							               th:value="${exp.workExpDays}">
 							    </td>
+
+							    <td>
+							        <textarea name="workdetail[]"
+							                  class="form-control"
+							                  rows="3"
+							                  th:text="${exp.workDetails}"></textarea>
+							    </td>
+
+							    <td>
+							        <!-- First Row -->
+							        <button th:if="${iterStat.first}"
+							                type="button"
+							                class="btn btn-success btn-sm addRow">
+							            +
+							        </button>
+
+							        <!-- Remaining Rows -->
+							        <button th:unless="${iterStat.first}"
+							                type="button"
+							                class="btn btn-danger btn-sm removeRow">
+							            ×
+							        </button>
+							    </td>
+
 							</tr>
+							
+							<tr th:if="${#lists.isEmpty(experiences)}">
+							      <td><input type="text" name="officename[]" class="form-control"></td>
+							      <td><input type="text" name="address[]" class="form-control"></td>
+							      <td>
+							          <input type="text" name="yr[]" class="form-control d-inline-block" style="width:80px;">
+							          <input type="text" name="day[]" class="form-control d-inline-block ms-2" style="width:80px;">
+							      </td>
+							      <td>
+							          <textarea name="workdetail[]" class="form-control" rows="3"></textarea>
+							      </td>
+							      <td>
+							          <button type="button" class="btn btn-success btn-sm addRow">+</button>
+							      </td>
+							  </tr>
+
+							  <!-- Existing rows -->
+							  <tr th:each="exp, iterStat : ${experiences}">
+							      <!-- same code as above -->
+							  </tr>
+
+
 							</tbody>
 							
 						</table>
@@ -421,7 +478,6 @@ document.addEventListener("click", function (e) {
 
 		    <thead class="table-primary">
 		    <tr>
-				<th class="table-primary">Sl. No.</th>
 		        <th class="table-primary">Name</th>
 		        <th class="table-primary">Designation</th>
 		        <th class="table-primary">Qualification</th>
@@ -441,30 +497,30 @@ document.addEventListener("click", function (e) {
 		    </tr>
 		    </thead>
 
-		    <tbody th:with="sr=0">
+		    <tbody>
 
 		    <tr th:each="row, stat : ${functionariesList}">
+
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[3] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>
+
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}"></td>
+				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}"></td>
+
+		        <td th:text="${row[12]}"></td>
+		        <td th:text="${row[13]}"></td>
+		        <td th:text="${row[14]}"></td>
+		        <td th:text="${row[15]}"></td>
+		        <td th:text="${row[16]}"></td>
 				
-				 <td th:text="${row[17]}"></td>
-
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[3] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>
-
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}"></td>
-
-		         <td th:text="${row[12]}"></td>
-		         <td th:text="${row[13]}"></td>
-		         <td th:text="${row[14]}"></td>
-		         <td th:text="${row[15]}"></td>
-		         <td th:text="${row[16]}"></td>
-				
-				 <td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
-					&nbsp; &nbsp; 
+				<td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
+					
+					
+					
 						<a th:if="${row[10].toString().equals('D')}"
 							th:href="@{/deleteSLNAFunctionariesPPR3(id=${row[0]})}"
 							class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">

@@ -2,6 +2,9 @@ package gov.dolr.wdcpmksy3.service;
 
 import java.math.BigDecimal;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public interface SlnaFunctionaryService {
 	
 	 void saveFunctionary(Integer pprInstStrId, String name, Integer designation, Integer qualification, String workallocation,

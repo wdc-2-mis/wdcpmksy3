@@ -26,9 +26,16 @@ public class SlnaFunctionary {
 
     @Column(name = "qualification_id")
     private Integer qualificationId;
+    
+    @Column(name = "level", length = 5)
+    private String level;
 
-    @Column(name = "slna_fun_name", length = 100)
-    private String slnaFunName;
+    @Column(name = "slna_fun_fname", length =50)
+    private String slnaFunFname;
+    
+    @Column(name = "slna_fun_lname", length =50)
+    private String slnaFunLname;
+
 
     @Column(name = "work_allocation", length = 1000)
     private String workAllocation;
@@ -98,12 +105,28 @@ public class SlnaFunctionary {
 		this.qualificationId = qualificationId;
 	}
 
-	public String getSlnaFunName() {
-		return slnaFunName;
+	public String getLevel() {
+		return level;
 	}
 
-	public void setSlnaFunName(String slnaFunName) {
-		this.slnaFunName = slnaFunName;
+	public void setLevel(String level) {
+		this.level = level;
+	}
+
+	public String getSlnaFunFname() {
+		return slnaFunFname;
+	}
+
+	public void setSlnaFunFname(String slnaFunFname) {
+		this.slnaFunFname = slnaFunFname;
+	}
+
+	public String getSlnaFunLname() {
+		return slnaFunLname;
+	}
+
+	public void setSlnaFunLname(String slnaFunLname) {
+		this.slnaFunLname = slnaFunLname;
 	}
 
 	public String getWorkAllocation() {

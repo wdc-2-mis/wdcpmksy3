@@ -43,7 +43,7 @@ public class SlnaFunctionaryServiceImpl implements SlnaFunctionaryService {
 	        
 	       // fun.setInstitutionalStructure(inst1);
 	        fun.setInstitutionalStructure(inst);
-	        fun.setSlnaFunName(name);
+	        fun.setSlnaFunFname(name);
 	        fun.setDesignationId(designation);
 	        fun.setQualificationId(qualification);
 	        fun.setWorkAllocation(workallocation);
@@ -82,6 +82,17 @@ public class SlnaFunctionaryServiceImpl implements SlnaFunctionaryService {
 
 	    public List<Object[]> getFunctionariesList(Integer stcode) {
 	        return functionaryRepo.getFunctionariesList(stcode);
+	    }
+	    
+	    @Transactional
+	    public void completeRecord(Integer id) {
+
+	        SlnaFunctionary fun = functionaryRepo.findById(id)
+	                .orElseThrow(() -> new RuntimeException("Record not found"));
+
+	        fun.setStatus('C');
+
+	        functionaryRepo.save(fun);
 	    }
 
 }

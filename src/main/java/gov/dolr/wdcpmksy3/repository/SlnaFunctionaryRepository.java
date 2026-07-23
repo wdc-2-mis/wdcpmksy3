@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 
 import gov.dolr.wdcpmksy3.entity.SlnaFunctionary;
 
@@ -20,5 +22,10 @@ public interface SlnaFunctionaryRepository extends JpaRepository<SlnaFunctionary
 			+ "ON q.qualification_id = f.qualification_id LEFT JOIN ppr_slna_functionary_work_experience e ON e.ppr_slna_fun_id = f.ppr_slna_fun_id "
 			+ "WHERE i.st_code =:stcode ORDER BY f.ppr_slna_fun_id DESC, e.ppr_slna_fun_exp_id ASC", nativeQuery = true)
 	    List<Object[]> getFunctionariesList(@Param("stcode") int stcode);
+	    
+	    @Transactional
+	    @Modifying
+	    @Query("UPDATE SlnaFunctionary s SET s.status = 'C' WHERE s.pprSlnaFunId = :id")
+	    int updateStatus(@Param("id") Integer id);
 
 }
