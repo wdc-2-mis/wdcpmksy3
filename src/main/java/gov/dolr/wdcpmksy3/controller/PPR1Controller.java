@@ -523,7 +523,9 @@ public class PPR1Controller {
     
     @PostMapping("/saveSLNAFunctionariesPPR3")
     public String saveSLNAFunctionariesPPR3(HttpSession session, Model model, HttpServletRequest request,
-            @RequestParam String name,
+    		@RequestParam String level,
+    		@RequestParam String fname,
+            @RequestParam String lname,
             @RequestParam Integer designation,
             @RequestParam Integer qualification,
             @RequestParam String workallocation,
@@ -556,7 +558,7 @@ public class PPR1Controller {
 			   // System.out.println("Id : " + pprInstStrId);
 			}
 
-			slnaFunctionaryService.saveFunctionary(pprInstStrId, name, designation, qualification, workallocation, slr,
+			slnaFunctionaryService.saveFunctionary(pprInstStrId, level, fname, lname, designation, qualification, workallocation, slr,
                 slnr, dlr,dlnr,officename, address, yr, day, workdetail, action, userid, request.getRemoteAddr());
 
 			redirectAttributes.addFlashAttribute( "success", "Functionary saved successfully.");
@@ -681,9 +683,9 @@ public class PPR1Controller {
     
     @PostMapping("/updateSLNAFunctionariesPPR3")
     public String updateFunctionary(HttpSession session, Model model, HttpServletRequest request,
-            @RequestParam Integer pprSlnaFunId, @RequestParam String name, @RequestParam Integer designation,
-            @RequestParam Integer qualification,  @RequestParam String workallocation, @RequestParam BigDecimal slr,
-            @RequestParam BigDecimal slnr,  @RequestParam BigDecimal dlr, @RequestParam BigDecimal dlnr,
+            @RequestParam Integer pprSlnaFunId, @RequestParam String level, @RequestParam String fname, @RequestParam String lname,
+            @RequestParam Integer designation, @RequestParam Integer qualification,  @RequestParam String workallocation, 
+            @RequestParam BigDecimal slr, @RequestParam BigDecimal slnr,  @RequestParam BigDecimal dlr, @RequestParam BigDecimal dlnr,
             @RequestParam("officename[]") String[] office,
             @RequestParam("address[]") String[] address,
             @RequestParam("yr[]") Integer[] year,
@@ -703,7 +705,9 @@ public class PPR1Controller {
 		     }
 			 SlnaFunctionary functionary = slnafuncrep.findById(pprSlnaFunId).get();
 
-		        functionary.setSlnaFunFname(name);
+			 	functionary.setLevel(level);
+		        functionary.setSlnaFunFname(fname);
+		        functionary.setSlnaFunLname(lname);
 		        functionary.setDesignationId(designation);
 		        functionary.setQualificationId(qualification);
 		        functionary.setWorkAllocation(workallocation);

@@ -52,7 +52,9 @@
 
 	    form.addEventListener("submit", function (e) {
 
-	        const name = document.getElementById("name");
+			const level = document.querySelector('input[name="level"]:checked');
+	        const fname = document.getElementById("fname");
+			const lname = document.getElementById("fname");
 	        const designation = document.getElementById("designation");
 	        const qualification = document.getElementById("qualification");
 	        const workallocation = document.getElementById("workallocation");
@@ -62,13 +64,26 @@
 	        const dlr = document.getElementById("dlr");
 	        const dlnr = document.getElementById("dlnr");
 
-	        // Name
-	        if (name.value.trim() === "") {
-	            alert("Please enter Name.");
-	            name.focus();
+			if (!level) {
+			     alert("Please select Functionaries Working for.");
+			     e.preventDefault();
+			     return;
+			}
+	        // fName
+	        if (fname.value.trim() === "") {
+	            alert("Please enter First Name.");
+	            fname.focus();
 	            e.preventDefault();
 	            return;
 	        }
+			
+			// fName
+			//if (lname.value.trim() === "") {
+			//	alert("Please enter Last Name.");
+			//	lname.focus();
+			//	e.preventDefault();
+			//	return;
+			//}
 
 	        // Designation
 	        if (designation.value === "") {
@@ -159,7 +174,12 @@
 	                e.preventDefault();
 	                return;
 	            }
-
+				if (parseInt(year.value, 10) > 30) {
+					alert("Experience Year cannot be greater than 30 in Row " + (i + 1));
+					year.focus();
+					e.preventDefault();
+					return;
+				}
 	            if (day.value.trim() === "") {
 	                alert("Please enter Experience Day in Row " + (i + 1));
 	                day.focus();
@@ -173,7 +193,12 @@
 	                e.preventDefault();
 	                return;
 	            }
-
+				if (parseInt(day.value, 10) > 364) {
+					alert("Experience Day cannot be greater than 364 in Row " + (i + 1));
+					day.focus();
+					e.preventDefault();
+					return;
+				}
 	            if (work.value.trim() === "") {
 	                alert("Please enter Work Details in Row " + (i + 1));
 	                work.focus();
@@ -271,15 +296,35 @@ document.addEventListener("click", function (e) {
 
              <form id="slnaFunctionaries" th:action="@{/saveSLNAFunctionariesPPR3}" method="post">
 
-				
+							<div class="row mb-3">
+								<div class="col-md-3">
+									<label>Functionaries Working for</label><span class="required">*</span>
+								</div>
+								<div class="col-md-5">
+									<input type="radio" id="SLNA" name="level" value="SLNA">
+									<label for="html">SLNA</label> &nbsp;&nbsp;
+									<input type="radio" id="SLDC" name="level" value="SLDC">
+									<label for="css">SLDC</label>&nbsp;&nbsp;
+									<input type="radio" id="both" name="level" value="Both">
+									<label for="javascript">Both</label>
+								</div>
+							</div>
 
 							<div class="row mb-3">
 								<div class="col-md-3">
-									<label>Name</label><span class="required">*</span>
+									<label>First Name</label><span class="required">*</span>
 								</div>
 								<div class="col-md-5">
-								<input type="text" name="name" id="name" class="form-control">
+								<input type="text" name="fname" id="fname" class="form-control">
 								</div>
+							</div>
+							<div class="row mb-3">
+									<div class="col-md-3">
+											<label>Last Name</label>
+									</div>
+									<div class="col-md-5">
+											<input type="text" name="lname" id="lname" class="form-control">
+									</div>
 							</div>
 							<div class="row mb-3">
 								<div class="col-md-3">
@@ -358,7 +403,7 @@ document.addEventListener("click", function (e) {
 							
 							<hr>
 							<h4 class="mb-3">
-								Experience Details
+								Experience Details<span class="required">*</span>
 							</h4>
 						<table class="table table-bordered">
 							<thead class="table-light">
@@ -422,7 +467,9 @@ document.addEventListener("click", function (e) {
 		    <thead class="table-primary">
 		    <tr>
 				<th class="table-primary">Sl. No.</th>
-		        <th class="table-primary">Name</th>
+				<th class="table-primary">Functionaries Work for</th>
+		        <th class="table-primary">First Name</th>
+				<th class="table-primary">Last Name</th>
 		        <th class="table-primary">Designation</th>
 		        <th class="table-primary">Qualification</th>
 		        <th class="table-primary">Work Allocation</th>
@@ -445,9 +492,10 @@ document.addEventListener("click", function (e) {
 
 		    <tr th:each="row, stat : ${functionariesList}">
 				
-				 <td th:text="${row[17]}"></td>
-
+				 <td th:text="${row[19]}"></td>
+				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[18] : ''}"></td>
 				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}"></td>
+				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[17] : ''}"></td>
 				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[3] : ''}"></td>
 				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
 				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>

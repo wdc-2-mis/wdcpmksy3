@@ -52,7 +52,8 @@
 
 	    form.addEventListener("submit", function (e) {
 
-	        const name = document.getElementById("name");
+			const level = document.querySelector('input[name="level"]:checked');
+	        const name = document.getElementById("fname");
 	        const designation = document.getElementById("designation");
 	        const qualification = document.getElementById("qualification");
 	        const workallocation = document.getElementById("workallocation");
@@ -62,9 +63,14 @@
 	        const dlr = document.getElementById("dlr");
 	        const dlnr = document.getElementById("dlnr");
 
+			if (!level) {
+				alert("Please select Functionaries Working for.");
+				e.preventDefault();
+				return;
+			}
 	        // Name
 	        if (name.value.trim() === "") {
-	            alert("Please enter Name.");
+	            alert("Please enter first Name.");
 	            name.focus();
 	            e.preventDefault();
 	            return;
@@ -159,6 +165,12 @@
 	                e.preventDefault();
 	                return;
 	            }
+				if (parseInt(year.value, 10) > 30) {
+				    alert("Experience Year cannot be greater than 30 in Row " + (i + 1));
+				    year.focus();
+				    e.preventDefault();
+				    return;
+				}
 
 	            if (day.value.trim() === "") {
 	                alert("Please enter Experience Day in Row " + (i + 1));
@@ -173,6 +185,12 @@
 	                e.preventDefault();
 	                return;
 	            }
+				if (parseInt(day.value, 10) > 364) {
+				    alert("Experience Day cannot be greater than 364 in Row " + (i + 1));
+				    day.focus();
+				    e.preventDefault();
+				    return;
+				}
 
 	            if (work.value.trim() === "") {
 	                alert("Please enter Work Details in Row " + (i + 1));
@@ -269,202 +287,224 @@ document.addEventListener("click", function (e) {
 
         <div class="card-body">
 
-             <form id="slnaFunctionaries" th:action="@{/updateSLNAFunctionariesPPR3}" method="post">
+			<form id="slnaFunctionaries" th:action="@{/updateSLNAFunctionariesPPR3}" method="post">
+				<input type="hidden" name="pprSlnaFunId" th:value="${functionary.pprSlnaFunId}">
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<label>Functionaries Working for</label><span class="required">*</span>
+					</div>
+					<div class="col-md-5">
+						<input type="radio"
+						          id="SLNA"
+						          name="level"
+						          value="SLNA"
+						          th:checked="${functionary.level == 'SLNA'}">
+						   <label for="SLNA">SLNA</label> &nbsp;&nbsp;
 
-				
+						   <input type="radio"
+						          id="SLDC"
+						          name="level"
+						          value="SLDC"
+						          th:checked="${functionary.level == 'SLDC'}">
+						   <label for="SLDC">SLDC</label> &nbsp;&nbsp;
 
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>Name</label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-								<input type="text" name="name" id="name" class="form-control" th:value="${functionary.slnaFunName}">
-								<input type="hidden" name="pprSlnaFunId" th:value="${functionary.pprSlnaFunId}">
-								</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>Designation</label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-									<select class="form-select" name="designation" id="designation" >
-										<option value="">--Select Designation--</option>
-										<option th:each="des:${designationList}"
-										           th:value="${des.designationId}"
-										           th:text="${des.designationName}"
-										           th:selected="${des.designationId==functionary.designationId}">
-										   </option>
-									</select>
-								</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>Qualification</label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-									<select class="form-select" name="qualification" id="qualification">
-										<option value="">--Select Qualification--</option>
-										<option th:each="qua:${qualificationList}"
-										           th:value="${qua.qualificationId}"
-										           th:text="${qua.qualificationName}"
-										           th:selected="${qua.qualificationId==functionary.qualificationId}">
-										 </option>
-									</select>
-								</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>Work Allocation</label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-									<textarea name="workallocation" id="workallocation" class="form-control" rows="3"  th:text="${functionary.workAllocation}"></textarea>
-									<!--<input type="text" name="workallocation" id="workallocation" class="form-control">-->
-								</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-								<label>Monthly Remuneration (Rs.)</label>
-								</div>
-								<div class="col-md-3">
-								<label class="mb-1">Recurring</label>
-								
-								</div>
-								<div class="col-md-3">
-								<label class="mb-1">Non-Recurring</label>
-								
-								</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-									Total Budget of SLNA<span class="required">*</span>
-								</div>
-								<div class="col-md-3">
-									<input type="text" name="slr" id="slr" maxlength="11" th:value="${functionary.totBudgetSlnaRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-								</div>
-								<div class="col-md-3">
-									<input type="text" name="slnr" id="slnr" maxlength="11" th:value="${functionary.totBudgetSlnaNonRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-								</div>
-							</div>
-							<div class="row mb-4">
-								<div class="col-md-3">
-									Funding Expected from DoLR <span class="required">*</span>
-								</div>
-								<div class="col-md-3">
-								<input type="text" name="dlr" id="dlr" maxlength="11" th:value="${functionary.dolrFundRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-								</div>
-								<div class="col-md-3">
-								<input type="text" name="dlnr" id="dlnr" maxlength="11" th:value="${functionary.dolrFundNonRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-								</div>
-							</div>
-							
-							<hr>
-							<h4 class="mb-3">
-								Experience Details
-							</h4>
-						<table class="table table-bordered">
-							<thead class="table-light">
-								<tr>
-									<th width="15%">Office Name</th>
-									<th width="25%">Address</th>
-									<th width="20%">Experience in No. of Years and Days</th>
-									<th width="30%">Work Details</th>
-									<th width="10%">Action</th>
-								</tr>
-							</thead>
-						
-							<tbody id="experienceTable">
-
-							<tr th:each="exp, iterStat : ${experiences}">
-
-							    <td>
-							        <input type="text"
-							               name="officename[]"
-							               class="form-control"
-							               th:value="${exp.officeName}">
-							    </td>
-
-							    <td>
-							        <input type="text"
-							               name="address[]"
-							               class="form-control"
-							               th:value="${exp.address}">
-							    </td>
-
-							    <td>
-							        <input type="text" maxlength="2" minlength="1" max="30"
-							               name="yr[]" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-							               class="form-control d-inline-block"
-							               style="width:80px;"
-							               th:value="${exp.workExpYrs}">
-
-							        <input type="text" maxlength="3" minlength="1" max="364"
-							               name="day[]" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-							               class="form-control d-inline-block ms-2"
-							               style="width:80px;"
-							               th:value="${exp.workExpDays}">
-							    </td>
-
-							    <td>
-							        <textarea name="workdetail[]"
-							                  class="form-control"
-							                  rows="3"
-							                  th:text="${exp.workDetails}"></textarea>
-							    </td>
-
-							    <td>
-							        <!-- First Row -->
-							        <button th:if="${iterStat.first}"
-							                type="button"
-							                class="btn btn-success btn-sm addRow">
-							            +
-							        </button>
-
-							        <!-- Remaining Rows -->
-							        <button th:unless="${iterStat.first}"
-							                type="button"
-							                class="btn btn-danger btn-sm removeRow">
-							            ×
-							        </button>
-							    </td>
-
-							</tr>
-							
-							<tr th:if="${#lists.isEmpty(experiences)}">
-							      <td><input type="text" name="officename[]" class="form-control"></td>
-							      <td><input type="text" name="address[]" class="form-control"></td>
-							      <td>
-							          <input type="text" name="yr[]" class="form-control d-inline-block" style="width:80px;">
-							          <input type="text" name="day[]" class="form-control d-inline-block ms-2" style="width:80px;">
-							      </td>
-							      <td>
-							          <textarea name="workdetail[]" class="form-control" rows="3"></textarea>
-							      </td>
-							      <td>
-							          <button type="button" class="btn btn-success btn-sm addRow">+</button>
-							      </td>
-							  </tr>
-
-							  <!-- Existing rows -->
-							  <tr th:each="exp, iterStat : ${experiences}">
-							      <!-- same code as above -->
-							  </tr>
-
-
-							</tbody>
-							
-						</table>
-
-						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning">
-							      <i class="fas fa-save"></i>
-							      Save as Draft
-							</button>
-							<!--<button class="btn btn-primary">
-								Submit
-							</button>-->
-						</div>
-				
-            </form>
+						   <input type="radio"
+						          id="both"
+						          name="level"
+						          value="Both"
+						          th:checked="${functionary.level == 'Both'}">
+						   <label for="both">Both</label>
+					</div>
+				</div>
+			
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<label>First Name</label><span class="required">*</span>
+					</div>
+					<div class="col-md-5">
+						<input type="text" name="fname" id="fname" th:value="${functionary.slnaFunFname}" class="form-control">
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<label>Last Name</label>
+					</div>
+					<div class="col-md-5">
+						<input type="text" name="lname" id="lname" th:value="${functionary.slnaFunLname}" class="form-control">
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<label>Designation</label><span class="required">*</span>
+					</div>
+					<div class="col-md-5">
+						<select class="form-select" name="designation" id="designation">
+							<option value="">--Select Designation--</option>
+							<option th:each="des:${designationList}" th:value="${des.designationId}"
+								th:text="${des.designationName}" th:selected="${des.designationId==functionary.designationId}">
+							</option>
+						</select>
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<label>Qualification</label><span class="required">*</span>
+					</div>
+					<div class="col-md-5">
+						<select class="form-select" name="qualification" id="qualification">
+							<option value="">--Select Qualification--</option>
+							<option th:each="qua:${qualificationList}" th:value="${qua.qualificationId}"
+								th:text="${qua.qualificationName}"
+								th:selected="${qua.qualificationId==functionary.qualificationId}">
+							</option>
+						</select>
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<label>Work Allocation</label><span class="required">*</span>
+					</div>
+					<div class="col-md-5">
+						<textarea name="workallocation" id="workallocation" class="form-control" rows="3"
+							th:text="${functionary.workAllocation}"></textarea>
+						<!--<input type="text" name="workallocation" id="workallocation" class="form-control">-->
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<label>Monthly Remuneration (Rs.)</label>
+					</div>
+					<div class="col-md-3">
+						<label class="mb-1">Recurring</label>
+			
+					</div>
+					<div class="col-md-3">
+						<label class="mb-1">Non-Recurring</label>
+			
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-md-3">
+						Total Budget of SLNA<span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="slr" id="slr" maxlength="11" th:value="${functionary.totBudgetSlnaRecurring}"
+							style="height:40px; width: 120px;"
+							oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="slnr" id="slnr" maxlength="11" th:value="${functionary.totBudgetSlnaNonRecurring}"
+							style="height:40px; width: 120px;"
+							oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+					</div>
+				</div>
+				<div class="row mb-4">
+					<div class="col-md-3">
+						Funding Expected from DoLR <span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="dlr" id="dlr" maxlength="11" th:value="${functionary.dolrFundRecurring}"
+							style="height:40px; width: 120px;"
+							oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="dlnr" id="dlnr" maxlength="11" th:value="${functionary.dolrFundNonRecurring}"
+							style="height:40px; width: 120px;"
+							oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+					</div>
+				</div>
+			
+				<hr>
+				<h4 class="mb-3">
+					Experience Details<span class="required">*</span>
+				</h4>
+				<table class="table table-bordered">
+					<thead class="table-light">
+						<tr>
+							<th width="15%">Office Name</th>
+							<th width="25%">Address</th>
+							<th width="20%">Experience in No. of Years and Days</th>
+							<th width="30%">Work Details</th>
+							<th width="10%">Action</th>
+						</tr>
+					</thead>
+			
+					<tbody id="experienceTable">
+			
+						<tr th:each="exp, iterStat : ${experiences}">
+			
+							<td>
+								<input type="text" name="officename[]" class="form-control" th:value="${exp.officeName}">
+							</td>
+			
+							<td>
+								<input type="text" name="address[]" class="form-control" th:value="${exp.address}">
+							</td>
+			
+							<td>
+								<input type="text" maxlength="2" minlength="1" max="30" name="yr[]"
+									oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="form-control d-inline-block"
+									style="width:80px;" th:value="${exp.workExpYrs}">
+			
+								<input type="text" maxlength="3" minlength="1" max="364" name="day[]"
+									oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="form-control d-inline-block ms-2"
+									style="width:80px;" th:value="${exp.workExpDays}">
+							</td>
+			
+							<td>
+								<textarea name="workdetail[]" class="form-control" rows="3" th:text="${exp.workDetails}"></textarea>
+							</td>
+			
+							<td>
+								<!-- First Row -->
+								<button th:if="${iterStat.first}" type="button" class="btn btn-success btn-sm addRow">
+									+
+								</button>
+			
+								<!-- Remaining Rows -->
+								<button th:unless="${iterStat.first}" type="button" class="btn btn-danger btn-sm removeRow">
+									×
+								</button>
+							</td>
+			
+						</tr>
+			
+						<tr th:if="${#lists.isEmpty(experiences)}">
+							<td><input type="text" name="officename[]" class="form-control"></td>
+							<td><input type="text" name="address[]" class="form-control"></td>
+							<td>
+								<input type="text" name="yr[]" class="form-control d-inline-block" style="width:80px;">
+								<input type="text" name="day[]" class="form-control d-inline-block ms-2" style="width:80px;">
+							</td>
+							<td>
+								<textarea name="workdetail[]" class="form-control" rows="3"></textarea>
+							</td>
+							<td>
+								<button type="button" class="btn btn-success btn-sm addRow">+</button>
+							</td>
+						</tr>
+			
+						<!-- Existing rows -->
+						<tr th:each="exp, iterStat : ${experiences}">
+							<!-- same code as above -->
+						</tr>
+			
+			
+					</tbody>
+			
+				</table>
+			
+				<div class="text-center mt-4">
+					<button type="submit" name="action" value="D" class="btn btn-warning">
+						<i class="fas fa-save"></i>
+						Save as Draft
+					</button>
+					<!--<button class="btn btn-primary">
+											Submit
+										</button>-->
+				</div>
+			
+			</form>
 
         </div>
 		
@@ -478,7 +518,9 @@ document.addEventListener("click", function (e) {
 
 		    <thead class="table-primary">
 		    <tr>
-		        <th class="table-primary">Name</th>
+				<th class="table-primary">Functionaries Work for</th>
+				<th class="table-primary">First Name</th>
+				<th class="table-primary">Last Name</th>
 		        <th class="table-primary">Designation</th>
 		        <th class="table-primary">Qualification</th>
 		        <th class="table-primary">Work Allocation</th>
@@ -500,16 +542,17 @@ document.addEventListener("click", function (e) {
 		    <tbody>
 
 		    <tr th:each="row, stat : ${functionariesList}">
-
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[18] : ''}"></td>
 				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}"></td>
-				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[3] : ''}"></td>
-				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
-				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[17] : ''}"></td>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[3] : ''}"></td>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>
 
-				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}"></td>
-				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}"></td>
-				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}"></td>
-				    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}"></td>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}"></td>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}"></td>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}"></td>
+				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}"></td>
 
 		        <td th:text="${row[12]}"></td>
 		        <td th:text="${row[13]}"></td>

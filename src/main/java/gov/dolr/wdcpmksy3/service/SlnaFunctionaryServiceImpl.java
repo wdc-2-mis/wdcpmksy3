@@ -28,7 +28,7 @@ public class SlnaFunctionaryServiceImpl implements SlnaFunctionaryService {
     private InstitutionalStructureRepository institutionalRepo;
 
 	@Override
-	public void saveFunctionary(Integer pprInstStrId, String name, Integer designation, Integer qualification,
+	public void saveFunctionary(Integer pprInstStrId, String level, String fname, String lname, Integer designation, Integer qualification,
 			String workallocation, BigDecimal slr, BigDecimal slnr, BigDecimal dlr, BigDecimal dlnr,
 			String[] officename, String[] address, Integer[] yr, Integer[] day, String[] workdetail, String status,
 			String user, String ip) {
@@ -43,7 +43,9 @@ public class SlnaFunctionaryServiceImpl implements SlnaFunctionaryService {
 	        
 	       // fun.setInstitutionalStructure(inst1);
 	        fun.setInstitutionalStructure(inst);
-	        fun.setSlnaFunFname(name);
+	        fun.setLevel(level);
+	        fun.setSlnaFunFname(fname);
+	        fun.setSlnaFunLname(lname);
 	        fun.setDesignationId(designation);
 	        fun.setQualificationId(qualification);
 	        fun.setWorkAllocation(workallocation);
