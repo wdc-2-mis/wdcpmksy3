@@ -263,7 +263,6 @@ public class PprDetailsOfSlnaController {
 		        @RequestParam String phone,
 		        @RequestParam String email,
 		        @RequestParam(required = false) String fax,
-		        @RequestParam Character action,
 		        RedirectAttributes redirectAttributes,
 		        HttpSession session) throws IOException {
 			String userid=(String)session.getAttribute("userid");
@@ -290,9 +289,6 @@ public class PprDetailsOfSlnaController {
 				details.setCreatedBy(userid);
 				details.setCreatedDate(LocalDateTime.now());
 				details.setRequestIp(CommonFunctions.getClientIpAddr(request));
-
-				// Example if your table has status
-				details.setStatus(action);
 
 				pprSlnaDetailsService.save(details);
 

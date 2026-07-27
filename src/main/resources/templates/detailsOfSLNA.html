@@ -61,7 +61,8 @@
 					fetch("/getDetailsOfSLNAById?id=" + id)
 						.then(response => response.json())
 						.then(data => {
-							document.querySelectorAll("input[name='memberType']").forEach(radio => {
+							const editForm = document.getElementById("editForm");
+							editForm.querySelectorAll("input[name='memberType']").forEach(radio => {
 							    radio.checked = (radio.value == data.memberId);
 							});
 							
@@ -191,6 +192,7 @@
 	const emailMap = /*[[${emailMap}]]*/ {};
 	document.addEventListener("DOMContentLoaded", function () {
 	    const saveButton = document.querySelector("button[name='action'][value='D']");
+		const updateButton = document.querySelector("button[name='updateAction'][value='D']");
 	    const memberRadios = document.querySelectorAll("input[name='memberType']");
 		
 		const phoneInputs = document.querySelectorAll("input[name='phone']");
@@ -208,9 +210,11 @@
 				
 	            if (chairpersonExists && selectedText === "Chairperson") {
 	                saveButton.disabled = true;
+					updateButton.disabled = true;
 	                alert(selectedText + " details for this SLNA is already saved. You cannot save again.");
 	            } else if (ceoExists && selectedText === "CEO") {
 					saveButton.disabled = true;
+					updateButton.disabled = true;
 					alert(selectedText + " details for this SLNA is already saved. You cannot save again.");
 				} else{
 	                saveButton.disabled = false;
@@ -462,7 +466,7 @@
 						<button class="btn-close" data-bs-dismiss="modal"></button>
 					</div>
 					<div class="modal-body">
-						<form th:action="@{/updateDetailsOfSLNA}" method="post">
+						<form id="editForm" th:action="@{/updateDetailsOfSLNA}" method="post">
 						<input type="hidden" id="pprSlna" name="pprSlna">
 						<!-- Member Details -->
 						<div class="row mb-3 align-items-center">
@@ -561,7 +565,7 @@
 						</div>
 						
 						<div class="text-center mt-4">
-							<button type="submit" name="action" value="D" class="btn btn-warning">
+							<button type="submit" name="updateAction" value="D" class="btn btn-warning">
 								<i class="fas fa-save"></i>
 								Update
 							</button>
