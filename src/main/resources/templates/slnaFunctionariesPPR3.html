@@ -512,7 +512,7 @@ document.addEventListener("click", function (e) {
 		         <td th:text="${row[16]}"></td>
 				
 				 <td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
-					&nbsp; &nbsp; 
+						&nbsp; &nbsp; 
 						<a th:if="${row[10].toString().equals('D')}"
 							th:href="@{/deleteSLNAFunctionariesPPR3(id=${row[0]})}"
 							class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">

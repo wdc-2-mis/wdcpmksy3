@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -77,6 +78,20 @@ public class PreliminaryPPR4AController {
 		model.addAttribute("stcode", stcode);
         return "ppr4";
     }
+	
+	@GetMapping("/checkDistrictExists")
+	@ResponseBody
+	public String checkDistrictExists(@RequestParam Integer dcode) {
+
+		System.out.println("kdy" +dcode);
+	    boolean exists = pprwdcddetail.existsByDcode(dcode);
+
+	    if (exists) {
+	        return "EXISTS";
+	    }
+
+	    return "NOT_EXISTS";
+	}
 	
 	@PostMapping("/savePreliminaryPPR4A")
 	public String savePreliminaryPPR4A(HttpSession session,

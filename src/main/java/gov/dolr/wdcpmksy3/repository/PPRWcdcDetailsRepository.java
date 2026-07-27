@@ -30,5 +30,7 @@ public interface PPRWcdcDetailsRepository extends JpaRepository<PPRWcdcDetails, 
 	    @Transactional
 	    @Query("UPDATE PPRWcdcDetails i SET i.status = 'C' WHERE i.id = :id")
 	    int completeRecordPPR4(@Param("id") Integer id);
+	    
+	    boolean existsByDcode(Integer dcode);
 
 }

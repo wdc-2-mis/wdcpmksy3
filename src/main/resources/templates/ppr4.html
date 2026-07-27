@@ -18,6 +18,29 @@
 
 
 <script>
+	
+	function checkDistrictExists() {
+
+	    let district = document.getElementById("district").value;
+
+	    if (district === "") {
+	        return;
+	    }
+	
+	    fetch('/checkDistrictExists?dcode=' + district)
+	        .then(response => response.text())
+	        .then(result => {
+				console.log(result);
+	            if (result === "EXISTS") {
+	                alert("This District Data already exists. Please select different Distrinct");
+
+	                document.getElementById("district").value = "";
+	                document.getElementById("district").focus();
+	            }
+
+	        })
+	        .catch(error => console.error(error));
+	}
 
 // Restrict dates before 2026
 document.addEventListener("DOMContentLoaded", function () {
@@ -168,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
 										<label>District Name</label><span class="required">*</span>
 									</div>
 									<div class="col-md-5">
-										<select id="district" name="district" class="form-control form-control-sm"   >
+										<select id="district" name="district" class="form-control form-control-sm"  onchange="checkDistrictExists()" >
 																														       <option value="">--Select District--</option>
 																														    <th:block th:each="dist : ${distList}">
 																														        <option th:value="${dist.dcode}"
@@ -268,18 +291,16 @@ document.addEventListener("DOMContentLoaded", function () {
 				                           <td th:text="${user[2]}"></td>-->
 											
 										   <tr th:each="user, stat : ${ppr4List}">
-										       <td th:text="${stat.first ? user[1] : ''}"></td>
-											
-											
-				                            <td th:text="${user[2]}"></td>
-											<td th:text="${user[3]}"></td>
-											<td th:text="${user[4]}"></td>
+										       	<td th:text="${user[1]}"></td>
+					                           	<td th:text="${user[2]}"></td>
+												<td th:text="${user[3]}"></td>
+												<td th:text="${user[4]}"></td>
 
-											<td>
-												<a th:href="@{/viewPdfPreliminaryPPR4A(id=${user[0]})}" target="_blank">
-														View MoU
-												</a>
-											</td>
+												<td>
+													<a th:href="@{/viewPdfPreliminaryPPR4A(id=${user[0]})}" target="_blank">
+															View MoU
+													</a>
+												</td>
 											
 											<td>
 												<a th:if="${user[6].toString().equals('D')}"
