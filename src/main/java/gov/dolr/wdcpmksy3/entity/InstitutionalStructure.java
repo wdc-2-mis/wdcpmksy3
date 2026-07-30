@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
+
 @Entity
 @Table(name="ppr_slna_institutional_structure")
 public class InstitutionalStructure {
@@ -55,6 +57,9 @@ public class InstitutionalStructure {
     private List<SlnaFunctionary> functionaries = new ArrayList<SlnaFunctionary>();
 
 
+    @OneToMany(mappedBy = "institutionalStructure")
+    private List<MPpr> pprs;
+    
     //Getters and Setters
     
 	public Integer getPprInstStrId() {
@@ -162,6 +167,12 @@ public class InstitutionalStructure {
 	}
 	public void setFunctionaries(List<SlnaFunctionary> functionaries) {
 		this.functionaries = functionaries;
+	}
+	public List<MPpr> getPprs() {
+		return pprs;
+	}
+	public void setPprs(List<MPpr> pprs) {
+		this.pprs = pprs;
 	}
 
     

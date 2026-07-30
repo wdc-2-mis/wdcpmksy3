@@ -25,6 +25,9 @@ public interface InstitutionalStructureRepository extends JpaRepository<Institut
 	    int completeRecordPPR1(@Param("id") Long id);
 	    
 	    boolean existsByStCode(Integer stCode);
+
+
+		InstitutionalStructure findByStCode(Integer stCode);
 	    
 	    
 
