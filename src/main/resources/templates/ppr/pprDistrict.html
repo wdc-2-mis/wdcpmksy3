@@ -79,6 +79,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+var microIds = button.getAttribute('data-micro');
+var select = document.getElementById('microEdit');
+Array.from(select.options).forEach(opt => {
+    opt.selected = microIds.split(',').includes(opt.value);
+});
+
 </script>
 
 </head>
@@ -200,10 +207,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <div th:if="${rec.status != 'C'}">
                             <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" th:attr="data-id=${rec.pprId}, data-finyear=${rec.finYear.finYrDesc}, data-district=${rec.district.distName},
-                            data-project=${rec.projectName}, data-micro=${#strings.listJoin(rec.microWatersheds.?[microWatershed != null].![microWatershed.mwId], ',')}"> Update</button>
+                            data-project=${rec.projectName}, data-micro=${rec.microIdsCsv}"> Update</button>
                             
-                           
-                            <button class="btn btn-primary btn-sm" th:onclick="'confirmComplete(' + ${rec.pprId} + ')'">Complete</button>
+                               <button class="btn btn-primary btn-sm" th:onclick="'confirmComplete(' + ${rec.pprId} + ')'">Complete</button>
                             <button class="btn btn-danger btn-sm" th:onclick="'confirmDelete(' + ${rec.pprId} + ')'">Delete</button>
                         </div>
                     </td>

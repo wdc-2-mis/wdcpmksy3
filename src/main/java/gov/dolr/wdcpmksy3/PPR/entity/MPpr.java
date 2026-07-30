@@ -3,6 +3,7 @@ package gov.dolr.wdcpmksy3.PPR.entity;
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.IwmpDistrict;
@@ -55,6 +56,15 @@ public class MPpr {
 
     @OneToMany(mappedBy = "ppr")
     private List<PprMicroWatershed> microWatersheds;
+    
+    public String getMicroIdsCsv() {
+        if (microWatersheds == null || microWatersheds.isEmpty()) {
+            return "";
+        }
+        return microWatersheds.stream()
+                .map(mw -> mw.getMicroWatershed().getMwId().toString())
+                .collect(Collectors.joining(","));
+    }
     
     // --- Getters and Setters ---
     public Integer getPprId() {

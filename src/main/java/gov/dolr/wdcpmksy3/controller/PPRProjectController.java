@@ -61,7 +61,7 @@ public class PPRProjectController {
 	
 	@PostMapping("/savePPRDistrict")
 	public String savePreliminaryPPR4A(@RequestParam("fyear") Integer finYrCd, @RequestParam("district") Integer dcode, @RequestParam("agency") String projectName, @RequestParam("micro") List<Integer> mwIds,
-	        HttpSession session, Model model, HttpServletRequest servletRequest) {
+	        HttpSession session, Model model, HttpServletRequest servletRequest, RedirectAttributes redirectAttributes) {
 
 	    String userId = (String) session.getAttribute("userid");
 	    Integer stCode = (Integer) session.getAttribute("stcode");
@@ -73,7 +73,8 @@ public class PPRProjectController {
         List<MPpr> records = pprRepo.findAll();
 	    model.addAttribute("records", records);
         model.addAttribute("saveMessage", message);
-	    return "ppr/pprDistrict"; 
+        redirectAttributes.addFlashAttribute("saveMessage", message);
+	    return "redirect:/pprDistrict";
 	}
 	
 	@PostMapping("/updatePPRDistrict")
