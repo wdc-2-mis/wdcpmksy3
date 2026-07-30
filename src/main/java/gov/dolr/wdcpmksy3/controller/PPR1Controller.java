@@ -39,8 +39,10 @@ import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
 import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryRepository;
 import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryWorkExperienceRepository;
 import gov.dolr.wdcpmksy3.service.DesignationService;
+import gov.dolr.wdcpmksy3.service.DistrictService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
+import gov.dolr.wdcpmksy3.service.PPRWcdcDetailsServiceImpl;
 import gov.dolr.wdcpmksy3.service.QualificationService;
 import gov.dolr.wdcpmksy3.service.SlnaFunctionaryServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,6 +77,12 @@ public class PPR1Controller {
     
     @Autowired
     SlnaFunctionaryWorkExperienceRepository exprep;
+    
+    @Autowired
+    private DistrictService districtService;
+    
+    @Autowired
+    private PPRWcdcDetailsServiceImpl ppwd;
 	
 	@GetMapping("/institutionalStructurePPR1")
     public String ppr1(HttpSession session, Model model) 
@@ -559,7 +567,7 @@ public class PPR1Controller {
 			}
 
 			slnaFunctionaryService.saveFunctionary(pprInstStrId, level, fname, lname, designation, qualification, workallocation, slr,
-                slnr, dlr,dlnr,officename, address, yr, day, workdetail, action, userid, request.getRemoteAddr());
+                slnr, dlr,dlnr,officename, address, yr, day, workdetail, action, userid, getClientIpAddr(request));
 
 			redirectAttributes.addFlashAttribute( "success", "Functionary saved successfully.");
         
@@ -594,7 +602,9 @@ public class PPR1Controller {
             	slnafuncrep.deleteById(id);
             	redirectAttributes.addFlashAttribute("success", "Record deleted successfully.");
             }
-            else {}
+            else {
+            	redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+            }
             
 
             
@@ -738,7 +748,7 @@ public class PPR1Controller {
 		            exp.setWorkExpDays(day[i]);
 		            exp.setWorkDetails(workdetail[i]);
 		            exp.setUpdatedBy(userid);
-		            exp.setRequestIp(request.getRemoteAddr());
+		            exp.setRequestIp(getClientIpAddr(request));
 		            exp.setUpdatedDate(LocalDate.now());
 		
 		            exprep.save(exp);
@@ -755,6 +765,99 @@ public class PPR1Controller {
         return "redirect:/slnaFunctionariesPPR3";	
     }
     
+    @GetMapping("/wcdcFunctionariesPPR4B")
+    public String wcdcFunctionariesPPR4(HttpSession session, Model model) 
+	{
+		
+		String statename=session.getAttribute("statename").toString();
+		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+		
+		List<Object[]> list = isserv.getPPR1List(stcode);
+		for (Object[] row : list) {
+
+		    Integer id = (Integer) row[0];
+		    System.out.println("Id : " + id);
+		}
+		
+        if(userid==null){
+
+            return "redirect:/login";
+        }
+        List<Object[]> functionariesList = slnaFunctionaryService.getWcdcFunctionariesList(stcode);
+
+        List<Object[]> finalList = new ArrayList<>();
+
+        int srNo = 1;
+        Integer previousId = null;
+
+        for (Object[] row : functionariesList) {
+
+            Integer currentId = ((Number) row[0]).intValue();
+
+            // Create a new array with one extra column for serial number
+            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+            if (previousId == null || !previousId.equals(currentId)) {
+                newRow[row.length] = srNo++;   // Serial No.
+            } else {
+                newRow[row.length] = "";       // Blank for duplicate rows
+            }
+            finalList.add(newRow);
+            previousId = currentId;
+        }
+
+        model.addAttribute("functionariesList", finalList);
+        model.addAttribute("designationList", dserv.getAllDesignationDetails());
+        model.addAttribute("qualificationList", qserv.getAllQualification());
+        model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
+		model.addAttribute("statename", statename);
+		model.addAttribute("stcode", stcode);
+        return "wcdcFunctionariesPPR4";
+    } 
     
+    @PostMapping("/saveWCDCFunctionariesPPR4B")
+    public String saveWCDCFunctionariesPPR4B(HttpSession session, Model model, HttpServletRequest request,
+    		@RequestParam Integer district,
+    		@RequestParam String fname,
+            @RequestParam String lname,
+            @RequestParam Integer designation,
+            @RequestParam Integer qualification,
+            @RequestParam String workallocation,
+            @RequestParam BigDecimal slr,
+            @RequestParam BigDecimal slnr,
+            @RequestParam BigDecimal dlr,
+            @RequestParam BigDecimal dlnr,
+            @RequestParam("officename[]") String[] officename,
+            @RequestParam("address[]") String[] address,
+            @RequestParam("yr[]") Integer[] yr,
+            @RequestParam("day[]") Integer[] day,
+            @RequestParam("workdetail[]") String[] workdetail,
+            @RequestParam String action,
+            RedirectAttributes redirectAttributes) {
+   
+    		
+	    	String statename=session.getAttribute("statename").toString();
+			Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+			String userid=(String)session.getAttribute("userid");
+			try {
+			 if(userid==null){
+
+		            return "redirect:/login";
+		     }
+
+			ppwd.saveWCDCFunctionary(district, fname, lname, designation, qualification, workallocation, slr, slnr, dlr, 
+					dlnr, officename, address, yr, day, workdetail, action, userid, getClientIpAddr(request));
+
+			redirectAttributes.addFlashAttribute( "success", "District Functionary saved successfully.");
+        
+			}
+			catch (Exception e) {
+
+				e.printStackTrace();
+		        redirectAttributes.addFlashAttribute("error", "Unable to saved record.");
+			}
+			return "redirect:/wcdcFunctionariesPPR4B";	
+    }
 
 }

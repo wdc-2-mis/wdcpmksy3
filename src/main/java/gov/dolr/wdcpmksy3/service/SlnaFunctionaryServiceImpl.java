@@ -11,6 +11,7 @@ import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.SlnaFunctionary;
 import gov.dolr.wdcpmksy3.entity.SlnaFunctionaryWorkExperience;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
+import gov.dolr.wdcpmksy3.repository.PprWcdcFunctionaryRepository;
 import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryRepository;
 import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryWorkExperienceRepository;
 
@@ -26,6 +27,9 @@ public class SlnaFunctionaryServiceImpl implements SlnaFunctionaryService {
 
     @Autowired
     private InstitutionalStructureRepository institutionalRepo;
+    
+    @Autowired
+    private PprWcdcFunctionaryRepository pprwcdcfunrep;
 
 	@Override
 	public void saveFunctionary(Integer pprInstStrId, String level, String fname, String lname, Integer designation, Integer qualification,
@@ -95,6 +99,10 @@ public class SlnaFunctionaryServiceImpl implements SlnaFunctionaryService {
 	        fun.setStatus('C');
 
 	        functionaryRepo.save(fun);
+	    }
+	    
+	    public List<Object[]> getWcdcFunctionariesList(Integer stcode) {
+	        return pprwcdcfunrep.getWcdcFunctionariesList(stcode);
 	    }
 
 }

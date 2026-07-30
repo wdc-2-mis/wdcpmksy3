@@ -581,7 +581,11 @@ document.addEventListener("click", function (e) {
 							th:href="@{/completeSLNAFunctionariesPPR3(id=${row[0]})}"
 							class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
 							 <i class="fas fa-check"></i>
-						</a>	
+						</a>
+						<span th:if="${row[10].toString().equals('C')}"
+								class="badge bg-success">
+								<i class="fas fa-check-circle"></i> Completed
+						</span>		
 				</td>
 				<td th:unless="${stat.first || row[0] != functionariesList[stat.index-1][0]}"></td>
 		    </tr>

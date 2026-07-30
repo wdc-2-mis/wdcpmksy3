@@ -17,4 +17,10 @@ public class DistrictService {
     public List<IwmpDistrict> getDistrictsByState(Integer stCode) {
         return districtRepo.findByState_StCodeOrderByDistNameAsc(stCode);
     }
+    
+    public List<IwmpDistrict> findCompletedDistrictsByState(Integer stCode) {
+        return districtRepo.findCompletedDistrictsByState(stCode);
+    }
+    
+    
 }

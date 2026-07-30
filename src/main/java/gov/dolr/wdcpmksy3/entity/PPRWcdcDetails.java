@@ -3,10 +3,11 @@ package gov.dolr.wdcpmksy3.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="ppr_wcdc_details")
-
 public class PPRWcdcDetails {
 
 	  	@Id
@@ -50,6 +51,10 @@ public class PPRWcdcDetails {
 
 	    @Column(name = "updated_date")
 	    private LocalDate updatedDate;
+	    
+	    @OneToMany(mappedBy = "wcdcDetails",
+	            cascade = CascadeType.ALL, orphanRemoval = true)
+	    private List<PprWcdcFunctionary> functionaries = new ArrayList<PprWcdcFunctionary>();
 
 	    // Getters and Setters
 
@@ -156,7 +161,16 @@ public class PPRWcdcDetails {
 	    public void setUpdatedDate(LocalDate updatedDate) {
 	        this.updatedDate = updatedDate;
 	    }
+
+		public List<PprWcdcFunctionary> getFunctionaries() {
+			return functionaries;
+		}
+
+		public void setFunctionaries(List<PprWcdcFunctionary> functionaries) {
+			this.functionaries = functionaries;
+		}
 	
 	
+	    
 
 }

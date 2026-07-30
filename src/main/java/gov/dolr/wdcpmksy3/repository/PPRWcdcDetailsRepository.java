@@ -32,5 +32,8 @@ public interface PPRWcdcDetailsRepository extends JpaRepository<PPRWcdcDetails, 
 	    int completeRecordPPR4(@Param("id") Integer id);
 	    
 	    boolean existsByDcode(Integer dcode);
+	    
+	    @Query(value ="select ppr_wcdc_id, dcode, status from ppr_wcdc_details where status='C' and dcode=:district", nativeQuery = true)
+		List<Object[]> getPPR4BWCDCList( Integer district);
 
 }

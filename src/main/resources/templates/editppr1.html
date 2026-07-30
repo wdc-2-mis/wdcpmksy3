@@ -266,6 +266,11 @@ document.addEventListener("DOMContentLoaded", function () {
 										            class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
 										        Complete
 										     </a>
+											 <span th:if="${user[8].toString().equals('C')}"
+											 			class="badge bg-success">
+											 			<i class="fas fa-check-circle"></i> Completed
+											 </span>
+											 
 										</td>
 		                        </tr>
 		                    </table>
