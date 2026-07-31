@@ -314,7 +314,7 @@ document.addEventListener("DOMContentLoaded", function () {
 						<div class="table-responsive" th:if="${#lists.size(ppr1List) > 0}">
 		                    <table class="table table-bordered">
 								<h4>
-								      <b> <centre> List of  Institutional Structure </centre>  </b>
+								      <b> <centre> List of Institutional Structure </centre>  </b>
 								 </h4>
 								 <br/>
 		                        <tbody>
@@ -358,28 +358,28 @@ document.addEventListener("DOMContentLoaded", function () {
 									</td>
 									
 									<td>
-										<a th:if="${user[8].toString().equals('D')}"
+										<a th:if="${user[8].toString().equals('D')}" title="Delete"
 										   th:href="@{/deleteInstitutionalStructurePPR1(id=${user[0]})}"
 										   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
 										     <i class="fas fa-trash"></i>
 										</a>
 										&nbsp; &nbsp; 
-										<a th:if="${user[8].toString().equals('D')}"
+										<a th:if="${user[8].toString().equals('D')}" title="Edit"
 										   th:href="@{/editInstitutionalStructurePPR1(id=${user[0]})}"
 										   class="btn btn-primary btn-sm"
 										   onclick="return confirm('Are you sure you want to edit this record?');">
 										     <i class="fas fa-edit"></i>
 										</a>
 										&nbsp; &nbsp; 
-									    <a th:if="${user[8].toString().equals('D')}"
+									    <a th:if="${user[8].toString().equals('D')}" title="Complete"
 										th:href="@{/completeInstitutionalStructurePPR1(id=${user[0]})}"
 									            class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
 									         <i class="fas fa-check"></i>
 									     </a>
 										 <span th:if="${user[8].toString().equals('C')}"
-										 								class="badge bg-success">
-										 							<i class="fas fa-check-circle"></i> Completed
-										 						</span>	
+										 				class="badge bg-success">
+										 		<i class="fas fa-check-circle"></i> Completed
+										 </span>	
 										 
 									</td>
 									
