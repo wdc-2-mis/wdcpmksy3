@@ -33,9 +33,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
+import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionary;
+import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionaryWorkExperience;
 import gov.dolr.wdcpmksy3.entity.SlnaFunctionary;
 import gov.dolr.wdcpmksy3.entity.SlnaFunctionaryWorkExperience;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
+import gov.dolr.wdcpmksy3.repository.PprWcdcFunctionaryRepository;
+import gov.dolr.wdcpmksy3.repository.PprWcdcFunctionaryWorkExperienceRepository;
 import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryRepository;
 import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryWorkExperienceRepository;
 import gov.dolr.wdcpmksy3.service.DesignationService;
@@ -83,6 +87,12 @@ public class PPR1Controller {
     
     @Autowired
     private PPRWcdcDetailsServiceImpl ppwd;
+    
+    @Autowired
+    private PprWcdcFunctionaryRepository wdcrep;
+    
+    @Autowired
+    private PprWcdcFunctionaryWorkExperienceRepository wdcexprep;
 	
 	@GetMapping("/institutionalStructurePPR1")
     public String ppr1(HttpSession session, Model model) 
@@ -773,12 +783,11 @@ public class PPR1Controller {
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
 		
-		List<Object[]> list = isserv.getPPR1List(stcode);
-		for (Object[] row : list) {
-
-		    Integer id = (Integer) row[0];
-		    System.out.println("Id : " + id);
-		}
+		/*
+		 * List<Object[]> list = isserv.getPPR1List(stcode); for (Object[] row : list) {
+		 * 
+		 * Integer id = (Integer) row[0]; System.out.println("Id : " + id); }
+		 */
 		
         if(userid==null){
 
@@ -858,6 +867,164 @@ public class PPR1Controller {
 		        redirectAttributes.addFlashAttribute("error", "Unable to saved record.");
 			}
 			return "redirect:/wcdcFunctionariesPPR4B";	
+    }
+    
+    @GetMapping("/deleteWCDCFunctionariesPPR4B")
+    public String deleteWCDCFunctionariesPPR4B(HttpSession session, Model model, @RequestParam("id") Integer id,  
+    		RedirectAttributes redirectAttributes) {
+
+		
+		String userid=(String)session.getAttribute("userid");
+		try {
+			
+	        if(userid==null){
+	
+	            return "redirect:/login";
+	        }
+	        PprWcdcFunctionary data = wdcrep.findById(id).orElse(null);
+            if (data == null) {
+                redirectAttributes.addFlashAttribute("error", "Record not found.");
+                return "redirect:/wcdcFunctionariesPPR4B";
+            }
+            
+            if (wdcrep.existsById(id)) {
+            	wdcrep.deleteById(id);
+            	redirectAttributes.addFlashAttribute("success", "Record deleted successfully.");
+            }
+            else {
+            	redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+            }
+            
+
+            
+        } 
+        catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+            e.printStackTrace();
+        }
+		return "redirect:/wcdcFunctionariesPPR4B";
+    }
+    
+    @GetMapping("/completeWCDCFunctionariesPPR4B")
+    public String completeWCDCFunctionariesPPR4B(HttpSession session, Model model, @RequestParam("id") Integer id,  
+    		RedirectAttributes redirectAttributes) {
+
+		String statename=session.getAttribute("statename").toString();
+		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+		 	try {
+		 		int updated =0;
+		 		if(userid==null){
+
+		            return "redirect:/login";
+		        }
+		 		ppwd.completeRecord(id);
+		        
+		        redirectAttributes.addFlashAttribute("success", "Record completed successfully.");
+		       
+		    } 
+		 	catch (Exception e) {
+		 		e.printStackTrace();
+		        redirectAttributes.addFlashAttribute("error", "Unable to complete record.");
+		    }
+       
+        return "redirect:/wcdcFunctionariesPPR4B";
+    }
+    
+    @GetMapping("/editWCDCFunctionariesPPR4B")
+    public String editWCDCFunctionariesPPR4B(@RequestParam Integer id, Model model, HttpSession session) {
+
+    	
+		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+
+		if(userid==null){
+
+		    return "redirect:/login";
+		}
+		
+		PprWcdcFunctionary functionary = wdcrep.findById(id).orElseThrow(() -> new RuntimeException("Record not found"));
+
+	    List<PprWcdcFunctionaryWorkExperience> experiences =wdcexprep.findByFunctionaryPprWcdcFunId(id);
+	    
+	    List<Object[]> functionariesList = slnaFunctionaryService.getWcdcFunctionariesList(stcode);
+
+        List<Object[]> finalList = new ArrayList<>();
+
+        int srNo = 1;
+        Integer previousId = null;
+
+        for (Object[] row : functionariesList) {
+
+            Integer currentId = ((Number) row[0]).intValue();
+
+            // Create a new array with one extra column for serial number
+            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+            if (previousId == null || !previousId.equals(currentId)) {
+                newRow[row.length] = srNo++;   // Serial No.
+            } else {
+                newRow[row.length] = "";       // Blank for duplicate rows
+            }
+            finalList.add(newRow);
+            previousId = currentId;
+        }
+
+        model.addAttribute("functionariesList", finalList);
+	    model.addAttribute("functionary", functionary);
+	    model.addAttribute("experiences", experiences);
+	    model.addAttribute("designationList", dserv.getAllDesignationDetails());
+        model.addAttribute("qualificationList", qserv.getAllQualification());
+        model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
+		model.addAttribute("stcode", stcode);
+
+        return "editWCDCFunctionaryPPR4";
+    }
+    
+    @PostMapping("/UpdateWCDCFunctionariesPPR4B")
+    public String UpdateWCDCFunctionariesPPR4B(HttpSession session, Model model, HttpServletRequest request,
+            @RequestParam Integer pprwcdcFunId, @RequestParam Integer district,
+    		@RequestParam String fname,
+            @RequestParam String lname,
+            @RequestParam Integer designation,
+            @RequestParam Integer qualification,
+            @RequestParam String workallocation,
+            @RequestParam BigDecimal slr,
+            @RequestParam BigDecimal slnr,
+            @RequestParam BigDecimal dlr,
+            @RequestParam BigDecimal dlnr,
+            @RequestParam("officename[]") String[] officename,
+            @RequestParam("address[]") String[] address,
+            @RequestParam("yr[]") Integer[] yr,
+            @RequestParam("day[]") Integer[] day,
+            @RequestParam("workdetail[]") String[] workdetail,
+            @RequestParam String action,
+            RedirectAttributes redirectAttributes) {
+    	
+    
+    	Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+		try {
+			
+			 if(userid==null){
+	
+		            return "redirect:/login";
+		     }
+			 
+			 
+			 ppwd.UpdateWCDCFunctionary(pprwcdcFunId,district, fname, lname, designation, qualification, workallocation, slr, slnr, dlr, 
+						dlnr, officename, address, yr, day, workdetail, action, userid, getClientIpAddr(request));
+			 
+		        redirectAttributes.addFlashAttribute("success", "Record update successfully.");
+		}
+		catch (Exception e) {
+
+			e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("error", "Unable to Update record.");
+		}
+
+        return "redirect:/wcdcFunctionariesPPR4B";	
     }
 
 }

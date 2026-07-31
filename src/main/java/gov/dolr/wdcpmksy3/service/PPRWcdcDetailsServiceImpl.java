@@ -122,7 +122,85 @@ public class PPRWcdcDetailsServiceImpl implements PPRWcdcDetailsService {
             exp.setRequestIp(ip);
             wcExpRepo.save(exp);
         }
+	}
+	
+	@Transactional
+    public void completeRecord(Integer id) {
+
+		PprWcdcFunctionary fun = wcfunrepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Record not found"));
+
+        fun.setStatus('C');
+
+        wcfunrepo.save(fun);
+    }
+
+	@Override
+	public void UpdateWCDCFunctionary(Integer pprwcdcFunId, Integer district, String fname, String lname,
+			Integer designation, Integer qualification, String workallocation, BigDecimal slr, BigDecimal slnr,
+			BigDecimal dlr, BigDecimal dlnr, String[] officename, String[] address, Integer[] yr, Integer[] day,
+			String[] workdetail, String status, String userid, String ip) {
 		
+		
+		try {
+			
+			PprWcdcFunctionary fun= wcfunrepo.findById(pprwcdcFunId).get();
+			
+			Integer pprwcId =0;
+	    	List<Object[]> list = repository.getPPR4BWCDCList(district);
+			for (Object[] row : list) {
+
+				pprwcId = (Integer) row[0];
+			}
+			
+			PPRWcdcDetails wcd = repository.getReferenceById(pprwcId);
+			Designation des=desrep.getReferenceById(designation);
+			Qualification qa=quarep.getReferenceById(qualification);
+			
+			fun.setWcdcDetails(wcd);
+	        fun.setFirstName(fname);
+	        fun.setLastName(lname);
+	        fun.setDesignation(des);
+	        fun.setQualification(qa);
+	        fun.setWorkAllocation(workallocation);
+	        fun.setTotalBudgetRecurring(slr);
+	        fun.setTotalBudgetNonRecurring(slnr);
+	        fun.setDolrFundRecurring(dlr);
+	        fun.setDolrFundNonRecurring(dlnr);
+	        fun.setStatus(status.charAt(0));
+	        fun.setUpdatedBy(userid);
+	        fun.setUpdatedDate(LocalDate.now());
+	        fun.setRequestIp(ip);
+
+	        wcfunrepo.save(fun);
+	        
+	        wcExpRepo.deleteByFunctionaryPprWcdcFunId(pprwcdcFunId);
+	        
+	        for (int i = 0; i < officename.length; i++) 
+	        {
+	            if (officename[i] == null || officename[i].trim().isEmpty())
+	                continue;
+
+	            PprWcdcFunctionaryWorkExperience exp =new PprWcdcFunctionaryWorkExperience();
+
+	            exp.setFunctionary(fun);
+	            exp.setOfficeName(officename[i]);
+	            exp.setAddress(address[i]);
+	            exp.setWorkExpYrs(yr[i]);
+	            exp.setWorkExpDays(day[i]);
+	            exp.setWorkDetails(workdetail[i]);
+	            exp.setCreatedBy(userid);
+	            exp.setCreatedDate(LocalDateTime.now());
+	            exp.setUpdatedBy(userid);
+	            exp.setUpdatedDate(LocalDate.now());
+	            exp.setRequestIp(ip);
+	            wcExpRepo.save(exp);
+	        }
+	        
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 

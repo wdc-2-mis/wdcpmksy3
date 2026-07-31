@@ -34,7 +34,9 @@ public class SecurityConfig {
                         "/", "/login", "/loginSuccess", "/getEmailandGenerateotp", "/verifyOtp", "/piaPjtNotLocatiaon", "/institutionalStructurePPR1", "/saveInstitutionalStructurePPR1", "/updateInstitutionalStructurePPR1", "/viewPdfPreliminaryPPR4A","/editPreliminaryPPR4A", "/updatePreliminaryPPR4A",
                         "/detailsOfSLNA", "/saveDetailsOfSLNA", "/deleteDetailsOfSLNA", "/completeDetailsOfSLNA", "/updateDetailsOfSLNA", "/getDetailsOfSLNAById", "/register", "/register/**", "/technicalsupport", "/customLogout", "/download/**","/viewPdfInstitutionalStructure", "/deleteInstitutionalStructurePPR1", "/completeInstitutionalStructurePPR1", 
                         "/editInstitutionalStructurePPR1", "/slnaFunctionariesPPR3", "/saveSLNAFunctionariesPPR3", "/deleteSLNAFunctionariesPPR3", "/editSLNAFunctionariesPPR3", "/completeSLNAFunctionariesPPR3","/updateSLNAFunctionariesPPR3",
-                        "/preliminaryPPR4A", "/savePreliminaryPPR4A", "/deletePreliminaryPPR4A", "/completePreliminaryPPR4A","/checkDistrictExists", "/wcdcFunctionariesPPR4B", "/saveWCDCFunctionariesPPR4B", "/pprDistrict", "/savePPRDistrict", "/updatePPRDistrict", "/completePPRDistrict/**", "/deletePPRDistrict/**",
+                        "/preliminaryPPR4A", "/savePreliminaryPPR4A", "/deletePreliminaryPPR4A", "/completePreliminaryPPR4A","/checkDistrictExists", "/wcdcFunctionariesPPR4B", "/saveWCDCFunctionariesPPR4B", "/UpdateWCDCFunctionariesPPR4B", "/deleteWCDCFunctionariesPPR4B", "/editWCDCFunctionariesPPR4B", "/completeWCDCFunctionariesPPR4B",
+                        "/pprDistrict", "/savePPRDistrict", "/updatePPRDistrict", "/completePPRDistrict/**", "/deletePPRDistrict/**",
+                        
                         "/css/**",
                         "/js/**",
                         "/images/**",

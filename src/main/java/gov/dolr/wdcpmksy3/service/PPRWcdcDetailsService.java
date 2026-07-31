@@ -22,5 +22,9 @@ public interface PPRWcdcDetailsService {
             BigDecimal slr, BigDecimal slnr,BigDecimal dlr, BigDecimal dlnr,String[] officename, String[] address,
             Integer[] yr, Integer[] day, String[] workdetail, String status, String userid, String ip);
     
+    void UpdateWCDCFunctionary(Integer pprwcdcFunId, Integer district, String fname, String lname, Integer designation, Integer qualification, String workallocation,
+            BigDecimal slr, BigDecimal slnr,BigDecimal dlr, BigDecimal dlnr,String[] officename, String[] address,
+            Integer[] yr, Integer[] day, String[] workdetail, String status, String userid, String ip);
+    
    
 }
