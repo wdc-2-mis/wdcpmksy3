@@ -17,4 +17,8 @@ public interface IwmpDistrictRepository extends JpaRepository<IwmpDistrict, Inte
     @Query(" SELECT d FROM IwmpDistrict d  WHERE d.state.stCode = :stCode AND d.dcode "
     		+ "IN ( SELECT w.dcode FROM PPRWcdcDetails w WHERE w.status = 'C' ) ORDER BY d.distName")
         List<IwmpDistrict> findCompletedDistrictsByState(@Param("stCode") Integer stCode);
+
+    
+    @Query("SELECT DISTINCT p.district FROM MPpr p WHERE p.district.state.stCode = :stcode AND p.status = 'C' ORDER BY p.district.distName")
+	List<IwmpDistrict> getPPRDistrictsByState(Integer stcode);
 }
