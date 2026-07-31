@@ -1,16 +1,20 @@
 package gov.dolr.wdcpmksy3.controller;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,9 +33,25 @@ import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
 import gov.dolr.wdcpmksy3.service.PPRWcdcDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
+
 
 @Controller
 public class PreliminaryPPR4AController {
+	
+	private String getClientIpAddr(HttpServletRequest request) {
+
+        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
+
+        if (xForwardedForHeader == null || xForwardedForHeader.isEmpty()) {
+            return request.getRemoteAddr();
+        }
+
+        return xForwardedForHeader.split(",")[0];
+    }
 	
 	@Autowired
     private DistrictService districtService;
@@ -240,7 +260,160 @@ public class PreliminaryPPR4AController {
         return "ppr4";
     }
     
-    
-    
+    @GetMapping("/viewPdfPreliminaryPPR4A")
+    public ResponseEntity<Resource> viewPdfPPR4(@RequestParam Integer id)
+            throws IOException {
 
+        PPRWcdcDetails data = pprwdcddetail.findById(id).orElse(null);
+
+        if (data == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String filePath = data.getMouFile();
+
+        if (filePath == null || filePath.trim().isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Path path = Paths.get(filePath);
+        Resource resource = new UrlResource(path.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String fileName = path.getFileName().toString();
+
+        int index = fileName.indexOf("_");
+        if (index != -1 && index < fileName.length() - 1) {
+            fileName = fileName.substring(index + 1);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + fileName + "\"")
+                .body(resource);
+    }
+    
+    
+    
+    @GetMapping("/editPreliminaryPPR4A")
+    public String editPPR4(@RequestParam Integer id,
+            Model model,
+            HttpSession session) {
+
+        PPRWcdcDetails data = pprwdcddetail.findById(id).orElse(null);
+
+        model.addAttribute("editData", data);
+
+        String statename = session.getAttribute("statename").toString();
+        Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+        String userid = (String) session.getAttribute("userid");
+
+        if (userid == null) {
+
+            return "redirect:/login";
+        }
+
+        model.addAttribute("distList",
+                districtService.getDistrictsByState(stcode));
+
+        model.addAttribute("ppr4List",
+                pprWcdcDetailsService.getPPR4List(stcode));
+
+        model.addAttribute("statename", statename);
+        model.addAttribute("stcode", stcode);
+
+        return "editppr4";
+    }
+    
+    
+    
+    @PostMapping("/updatePreliminaryPPR4A")
+    public String updatePreliminaryPPR4A(HttpSession session,
+            Model model,
+            HttpServletRequest request,
+
+            @RequestParam Integer pprWcdcId,
+            @RequestParam Integer dcode,
+            @RequestParam String executingAgency,
+            @RequestParam String chairmanStatus,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate mouDate,
+            @RequestParam(required = false) MultipartFile mouFile,
+
+            RedirectAttributes redirectAttributes) throws IOException {
+
+        String userid = (String) session.getAttribute("userid");
+        Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
+        Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+
+        String mouFileName = null;
+
+        if (userid != null) {
+
+            File dir = new File(uploadPath);
+
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            PPRWcdcDetails data =
+                    pprwdcddetail.findById(pprWcdcId).orElse(null);
+
+            if (data == null) {
+            	 model.addAttribute("error",
+                        "Record not found.");
+                return "redirect:/preliminaryPPR4A";
+            }
+
+            if (mouFile != null && !mouFile.isEmpty()) {
+
+                deleteFile(data.getMouFile());
+
+                mouFileName = UUID.randomUUID()
+                        .toString()
+                        .replace("-", "")
+                        .substring(0, 6)
+                        + "_"
+                        + mouFile.getOriginalFilename();
+
+                mouFile.transferTo(new File(uploadPath + mouFileName));
+
+                data.setMouFile(uploadPath + mouFileName);
+            }
+
+           // if (dcode != null)
+                //data.setDcode(dcode);
+
+            if (executingAgency != null)
+                data.setExecutingAgency(executingAgency);
+
+            if (chairmanStatus != null)
+                data.setChairmanStatus(chairmanStatus);
+
+            if (mouDate != null)
+                data.setMouDate(mouDate);
+
+            data.setUpdatedBy(userid);
+            data.setUpdatedDate(LocalDate.now());
+            data.setRequestIp(getClientIpAddr(request));
+
+            pprwdcddetail.save(data);
+
+            redirectAttributes.addFlashAttribute("success",
+                    "Record updated successfully.");
+            model.addAttribute("ppr4List",
+                    pprWcdcDetailsService.getPPR4List(stcode));
+
+            return "redirect:/preliminaryPPR4A";
+
+        } else {
+
+            return "redirect:/login";
+        }
+    }
+    
+   
 }
