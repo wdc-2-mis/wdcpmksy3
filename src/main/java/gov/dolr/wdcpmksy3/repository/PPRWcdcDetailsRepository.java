@@ -21,7 +21,7 @@ public interface PPRWcdcDetailsRepository extends JpaRepository<PPRWcdcDetails, 
 	        "w.mou_file, " +
 	        "w.status " +
 	        "FROM ppr_wcdc_details w " +
-	        "JOIN iwmp_district d ON d.dcode = w.dcode " +
+	        "JOIN m_district d ON d.dcode = w.dcode " +
 	        "WHERE d.st_code = :stcode order by dist_name" ,
 	        nativeQuery = true)
 	    List<Object[]> getPPR4List(@Param("stcode") Integer stcode);
