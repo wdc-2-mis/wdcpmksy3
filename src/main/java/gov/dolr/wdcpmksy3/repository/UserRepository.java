@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<IwmpUserReg, Long> {
     @Query(value = "select user_name, user_type, cur_address, department, designation, email, mobile_no, status, user_id, "
     		+ "case when user_type = 'DL' OR user_type = 'ADMIN' then 0 else (select distinct st_code from iwmp_user_map where reg_id = ureg.reg_id) end as statecd,"
     		+ " rolemap.home_page as home_page, role_name, ureg.reg_id, case when user_type = 'DL' OR user_type = 'ADMIN' then null else "
-    		+ "(select distinct st_name from iwmp_state where st_code in (select distinct st_code from iwmp_user_map where reg_id = ureg.reg_id)) end as stname "
+    		+ "(select distinct st_name from m_state where st_code in (select distinct st_code from iwmp_user_map where reg_id = ureg.reg_id)) end as stname "
     		+ "from iwmp_user_reg ureg,  iwmp_user_app_role_map, iwmp_app_role_map rolemap where upper(ureg.user_id) = upper(:userId) and Lower(status)=Lower('ACTIVE')  "
     		+ "and (iwmp_user_app_role_map.role_id=rolemap.role_id) and iwmp_user_app_role_map.reg_id=ureg.reg_id",nativeQuery = true)
     List<Object[]> getUserList(@Param("userId") String userId);
@@ -44,7 +44,7 @@ public interface UserRepository extends JpaRepository<IwmpUserReg, Long> {
     		+ "case when user_type = 'DL' OR user_type = 'ADMIN' then 0 else (select distinct st_code from iwmp_user_map "
     		+ "where reg_id = ureg.reg_id) end as statecd, rolemap.home_page as home_page, role_name, ureg.reg_id, "
     		+ "case when user_type = 'DL' OR user_type = 'ADMIN' then null else "
-    		+ "(select distinct st_name from iwmp_state where st_code in (select distinct st_code from iwmp_user_map where "
+    		+ "(select distinct st_name from m_state where st_code in (select distinct st_code from iwmp_user_map where "
     		+ "reg_id = ureg.reg_id)) end as stname, encrypted_pass, encrypted_pass_second from iwmp_user_reg ureg,  iwmp_user_app_role_map, iwmp_app_role_map rolemap "
     		+ "where upper(ureg.user_id) = upper(:userId) and Lower(status)=Lower('ACTIVE') "
     		+ "and (iwmp_user_app_role_map.role_id=rolemap.role_id) and iwmp_user_app_role_map.reg_id=ureg.reg_id",nativeQuery = true)
