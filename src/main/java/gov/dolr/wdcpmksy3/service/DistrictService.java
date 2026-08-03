@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gov.dolr.wdcpmksy3.entity.IwmpDistrict;
+import gov.dolr.wdcpmksy3.entity.MDistrict;
 import gov.dolr.wdcpmksy3.repository.IwmpDistrictRepository;
 
 @Service
@@ -15,15 +16,15 @@ public class DistrictService {
     @Autowired
     private IwmpDistrictRepository districtRepo;
 
-    public List<IwmpDistrict> getDistrictsByState(Integer stCode) {
+    public List<MDistrict> getDistrictsByState(Integer stCode) {
         return districtRepo.findByState_StCodeOrderByDistNameAsc(stCode);
     }
     
-    public List<IwmpDistrict> findCompletedDistrictsByState(Integer stCode) {
+    public List<MDistrict> findCompletedDistrictsByState(Integer stCode) {
         return districtRepo.findCompletedDistrictsByState(stCode);
     }
 
-	public List<IwmpDistrict> getPPRDistrictsByState(Integer stcode) {
+	public List<MDistrict> getPPRDistrictsByState(Integer stcode) {
 		// TODO Auto-generated method stub
 		return districtRepo.getPPRDistrictsByState(stcode);
 	}

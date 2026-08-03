@@ -21,11 +21,11 @@ public class IwmpUserMap {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "st_code")
-    private IwmpState state;
+    private MState state;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dcode")
-    private IwmpDistrict district;
+    private MDistrict district;
 
     @Column(name = "creator_date")
     private LocalDate creatorDate;
@@ -58,19 +58,19 @@ public class IwmpUserMap {
 		this.user = user;
 	}
 
-	public IwmpState getState() {
+	public MState getState() {
 		return state;
 	}
 
-	public void setState(IwmpState state) {
+	public void setState(MState state) {
 		this.state = state;
 	}
 
-	public IwmpDistrict getDistrict() {
+	public MDistrict getDistrict() {
 		return district;
 	}
 
-	public void setDistrict(IwmpDistrict district) {
+	public void setDistrict(MDistrict district) {
 		this.district = district;
 	}
 

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.IwmpDistrict;
+import gov.dolr.wdcpmksy3.entity.MDistrict;
 
 @Entity
 @Table(name = "m_ppr", schema = "public")
@@ -24,7 +25,7 @@ public class MPpr {
 
     @ManyToOne
     @JoinColumn(name = "dcode", nullable = false)
-    private IwmpDistrict district;
+    private MDistrict district;
 
     @ManyToOne
     @JoinColumn(name = "fin_yr_cd")
@@ -83,11 +84,11 @@ public class MPpr {
         this.institutionalStructure = institutionalStructure;
     }
 
-    public IwmpDistrict getDistrict() {
+    public MDistrict getDistrict() {
         return district;
     }
 
-    public void setDistrict(IwmpDistrict district) {
+    public void setDistrict(MDistrict district) {
         this.district = district;
     }
 

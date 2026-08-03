@@ -6,9 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import gov.dolr.wdcpmksy3.entity.IwmpState;
+import gov.dolr.wdcpmksy3.entity.MState;
 
 @Repository
-public interface IwmpStateRepository extends JpaRepository<IwmpState, Integer> {
+public interface IwmpStateRepository extends JpaRepository<MState, Integer> {
 
-    List<IwmpState> findAllByWdcpmksyOrderByStNameAsc(int i);
+    List<MState> findAllByWdcpmksyOrderByStNameAsc(int i);
 }

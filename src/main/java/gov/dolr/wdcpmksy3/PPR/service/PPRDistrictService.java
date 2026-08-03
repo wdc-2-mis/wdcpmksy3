@@ -15,6 +15,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprMicroWatershedRepository;
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.IwmpDistrict;
+import gov.dolr.wdcpmksy3.entity.MDistrict;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
 import gov.dolr.wdcpmksy3.repository.IwmpDistrictRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -70,7 +71,7 @@ public class PPRDistrictService {
 	public String savePreliminaryPPR(Integer finYrCd, Integer dcode, String projectName, List<Integer> mwIds, String userId,  Integer stCode, HttpServletRequest servletRequest) {
         try {
             IwmpMFinYear finYear = finYearRepo.findById(finYrCd).orElseThrow();
-            IwmpDistrict district = districtRepo.findById(dcode).orElseThrow();
+            MDistrict district = districtRepo.findById(dcode).orElseThrow();
             InstitutionalStructure inst = instRepo.findByStCode(stCode);
 
             MPpr ppr = new MPpr();
@@ -166,5 +167,14 @@ public class PPRDistrictService {
             return "Error deleting record: " + e.getMessage();
         }
     
+	}
+
+	public Long getTotalMicroWatersheds(Integer dcode) {
+		return pmwRepo.countByDistrictWithCompletedStatus(dcode);
+	}
+
+	public Double getTotalMicroWatershedArea(Integer dcode) {
+		// TODO Auto-generated method stub
+		return microRepo.sumAreaByDistrictWithCompletedStatus(dcode);
 	}
 }

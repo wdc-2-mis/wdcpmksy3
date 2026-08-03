@@ -23,6 +23,7 @@ import gov.dolr.wdcpmksy3.dto.MenuMap;
 import gov.dolr.wdcpmksy3.dto.ProfileBean;
 import gov.dolr.wdcpmksy3.entity.IwmpState;
 import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
+import gov.dolr.wdcpmksy3.entity.MState;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 import gov.dolr.wdcpmksy3.service.LoginServices;
 import gov.dolr.wdcpmksy3.service.MenuService;
@@ -152,10 +153,10 @@ public class LoginController {
             	//String userType = session.getAttribute("userType").toString();
             	LinkedHashMap<Integer, List<ProfileBean>> map = new LinkedHashMap<Integer, List<ProfileBean>>();
     			
-            	List<IwmpState> lists = stateService.getAllStates(i);
+            	List<MState> lists = stateService.getAllStates(i);
             	LinkedHashMap<Integer, String> stateList = new LinkedHashMap<>();
 
-            	for (IwmpState state : stateService.getAllStates(i)) {
+            	for (MState state : stateService.getAllStates(i)) {
             	    stateList.put(state.getStCode(), state.getStName());
             	}
 
@@ -305,10 +306,10 @@ public class LoginController {
              	//String userType = session.getAttribute("userType").toString();
              	LinkedHashMap<Integer, List<ProfileBean>> map = new LinkedHashMap<Integer, List<ProfileBean>>();
      			
-             	List<IwmpState> lists = stateService.getAllStates(i);
+             	List<MState> lists = stateService.getAllStates(i);
              	LinkedHashMap<Integer, String> stateList = new LinkedHashMap<>();
 
-             	for (IwmpState state : stateService.getAllStates(i)) {
+             	for (MState state : stateService.getAllStates(i)) {
              	    stateList.put(state.getStCode(), state.getStName());
              	}
 
