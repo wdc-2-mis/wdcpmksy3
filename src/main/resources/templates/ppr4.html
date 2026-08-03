@@ -191,14 +191,14 @@ document.addEventListener("DOMContentLoaded", function () {
 										<label>District Name</label><span class="required">*</span>
 									</div>
 									<div class="col-md-5">
-										<select id="district" name="district" class="form-control form-control-sm"  onchange="checkDistrictExists()" >
-																														       <option value="">--Select District--</option>
-																														    <th:block th:each="dist : ${distList}">
-																														        <option th:value="${dist.dcode}"
-																														                th:text="${dist.distName}">
-																														        </option>
-																														    </th:block>
-																														    </select>
+										<select id="district" name="district" class="form-select"  onchange="checkDistrictExists()" >
+												<option value="">--Select District--</option>
+												<th:block th:each="dist : ${distList}">
+														<option th:value="${dist.dcode}"
+																th:text="${dist.distName}">
+														</option>
+												</th:block>
+										</select>
 
 									</div>
 								</div>
