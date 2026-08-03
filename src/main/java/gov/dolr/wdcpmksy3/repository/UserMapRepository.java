@@ -21,7 +21,7 @@ public interface UserMapRepository extends JpaRepository<IwmpUserMap, Integer> {
     @Query(value =
             "select cast(st_code as integer) as stateCode, " +
             "st_name as stateName " +
-            "from iwmp_state " +
+            "from m_state " +
             "where st_code in " +
             "(select st_code from iwmp_user_map where reg_id=:regid) " +
             "order by stateCode",
@@ -31,10 +31,10 @@ public interface UserMapRepository extends JpaRepository<IwmpUserMap, Integer> {
 
     @Query(value =
             "select cast(st_code as integer) as stateCode, " +
-            "(select st_name from iwmp_state s where s.st_code=d.st_code) as stateName, " +
+            "(select st_name from m_state s where s.st_code=d.st_code) as stateName, " +
             "cast(dcode as integer) as districtCode, " +
             "dist_name as districtName " +
-            "from iwmp_district d " +
+            "from m_district d " +
             "where dcode in " +
             "(select dcode from iwmp_user_map where reg_id=:regid) " +
             "and st_code in " +
@@ -47,9 +47,9 @@ public interface UserMapRepository extends JpaRepository<IwmpUserMap, Integer> {
     @Query(value =
             "select distinct " +
             "cast(m.st_code as integer) as stateCode, " +
-            "(select st_name from iwmp_state s where s.st_code=m.st_code) as stateName, " +
+            "(select st_name from m_state s where s.st_code=m.st_code) as stateName, " +
             "cast(m.dcode as integer) as districtCode, " +
-            "(select dist_name from iwmp_district d " +
+            "(select dist_name from m_district d " +
             " where d.st_code=m.st_code and d.dcode=m.dcode) as districtName, " +
             "pm.proj_id as projectCode, " +
             "(select proj_name from iwmp_m_project p " +
