@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
-import gov.dolr.wdcpmksy3.entity.IwmpDistrict;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
 
 @Entity

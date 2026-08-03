@@ -14,7 +14,6 @@ import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprMicroWatershedRepository;
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
-import gov.dolr.wdcpmksy3.entity.IwmpDistrict;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
 import gov.dolr.wdcpmksy3.repository.IwmpDistrictRepository;

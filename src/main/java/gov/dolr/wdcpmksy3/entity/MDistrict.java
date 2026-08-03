@@ -1,5 +1,8 @@
 package gov.dolr.wdcpmksy3.entity;
 
+import java.util.List;
+
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -40,6 +44,9 @@ public class MDistrict {
     @Column(name = "district_codelgd")
     private Integer districtCodeLgd;
 
+    @OneToMany(mappedBy = "district")
+    private List<MPpr> pprs;
+    
 	public Integer getDcode() {
 		return dcode;
 	}
@@ -94,6 +101,14 @@ public class MDistrict {
 
 	public void setDistrictCodeLgd(Integer districtCodeLgd) {
 		this.districtCodeLgd = districtCodeLgd;
+	}
+
+	public List<MPpr> getPprs() {
+		return pprs;
+	}
+
+	public void setPprs(List<MPpr> pprs) {
+		this.pprs = pprs;
 	}
     
     

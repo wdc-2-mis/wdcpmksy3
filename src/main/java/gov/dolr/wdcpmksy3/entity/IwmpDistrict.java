@@ -89,8 +89,9 @@ public class IwmpDistrict {
     private Boolean distProj;
     
 
-    @OneToMany(mappedBy = "district")
-    private List<MPpr> pprs;
+	/*
+	 * @OneToMany(mappedBy = "district") private List<MPpr> pprs;
+	 */
     
 	public Integer getDcode() {
 		return dcode;
@@ -316,13 +317,11 @@ public class IwmpDistrict {
 		this.distProj = distProj;
 	}
 
-	public List<MPpr> getPprs() {
-		return pprs;
-	}
-
-	public void setPprs(List<MPpr> pprs) {
-		this.pprs = pprs;
-	}
+	/*
+	 * public List<MPpr> getPprs() { return pprs; }
+	 * 
+	 * public void setPprs(List<MPpr> pprs) { this.pprs = pprs; }
+	 */
     
     
 }
