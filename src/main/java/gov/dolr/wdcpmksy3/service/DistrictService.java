@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gov.dolr.wdcpmksy3.entity.MDistrict;
-import gov.dolr.wdcpmksy3.repository.IwmpDistrictRepository;
+import gov.dolr.wdcpmksy3.repository.MDistrictRepository;
 
 @Service
 public class DistrictService {
 
     @Autowired
-    private IwmpDistrictRepository districtRepo;
+    private MDistrictRepository districtRepo;
 
     public List<MDistrict> getDistrictsByState(Integer stCode) {
         return districtRepo.findByState_StCodeOrderByDistNameAsc(stCode);

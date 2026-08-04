@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "iwmp_user_map")
-public class IwmpUserMap {
+@Table(name = "wdcpmksy_user_map")
+public class WdcpmksyUserMap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +17,7 @@ public class IwmpUserMap {
        
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reg_id")
-    private IwmpUserReg user;
+    private WdcpmksyUserReg user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "st_code")
@@ -50,11 +50,11 @@ public class IwmpUserMap {
 		this.mapId = mapId;
 	}
 
-	public IwmpUserReg getUser() {
+	public WdcpmksyUserReg getUser() {
 		return user;
 	}
 
-	public void setUser(IwmpUserReg user) {
+	public void setUser(WdcpmksyUserReg user) {
 		this.user = user;
 	}
 

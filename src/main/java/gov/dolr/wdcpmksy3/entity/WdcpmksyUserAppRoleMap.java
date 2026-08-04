@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 import java.time.LocalDate; 
 
 @Entity 
-@Table(name = "iwmp_user_app_role_map", 
-uniqueConstraints = { @UniqueConstraint(name = "iwmp_user_app_role_map_uniquekey", 
+@Table(name = "wdcpmksy_user_app_role_map", 
+uniqueConstraints = { @UniqueConstraint(name = "wdcpmksy_user_app_role_map_uniquekey", 
 columnNames = "reg_id") }) 
-public class IwmpUserAppRoleMap { 
+public class WdcpmksyUserAppRoleMap { 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) 
 	@Column(name = "user_app_id") 
 	private Integer userAppId; 
@@ -26,7 +26,7 @@ public class IwmpUserAppRoleMap {
 	
 	@ManyToOne(fetch = FetchType.LAZY) 
 	@JoinColumn(name = "role_id", nullable = false) 
-	private IwmpAppRoleMap role; 
+	private WdcpmksyAppRoleMap role; 
 	
 	// Getters and Setters 
 	public Integer getUserAppId() 
@@ -69,11 +69,11 @@ public class IwmpUserAppRoleMap {
 	{ 
 		this.requestIp = requestIp; 
 	} 
-	public IwmpAppRoleMap getRole() 
+	public WdcpmksyAppRoleMap getRole() 
 	{ 
 		return role; 
 	} 
-	public void setRole(IwmpAppRoleMap role) 
+	public void setRole(WdcpmksyAppRoleMap role) 
 	{ 
 		this.role = role; 
 	} 

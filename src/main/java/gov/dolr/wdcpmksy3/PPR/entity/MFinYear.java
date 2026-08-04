@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "iwmp_m_fin_year", schema = "public")
-public class IwmpMFinYear {
+@Table(name = "m_fin_year", schema = "public")
+public class MFinYear {
 
     @Id
     @Column(name = "fin_yr_cd", nullable = false)

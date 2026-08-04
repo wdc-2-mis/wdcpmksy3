@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity 
-@Table(name = "iwmp_app_role_map") 
-public class IwmpAppRoleMap {
+@Table(name = "wdcpmksy_app_role_map") 
+public class WdcpmksyAppRoleMap {
 
 	@Id @Column(name = "role_id") 
 	private Integer roleId;
@@ -28,11 +28,11 @@ public class IwmpAppRoleMap {
 	
 	@OneToMany(mappedBy = "role",cascade = CascadeType.ALL,
              fetch = FetchType.LAZY)
-    private List<IwmpUserAppRoleMap> userRoleMappings;
+    private List<WdcpmksyUserAppRoleMap> userRoleMappings;
 
 	@OneToMany(mappedBy = "role",cascade = CascadeType.ALL,
              fetch = FetchType.LAZY)
-	private List<IwmpRoleMenuMap> roleMenuMappings;
+	private List<WdcpmksyRoleMenuMap> roleMenuMappings;
 	
 	// Getters and Setters 
 	public Integer getRoleId() 
@@ -82,16 +82,16 @@ public class IwmpAppRoleMap {
 	{ 
 		this.requestIp = requestIp; 
 	}
-	public List<IwmpUserAppRoleMap> getUserRoleMappings() {
+	public List<WdcpmksyUserAppRoleMap> getUserRoleMappings() {
 		return userRoleMappings;
 	}
-	public void setUserRoleMappings(List<IwmpUserAppRoleMap> userRoleMappings) {
+	public void setUserRoleMappings(List<WdcpmksyUserAppRoleMap> userRoleMappings) {
 		this.userRoleMappings = userRoleMappings;
 	}
-	public List<IwmpRoleMenuMap> getRoleMenuMappings() {
+	public List<WdcpmksyRoleMenuMap> getRoleMenuMappings() {
 		return roleMenuMappings;
 	}
-	public void setRoleMenuMappings(List<IwmpRoleMenuMap> roleMenuMappings) {
+	public void setRoleMenuMappings(List<WdcpmksyRoleMenuMap> roleMenuMappings) {
 		this.roleMenuMappings = roleMenuMappings;
 	} 
 	

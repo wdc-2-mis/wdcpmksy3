@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gov.dolr.wdcpmksy3.dto.ProfileBean;
-import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.ProfileProjection;
 import gov.dolr.wdcpmksy3.repository.UserMapRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
@@ -21,7 +21,7 @@ public class ProfileService {
 	    @Autowired
 	    private UserMapRepository repository;
 
-	    public List<IwmpUserReg> getUserDetail(Integer regid) {
+	    public List<WdcpmksyUserReg> getUserDetail(Integer regid) {
 	        return userRepository.getUserDetail(regid);
 	    }
 

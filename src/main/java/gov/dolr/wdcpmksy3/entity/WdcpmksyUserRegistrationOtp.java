@@ -8,8 +8,8 @@ import lombok.Data;
 import tools.jackson.core.JsonParser;
 
 @Entity
-@Table(name = "iwmp_user_registration_otp")
-public class IwmpUserRegistrationOtp {
+@Table(name = "wdcpmksy_user_registration_otp")
+public class WdcpmksyUserRegistrationOtp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "iwmp_user_reg", schema = "public")
-public class IwmpUserReg {
+@Table(name = "wdcpmksy_user_reg", schema = "public")
+public class WdcpmksyUserReg {
 
     @Id
     @Column(name = "reg_id", nullable = false)
@@ -100,7 +100,7 @@ public class IwmpUserReg {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
-    private List<IwmpUserMap> userMappings;
+    private List<WdcpmksyUserMap> userMappings;
     
     
     // Getters and Setters
@@ -291,10 +291,10 @@ public class IwmpUserReg {
 	public void setOtpExpiry(LocalDateTime otpExpiry) {
 		this.otpExpiry = otpExpiry;
 	}
-	public List<IwmpUserMap> getUserMappings() {
+	public List<WdcpmksyUserMap> getUserMappings() {
 		return userMappings;
 	}
-	public void setUserMappings(List<IwmpUserMap> userMappings) {
+	public void setUserMappings(List<WdcpmksyUserMap> userMappings) {
 		this.userMappings = userMappings;
 	}
 	public String getOtpMobile() {

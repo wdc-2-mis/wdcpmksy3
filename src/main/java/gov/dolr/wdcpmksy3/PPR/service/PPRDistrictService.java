@@ -6,26 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gov.dolr.wdcpmksy3.PPR.dto.MicroWatershedDTO;
-import gov.dolr.wdcpmksy3.PPR.entity.IwmpMFinYear;
+import gov.dolr.wdcpmksy3.PPR.entity.MFinYear;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.entity.PprMicroWatershed;
-import gov.dolr.wdcpmksy3.PPR.repository.IwmpMFinYearRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.WdcpmksyMFinYearRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprMicroWatershedRepository;
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
-import gov.dolr.wdcpmksy3.repository.IwmpDistrictRepository;
+import gov.dolr.wdcpmksy3.repository.MDistrictRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class PPRDistrictService {
 
 	@Autowired private MPprRepository pprRepo;
-    @Autowired private IwmpMFinYearRepository finYearRepo;
-    @Autowired private IwmpDistrictRepository districtRepo;
+    @Autowired private WdcpmksyMFinYearRepository finYearRepo;
+    @Autowired private MDistrictRepository districtRepo;
     @Autowired private MicroWatershedRepository microRepo;
     @Autowired private InstitutionalStructureRepository instRepo;
     @Autowired private PprMicroWatershedRepository pmwRepo;
@@ -70,7 +70,7 @@ public class PPRDistrictService {
     
 	public String savePreliminaryPPR(Integer finYrCd, Integer dcode, String projectName, List<Integer> mwIds, String userId,  Integer stCode, HttpServletRequest servletRequest) {
         try {
-            IwmpMFinYear finYear = finYearRepo.findById(finYrCd).orElseThrow();
+            MFinYear finYear = finYearRepo.findById(finYrCd).orElseThrow();
             MDistrict district = districtRepo.findById(dcode).orElseThrow();
             InstitutionalStructure inst = instRepo.findByStCode(stCode);
 

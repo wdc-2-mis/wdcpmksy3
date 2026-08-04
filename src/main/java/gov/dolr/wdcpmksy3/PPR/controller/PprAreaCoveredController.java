@@ -7,12 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import gov.dolr.wdcpmksy3.PPR.service.PPRDistrictService;
 import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.service.DistrictService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -59,5 +63,16 @@ public class PprAreaCoveredController {
 	    return result;
 	}
 
-	
+	@PostMapping("/saveAreaWP")
+    public String saveAreaWP(@RequestParam Integer district,
+                                  @RequestParam Integer mw,
+                                  @RequestParam Map<String, String> params,
+                                  Model model, HttpServletRequest servletRequest, HttpSession session) {
+	  String userId = (String) session.getAttribute("userid");
+      pprAreaService.saveRecords(district, mw, params, userId, servletRequest);
+
+        model.addAttribute("saveMessage", "Records saved successfully!");
+        return "ppr/areaCoveredUnderWP";
+    }
+
 }

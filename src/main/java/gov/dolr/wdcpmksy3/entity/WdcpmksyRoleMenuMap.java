@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDate; 
 
 @Entity 
-@Table(name = "iwmp_role_menu_map") 
-public class IwmpRoleMenuMap 
+@Table(name = "wdcpmksy_role_menu_map") 
+public class WdcpmksyRoleMenuMap 
 { 
 	@Id 
 	@GeneratedValue(strategy = GenerationType.IDENTITY) 
@@ -23,11 +23,11 @@ public class IwmpRoleMenuMap
 	
 	@ManyToOne(fetch = FetchType.LAZY) 
 	@JoinColumn(name = "role_id", nullable = false) 
-	private IwmpAppRoleMap role; 
+	private WdcpmksyAppRoleMap role; 
 	
 	@ManyToOne(fetch = FetchType.LAZY) 
 	@JoinColumn(name = "submenu_id", nullable = false) 
-	private IwmpSubmenu submenu; 
+	private WdcpmksySubmenu submenu; 
 	
 	
 	// Getters and Setters 
@@ -63,19 +63,19 @@ public class IwmpRoleMenuMap
 	{ 
 		this.requestIp = requestIp; 
 	} 
-	public IwmpAppRoleMap getRole() 
+	public WdcpmksyAppRoleMap getRole() 
 	{ 
 		return role; 
 	}
-	public void setRole(IwmpAppRoleMap role) 
+	public void setRole(WdcpmksyAppRoleMap role) 
 	{ 
 		this.role = role; 
 	} 
-	public IwmpSubmenu getSubmenu() 
+	public WdcpmksySubmenu getSubmenu() 
 	{ 
 		return submenu; 
 	} 
-	public void setSubmenu(IwmpSubmenu submenu) 
+	public void setSubmenu(WdcpmksySubmenu submenu) 
 	{ 
 		this.submenu = submenu; 
 	} 

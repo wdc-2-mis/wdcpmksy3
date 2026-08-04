@@ -4,14 +4,14 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import gov.dolr.wdcpmksy3.entity.IwmpUserRegistrationOtp;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserRegistrationOtp;
 
 public interface UserRegistrationOtpRepository
-        extends JpaRepository<IwmpUserRegistrationOtp, Long> {
+        extends JpaRepository<WdcpmksyUserRegistrationOtp, Long> {
 
-    Optional<IwmpUserRegistrationOtp> findTopByEmailOrderByOtpIdDesc(String email);
+    Optional<WdcpmksyUserRegistrationOtp> findTopByEmailOrderByOtpIdDesc(String email);
 
-	Optional<IwmpUserRegistrationOtp> findTopByEmailAndVerifiedOrderByOtpIdDesc(String email, String verified);
+	Optional<WdcpmksyUserRegistrationOtp> findTopByEmailAndVerifiedOrderByOtpIdDesc(String email, String verified);
     
     
 

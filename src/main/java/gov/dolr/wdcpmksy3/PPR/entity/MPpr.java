@@ -28,7 +28,7 @@ public class MPpr {
 
     @ManyToOne
     @JoinColumn(name = "fin_yr_cd")
-    private IwmpMFinYear finYear;
+    private MFinYear finYear;
 
     // --- Other Columns ---
     @Column(name = "project_name", length = 200, unique = true)
@@ -91,11 +91,11 @@ public class MPpr {
         this.district = district;
     }
 
-    public IwmpMFinYear getFinYear() {
+    public MFinYear getFinYear() {
         return finYear;
     }
 
-    public void setFinYear(IwmpMFinYear finYear) {
+    public void setFinYear(MFinYear finYear) {
         this.finYear = finYear;
     }
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
 
 @Repository
-public interface IwmpDistrictRepository extends JpaRepository<MDistrict, Integer> {
+public interface MDistrictRepository extends JpaRepository<MDistrict, Integer> {
 
     List<MDistrict> findByState_StCodeOrderByDistNameAsc(Integer stCode);
     

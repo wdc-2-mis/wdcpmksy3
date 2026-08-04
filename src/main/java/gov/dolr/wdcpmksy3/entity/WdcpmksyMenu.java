@@ -6,8 +6,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "iwmp_m_menu")
-public class IwmpMenu {
+@Table(name = "m_menu")
+public class WdcpmksyMenu {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class IwmpMenu {
     @OneToMany(mappedBy = "menu",
                cascade = CascadeType.ALL,
                fetch = FetchType.LAZY)
-    private List<IwmpSubmenu> submenus;
+    private List<WdcpmksySubmenu> submenus;
 
     // Getters and Setters
 
@@ -106,11 +106,11 @@ public class IwmpMenu {
         this.menuHindiName = menuHindiName;
     }
 
-    public List<IwmpSubmenu> getSubmenus() {
+    public List<WdcpmksySubmenu> getSubmenus() {
         return submenus;
     }
 
-    public void setSubmenus(List<IwmpSubmenu> submenus) {
+    public void setSubmenus(List<WdcpmksySubmenu> submenus) {
         this.submenus = submenus;
     }
 }

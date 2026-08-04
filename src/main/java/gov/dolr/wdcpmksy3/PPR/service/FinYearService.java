@@ -5,16 +5,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gov.dolr.wdcpmksy3.PPR.entity.IwmpMFinYear;
-import gov.dolr.wdcpmksy3.PPR.repository.IwmpMFinYearRepository;
+import gov.dolr.wdcpmksy3.PPR.entity.MFinYear;
+import gov.dolr.wdcpmksy3.PPR.repository.WdcpmksyMFinYearRepository;
 
 @Service
 public class FinYearService {
 
     @Autowired
-    private IwmpMFinYearRepository finYearRepository;
+    private WdcpmksyMFinYearRepository finYearRepository;
 
-    public List<IwmpMFinYear> getFinYearCdAndDesc() {
+    public List<MFinYear> getFinYearCdAndDesc() {
         return finYearRepository.findAll(); 
     }
     

@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import gov.dolr.wdcpmksy3.dto.OtpResponse;
 import gov.dolr.wdcpmksy3.dto.SendOtpRequest;
 import gov.dolr.wdcpmksy3.dto.VerifyOtpRequest;
-import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -73,7 +73,7 @@ public class OtpService {
 
     public boolean verifyOtp(String userId, String otp) {
 
-         Optional<IwmpUserReg> optionalUser = userRepository.findByUserId(userId);
+         Optional<WdcpmksyUserReg> optionalUser = userRepository.findByUserId(userId);
          if (optionalUser.isEmpty()) {
           return false;
           }
@@ -98,11 +98,11 @@ public class OtpService {
     
     public boolean verifyUserOtp(String userid, String otp) {
 
-        Optional<IwmpUserReg> optionalUser =userRepository.findByUserId(userid);
+        Optional<WdcpmksyUserReg> optionalUser =userRepository.findByUserId(userid);
 
         if(optionalUser.isPresent()) {
 
-        	IwmpUserReg user = optionalUser.get();
+        	WdcpmksyUserReg user = optionalUser.get();
 
             return otp.equals(user.getOtp())
                     && user.getOtpExpiry().isAfter(LocalDateTime.now());

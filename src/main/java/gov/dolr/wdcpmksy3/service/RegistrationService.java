@@ -20,11 +20,11 @@ import gov.dolr.wdcpmksy3.dto.OtpResponse;
 import gov.dolr.wdcpmksy3.dto.RegistrationDTO;
 import gov.dolr.wdcpmksy3.dto.SendOtpRequest;
 import gov.dolr.wdcpmksy3.dto.VerifyOtpRequest;
-import gov.dolr.wdcpmksy3.entity.IwmpUserMap;
-import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
-import gov.dolr.wdcpmksy3.entity.IwmpUserRegistrationOtp;
-import gov.dolr.wdcpmksy3.repository.IwmpDistrictRepository;
-import gov.dolr.wdcpmksy3.repository.IwmpStateRepository;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserMap;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserRegistrationOtp;
+import gov.dolr.wdcpmksy3.repository.MDistrictRepository;
+import gov.dolr.wdcpmksy3.repository.MStateRepository;
 import gov.dolr.wdcpmksy3.repository.UserMapRepository;
 import gov.dolr.wdcpmksy3.repository.UserRegistrationOtpRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
@@ -47,10 +47,10 @@ public class RegistrationService {
 	 
     
     @Autowired
-    private IwmpStateRepository stateRepository;
+    private MStateRepository stateRepository;
 
     @Autowired
-    private IwmpDistrictRepository districtRepository;
+    private MDistrictRepository districtRepository;
     
     @Autowired
 	private UserMapRepository userMapRepository;
@@ -155,10 +155,10 @@ public class RegistrationService {
 
             if ("SUCCESS".equalsIgnoreCase(response.getBody().getStatus())) {
 
-                Optional<IwmpUserRegistrationOtp> optional =
+                Optional<WdcpmksyUserRegistrationOtp> optional =
                         otpRepository.findTopByEmailOrderByOtpIdDesc(dto.getUserEmailId());
 
-                IwmpUserRegistrationOtp otpEntity;
+                WdcpmksyUserRegistrationOtp otpEntity;
 
                 if (optional.isPresent()) {
 
@@ -166,7 +166,7 @@ public class RegistrationService {
 
                 } else {
 
-                    otpEntity = new IwmpUserRegistrationOtp();
+                    otpEntity = new WdcpmksyUserRegistrationOtp();
 
                     otpEntity.setCreatedDate(LocalDateTime.now());
                     otpEntity.setVerified("N");
@@ -306,14 +306,14 @@ public class RegistrationService {
             // Step 3 : OTP verified by Pune
             // Fetch registration data from WDC database
 
-            Optional<IwmpUserRegistrationOtp> optional =
+            Optional<WdcpmksyUserRegistrationOtp> optional =
                     otpRepository.findTopByEmailOrderByOtpIdDesc(email);
 
             if (optional.isEmpty()) {
                 return "OTP_NOT_FOUND";
             }
 
-            IwmpUserRegistrationOtp otpEntity = optional.get();
+            WdcpmksyUserRegistrationOtp otpEntity = optional.get();
 
             RegistrationDTO dto =
                     objectMapper.readValue(
@@ -348,7 +348,7 @@ public class RegistrationService {
     @Transactional
     public void saveUser(RegistrationDTO dto, HttpServletRequest request) {
 
-        IwmpUserReg user = new IwmpUserReg();
+        WdcpmksyUserReg user = new WdcpmksyUserReg();
 
         user.setRegId(getNextRegId());
 
@@ -392,9 +392,9 @@ public class RegistrationService {
 	}
     
         @Transactional
-        private void saveUserMap(IwmpUserReg user, RegistrationDTO dto, HttpServletRequest request) {
+        private void saveUserMap(WdcpmksyUserReg user, RegistrationDTO dto, HttpServletRequest request) {
 
-            IwmpUserMap map = new IwmpUserMap();
+            WdcpmksyUserMap map = new WdcpmksyUserMap();
 
 			/* map.setMapId(getNextMapId()); */
 

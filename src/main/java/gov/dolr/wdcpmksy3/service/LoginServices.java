@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import gov.dolr.wdcpmksy3.entity.IwmpLoginLog;
-import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
-import gov.dolr.wdcpmksy3.repository.IwmpLoginLogRepository;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyLoginLog;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
+import gov.dolr.wdcpmksy3.repository.WdcpmksyLoginLogRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -39,7 +39,7 @@ public class LoginServices {
 	*/
 	
 	@Autowired
-    private IwmpLoginLogRepository loginLogRepository;
+    private WdcpmksyLoginLogRepository loginLogRepository;
 
     public boolean insertloginlog(String userid,
                                   String success,
@@ -49,7 +49,7 @@ public class LoginServices {
 
         try {
 
-            IwmpLoginLog log = new IwmpLoginLog();
+            WdcpmksyLoginLog log = new WdcpmksyLoginLog();
 
             log.setLoginid(userid);
             log.setLoginSts(success);

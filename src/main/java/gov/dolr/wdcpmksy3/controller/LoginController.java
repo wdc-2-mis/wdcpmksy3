@@ -21,10 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import gov.dolr.wdcpmksy3.dto.LoginDTO;
 import gov.dolr.wdcpmksy3.dto.MenuMap;
 import gov.dolr.wdcpmksy3.dto.ProfileBean;
-import gov.dolr.wdcpmksy3.entity.IwmpState;
-import gov.dolr.wdcpmksy3.entity.IwmpUserReg;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.entity.MState;
-import gov.dolr.wdcpmksy3.repository.UserRepository;
 import gov.dolr.wdcpmksy3.service.LoginServices;
 import gov.dolr.wdcpmksy3.service.MenuService;
 import gov.dolr.wdcpmksy3.service.OtpService;
@@ -161,7 +159,7 @@ public class LoginController {
             	}
 
 				
-				List<IwmpUserReg> list=new  ArrayList<IwmpUserReg>();
+				List<WdcpmksyUserReg> list=new  ArrayList<WdcpmksyUserReg>();
 				List<ProfileBean> listm=new  ArrayList<ProfileBean>();
 				
 				list=profileService.getUserDetail(regid);
@@ -314,7 +312,7 @@ public class LoginController {
              	}
 
  				
- 				List<IwmpUserReg> list=new  ArrayList<IwmpUserReg>();
+ 				List<WdcpmksyUserReg> list=new  ArrayList<WdcpmksyUserReg>();
  				List<ProfileBean> listm=new  ArrayList<ProfileBean>();
  				
  				list=profileService.getUserDetail(regid);

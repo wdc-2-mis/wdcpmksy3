@@ -16,9 +16,9 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="iwmp_login_log")
-@NamedQuery(name="IwmpLoginLog.findAll", query="SELECT i FROM IwmpLoginLog i")
-public class IwmpLoginLog implements Serializable {
+@Table(name="wdcpmksy_login_log")
+@NamedQuery(name="WdcpmksyLoginLog.findAll", query="SELECT i FROM WdcpmksyLoginLog i")
+public class WdcpmksyLoginLog implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -67,9 +67,9 @@ public class IwmpLoginLog implements Serializable {
 	//bi-directional many-to-one association to IwmpUserReg
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reg_id", referencedColumnName = "reg_id")
-    private IwmpUserReg userReg;
+    private WdcpmksyUserReg userReg;
 
-	public IwmpLoginLog() {
+	public WdcpmksyLoginLog() {
 	}
 
 	public Integer getLogin_log_id() {
@@ -184,11 +184,11 @@ public class IwmpLoginLog implements Serializable {
 		this.userType = userType;
 	}
 
-	public IwmpUserReg getUserReg() {
+	public WdcpmksyUserReg getUserReg() {
 		return userReg;
 	}
 
-	public void setUserReg(IwmpUserReg userReg) {
+	public void setUserReg(WdcpmksyUserReg userReg) {
 		this.userReg = userReg;
 	}
 
