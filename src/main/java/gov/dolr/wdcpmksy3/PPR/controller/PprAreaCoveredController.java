@@ -72,7 +72,7 @@ public class PprAreaCoveredController {
       pprAreaService.saveRecords(district, mw, params, userId, servletRequest);
 
         model.addAttribute("saveMessage", "Records saved successfully!");
-        return "ppr/areaCoveredUnderWP";
+        return "redirect:/areaCoveredUnderWP";
     }
 
 }

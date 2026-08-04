@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "wdcpmksy_m_submenu")
+@Table(name = "m_submenu")
 public class WdcpmksySubmenu {
 
     @Id

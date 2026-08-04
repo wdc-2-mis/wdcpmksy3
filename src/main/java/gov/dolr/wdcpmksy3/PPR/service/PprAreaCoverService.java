@@ -13,6 +13,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MScheme;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWatershedCoveredArea;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprAreaCoveredRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWatershedCoveredAreaRepo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,9 @@ public class PprAreaCoverService {
 
 	@Autowired
 	private PprWatershedCoveredAreaRepo wcarearepo;
+	
+	@Autowired 
+	private MPprRepository pprRepo;
 	
 	public List<MScheme> getAllSchemes() {
         return repo.findAll();
@@ -82,8 +86,8 @@ public class PprAreaCoverService {
                 String areaStr = params.get("scheme[" + schemeId + "].area");
 
                 PprWatershedCoveredArea entity = new PprWatershedCoveredArea();
-                MPpr ppr = new MPpr();
-                ppr.setPprId(district);
+                MPpr ppr = pprRepo.findByDistrict_Dcode(district);
+                
                 
                 MicroWatershed mwEntity = new MicroWatershed();
                 mwEntity.setMwId(mw);

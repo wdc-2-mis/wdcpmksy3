@@ -17,5 +17,7 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
     List<MPpr> findByFinYearFinYrCd(Integer finYrCd);
 
     boolean existsByProjectName(String projectName);
+
+	MPpr findByDistrict_Dcode(Integer district);
 }
 
