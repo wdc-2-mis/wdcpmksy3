@@ -17,6 +17,11 @@ public class MicroWatershedService {
 	public List<MicroWatershed> getMicroServiceIdandName() {
         return repository.findAll(); 
     }
+	
+	@SuppressWarnings("deprecation")
+	public MicroWatershed getMicroWatershedById(int id) {
+		return repository.getById(id);
+	}
 
 	
 }

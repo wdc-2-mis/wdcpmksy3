@@ -218,6 +218,7 @@
 					alert(selectedText + " details for this SLNA is already saved. You cannot save again.");
 				} else{
 	                saveButton.disabled = false;
+					updateButton.disabled = false;
 	            }
 	        });
 	    });
@@ -358,7 +359,7 @@
 	                </div>
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Tenure Period </label>
+	                    <label class="col-md-3 fw-bold"> Tenure Period (in years) </label>
 	                    <div class="col-md-3">
 	                        <input type="text" class="form-control" name="tenure">
 	                    </div>
@@ -409,7 +410,7 @@
 		            <th>Qualification</th>
 		            <th>Appointment Date</th>
 		            <th>Nature of Appointment</th>
-		            <th>Tenure</th>
+		            <th>Tenure(in years)</th>
 		            <th>Phone</th>
 		            <th>Email</th>
 		            <th>Fax</th>
@@ -433,14 +434,17 @@
 		            <td th:text="${data.fax}"></td>
 
 		            <td>
-						<button type="button" class="btn btn-warning btn-sm editBtn" th:data-id="${data.pprSlnaId}" data-bs-toggle="modal" data-bs-target="#editModal">
-						        Edit
+						<div class="d-flex align-items-center gap-2">
+						<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${data.pprSlnaId}" data-bs-toggle="modal" data-bs-target="#editModal">
+						       <i class="fas fa-edit"></i>
 						    </button>
+							&nbsp;
 		                <a th:href="@{/deleteDetailsOfSLNA(id=${data.pprSlnaId})}"
 		                   class="btn btn-danger btn-sm"
 		                   onclick="return confirm('Are you sure you want to delete this record?');">
-		                    Delete
+		                    <i class="fas fa-trash"></i>
 		                </a>
+						</div>
 		            </td>
 		        </tr>
 		        <tr th:if="${#lists.isEmpty(detailsOfSLNAList)}">
@@ -452,7 +456,7 @@
 		    </table>
 		    <div class="text-center mb-5">
 		        <button type="submit" class="btn btn-primary btn-lg">
-		            Submit
+		            Complete
 		        </button>
 		    </div>
 		</form>
@@ -537,7 +541,7 @@
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Tenure Period </label>
+							<label class="col-md-3 fw-bold"> Tenure Period (in years)</label>
 							<div class="col-md-3">
 								<input type="text" id="tenure" class="form-control" name="tenure">
 							</div>
