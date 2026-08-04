@@ -36,7 +36,7 @@ public class SecurityConfig {
                         "/editInstitutionalStructurePPR1", "/slnaFunctionariesPPR3", "/saveSLNAFunctionariesPPR3", "/deleteSLNAFunctionariesPPR3", "/editSLNAFunctionariesPPR3", "/completeSLNAFunctionariesPPR3","/updateSLNAFunctionariesPPR3",
                         "/preliminaryPPR4A", "/savePreliminaryPPR4A", "/deletePreliminaryPPR4A", "/completePreliminaryPPR4A","/checkDistrictExists", "/wcdcFunctionariesPPR4B", "/saveWCDCFunctionariesPPR4B", "/UpdateWCDCFunctionariesPPR4B", "/deleteWCDCFunctionariesPPR4B", "/editWCDCFunctionariesPPR4B", "/completeWCDCFunctionariesPPR4B",
                         "/pprDistrict", "/savePPRDistrict", "/updatePPRDistrict", "/completePPRDistrict/**", "/deletePPRDistrict/**", "/pprProposedProjectDetails", "/getProjAndMicroWaterDetailsByDcode", "/agroClimateConditionPPR10", "/getProjectsByDistrictPPR10", "/getVillagesByProjectPPR10",
-                        "/areaCoveredUnderWP", "/districtStats/**", "/microWatershedArea/**", "/saveAreaWP",
+                        "/areaCoveredUnderWP", "/districtStats/**", "/microWatershedArea/**", "/saveAreaWP",  "/preliminaryPPR8" ,
                         "/css/**",
                         "/js/**",
                         "/images/**",

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+<meta charset="UTF-8">
+<title>Edit Functionaries of Watershed Cell (PPR4)</title>
+
+<style>
+.required{
+    color:red;
+}
+</style>
+
+<script>
+
+function checkDistrictExists() {
+
+    let district = document.getElementById("district").value;
+
+    if (district === "") {
+        return;
+    }
+
+    fetch('/checkDistrictExists?dcode=' + district)
+        .then(response => response.text())
+        .then(result => {
+
+            if (result === "EXISTS") {
+
+                let oldDistrict = document.getElementById("oldDistrict").value;
+
+                if(oldDistrict != district){
+
+                    alert("This District Data already exists.");
+
+                    document.getElementById("district").value = oldDistrict;
+                }
+
+            }
+
+        })
+        .catch(error => console.error(error));
+
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const mouDate = document.getElementById("MoU");
+    mouDate.setAttribute("min","2026-01-01");
+
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("institutionForm");
+    const mouFile = document.getElementById("MoUfile");
+
+    function validatePDF(input){
+
+        if(input.files.length==0){
+            return true;
+        }
+
+        const file=input.files[0];
+
+        if(file.type!="application/pdf" &&
+           !file.name.toLowerCase().endsWith(".pdf")){
+
+            alert("Only PDF files are allowed.");
+
+            input.value="";
+
+            return false;
+        }
+
+        return true;
+
+    }
+
+    mouFile.addEventListener("change",function(){
+
+        validatePDF(this);
+
+    });
+
+    form.addEventListener("submit",function(e){
+
+        const district=document.getElementById("district");
+
+        const agency=document.getElementById("agency");
+
+        const chairman=document.getElementById("chairman");
+
+        const mouDate=document.getElementById("MoU");
+
+        if(district.value==""){
+
+            alert("Please select District.");
+
+            district.focus();
+
+            e.preventDefault();
+
+            return false;
+
+        }
+
+        if(agency.value.trim()==""){
+
+            alert("Please Enter Executing Agency");
+
+            agency.focus();
+
+            e.preventDefault();
+
+            return false;
+
+        }
+
+        if(chairman.value.trim()==""){
+
+            alert("Please Enter Chairman Status");
+
+            chairman.focus();
+
+            e.preventDefault();
+
+            return false;
+
+        }
+
+        if(mouDate.value==""){
+
+            alert("Please Select MoU Date");
+
+            mouDate.focus();
+
+            e.preventDefault();
+
+            return false;
+
+        }
+
+        validatePDF(mouFile);
+
+    });
+
+});
+
+</script>
+
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-header bg-primary text-white">
+
+<h4 class="mb-0">
+
+Edit Functionaries of Watershed Cell (PPR4)
+
+</h4>
+
+</div>
+
+<div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+
+<span th:text="${success}"></span>
+
+<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+</div>
+
+<div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+
+<span th:text="${error}"></span>
+
+<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+</div>
+
+<div class="card-body">
+
+<form id="institutionForm"
+      th:action="@{/updatePreliminaryPPR4A}"
+      method="post"
+      enctype="multipart/form-data"
+      novalidate>
+
+<input type="hidden"
+       name="pprWcdcId"
+       th:value="${editData.pprWcdcId}">
+
+<input type="hidden"
+       id="oldDistrict"
+       th:value="${editData.dcode}">
+
+<div class="row mb-3">
+
+<div class="col-md-3">
+
+<label>District Name</label>
+
+<span class="required">*</span>
+
+</div>
+
+<div class="col-md-5">
+
+    <select class="form-control" disabled>
+        <option th:each="dist : ${distList}"
+                th:value="${dist.dcode}"
+                th:text="${dist.distName}"
+                th:selected="${dist.dcode == editData.dcode}">
+        </option>
+    </select>
+
+    <input type="hidden"
+           name="dcode"
+           th:value="${editData.dcode}">
+
+</div>
+</div>
+
+<div class="row mb-3">
+
+<div class="col-md-3">
+
+<label>Name of Executing Agency</label>
+
+<span class="required">*</span>
+
+</div>
+
+<div class="col-md-5">
+
+<input type="text"
+       id="agency"
+       name="executingAgency"
+       class="form-control"
+       placeholder="Enter Executing Agency"
+       th:value="${editData.executingAgency}">
+
+</div>
+
+</div>
+
+<div class="row mb-3">
+
+<div class="col-md-3">
+
+<label>Status of Chairman</label>
+
+<span class="required">*</span>
+
+</div>
+
+<div class="col-md-5">
+
+<input type="text"
+       id="chairman"
+       name="chairmanStatus"
+       class="form-control"
+       placeholder="Enter Chairman Status"
+       th:value="${editData.chairmanStatus}">
+
+</div>
+
+</div>
+
+<div class="row mb-3">
+
+<div class="col-md-3">
+
+<label>Date of Signing of MoU with SLNA</label>
+
+<span class="required">*</span>
+
+</div>
+
+<div class="col-md-5">
+
+<input type="date"
+       id="MoU"
+       name="mouDate"
+       class="form-control"
+       th:value="${editData.mouDate}">
+
+</div>
+
+</div>
+
+<div class="row mb-3">
+
+<div class="col-md-3">
+
+<label>Upload MoU</label>
+
+</div>
+
+<div class="col-md-5">
+
+<input type="file"
+       id="MoUfile"
+       name="mouFile"
+       class="form-control"
+       accept=".pdf">
+
+<small class="text-muted">
+
+Only PDF file is allowed. Leave empty to keep existing PDF.
+
+</small>
+
+</div>
+
+</div>
+
+<div class="text-center mt-4">
+
+<button type="submit"
+        name="action"
+        value="D"
+        class="btn btn-primary">
+
+<i class="fas fa-save"></i>
+
+Update
+
+</button>
+
+</div>
+
+</form>
+
+<div class="table-responsive" th:if="${#lists.size(ppr4List) > 0}">
+
+    <table class="table table-bordered">
+
+        <h4>
+            <b>
+                <center>List of Functionaries of Watershed Cell (PPR4)</center>
+            </b>
+        </h4>
+
+        <br/>
+
+        <thead>
+
+        <tr>
+
+            <th class="table-primary">District Name</th>
+
+            <th class="table-primary">Name of Executing Agency</th>
+
+            <th class="table-primary">Status of Chairman</th>
+
+            <th class="table-primary">Date of Signing of MoU with SLNA</th>
+
+            <th class="table-primary">Upload MoU</th>
+
+            <th class="table-primary">Action</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        <tr th:each="user,stat : ${ppr4List}">
+
+            <td th:text="${user[1]}"></td>
+
+            <td th:text="${user[2]}"></td>
+
+            <td th:text="${user[3]}"></td>
+
+            <td th:text="${user[4]}"></td>
+
+            <td>
+
+                <a th:href="@{/viewPdfPreliminaryPPR4A(id=${user[0]})}"
+                   target="_blank">
+
+                    View MoU
+
+                </a>
+
+            </td>
+
+            <td>
+
+                <a th:if="${user[6].toString().equals('D')}"
+                   th:href="@{/deletePreliminaryPPR4A(id=${user[0]})}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Are you sure you want to delete this record?');">
+
+                    <i class="fas fa-trash"></i>
+
+                </a>
+
+                &nbsp;
+
+                <a th:if="${user[6].toString().equals('D')}"
+                   th:href="@{/editPreliminaryPPR4A(id=${user[0]})}"
+                   class="btn btn-primary btn-sm"
+                   onclick="return confirm('Are you sure you want to edit this record?');">
+
+                    <i class="fas fa-edit"></i>
+
+                </a>
+
+                &nbsp;
+
+                <a th:if="${user[6].toString().equals('D')}"
+                   th:href="@{/completePreliminaryPPR4A(id=${user[0]})}"
+                   class="btn btn-success btn-sm"
+                   onclick="return confirm('Are you sure you want to complete this record?');">
+
+                    <i class="fas fa-check"></i>
+
+                </a>
+
+            </td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

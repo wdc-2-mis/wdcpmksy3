@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Preliminary Project Report (PPR8)</title>
+
+<style>
+
+.required{
+    color:red;
+}
+
+.table th{
+    text-align:center;
+    vertical-align:middle;
+}
+
+.table td{
+    vertical-align:middle;
+}
+
+.form-label{
+    font-weight:600;
+}
+
+</style>
+
+
+<script>
+	
+	document.addEventListener("DOMContentLoaded", function () {
+		
+		
+		
+	   document.getElementById("district").addEventListener("change", function () {
+		
+	        let districtId = this.value;
+			let project = document.getElementById("project");
+			console.log("District Changed");;
+			project.innerHTML = '<option value="">--Select Project--</option>';
+
+					    if (districtId === "") {
+					        return;
+					    }
+
+						fetch('/getProjectByDistrictPPR8?dcode=' + districtId)
+								.then(response => response.json())
+								 .then(data => {
+
+								            data.forEach(function(item) {
+
+								                let option = document.createElement("option");
+								                option.value = item.id;          // PPR ID
+								                option.textContent = item.name;  // Project Name
+
+								                project.appendChild(option);
+								            });
+
+								        })
+								        .catch(error => {
+								            console.error("Error:", error);
+								        });
+
+
+	    });
+
+	
+
+	
+	
+
+
+
+});
+</script>
+
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-header bg-primary text-white">
+
+<h3 class="mb-0">
+
+Preliminary Project Report (PPR8)
+
+</h3>
+
+</div>
+
+<!-- SUCCESS -->
+
+<div th:if="${success}"
+     class="alert alert-success alert-dismissible fade show">
+
+    <span th:text="${success}"></span>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+
+    </button>
+
+</div>
+
+<!-- ERROR -->
+
+<div th:if="${error}"
+     class="alert alert-danger alert-dismissible fade show">
+
+    <span th:text="${error}"></span>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+
+    </button>
+
+</div>
+
+<div class="card-body">
+
+<div class="container" style="max-width:1000px;">
+
+<h4 class="text-center mb-4">
+
+<b>
+
+Details of Previously identified DPAP/DDP/IWDP areas proposed users
+
+</b>
+
+</h4>
+
+<form id="ppr8Form"
+      th:action="@{/savePreliminaryPPR8}"
+      method="post">
+
+<!-- ========================= ROW 1 ========================= -->
+
+<div class="row mb-3">
+
+<div class="col-md-2">
+
+<label class="form-label">
+
+State Name
+
+<span class="required">*</span>
+
+</label>
+
+</div>
+
+<div class="col-md-4">
+
+<input type="text"
+       class="form-control"
+       name="stateName"
+       th:value="${stateName}"
+       readonly>
+
+</div>
+
+<div class="col-md-2">
+
+<label class="form-label">
+
+District Name
+
+<span class="required">*</span>
+
+</label>
+
+</div>
+
+<div class="col-md-4">
+
+<select class="form-control"
+        id="district"
+        name="district">
+
+<option value="">--Select District--</option>
+
+<option th:each="d:${distList}"
+        th:value="${d.dcode}"
+        th:text="${d.distName}">
+
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+<!-- ========================= ROW 2 ========================= -->
+
+<div class="row mb-3">
+
+<div class="col-md-2">
+
+<label class="form-label">
+
+Name of Project
+
+<span class="required">*</span>
+
+</label>
+
+</div>
+
+<div class="col-md-4">
+
+	<select class="form-control"
+	        id="project"
+	        name="project">
+
+	    <option value="">--Select Project--</option>
+
+	</select>
+</div>
+
+<div class="col-md-2">
+
+<label class="form-label">
+
+Name of Block
+
+<span class="required">*</span>
+
+</label>
+
+</div>
+
+<div class="col-md-4">
+
+<select class="form-control"
+        id="block"
+        name="bcode">
+
+<option value="">--Select Block--</option>
+
+<option th:each="b:${blockList}"
+        th:value="${b.bcode}"
+        th:text="${b.blockName}">
+
+</option>
+
+</select>
+
+</div>
+
+</div>
+<!-- ========================= ROW 3 ========================= -->
+
+<div class="row mb-3">
+
+    <div class="col-md-2">
+
+        <label class="form-label">
+            Type of Scheme
+            <span class="required">*</span>
+        </label>
+
+    </div>
+
+    <div class="col-md-10">
+
+        <div class="form-check form-check-inline">
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="schemeType"
+                   id="dpap"
+                   value="DPAP">
+
+            <label class="form-check-label" for="dpap">
+                DPAP
+            </label>
+
+        </div>
+
+        <div class="form-check form-check-inline">
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="schemeType"
+                   id="ddp"
+                   value="DDP">
+
+            <label class="form-check-label" for="ddp">
+                DDP
+            </label>
+
+        </div>
+
+        <div class="form-check form-check-inline">
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="schemeType"
+                   id="iwdp"
+                   value="IWDP">
+
+            <label class="form-check-label" for="iwdp">
+                IWDP
+            </label>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ========================= ROW 4 ========================= -->
+
+
+<div class="row mb-3">
+
+    <div class="col-md-5">
+        <label>No. of Pre WDC 3.0 Projects sanctioned in the Block
+            <span class="required">*</span>
+        </label>
+    </div>
+
+    <div class="col-md-7">
+        <input type="number"
+               class="form-control"
+               name="preProjects">
+    </div>
+
+</div>
+
+	<div class="row mb-3">
+
+	    <div class="col-md-5">
+	        <label>Area of Sanctioned Projects (ha)</label>
+	        <span class="required">*</span>
+	    </div>
+
+	    <div class="col-md-7">
+	        <input type="text"
+	               class="form-control"
+	               name="sanctionArea">
+	    </div>
+
+	</div>
+<!-- ========================= ROW 5 ========================= -->
+
+<div class="row mb-3">
+
+    <div class="col-md-5">
+        <label>Net Area to be Covered</label>
+        <span class="required">*</span>
+    </div>
+
+    <div class="col-md-7">
+        <input type="text"
+               class="form-control"
+               name="netArea">
+    </div>
+
+</div>
+
+<div class="row mb-3">
+
+    <div class="col-md-5">
+        <label>Area of Proposed Projects (ha)</label>
+        <span class="required">*</span>
+    </div>
+
+    <div class="col-md-7">
+        <input type="text"
+               class="form-control"
+               name="proposedArea">
+    </div>
+
+</div>
+<!-- ========================= ROW 6 ========================= -->
+
+<div class="row mb-3">
+
+    <div class="col-md-5">
+        <label>Area proposed to be covered by scheme other than DoLR (ha)</label>
+        <span class="required">*</span>
+    </div>
+
+    <div class="col-md-7">
+        <input type="text"
+               class="form-control"
+               name="otherArea">
+    </div>
+
+</div>
+
+<div class="row mb-3">
+
+    <div class="col-md-5">
+        <label>Net Balance Area (ha)</label>
+        <span class="required">*</span>
+    </div>
+
+    <div class="col-md-7">
+        <input type="text"
+               class="form-control"
+               name="balanceArea">
+    </div>
+
+</div>
+
+
+<!-- ========================= SAVE BUTTON ========================= -->
+
+<div class="text-center mt-4">
+
+    <button class="btn btn-warning">
+        <i class="fas fa-save"></i> Save as Draft
+    </button>
+
+</div>
+
+
+</form>
+
+<!-- ===================================================== -->
+<!--                  DRAFT DETAILS                        -->
+<!-- ===================================================== -->
+
+<div class="table-responsive mt-5">
+
+    <h4 class="text-center mb-3">
+
+        <b>Draft Details</b>
+
+    </h4>
+
+    <table class="table table-bordered table-striped table-hover">
+
+        <thead>
+
+        <tr>
+
+            <th class="table-primary">State</th>
+
+            <th class="table-primary">District</th>
+
+            <th class="table-primary">Project</th>
+
+            <th class="table-primary">Block</th>
+
+            <th class="table-primary">Scheme</th>
+
+            <th class="table-primary">
+                No. of Pre WDC Projects
+            </th>
+
+            <th class="table-primary">
+                Sanctioned Area
+            </th>
+
+            <th class="table-primary">
+                Net Area
+            </th>
+
+            <th class="table-primary">
+                Proposed Area
+            </th>
+
+            <th class="table-primary">
+                Other DoLR Area
+            </th>
+
+            <th class="table-primary">
+                Balance Area
+            </th>
+
+            <th class="table-primary" style="min-width:120px;">
+                Action
+            </th>
+
+        </tr>
+
+        </thead>
+		<tbody>
+
+		<tr>
+		    <td>Rajasthan</td>
+		    <td>Jaipur</td>
+		    <td>PPR-001</td>
+		    <td>Sanganer</td>
+		    <td>DPAP</td>
+		    <td>5</td>
+		    <td>11.35</td>
+		    <td>5.22</td>
+		    <td>4.33</td>
+		    <td>1.33</td>
+		    <td>0.47</td>
+
+			<td class="text-center" style="min-width:120px; white-space:nowrap;">
+
+			    <button type="button" class="btn btn-danger btn-sm me-1">
+			        <i class="fa fa-trash"></i>
+			    </button>
+
+			    <button type="button" class="btn btn-primary btn-sm me-1">
+			        <i class="fa fa-edit"></i>
+			    </button>
+
+			    <button type="button" class="btn btn-success btn-sm">
+			        <i class="fa fa-check"></i>
+			    </button>
+
+			</td>
+		</tr>
+
+		</tbody>
+        
+    </table>
+
+</div>
+<!-- ========================================================= -->
+<!-- SUCCESS MESSAGE -->
+<!-- ========================================================= -->
+
+<div th:if="${success}"
+     class="alert alert-success alert-dismissible fade show mt-3"
+     role="alert">
+
+    <span th:text="${success}"></span>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+    </button>
+
+</div>
+
+<!-- ========================================================= -->
+<!-- ERROR MESSAGE -->
+<!-- ========================================================= -->
+
+<div th:if="${error}"
+     class="alert alert-danger alert-dismissible fade show mt-3"
+     role="alert">
+
+    <span th:text="${error}"></span>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+    </button>
+
+</div>
+
+</div>      <!-- container -->
+
+</div>      <!-- card-body -->
+
+</div>      <!-- card -->
+
+</div>      <!-- layout fragment -->
+
+
+<script>
+
+/* ==========================================================
+   Load Block according to District
+========================================================== */
+
+document.getElementById("district").addEventListener("change", function () {
+
+    let dcode = this.value;
+
+    if (dcode == "") {
+
+        document.getElementById("block").innerHTML =
+                "<option value=''>--Select Block--</option>";
+
+        return;
+
+    }
+
+    fetch("/getBlocksByDistrict?dcode=" + dcode)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            let block = document.getElementById("block");
+
+            block.innerHTML =
+                "<option value=''>--Select Block--</option>";
+
+            data.forEach(function(item){
+
+                let option =
+                    document.createElement("option");
+
+                option.value = item.bcode;
+
+                option.text = item.blockName;
+
+                block.appendChild(option);
+
+            });
+
+        })
+
+        .catch(function(error){
+
+            console.log(error);
+
+        });
+
+});
+
+
+/* ==========================================================
+   Auto Calculate Balance Area
+========================================================== */
+
+function calculateBalance(){
+
+    let sanctioned =
+        parseFloat(document.getElementById("sanctionArea").value) || 0;
+
+    let proposed =
+        parseFloat(document.getElementById("proposedArea").value) || 0;
+
+    let other =
+        parseFloat(document.getElementById("otherArea").value) || 0;
+
+    let balance = sanctioned - proposed - other;
+
+    if(balance < 0){
+
+        balance = 0;
+
+    }
+
+    document.getElementById("balanceArea").value =
+        balance.toFixed(2);
+
+}
+
+
+document.getElementById("sanctionArea")
+        .addEventListener("keyup", calculateBalance);
+
+document.getElementById("proposedArea")
+        .addEventListener("keyup", calculateBalance);
+
+document.getElementById("otherArea")
+        .addEventListener("keyup", calculateBalance);
+
+</script>
+
+</body>
+
