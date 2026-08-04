@@ -19,5 +19,7 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
     boolean existsByProjectName(String projectName);
 
 	MPpr findByDistrict_Dcode(Integer district);
+	
+	List<MPpr> findByDistrict_DcodeAndStatusOrderByProjectNameAsc(Integer dcode, String status);
 }
 

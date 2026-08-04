@@ -53,7 +53,7 @@ public class RegistrationController {
 	            .stream()
 	            .map(d -> {
 	                DistrictDTO dto = new DistrictDTO();
-	                dto.setDistCode(d.getDistCode());
+	                dto.setDistCode(d.getDcode());
 	                dto.setDistName(d.getDistName());
 	                return dto;
 	            })

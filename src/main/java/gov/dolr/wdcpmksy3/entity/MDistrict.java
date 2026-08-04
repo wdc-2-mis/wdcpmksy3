@@ -29,9 +29,6 @@ public class MDistrict {
     @JoinColumn(name = "st_code")
     private MState state;
 	
-	@Column(name = "dist_code")
-    private Integer distCode;
-
     @Column(name = "dist_name")
     private String distName;
     
@@ -61,14 +58,6 @@ public class MDistrict {
 
 	public void setState(MState state) {
 		this.state = state;
-	}
-
-	public Integer getDistCode() {
-		return distCode;
-	}
-
-	public void setDistCode(Integer distCode) {
-		this.distCode = distCode;
 	}
 
 	public String getDistName() {

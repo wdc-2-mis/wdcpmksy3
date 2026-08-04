@@ -14,9 +14,6 @@ public class WdcpmksyAppRoleMap {
 	@Column(name = "role_name", length = 255) 
 	private String roleName;
 	
-	@Column(name = "home_page", length = 255) 
-	private String homePage;
-	
 	@Column(name = "last_updated_by", length = 255) 
 	private String lastUpdatedBy;
 	
@@ -51,13 +48,7 @@ public class WdcpmksyAppRoleMap {
 	{ 
 		this.roleName = roleName; 
 	} 
-	public String getHomePage() 
-	{ 
-		return homePage; } 
-	public void setHomePage(String homePage) 
-	{ 
-		this.homePage = homePage; 
-	} 
+	
 	public String getLastUpdatedBy() 
 	{ 
 		return lastUpdatedBy; 
