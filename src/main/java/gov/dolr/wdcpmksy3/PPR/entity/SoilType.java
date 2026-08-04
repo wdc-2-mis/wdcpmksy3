@@ -4,11 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+
 @Entity
 @Table(name = "m_soil_type")
 public class SoilType {
@@ -35,4 +32,66 @@ public class SoilType {
 
     @Column(name = "updated_date")
     private LocalDate updatedDate;
+
+	public Integer getSoilTypeId() {
+		return soilTypeId;
+	}
+
+	public void setSoilTypeId(Integer soilTypeId) {
+		this.soilTypeId = soilTypeId;
+	}
+
+	public String getSoilName() {
+		return soilName;
+	}
+
+	public void setSoilName(String soilName) {
+		this.soilName = soilName;
+	}
+
+	public String getRequestIp() {
+		return requestIp;
+	}
+
+	public void setRequestIp(String requestIp) {
+		this.requestIp = requestIp;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public LocalDateTime getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public LocalDate getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(LocalDate updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+    
+    
+    
+    
+    
+    
 }

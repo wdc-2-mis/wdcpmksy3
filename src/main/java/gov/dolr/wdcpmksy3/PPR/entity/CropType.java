@@ -4,11 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+
+
 @Entity
 @Table(name = "m_crop_type")
 public class CropType {
@@ -35,4 +33,65 @@ public class CropType {
 
     @Column(name = "updated_date")
     private LocalDate updatedDate;
+
+	public Integer getCropTypeId() {
+		return cropTypeId;
+	}
+
+	public void setCropTypeId(Integer cropTypeId) {
+		this.cropTypeId = cropTypeId;
+	}
+
+	public String getCropName() {
+		return cropName;
+	}
+
+	public void setCropName(String cropName) {
+		this.cropName = cropName;
+	}
+
+	public String getRequestIp() {
+		return requestIp;
+	}
+
+	public void setRequestIp(String requestIp) {
+		this.requestIp = requestIp;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public LocalDateTime getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public LocalDate getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(LocalDate updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+    
+    
+    
+    
+    
 }
