@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gov.dolr.wdcpmksy3.PPR.dto.MicroWatershedDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.IwmpMFinYear;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
@@ -175,5 +176,14 @@ public class PPRDistrictService {
 	public Double getTotalMicroWatershedArea(Integer dcode) {
 		// TODO Auto-generated method stub
 		return microRepo.sumAreaByDistrictWithCompletedStatus(dcode);
+	}
+
+	public List<MicroWatershedDTO> getMicroWatershedsByDistrict(Integer dcode) {
+        return microRepo.findByDistrict(dcode);
+    }
+
+	public Double getMicroWatershedArea(Integer mwId) {
+		// TODO Auto-generated method stub
+		return microRepo.microWatershedArea(mwId);
 	}
 }

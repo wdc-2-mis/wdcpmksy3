@@ -37,7 +37,7 @@ public class PprAreaCoveredController {
             return "redirect:/login";
         }
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
-        model.addAttribute("schemeList", pprAreaService.getAllSchemes());
+        model.addAttribute("schemeList", pprAreaService.getAllSchemes().stream().limit(6));
         return "ppr/areaCovered";
 	}
 	
@@ -47,10 +47,17 @@ public class PprAreaCoveredController {
 	public Map<String, Object> getDistrictStats(@PathVariable Integer dcode) {
 	    Map<String, Object> result = new HashMap<>();
 	    result.put("totalMw", pprService.getTotalMicroWatersheds(dcode));
-	    result.put("totalMwArea", pprService.getTotalMicroWatershedArea(dcode));
+	    result.put("microWatersheds", pprService.getMicroWatershedsByDistrict(dcode));
 	    return result;
 	}
 
-	
+	@GetMapping("/microWatershedArea/{mwId}")
+	@ResponseBody
+	public Map<String, Object> getMicroWatershedArea(@PathVariable Integer mwId) {
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("area", pprService.getMicroWatershedArea(mwId));
+	    return result;
+	}
+
 	
 }

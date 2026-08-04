@@ -52,6 +52,18 @@
                          <div class="invalid-feedback">Please enter total micro-watersheds.</div>
                      </div>				
 				 </div>
+				 
+				 <div class="row mb-3">
+    					<div class="col-md-3">
+        					<label>Micro-Watershed:</label><span class="required">*</span>
+    					</div>
+    					<div class="col-md-5">
+        					<select id="mw" name="mw" class="form-control form-control-sm" required>
+            					<option value="">--Select Micro-Watershed--</option>
+            				</select>
+        					<div class="invalid-feedback">Please select a Micro-Watershed.</div>
+    					</div>
+					</div>
 								
 				<div class="row mb-3">
                     <div class="col-md-3">
@@ -63,6 +75,7 @@
                     </div>
                 </div>				
 	             
+	             
 	           
 	           <!-- Row 3: Section Header -->
 				<div class="row mb-3">
@@ -72,6 +85,7 @@
        				 </h6>
    				 </div>
 				</div>
+
 
 				<div class="row mb-2">
     				<div class="col-md-2"></div>
@@ -90,7 +104,7 @@
                    				th:id="'scheme' + ${scheme.schemeId} + 'No'"
                    				th:name="'scheme[' + ${scheme.schemeId} + '].no'"
                    				class="form-control form-control-sm"
-                   				required />
+                   				required min="1" max="9999" step="1" oninput="validateInteger(this,10)" />
             				<div class="invalid-feedback">Please enter No. for <span th:text="${scheme.schemeName}"></span>.</div>
         			</div>
 
@@ -99,7 +113,7 @@
                    				th:id="'scheme' + ${scheme.schemeId} + 'Area'"
                   	 			th:name="'scheme[' + ${scheme.schemeId} + '].area'"
                    				class="form-control form-control-sm"
-                   				required />
+                   				required oninput="validateDecimal(this, 20, 4)" />
             				<div class="invalid-feedback">Please enter Area for <span th:text="${scheme.schemeName}"></span>.</div>
         				</div>
     				</div>
@@ -114,20 +128,20 @@
 				</div>
 				<div class="row mb-3">
                     <div class="col-md-3">
-                    <label>Total no. of other watershed projects:</label><span class="required">*</span>
+                    <label>Total no. of other watershed projects:</label>
                     </div>
                     <div class="col-md-5">
-                    <input type="text" id="totalNoOtherProj" name="totalNoOtherProj" class="form-control form-control-sm" required />
+                    <input type="text" id="scheme7No" name="scheme7No" class="form-control form-control-sm" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g,'');"/>
                     <div class="invalid-feedback">Please enter area in number.</div>
                     </div>
                 </div>	
                 
                 <div class="row mb-3">
                     <div class="col-md-3">
-                    <label>Area covered under these projects(in ha.)</label><span class="required">*</span>
+                    <label>Area covered under these projects(in ha.)</label>
                     </div>
                     <div class="col-md-5">
-                    <input type="text" id="areaCovered" name="areaCovered" class="form-control form-control-sm" required />
+                    <input type="text" id="scheme7Area" name="scheme7Area" class="form-control form-control-sm" min="0" step="0.01" oninput="validateDecimal(this, 2)"/>
                     <div class="invalid-feedback">Please enter area in hectares.</div>
                     </div>
                 </div>	
@@ -150,21 +164,115 @@
 document.getElementById("district").addEventListener("change", function() {
     var dcode = this.value;
     if (dcode) {
-        fetch('/districtStats/' + dcode)   // adjust prefix if needed
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP error " + response.status);
-                }
-                return response.json();   // parse JSON directly
-            })
+        fetch('/districtStats/' + dcode)
+            .then(response => response.json())
             .then(data => {
-                console.log("Received JSON:", data); // debug
                 document.getElementById("totalMw").value = data.totalMw || "";
-                document.getElementById("totalMwArea").value = data.totalMwArea || "";
+
+                var mwSelect = document.getElementById("mw");
+                mwSelect.innerHTML = '<option value="">--Select Micro-Watershed--</option>';
+                if (data.microWatersheds) {
+                    data.microWatersheds.forEach(function(mw) {
+                        var opt = document.createElement("option");
+                        opt.value = mw.mwId;
+                        opt.text = mw.mwName;
+                        mwSelect.appendChild(opt);
+                    });
+                }
             })
             .catch(err => console.error("Error fetching district stats:", err));
     }
 });
+
+
+document.getElementById("mw").addEventListener("change", function() {
+    var mwId = this.value;
+    if (mwId) {
+        fetch('/microWatershedArea/' + mwId)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("totalMwArea").value = data.area || "";
+            })
+            .catch(err => console.error("Error fetching micro-watershed area:", err));
+    } else {
+        document.getElementById("totalMwArea").value = "";
+    }
+});
+
+document.getElementById("institutionForm").addEventListener("submit", function(e) {
+    // Collect all inputs/selects marked required
+    var requiredFields = this.querySelectorAll("input[required], select[required]");
+    var invalidFields = [];
+
+    requiredFields.forEach(function(field) {
+        if (!field.value || field.value.trim() === "") {
+            invalidFields.push(field);
+        }
+    });
+
+    if (invalidFields.length > 0) {
+        e.preventDefault(); // stop form submission
+
+        // Build a message listing missing fields
+        var messages = invalidFields.map(function(f) {
+            var label = f.closest(".row").querySelector("label, span").innerText;
+            return "- " + label;
+        });
+
+        alert("Please fill the following required fields:\n\n" + messages.join("\n"));
+
+        // Optionally focus the first invalid field
+        invalidFields[0].focus();
+    }
+});
+
+
+function validateInteger(input, maxDigits) {
+    // allow only digits
+    input.value = input.value.replace(/[^0-9]/g, '');
+    if (input.value.length > maxDigits) {
+        input.value = input.value.slice(0, maxDigits);
+        input.setCustomValidity("Maximum " + maxDigits + " digits allowed.");
+    } else {
+        input.setCustomValidity("");
+    }
+}
+
+function validateDecimal(input, maxIntDigits, maxFractionDigits) {
+    // allow only digits and one decimal point
+    input.value = input.value.replace(/[^0-9.]/g, '');
+    let parts = input.value.split('.');
+
+    // if more than one '.', keep only the first
+    if (parts.length > 2) {
+        input.value = parts[0] + '.' + parts[1];
+        parts = input.value.split('.');
+    }
+
+    // enforce max digits before decimal
+    if (parts[0].length > maxIntDigits) {
+        parts[0] = parts[0].slice(0, maxIntDigits);
+    }
+
+    // enforce max digits after decimal
+    if (parts[1] && parts[1].length > maxFractionDigits) {
+        parts[1] = parts[1].slice(0, maxFractionDigits);
+    }
+
+    // rebuild value
+    input.value = parts.join('.');
+
+    // final regex check
+    let regex = new RegExp("^\\d{0," + maxIntDigits + "}(\\.\\d{0," + maxFractionDigits + "})?$");
+    if (!regex.test(input.value)) {
+        input.setCustomValidity(
+            "Enter a number with up to " + maxIntDigits +
+            " digits before decimal and " + maxFractionDigits + " digits after."
+        );
+    } else {
+        input.setCustomValidity("");
+    }
+}
 </script>
 
 
