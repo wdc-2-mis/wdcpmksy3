@@ -23,7 +23,9 @@
 	        const dcode = this.value;
 	        const project = document.getElementById("project");
 	        const micro = document.getElementById("microWatershed");
+			const pprId = document.getElementById("pprId");
 	        project.value = "";
+			pprId.value = "";	
 	        micro.innerHTML = "<option value=''>--Select--</option>";
 	        if (dcode === "") {
 	            return;
@@ -31,7 +33,8 @@
 	        fetch("/getProjAndMicroWaterDetailsByDcode?dcode=" + dcode)
 	            .then(response => response.json())
 	            .then(data => {
-	                project.value = data.project;
+					pprId.value = data.pprId ?? "";
+	                project.value = data.project ?? "";
 	                data.microWatershedList.forEach(function (item) {
 	                    let option = document.createElement("option");
 	                    option.value = item.mwId;
@@ -49,12 +52,13 @@
 		    const microWatershed = document.getElementById("microWatershed");
 		    microWatershed.addEventListener("change", function () {
 		        const mwId = this.value;
+				alert('check '+mwId);
 		        const microWatershedCode = document.getElementById("microWatershedCode");
 		        microWatershedCode.value="";
 		        if (!mwId) {
 		            return;
 		        }
-		        fetch(contextPath + "getMicroWatershedCodeByMwId?mwId=" + mwId)
+		        fetch("/getMicroWatershedCodeByMwId?mwId=" + mwId)
 				.then(response => response.text())
 				    .then(data => {
 				    	microWatershedCode.value = data;
@@ -111,91 +115,55 @@
 	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
-	    // Select all forms on the page
-	    const forms = document.querySelectorAll("form");
+		document.getElementById("projectForm").addEventListener("submit", function(e){
+		    const district = document.getElementById("district").value;
+		    const project = document.getElementById("project").value.trim();
+		    const microWatershed = document.getElementById("microWatershed").value;
+		    const treatedArea = document.querySelector("[name='treatedProjectArea']").value;
+		    const proposedCost = document.querySelector("[name='proposedCost']").value;
+		    const projectType = document.querySelector("input[name='projectType']:checked");
+		    if(district === ""){
+		        alert("Please select District.");
+		        e.preventDefault();
+		        return;
+		    }
+		    if(project === ""){
+		        alert("Project Name is missing.");
+		        e.preventDefault();
+		        return;
+		    }
+		    if(microWatershed === ""){
+		        alert("Please select Micro-watershed.");
+		        e.preventDefault();
+		        return;
+		    }
+		    if(treatedArea === ""){
+		        alert("Please enter Proposed Project Area.");
+		        e.preventDefault();
+		        return;
+		    }
+		    if(Number(treatedArea) <= 0){
+		        alert("Project Area must be greater than zero.");
+		        e.preventDefault();
+		        return;
+		    }
+		    if(!projectType){
+		        alert("Please select Project Type.");
+		        e.preventDefault();
+		        return;
+		    }
+		    if(proposedCost === ""){
+		        alert("Please enter Proposed Cost.");
+		        e.preventDefault();
+		        return;
+		    }
+		    if(Number(proposedCost) <= 0){
+		        alert("Proposed Cost must be greater than zero.");
+		        e.preventDefault();
+		        return;
+		    }
+		});
 
-	    forms.forEach(form => {
-	        form.addEventListener("submit", function (event) {
-	            let valid = true;
-	            let messages = [];
-
-	            // Member type (radio)
-	            const memberRadios = form.querySelectorAll("input[name='memberType']");
-	            if (memberRadios.length && ![...memberRadios].some(r => r.checked)) {
-	                valid = false;
-	                messages.push("Please select a Member Type.");
-	            }
-
-	            // First name
-	            const firstName = form.querySelector("input[name='firstName']");
-	            if (firstName && !firstName.value.trim()) {
-	                valid = false;
-	                messages.push("First Name is required.");
-	            }
-
-	            // Last name
-	            const lastName = form.querySelector("input[name='lastName']");
-	            if (lastName && !lastName.value.trim()) {
-	                valid = false;
-	                messages.push("Last Name is required.");
-	            }
-
-	            // Designation
-	            const designation = form.querySelector("select[name='designation']");
-	            if (designation && !designation.value) {
-	                valid = false;
-	                messages.push("Please select a Designation.");
-	            }
-
-	            // Qualification
-	            const qualification = form.querySelector("select[name='qualification']");
-	            if (qualification && !qualification.value) {
-	                valid = false;
-	                messages.push("Please select a Qualification.");
-	            }
-
-	            // Appointment date
-	            const appointmentDate = form.querySelector("input[name='appointmentDate']");
-	            if (appointmentDate && !appointmentDate.value) {
-	                valid = false;
-	                messages.push("Appointment Date is required.");
-	            }
-
-	            // Joining type (radio)
-	            const joiningRadios = form.querySelectorAll("input[name='joiningType']");
-	            if (joiningRadios.length && ![...joiningRadios].some(r => r.checked)) {
-	                valid = false;
-	                messages.push("Please select Nature of Appointment.");
-	            }
-
-	            // Tenure
-	            const tenure = form.querySelector("input[name='tenure']");
-	            if (tenure && !tenure.value.trim()) {
-	                valid = false;
-	                messages.push("Tenure Period is required.");
-	            }
-
-	            // Phone
-	            const phone = form.querySelector("input[name='phone']");
-	            if (phone && !phone.value.trim()) {
-	                valid = false;
-	                messages.push("Phone number is required.");
-	            }
-
-	            // Email
-	            const email = form.querySelector("input[name='email']");
-	            if (email && !email.value.trim()) {
-	                valid = false;
-	                messages.push("Email is required.");
-	            }
-
-	            // If invalid, stop submission and show alert
-	            if (!valid) {
-	                event.preventDefault();
-	                alert(messages.join("\n"));
-	            }
-	        });
-	    });
 	});
 		
 </script>
@@ -216,8 +184,9 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 	        <div class="card-body">
-	            <form th:action="@{/savePrioritizedListOfProposedProject}" method="post">
-	                <!-- Member Details -->
+	            <form th:action="@{/savePrioritizedListOfProposedProject}" method="post" id="projectForm">
+	                
+					<input type="hidden" id="pprId" name="pprId">
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> District</label>
 						<div class="col-md-5">
@@ -280,7 +249,7 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Weightage under the Criteria </label>
 	                    <div class="col-md-4">
-	                         <a></a>
+	                         <a>Link</a>
 	                    </div>
 	                </div>
 
@@ -321,7 +290,7 @@
 		            <td th:text="${data.treatedArea}"></td>
 		            <td th:text="${data.mProjectType.projectType}"></td>
 		            <td th:text="${data.proposedCost}"></td>
-		            <td> <a></a></td>
+		            <td> <a>Link</a></td>
 
 		            <td>
 						<div class="d-flex align-items-center gap-2">
@@ -469,48 +438,6 @@
 				</div>
 			</div>
 		</div>
-		<table class="table table-bordered table-striped table-hover">
-				        <h4>
-				            <b><center>List of Complete SLNA Details</center></b>
-				        </h4>
-				        <br/>
-				        <thead class="table-primary">
-				        <tr>
-				            <th>S.No.</th>
-				            <th>Member Details</th>
-				            <th>Name</th>
-				            <th>Designation</th>
-				            <th>Qualification</th>
-				            <th>Appointment Date</th>
-				            <th>Nature of Appointment</th>
-				            <th>Tenure</th>
-				            <th>Phone</th>
-				            <th>Email</th>
-				            <th>Fax</th>
-				        </tr>
-				        </thead>
-				        <tbody>
-				        <tr th:each="data, stat : ${detailsOfSLNAComList}">
-				           <td th:text="${stat.count}"></td>
-				            <td th:text="${data.member.memberType}"></td>
-				            <td th:text="${data.firstName+' '+data.lastName}"></td>
-				            <td th:text="${data.designation.designationName}"></td>
-				            <td th:text="${data.qualification.qualificationName}"></td>
-				            <td th:text="${data.appointmentDate}"></td>
-				            <td th:text="${data.joiningType == 'F' ? 'Full Time' : 'Part Time'}"></td>
-				            <td th:text="${data.tenurePeriodYr}"></td>
-				            <td th:text="${data.phoneNo}"></td>
-				            <td th:text="${data.emailId}"></td>
-				            <td th:text="${data.fax}"></td>
-				           
-				        </tr>
-				        <tr th:if="${#lists.isEmpty(detailsOfSLNAComList)}">
-				            <td colspan="12" class="text-center text-danger">
-				                No records found.
-				            </td>
-				        </tr>
-				        </tbody>
-				    </table>
 	</div>
 </body>
 </html>

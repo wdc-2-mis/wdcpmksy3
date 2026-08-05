@@ -40,7 +40,7 @@ public class PprProposedProject {
     private BigDecimal proposedCost;
 
     @Column(name = "status", length = 1)
-    private String status;
+    private Character status;
 
     @Column(name = "request_ip", length = 20)
     private String requestIp;
@@ -113,11 +113,11 @@ public class PprProposedProject {
 		this.proposedCost = proposedCost;
 	}
 
-	public String getStatus() {
+	public Character getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Character status) {
 		this.status = status;
 	}
 

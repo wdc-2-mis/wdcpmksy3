@@ -33,7 +33,7 @@ public class ProjectType {
 
     @Column(name = "updated_date")
     private LocalDate updatedDate;
-
+    
     @PrePersist
     protected void onCreate() {
         if (createdDate == null) {
@@ -100,6 +100,11 @@ public class ProjectType {
 
 	public void setUpdatedDate(LocalDate updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public ProjectType() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
     
 }

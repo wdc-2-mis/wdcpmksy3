@@ -25,11 +25,17 @@ public class Criteria {
     @Column(name = "maximum_score")
     private Integer maximumScore;
 
-    @Column(name = "maximum_range")
-    private Integer maximumRange;
-
-    @Column(name = "minimum_range")
-    private Integer minimumRange;
+    @Column(name = "range_one", length = 100)
+    private String rangeOne;
+    
+    @Column(name = "range_two", length = 100)
+    private String rangeTwo;
+    
+    @Column(name = "range_three", length = 100)
+    private String rangeThree;
+    
+    @Column(name = "range_four", length = 100)
+    private String rangeFour;
 
     @Column(name = "request_ip", length = 20)
     private String requestIp;
@@ -85,23 +91,39 @@ public class Criteria {
         this.maximumScore = maximumScore;
     }
 
-    public Integer getMaximumRange() {
-        return maximumRange;
-    }
+    public String getRangeOne() {
+		return rangeOne;
+	}
 
-    public void setMaximumRange(Integer maximumRange) {
-        this.maximumRange = maximumRange;
-    }
+	public void setRangeOne(String rangeOne) {
+		this.rangeOne = rangeOne;
+	}
 
-    public Integer getMinimumRange() {
-        return minimumRange;
-    }
+	public String getRangeTwo() {
+		return rangeTwo;
+	}
 
-    public void setMinimumRange(Integer minimumRange) {
-        this.minimumRange = minimumRange;
-    }
+	public void setRangeTwo(String rangeTwo) {
+		this.rangeTwo = rangeTwo;
+	}
 
-    public String getRequestIp() {
+	public String getRangeThree() {
+		return rangeThree;
+	}
+
+	public void setRangeThree(String rangeThree) {
+		this.rangeThree = rangeThree;
+	}
+
+	public String getRangeFour() {
+		return rangeFour;
+	}
+
+	public void setRangeFour(String rangeFour) {
+		this.rangeFour = rangeFour;
+	}
+
+	public String getRequestIp() {
         return requestIp;
     }
 
