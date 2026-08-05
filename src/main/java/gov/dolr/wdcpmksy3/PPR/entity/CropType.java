@@ -2,6 +2,8 @@ package gov.dolr.wdcpmksy3.PPR.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -33,6 +35,9 @@ public class CropType {
 
     @Column(name = "updated_date")
     private LocalDate updatedDate;
+    
+    @OneToMany(mappedBy = "cropType")
+    private List<PprAgroCrop> cropList = new ArrayList<PprAgroCrop>();
 
 	public Integer getCropTypeId() {
 		return cropTypeId;
@@ -88,6 +93,14 @@ public class CropType {
 
 	public void setUpdatedDate(LocalDate updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public List<PprAgroCrop> getCropList() {
+		return cropList;
+	}
+
+	public void setCropList(List<PprAgroCrop> cropList) {
+		this.cropList = cropList;
 	}
     
     

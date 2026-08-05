@@ -1,6 +1,8 @@
 package gov.dolr.wdcpmksy3.PPR.entity;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,6 +58,9 @@ public class MPpr {
 
     @OneToMany(mappedBy = "ppr")
     private List<PprMicroWatershed> microWatersheds;
+    
+    @OneToMany(mappedBy = "ppr", cascade = CascadeType.ALL,  orphanRemoval = true)
+    private List<PprAgroClimate> agroClimateList = new ArrayList<PprAgroClimate>();
     
     public String getMicroIdsCsv() {
         if (microWatersheds == null || microWatersheds.isEmpty()) {
@@ -162,7 +167,16 @@ public class MPpr {
 	public void setMicroWatersheds(List<PprMicroWatershed> microWatersheds) {
 		this.microWatersheds = microWatersheds;
 	}
+
+	public List<PprAgroClimate> getAgroClimateList() {
+		return agroClimateList;
+	}
+
+	public void setAgroClimateList(List<PprAgroClimate> agroClimateList) {
+		this.agroClimateList = agroClimateList;
+	}
     
+	
     
 }
 

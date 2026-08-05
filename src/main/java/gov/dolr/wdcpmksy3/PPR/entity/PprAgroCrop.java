@@ -1,24 +1,30 @@
 package gov.dolr.wdcpmksy3.PPR.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.persistence.*;
 
-
 @Entity
-@Table(name = "m_soil_type")
-public class SoilType {
+@Table(name = "ppr_agro_crop")
+public class PprAgroCrop {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "soil_type_id")
-    private Integer soilTypeId;
+    @Column(name = "ppr_crop_id")
+    private Integer pprCropId;
 
-    @Column(name = "soil_name", length = 50)
-    private String soilName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ppr_agro_id", nullable = false)
+    private PprAgroClimate agroClimate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crop_type_id", nullable = false)
+    private CropType cropType;
+
+    @Column(name = "area", precision = 20, scale = 4)
+    private BigDecimal area;
 
     @Column(name = "request_ip", length = 20)
     private String requestIp;
@@ -34,24 +40,37 @@ public class SoilType {
 
     @Column(name = "updated_date")
     private LocalDate updatedDate;
-    
-    @OneToMany(mappedBy = "soilType")
-    private List<PprAgroSoil> soilList = new ArrayList<PprAgroSoil>();
 
-	public Integer getSoilTypeId() {
-		return soilTypeId;
+	public Integer getPprCropId() {
+		return pprCropId;
 	}
 
-	public void setSoilTypeId(Integer soilTypeId) {
-		this.soilTypeId = soilTypeId;
+	public void setPprCropId(Integer pprCropId) {
+		this.pprCropId = pprCropId;
 	}
 
-	public String getSoilName() {
-		return soilName;
+	public PprAgroClimate getAgroClimate() {
+		return agroClimate;
 	}
 
-	public void setSoilName(String soilName) {
-		this.soilName = soilName;
+	public void setAgroClimate(PprAgroClimate agroClimate) {
+		this.agroClimate = agroClimate;
+	}
+
+	public CropType getCropType() {
+		return cropType;
+	}
+
+	public void setCropType(CropType cropType) {
+		this.cropType = cropType;
+	}
+
+	public BigDecimal getArea() {
+		return area;
+	}
+
+	public void setArea(BigDecimal area) {
+		this.area = area;
 	}
 
 	public String getRequestIp() {
@@ -94,17 +113,5 @@ public class SoilType {
 		this.updatedDate = updatedDate;
 	}
 
-	public List<PprAgroSoil> getSoilList() {
-		return soilList;
-	}
-
-	public void setSoilList(List<PprAgroSoil> soilList) {
-		this.soilList = soilList;
-	}
-    
-    
-    
-    
-    
     
 }

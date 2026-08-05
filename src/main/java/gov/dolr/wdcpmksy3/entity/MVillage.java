@@ -1,10 +1,11 @@
 package gov.dolr.wdcpmksy3.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.*;
-
+import gov.dolr.wdcpmksy3.PPR.entity.PprAgroClimate;
 import gov.dolr.wdcpmksy3.PPR.entity.PprVillage;
 
 @Entity
@@ -41,6 +42,9 @@ public class MVillage {
 
     @OneToMany(mappedBy = "village")
     private List<PprVillage> pprVillages;
+    
+    @OneToMany(mappedBy = "village")
+    private List<PprAgroClimate> agroClimateList = new ArrayList<PprAgroClimate>();
 
     // Getters and Setters
 
@@ -116,4 +120,19 @@ public class MVillage {
     public void setPprVillages(List<PprVillage> pprVillages) {
         this.pprVillages = pprVillages;
     }
+
+	public List<PprAgroClimate> getAgroClimateList() {
+		return agroClimateList;
+	}
+
+	public void setAgroClimateList(List<PprAgroClimate> agroClimateList) {
+		this.agroClimateList = agroClimateList;
+	}
+    
+    
+    
+    
+    
+    
+    
 }
