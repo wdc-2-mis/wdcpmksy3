@@ -40,7 +40,16 @@ public class MDistrict {
     
     @Column(name = "district_codelgd")
     private Integer districtCodeLgd;
-
+    
+    @Column(name = "wdcpmksy")
+    private Boolean wdcpmksy;
+    
+    @Column(name = "wdcpmksy2")
+    private Boolean wdcpmksy2;
+    
+    @Column(name = "wdcpmksy3")
+    private Boolean wdcpmksy3;
+    
     @OneToMany(mappedBy = "district")
     private List<MPpr> pprs;
     
@@ -90,6 +99,29 @@ public class MDistrict {
 
 	public void setDistrictCodeLgd(Integer districtCodeLgd) {
 		this.districtCodeLgd = districtCodeLgd;
+	}
+	public Boolean getWdcpmksy() {
+		return wdcpmksy;
+	}
+
+	public void setWdcpmksy(Boolean wdcpmksy) {
+		this.wdcpmksy = wdcpmksy;
+	}
+
+	public Boolean getWdcpmksy2() {
+		return wdcpmksy2;
+	}
+
+	public void setWdcpmksy2(Boolean wdcpmksy2) {
+		this.wdcpmksy2 = wdcpmksy2;
+	}
+
+	public Boolean getWdcpmksy3() {
+		return wdcpmksy3;
+	}
+
+	public void setWdcpmksy3(Boolean wdcpmksy3) {
+		this.wdcpmksy3 = wdcpmksy3;
 	}
 
 	public List<MPpr> getPprs() {

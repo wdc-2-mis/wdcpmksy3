@@ -34,49 +34,72 @@
 <script>
 	
 	document.addEventListener("DOMContentLoaded", function () {
-		
-		
-		
-	   document.getElementById("district").addEventListener("change", function () {
-		
-	        let districtId = this.value;
-			let project = document.getElementById("project");
-			console.log("District Changed");;
-			project.innerHTML = '<option value="">--Select Project--</option>';
 
-					    if (districtId === "") {
-					        return;
-					    }
+			document.getElementById("district").addEventListener("change", function () {
 
-						fetch('/getProjectByDistrictPPR8?dcode=' + districtId)
-								.then(response => response.json())
-								 .then(data => {
+			    let districtId = this.value;
+			    let project = document.getElementById("project");
 
-								            data.forEach(function(item) {
+			    // Clear existing options
+			    project.innerHTML = '<option value="">--Select Project--</option>';
 
-								                let option = document.createElement("option");
-								                option.value = item.id;          // PPR ID
-								                option.textContent = item.name;  // Project Name
+			    if (districtId === "") {
+			        return;
+			    }
 
-								                project.appendChild(option);
-								            });
+			    fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
+			        .then(response => response.json())
+			        .then(data => {
 
-								        })
-								        .catch(error => {
-								            console.error("Error:", error);
-								        });
+			            data.forEach(function(item) {
 
+			                let option = document.createElement("option");
+			                option.value = item.id;          // PPR ID
+			                option.textContent = item.name;  // Project Name
 
-	    });
+			                project.appendChild(option);
+			            });
 
-	
+			        })
+			        .catch(error => {
+			            console.error("Error:", error);
+			        });
 
-	
-	
+			});
+			
+			document.getElementById("project").addEventListener("change", function () {
 
+			    let projectId = this.value;
+			    let village = document.getElementById("block");
 
+			    village.innerHTML =
+			        '<option value="">--Select Block--</option>';
 
-});
+			    if(projectId===""){
+			        return;
+			    }
+
+			    fetch("/getBlockByProjectPPR8?pprId="+projectId)
+			        .then(res=>res.json())
+			        .then(data=>{
+
+			            data.forEach(function(item){
+
+			                let option=document.createElement("option");
+
+			                option.value=item.id;
+			                option.text=item.name;
+
+			                village.appendChild(option);
+
+			            });
+
+			        })
+			        .catch(err=>console.log(err));
+
+			});
+
+		});
 </script>
 
 </head>
@@ -244,18 +267,8 @@ Name of Block
 
 <div class="col-md-4">
 
-<select class="form-control"
-        id="block"
-        name="bcode">
-
-<option value="">--Select Block--</option>
-
-<option th:each="b:${blockList}"
-        th:value="${b.bcode}"
-        th:text="${b.blockName}">
-
-</option>
-
+<select class="form-control" id="block"  name="bcode">
+	<option value="">--Select Block--</option>
 </select>
 
 </div>

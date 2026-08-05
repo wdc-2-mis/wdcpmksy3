@@ -1,7 +1,9 @@
 package gov.dolr.wdcpmksy3.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.entity.MBlock;
+import gov.dolr.wdcpmksy3.entity.MVillage;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
 import gov.dolr.wdcpmksy3.repository.MBlockRepository;
 import gov.dolr.wdcpmksy3.repository.PprProposedAreaRepository;
@@ -27,7 +30,7 @@ public class PrelimnaryPPR8AController {
     private DistrictService districtService;
 	
 	@Autowired
-    private MPprRepository mpprrep;
+    private PprProposedAreaRepository pprprep;
 	
 	@Autowired
 	private MPprRepository mpprRepository;
@@ -57,28 +60,26 @@ public class PrelimnaryPPR8AController {
     }
 	
 	
+	
+	@GetMapping("/getBlockByProjectPPR8")
 	@ResponseBody
-	@GetMapping("/getProjectByDistrictPPR8")
-	public List<MPpr> getProjectByDistrictPPR8(Integer dcode){
-	    return mpprRepository.findByDistrictDcode(dcode);
+	public List<Map<String,Object>> getBlocksByProject(@RequestParam Integer pprId){
+
+	    List<MBlock> block=blockRepository.getBlocksByProject(pprId);
+
+	    return block.stream().map(b->{
+
+	        Map<String,Object> map=new HashMap<>();
+
+	        map.put("id",b.getBcode());
+	        map.put("name",b.getBlockName());
+
+	        return map;
+
+	    }).toList();
+
 	}
-	
-	
-	
-	/*
-	 * @ResponseBody
-	 * 
-	 * @GetMapping("/getBlockByProjectPPR8") public List<MBlock>
-	 * getBlockByProjectPPR8(Integer pprId){
-	 * 
-	 * List<PprProposedArea> areas =
-	 * PprProposedAreaRepository.findByPprPprId(pprId);
-	 * 
-	 * List<Integer> blockCodes = areas.stream() .map(area ->
-	 * area.getBlock().getBcode()) .toList();
-	 * 
-	 * return blockRepository.findByBcodeIn(blockCodes); }
-	 */
+	 
 	
 	
 }
