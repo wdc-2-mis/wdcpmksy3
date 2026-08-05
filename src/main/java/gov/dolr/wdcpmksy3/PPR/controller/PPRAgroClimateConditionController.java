@@ -1,6 +1,8 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,12 +62,30 @@ public class PPRAgroClimateConditionController {
 		//String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
-
+		
+		List<Object[]> agroList = agcrepo.getPprAgroClimateList(stcode);
         if(userid==null){
 
             return "redirect:/login";
         }
-       // model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+        List<Object[]> finalList = new ArrayList<>();
+        int srNo = 1;
+        Integer previousId = null;
+        for (Object[] row : agroList) {
+
+            Integer currentId = ((Number) row[0]).intValue();
+            // Create a new array with one extra column for serial number
+            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+            if (previousId == null || !previousId.equals(currentId)) {
+                newRow[row.length] = srNo++;   // Serial No.
+            } else {
+                newRow[row.length] = "";       // Blank for duplicate rows
+            }
+            finalList.add(newRow);
+            previousId = currentId;
+        }
+
+        model.addAttribute("agroClimateList", finalList);
         model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
         model.addAttribute("soilTypeList", soilser.getAllSoilTypeDetails());
         model.addAttribute("cropTypeList", cropser.getAllCropTypeDetails());
