@@ -100,6 +100,100 @@
 			});
 
 		});
+		
+		
+		
+		document.addEventListener("DOMContentLoaded", function () {
+
+		    const form = document.getElementById("ppr8Form");
+
+		    form.addEventListener("submit", function (e) {
+
+		        const district = document.getElementById("district");
+		        const project = document.getElementById("project");
+		        const block = document.getElementById("block");
+
+		        const scheme = document.querySelector('input[name="scheme"]:checked');
+
+		        const projSanctionedNo = document.getElementsByName("projSanctionedNo")[0];
+		        const sanctionArea = document.getElementsByName("projSanctionedArea")[0];
+		        const netArea = document.getElementsByName("netArea")[0];
+		        const proposedArea = document.getElementsByName("proposedArea")[0];
+		        const otherArea = document.getElementsByName("proposedAreaOthers")[0];
+		        const balanceArea = document.getElementsByName("netBalArea")[0];
+
+		        if (district.value === "") {
+		            alert("Please select District.");
+		            district.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (project.value === "") {
+		            alert("Please select Project.");
+		            project.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (block.value === "") {
+		            alert("Please select Block.");
+		            block.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (!scheme) {
+		            alert("Please select Scheme.");
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (projSanctionedNo.value.trim() === "") {
+		            alert("Please enter No. of Pre WDC Projects.");
+		            projSanctionedNo.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (sanctionArea.value.trim() === "") {
+		            alert("Please enter Sanctioned Area.");
+		            sanctionArea.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (netArea.value.trim() === "") {
+		            alert("Please enter Net Area.");
+		            netArea.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (proposedArea.value.trim() === "") {
+		            alert("Please enter Proposed Area.");
+		            proposedArea.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (otherArea.value.trim() === "") {
+		            alert("Please enter Other DoLR Area.");
+		            otherArea.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (balanceArea.value.trim() === "") {
+		            alert("Please enter Net Balance Area.");
+		            balanceArea.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		    });
+
+		});
 </script>
 
 </head>
@@ -165,7 +259,7 @@ Details of Previously identified DPAP/DDP/IWDP areas proposed users
 </h4>
 
 <form id="ppr8Form"
-      th:action="@{/savePreliminaryPPR8}"
+      th:action="@{/saveDraftPPR8}"
       method="post">
 
 <!-- ========================= ROW 1 ========================= -->
@@ -246,7 +340,7 @@ Name of Project
 
 	<select class="form-control"
 	        id="project"
-	        name="project">
+	        name= "pprId">
 
 	    <option value="">--Select Project--</option>
 
@@ -267,7 +361,7 @@ Name of Block
 
 <div class="col-md-4">
 
-<select class="form-control" id="block"  name="bcode">
+<select class="form-control" id="block"  name= "bcode">
 	<option value="">--Select Block--</option>
 </select>
 
@@ -293,7 +387,7 @@ Name of Block
 
             <input class="form-check-input"
                    type="radio"
-                   name="schemeType"
+                   name= "scheme"
                    id="dpap"
                    value="DPAP">
 
@@ -307,7 +401,7 @@ Name of Block
 
             <input class="form-check-input"
                    type="radio"
-                   name="schemeType"
+                   name= "scheme"
                    id="ddp"
                    value="DDP">
 
@@ -321,7 +415,7 @@ Name of Block
 
             <input class="form-check-input"
                    type="radio"
-                   name="schemeType"
+                   name="scheme"
                    id="iwdp"
                    value="IWDP">
 
@@ -349,7 +443,7 @@ Name of Block
     <div class="col-md-7">
         <input type="number"
                class="form-control"
-               name="preProjects">
+               name="projSanctionedNo">
     </div>
 
 </div>
@@ -362,9 +456,10 @@ Name of Block
 	    </div>
 
 	    <div class="col-md-7">
-	        <input type="text"
-	               class="form-control"
-	               name="sanctionArea">
+			<input type="text"
+			       id="sanctionArea"
+			       class="form-control"
+			       name="projSanctionedArea">
 	    </div>
 
 	</div>
@@ -393,9 +488,10 @@ Name of Block
     </div>
 
     <div class="col-md-7">
-        <input type="text"
-               class="form-control"
-               name="proposedArea">
+		<input type="text"
+		       id="proposedArea"
+		       class="form-control"
+		       name="proposedArea">
     </div>
 
 </div>
@@ -409,9 +505,10 @@ Name of Block
     </div>
 
     <div class="col-md-7">
-        <input type="text"
-               class="form-control"
-               name="otherArea">
+		<input type="text"
+		       id="otherArea"
+		       class="form-control"
+		       name="proposedAreaOthers">
     </div>
 
 </div>
@@ -424,9 +521,10 @@ Name of Block
     </div>
 
     <div class="col-md-7">
-        <input type="text"
-               class="form-control"
-               name="balanceArea">
+		<input type="text"
+		       id="balanceArea"
+		       class="form-control"
+		       name="netBalArea">
     </div>
 
 </div>
@@ -436,9 +534,9 @@ Name of Block
 
 <div class="text-center mt-4">
 
-    <button class="btn btn-warning">
-        <i class="fas fa-save"></i> Save as Draft
-    </button>
+	<button type="submit" class="btn btn-warning">
+	    <i class="fas fa-save"></i> Save as Draft
+	</button>
 
 </div>
 
@@ -506,35 +604,45 @@ Name of Block
         </thead>
 		<tbody>
 
-		<tr>
-		    <td>Rajasthan</td>
-		    <td>Jaipur</td>
-		    <td>PPR-001</td>
-		    <td>Sanganer</td>
-		    <td>DPAP</td>
-		    <td>5</td>
-		    <td>11.35</td>
-		    <td>5.22</td>
-		    <td>4.33</td>
-		    <td>1.33</td>
-		    <td>0.47</td>
 
-			<td class="text-center" style="min-width:120px; white-space:nowrap;">
+			<tr th:each="area : ${ppr8List}">
 
-			    <button type="button" class="btn btn-danger btn-sm me-1">
-			        <i class="fa fa-trash"></i>
-			    </button>
+			    <td th:text="${area.ppr.district.state.stateName}"></td>
 
-			    <button type="button" class="btn btn-primary btn-sm me-1">
-			        <i class="fa fa-edit"></i>
-			    </button>
+			    <td th:text="${area.ppr.district.distName}"></td>
 
-			    <button type="button" class="btn btn-success btn-sm">
-			        <i class="fa fa-check"></i>
-			    </button>
+			    <td th:text="${area.ppr.projectName}"></td>
 
-			</td>
-		</tr>
+			    <td th:text="${area.block.blockName}"></td>
+
+			    <td th:text="${area.scheme.schemeName}"></td>
+
+			    <td th:text="${area.projSanctionedNo}"></td>
+
+			    <td th:text="${area.projSanctionedArea}"></td>
+
+			    <td th:text="${area.netArea}"></td>
+
+			    <td th:text="${area.proposedArea}"></td>
+
+			    <td th:text="${area.proposedAreaOthers}"></td>
+
+			    <td th:text="${area.netBalArea}"></td>
+
+			    <td>
+			        <a th:href="@{/editDraftPPR8(id=${area.pprProposedAreaId})}"
+			           class="btn btn-warning btn-sm">
+			            Edit
+			        </a>
+
+			        <a th:href="@{/deleteDraftPPR8(id=${area.pprProposedAreaId})}"
+			           class="btn btn-danger btn-sm"
+			           onclick="return confirm('Are you sure you want to delete this record?');">
+			            Delete
+			        </a>
+			    </td>
+
+			</tr>
 
 		</tbody>
         
