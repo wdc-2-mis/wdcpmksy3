@@ -29,10 +29,6 @@ public class PprProposedProject {
     @JoinColumn(name = "project_type_id", nullable = false)
     private ProjectType projectType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "criteria_detail_id", nullable = false)
-    private CriteriaDetails criteriaDetails;
-
     @Column(name = "treated_area", precision = 20, scale = 4)
     private BigDecimal treatedArea;
 
@@ -87,14 +83,6 @@ public class PprProposedProject {
 
 	public void setProjectType(ProjectType projectType) {
 		this.projectType = projectType;
-	}
-
-	public CriteriaDetails getCriteriaDetails() {
-		return criteriaDetails;
-	}
-
-	public void setCriteriaDetails(CriteriaDetails criteriaDetails) {
-		this.criteriaDetails = criteriaDetails;
 	}
 
 	public BigDecimal getTreatedArea() {

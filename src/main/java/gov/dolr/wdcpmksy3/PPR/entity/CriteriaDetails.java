@@ -29,6 +29,10 @@ public class CriteriaDetails {
 
     @Column(name = "remarks", length = 500)
     private String remarks;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ppr_proposed_project_id", nullable = false)
+    private PprProposedProject proposedProject;
 
     @Column(name = "status", length = 1)
     private String status;
@@ -92,7 +96,15 @@ public class CriteriaDetails {
         this.remarks = remarks;
     }
 
-    public String getStatus() {
+    public PprProposedProject getProposedProject() {
+		return proposedProject;
+	}
+
+	public void setProposedProject(PprProposedProject proposedProject) {
+		this.proposedProject = proposedProject;
+	}
+
+	public String getStatus() {
         return status;
     }
 

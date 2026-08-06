@@ -10,6 +10,7 @@ public class PprProposedProjectDto {
 
     private BigDecimal treatedProjectArea;
     private BigDecimal proposedCost;
+    private String criteriaData;
 
 	public Integer getPprId() {
 		return pprId;
@@ -49,6 +50,14 @@ public class PprProposedProjectDto {
 
 	public void setProposedCost(BigDecimal proposedCost) {
 		this.proposedCost = proposedCost;
+	}
+
+	public String getCriteriaData() {
+		return criteriaData;
+	}
+
+	public void setCriteriaData(String criteriaData) {
+		this.criteriaData = criteriaData;
 	}
 
     

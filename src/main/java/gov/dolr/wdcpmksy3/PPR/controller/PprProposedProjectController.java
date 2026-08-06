@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import gov.dolr.wdcpmksy3.PPR.dto.PprProposedProjectDto;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
+import gov.dolr.wdcpmksy3.PPR.repository.CriteriaRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.service.MicroWatershedService;
@@ -52,8 +53,11 @@ public class PprProposedProjectController {
 	@Autowired
 	private PprProposedProjectService proposedProjectService;
 	
+	@Autowired
+	private CriteriaRepository criteriaRepo;
+	
 	@GetMapping("/pprProposedProjectDetails")
-    public String pprProposedProjectDetails(HttpSession session, Model model) {
+    public String pprProposedProjectDetails(@RequestParam(required = false) Integer dcode, HttpSession session, Model model) {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -62,8 +66,26 @@ public class PprProposedProjectController {
 		if(userid==null){
             return "redirect:/login";
         }
+		if(dcode != null){
+
+	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
+
+	        if(!pprList.isEmpty()){
+
+	            MPpr ppr = pprList.get(0);
+	            model.addAttribute("pprId", ppr.getPprId());
+	            model.addAttribute("selectedDistrict", dcode);
+	            model.addAttribute("detailsOfListOfProposedProject",
+	                    proposedProjectService.getPprProposedProjectList(ppr));
+
+	            model.addAttribute("project", ppr.getProjectName());
+	            model.addAttribute("microWatershedList",
+	                    pprService.getMicroWatershedsByDistrict(dcode));
+	        }
+	    }
 		model.addAttribute("districtList", districtService.getDistrictsByState(stcode));
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
+		model.addAttribute("criteriaList", criteriaRepo.findAll());
 		model.addAttribute("statename", statename);
 		
 		return "prioritizedListOfProposedProject";
@@ -79,10 +101,12 @@ public class PprProposedProjectController {
             response.put("pprId", ppr.getPprId());
             response.put("project", ppr.getProjectName());
             response.put("microWatershedList", pprService.getMicroWatershedsByDistrict(dcode));
+            response.put("savedProjects", proposedProjectService.getPprProposedProjectList(ppr));
         } else {
         	response.put("pprId", null);
             response.put("project", "");
             response.put("microWatershedList", Collections.emptyList());
+            response.put("savedProjects", Collections.emptyList());
         }
         return response;
     }

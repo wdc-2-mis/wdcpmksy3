@@ -1,13 +1,17 @@
 package gov.dolr.wdcpmksy3.PPR.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gov.dolr.wdcpmksy3.PPR.dto.PprProposedProjectDto;
+import gov.dolr.wdcpmksy3.PPR.entity.CriteriaDetails;
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProposedProject;
 import gov.dolr.wdcpmksy3.PPR.repository.CriteriaDetailsRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.CriteriaRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProposedProjectRepository;
@@ -29,28 +33,54 @@ public class PprProposedProjectService {
 
     @Autowired
     private ProjectTypeRepository projectTypeRepository;
-
+    
     @Autowired
-    private CriteriaDetailsRepository criteriaDetailsRepository;
+    private CriteriaDetailsRepository criteriaDetailsRepo;
+    
+    @Autowired
+    private CriteriaRepository criteriaRepo;
 
     public void save(PprProposedProjectDto form, Character status, String userId, String ipAddress) {
         PprProposedProject entity = new PprProposedProject();
         entity.setPpr(pprRepository.findById(form.getPprId()).orElseThrow(() -> new RuntimeException("Invalid PPR Id")));
         entity.setMicroWatershed(microWatershedRepository.findById(form.getMicroWatershed()).orElseThrow(() -> new RuntimeException("Invalid Micro Watershed")));
-
         entity.setProjectType(projectTypeRepository.findById(form.getProjectType()).orElseThrow(() -> new RuntimeException("Invalid Project Type")));
         // Replace with actual criteria id or logic
-        entity.setCriteriaDetails(criteriaDetailsRepository.findById(1).orElseThrow(() -> new RuntimeException("Criteria not found")));
         entity.setTreatedArea(form.getTreatedProjectArea());
         entity.setProposedCost(form.getProposedCost());
         entity.setStatus(status);
-
         entity.setCreatedBy(userId);
-
         entity.setCreatedDate(LocalDateTime.now());
-
         entity.setRequestIp(ipAddress);
-
         repository.save(entity);
+        String[] arr=form.getCriteriaData().split(",");
+        
+        for(String s:arr){
+        	
+        	if (s.isBlank()) {
+                continue;
+            }
+            String[] value=s.split(":");
+            if (value.length != 2) {
+                continue;
+            }
+            Integer criteriaId=Integer.parseInt(value[0]);
+            Integer marks=Integer.parseInt(value[1]);
+            CriteriaDetails details=new CriteriaDetails();
+            details.setCriteria(
+                    criteriaRepo.findById(criteriaId).get());
+            details.setScoredMarks(marks);
+            details.setProposedProject(entity);
+            details.setStatus("D");
+            details.setCreatedBy(userId);
+            details.setCreatedDate(LocalDateTime.now());
+            criteriaDetailsRepo.save(details);
+
+        }
+    }
+    
+    public List<PprProposedProject> getPprProposedProjectList(MPpr ppr){
+    	List<PprProposedProject> list = repository.getListOfPprProposedProjectsByPpr(ppr);
+    	return list;
     }
 }
