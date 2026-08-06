@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
+import gov.dolr.wdcpmksy3.PPR.entity.PprWatershedCoveredArea;
 
 @Repository
 public interface MPprRepository extends JpaRepository<MPpr, Integer> {
@@ -21,5 +22,7 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 	MPpr findByDistrict_Dcode(Integer district);
 	
 	List<MPpr> findByDistrict_DcodeAndStatusOrderByProjectNameAsc(Integer dcode, String status);
+
+	
 }
 
