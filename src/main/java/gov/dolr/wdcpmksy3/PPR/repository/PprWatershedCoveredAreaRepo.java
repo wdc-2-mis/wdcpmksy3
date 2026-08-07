@@ -2,6 +2,7 @@ package gov.dolr.wdcpmksy3.PPR.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -20,5 +21,7 @@ public interface PprWatershedCoveredAreaRepo extends JpaRepository<PprWatershedC
 	List<PprWatershedCoveredArea> findByPpr_PprIdAndMicroWatershed_MwId(Integer pprId, Integer mwId);
 
 	boolean existsByMicroWatershed_MwIdAndStatus(Integer mwId, String string);
+
+	Optional<PprWatershedCoveredArea> findTopByMicroWatershed_MwIdOrderByIdDesc(Integer mwId);
 
 }

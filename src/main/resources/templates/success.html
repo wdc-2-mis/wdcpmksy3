@@ -39,53 +39,52 @@
             <!-- Region Details -->
 
             <div class="info-section">
-            
 
-                <h5>
+    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                    <i class="fa-solid fa-location-dot"></i>
+        <h5 class="mb-0">
+            <i class="fa-solid fa-location-dot"></i>
+            Region Information
+        </h5>
 
-                    Region Information
+        <a th:href="@{/changePassword}" class="btn btn-success">
+            <i class="fa-solid fa-key me-2"></i>
+            Change Password
+        </a>
 
-                </h5>
+    </div>
 
-                <div class="row">
+    <div class="row">
 
-                    <div class="col-lg-6">
+        <div class="col-lg-6">
 
-                        <label class="form-label">
-<th:block th:each="list : ${listm}">
-                      State: <td th:text="${list.value[0].statename}"></td>
+            <label class="form-label">
+                <th:block th:each="list : ${listm}">
+                    State:
+                    <span th:text="${list.value[0].statename}"></span>
+                </th:block>
+            </label>
 
-</th:block>
+        </div>
 
-                        </label>
+        <th:block th:if="${userType == 'DI' or userType == 'PI'}">
 
-                        <!-- Paste your existing State Thymeleaf code here exactly as it is -->
+            <div class="col-lg-6">
 
-                    </div>
-
-                    <th:block th:if="${userType == 'DI' or userType == 'PI'}">
-
-                        <div class="col-lg-6">
-
-                            <label class="form-label">
-<th:block th:each="list : ${listm}">
-                                District: <td th:text="${list.value[0].districtname}"></td>
-</th:block>
-
-                            </label>
-
-                            <!-- Paste your District Thymeleaf code here -->
-
-                        </div>
-
+                <label class="form-label">
+                    <th:block th:each="list : ${listm}">
+                        District:
+                        <span th:text="${list.value[0].districtname}"></span>
                     </th:block>
-
-                </div>
-
+                </label>
 
             </div>
+
+        </th:block>
+
+    </div>
+
+</div>
 
             <!-- User Information -->
 
@@ -146,6 +145,8 @@
             </div>
 
         </div>
+        
+        
 
     </div>
 

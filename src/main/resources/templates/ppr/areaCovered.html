@@ -604,25 +604,33 @@ document.getElementById("mw").addEventListener("change", function () {
     if (mwId) {
 
         fetch('/microWatershedArea/' + mwId)
-            .then(response => response.json())
-            .then(data => {
+    .then(response => response.json())
+    
+    .then(data => {
+        console.log(data);
+        document.getElementById("totalMwArea").value = data.area || "";
 
-                document.getElementById("totalMwArea").value = data.area || "";
+        const saveBtn = document.getElementById("saveDraftBtn");
 
-                if (data.completed) {
+        if (data.status === "C") {
 
-                    alert("This Micro-Watershed data has already been completed.");
+            alert("This Micro-Watershed has already been completed. You cannot create another record.");
 
-                    saveBtn.disabled = true;
+            saveBtn.disabled = true;
 
-                } else {
+        } else if (data.status === "D") {
 
-                    saveBtn.disabled = false;
+            alert("A draft already exists for this Micro-Watershed. Please edit the existing draft instead of creating a new one.");
 
-                }
+            saveBtn.disabled = true;
 
-            })
-            .catch(err => console.error("Error:", err));
+        } else {
+
+            saveBtn.disabled = false;
+
+        }
+
+    });
 
     } else {
 

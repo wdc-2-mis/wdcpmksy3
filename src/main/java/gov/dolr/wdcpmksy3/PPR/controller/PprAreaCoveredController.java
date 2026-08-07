@@ -70,7 +70,7 @@ public class PprAreaCoveredController {
 	public Map<String, Object> getMicroWatershedArea(@PathVariable Integer mwId) {
 	    Map<String, Object> result = new HashMap<>();
 	    result.put("area", pprService.getMicroWatershedArea(mwId));
-	    result.put("completed", pprAreaService.isCompleted(mwId));
+	    result.put("status", pprAreaService.getMicroWatershedStatus(mwId));
 	    return result;
 	}
 

@@ -318,7 +318,13 @@ public class PprAreaCoverService {
 	    );
 	}
 
+	public String getMicroWatershedStatus(Integer mwId) {
 
+	    return wcarearepo.findTopByMicroWatershed_MwIdOrderByIdDesc(mwId)
+	            .map(PprWatershedCoveredArea::getStatus)
+	            .orElse(null);
+
+	}
 
 
 

@@ -4,9 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -36,7 +33,7 @@ public class SecurityConfig {
                         "/slnaFunctionariesPPR3", "/saveSLNAFunctionariesPPR3", "/deleteSLNAFunctionariesPPR3", "/editSLNAFunctionariesPPR3", "/completeSLNAFunctionariesPPR3","/updateSLNAFunctionariesPPR3", "/preliminaryPPR4A", "/savePreliminaryPPR4A", "/deletePreliminaryPPR4A", "/completePreliminaryPPR4A","/checkDistrictExists", 
                         "/wcdcFunctionariesPPR4B", "/saveWCDCFunctionariesPPR4B", "/UpdateWCDCFunctionariesPPR4B", "/deleteWCDCFunctionariesPPR4B", "/editWCDCFunctionariesPPR4B", "/completeWCDCFunctionariesPPR4B", "/pprDistrict", "/savePPRDistrict", "/updatePPRDistrict", "/completePPRDistrict/**", "/deletePPRDistrict/**", "/pprProposedProjectDetails", 
                         "/getMicroWatershedCodeByMwId", "/getProjAndMicroWaterDetailsByDcode", "/savePrioritizedListOfProposedProject", "/agroClimateConditionPPR10", "/getProjectsByDistrictPPR10", "/getVillagesByProjectPPR10", "/saveAgroClimateConditionPPR10", "/deleteAgroClimateConditionPPR10", "/completeAgroClimateConditionPPR10", "/areaCoveredUnderWP", 
-                        "/districtStats/**", "/microWatershedArea/**", "/saveAreaWP",  "/preliminaryPPR8" , "/getBlockByProjectPPR8", "/updateAreaWP", "/completeAreaConveredWP", "/deleteAreaConveredWP",
+                        "/districtStats/**", "/microWatershedArea/**", "/saveAreaWP",  "/preliminaryPPR8" , "/getBlockByProjectPPR8", "/updateAreaWP", "/completeAreaConveredWP", "/deleteAreaConveredWP", "/profile", "/changePassword",
                        
                         "/css/**",
                         "/js/**",
