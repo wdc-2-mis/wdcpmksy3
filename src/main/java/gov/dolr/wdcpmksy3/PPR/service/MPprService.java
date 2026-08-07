@@ -17,4 +17,10 @@ public class MPprService {
     public List<MPpr> getProjectsByDistrict(Integer dcode) {
         return pprRepository.findByDistrict_DcodeAndStatusOrderByProjectNameAsc(dcode, "C");
     }
+    
+    public MPpr getById(Integer id){
+
+        return pprRepository.findById(id).orElse(null);
+
+    }
 }

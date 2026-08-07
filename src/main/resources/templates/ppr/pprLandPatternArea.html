@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<head>
+<meta charset="UTF-8">
+<title>PPR Land Pattern Area</title>
+
+<style>
+.required {
+	color: red;
+}
+</style>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const district = document.getElementById("district");
+    const project = document.getElementById("project");
+    const watershed = document.getElementById("watershed");
+    const village = document.getElementById("village");
+    const form = document.getElementById("landPatternAreaForm");
+    
+
+    /*---------------------------------------------------------
+      District -> Project
+    ---------------------------------------------------------*/
+    district.addEventListener("change", function () {
+
+        let districtId = this.value;
+        
+        if(districtId !== ""){
+            loadLandPatternTable(districtId);
+        }else{
+            document.getElementById("landPatternTableBody").innerHTML="";
+            document.getElementById("landPatternDiv").style.display="none";
+        }
+
+        project.innerHTML =
+            '<option value="">--Select Project--</option>';
+
+        watershed.innerHTML =
+            '<option value="">--Select Micro Watershed--</option>';
+
+        village.innerHTML =
+            '<option value="">--Select Village--</option>';
+
+        if (districtId === "") {
+            return;
+        }
+
+        fetch("/getProjectsByDistrictLandPattern?dcode=" + districtId)
+            .then(response => response.json())
+            .then(data => {
+
+                data.forEach(function(item){
+
+                    let option = document.createElement("option");
+
+                    option.value = item.id;
+                    option.textContent = item.name;
+
+                    project.appendChild(option);
+
+                });
+
+            })
+            .catch(error => {
+                console.error("Project Loading Error :", error);
+            });
+
+    });
+
+
+    /*---------------------------------------------------------
+      Project -> Micro Watershed
+    ---------------------------------------------------------*/
+    project.addEventListener("change", function () {
+
+        let pprId = this.value;
+
+        watershed.innerHTML =
+            '<option value="">--Select Micro Watershed--</option>';
+
+        village.innerHTML =
+            '<option value="">--Select Village--</option>';
+
+        if (pprId === "") {
+            return;
+        }
+
+        fetch("/getMicroWatershedsByProject?pprId=" + pprId)
+            .then(response => response.json())
+            .then(data => {
+
+                data.forEach(function(item){
+
+                    let option = document.createElement("option");
+
+                    option.value = item.id;
+                    option.textContent = item.name;
+
+                    watershed.appendChild(option);
+
+                });
+
+            })
+            .catch(error => {
+                console.error("Micro Watershed Loading Error :", error);
+            });
+
+    });
+
+
+    /*---------------------------------------------------------
+      Project -> Village
+    ---------------------------------------------------------*/
+    watershed.addEventListener("change", function () {
+
+        let pprId = project.value;
+
+        village.innerHTML =
+            '<option value="">--Select Village--</option>';
+
+        if (pprId === "") {
+            return;
+        }
+
+        fetch("/getVillagesByProject?pprId=" + pprId)
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Village API failed: " + response.status
+                    );
+                }
+
+                return response.json();
+            })
+            .then(data => {
+
+                data.forEach(function(item) {
+
+                    let option = document.createElement("option");
+
+                    option.value = item.id;
+                    option.textContent = item.name;
+
+                    village.appendChild(option);
+
+                });
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Village Loading Error :",
+                    error
+                );
+
+            });
+
+    });
+
+
+    /*---------------------------------------------------------
+      Village -> Check Existing Land Pattern Record
+    ---------------------------------------------------------*/
+    village.addEventListener("change", function () {
+
+        const vcode = this.value;
+
+        const saveBtn = document.querySelector(
+            '#landPatternAreaForm button[type="submit"]'
+        );
+
+        if (vcode === "") {
+
+            saveBtn.disabled = false;
+
+            return;
+        }
+        
+     	// Disable while checking
+        saveBtn.disabled = true;
+
+        console.log("========== VILLAGE STATUS CHECK ==========");
+        console.log("Selected Village VCode:", vcode);
+
+        fetch("/getLandPatternVillageStatus?vcode=" + vcode)
+            .then(response => {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Village Status API failed: " +
+                        response.status
+                    );
+
+                }
+
+                return response.json();
+
+            })
+            .then(data => {
+
+                console.log("Village Status Response:", data);
+
+                if (data.status === "C") {
+
+                    alert(
+                        "This village has already been completed. You cannot create another record."
+                    );
+
+                 	// Reset village dropdown
+                    village.value = "";
+                 
+                    saveBtn.disabled = true;
+
+                }
+                else if (data.status === "D") {
+
+                    alert(
+                        "A draft already exists for this village. Please edit the existing draft instead of creating a new record."
+                    );
+
+                 	// Reset village dropdown
+                    village.value = "";
+                 	
+                    saveBtn.disabled = true;
+
+                }
+                else {
+
+                    // No existing record
+                    saveBtn.disabled = false;
+
+                }
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Village Status Check Error:",
+                    error
+                );
+
+                alert("Unable to verify the selected village. Please try again.");
+                saveBtn.disabled = true;
+
+            });
+
+    });
+
+
+    /*---------------------------------------------------------
+      Form Validation
+    ---------------------------------------------------------*/
+    form.addEventListener("submit", function (e) {
+
+        const requiredFields = form.querySelectorAll("input[required], select[required]");
+
+        for (const field of requiredFields) {
+
+            if (field.value.trim() === "") {
+
+                e.preventDefault();
+
+                let fieldName = "";
+
+                // Dropdown
+                if(field.tagName === "SELECT"){
+                    fieldName = field.name.charAt(0).toUpperCase() +
+                                field.name.slice(1);
+
+                    alert("Please select " + fieldName);
+                }
+
+                // Textbox
+                else{
+
+                    const label = field.parentElement.previousElementSibling.querySelector("label");
+
+                    fieldName = label.innerText
+                                    .replace("*","")
+                                    .replace(":","")
+                                    .trim();
+
+                    alert("Please enter " + fieldName);
+                }
+
+                field.focus();
+                return;
+            }
+        }
+
+    });
+
+});
+
+
+/*---------------------------------------------------------
+Decimal Validation
+---------------------------------------------------------*/
+function validateDecimal(input, maxIntDigits, maxFractionDigits) {
+
+	// Remove everything except digits and decimal point
+    input.value = input.value.replace(/[^\d.]/g, "");
+
+    // Remove leading decimal point
+    if (input.value.startsWith(".")) {
+        input.value = "";
+        return;
+    }
+
+    let parts = input.value.split('.');
+
+    // Allow only one decimal point
+    if (parts.length > 2) {
+        input.value = parts[0] + '.' + parts[1];
+        parts = input.value.split('.');
+    }
+
+    // Maximum digits before decimal
+    if (parts[0].length > maxIntDigits) {
+        parts[0] = parts[0].slice(0, maxIntDigits);
+    }
+
+    // Maximum digits after decimal
+    if (parts[1] && parts[1].length > maxFractionDigits) {
+        parts[1] = parts[1].slice(0, maxFractionDigits);
+    }
+
+    input.value = parts.join('.');
+    
+    input.setCustomValidity("");
+}
+
+/*---------------------------------------------------------
+Land Area Data Display
+---------------------------------------------------------*/
+function loadLandPatternTable(dcode) {
+
+    const tableBody = document.getElementById("landPatternTableBody");
+    const tableDiv = document.getElementById("landPatternDiv");
+
+    tableBody.innerHTML = "";
+
+    fetch("/getLandPatternAreaByDistrict?dcode=" + dcode)
+        .then(response => response.json())
+        .then(data => {
+        	
+        // first time table display -- no records	
+        	if (!data || data.length === 0) {
+        	    tableDiv.style.display = "none";
+        	    return;
+        	}
+        	
+        	
+			
+            tableDiv.style.display = "block";
+
+            if (!data || data.length === 0) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="12" class="text-center">
+                            No Record Found
+                        </td>
+                    </tr>`;
+
+                return;
+            }
+
+            let rows = "";
+
+            data.forEach(function(item) {
+
+                rows += `
+                    <tr>
+                        <td>${item.dist_name}</td>
+                        <td>${item.project_name}</td>
+                        <td>${item.mw_name}</td>
+                        <td>${item.village_name}</td>
+                        <td class="text-end">${item.village_area}</td>
+                        <td class="text-end">${item.forest_area}</td>
+                        <td class="text-end">${item.argiculture_land}</td>
+                        <td class="text-end">${item.rainfed_area}</td>
+                        <td class="text-end">${item.pastures}</td>
+                        <td class="text-end">${item.cultivable_wasteland_area}</td>
+                        <td class="text-end">${item.non_cultivable_wasteland_area}</td>
+                        <td class="text-center">
+
+                        ${
+                            item.status === 'D'
+                            ?
+                            		
+                            `&nbsp; &nbsp; 
+                            <a href="/deletePPRLandPatternArea?id=${item.ppr_land_pattern_area_id}"
+                               class="btn btn-danger btn-sm"
+                               title="Delete"
+                               onclick="return confirm('Are you sure you want to delete this record?');">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            &nbsp; &nbsp; 
+                            <a href="javascript:void(0)"
+                            	   class="btn btn-primary btn-sm edit-btn"
+
+                            	   data-id="${item.ppr_land_pattern_area_id}"
+
+                            	   data-district="${item.dist_name}"
+                            	   data-project="${item.project_name}"
+                            	   data-watershed="${item.mw_name}"
+                            	   data-village="${item.village_name}"
+
+                            	   data-villagearea="${item.village_area}"
+                            	   data-forest="${item.forest_area}"
+                            	   data-agriculture="${item.argiculture_land}"
+                            	   data-rainfed="${item.rainfed_area}"
+                            	   data-pastures="${item.pastures}"
+                            	   data-cultivable="${item.cultivable_wasteland_area}"
+                            	   data-noncultivable="${item.non_cultivable_wasteland_area}"
+
+                            	   title="Edit">
+
+                            	    <i class="fas fa-edit"></i>
+
+                            	</a>
+                            &nbsp; &nbsp; 
+                            <a href="/completePPRLandPatternArea?id=${item.ppr_land_pattern_area_id}"
+                               class="btn btn-success btn-sm"
+                               title="Complete"
+                               onclick="return confirm('Are you sure you want to complete this record?');">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            `
+
+                            :
+
+                            `
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle"></i>
+                                Completed
+                            </span>
+                            `
+                        }
+
+                    </td>
+                    </tr>`;
+            });
+
+            tableBody.innerHTML = rows;
+
+        })
+        .catch(error => {
+            console.error("Error loading land pattern area:", error);
+            
+            tableDiv.style.display = "block";
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="12" class="text-center text-danger">
+                        Unable to load records.
+                    </td>
+                </tr>`;
+                
+        });
+
+}
+
+/*---------------------------------------------------------
+Edit Button Click
+---------------------------------------------------------*/
+document.addEventListener("click", function(e){
+
+    const btn = e.target.closest(".edit-btn");
+
+    if(!btn){
+        return;
+    }
+    
+    
+    //Hidden ID
+    document.getElementById("editId").value =
+        btn.dataset.id;
+
+    //Readonly fields
+    document.getElementById("editDistrict").value =
+        btn.dataset.district;
+
+    document.getElementById("editProject").value =
+        btn.dataset.project;
+
+    document.getElementById("editWatershed").value =
+        btn.dataset.watershed;
+
+    document.getElementById("editVillage").value =
+        btn.dataset.village;
+
+    //Editable fields
+    document.getElementById("editVillageArea").value =
+        btn.dataset.villagearea;
+
+    document.getElementById("editForestArea").value =
+        btn.dataset.forest;
+
+    document.getElementById("editAgricultureArea").value =
+        btn.dataset.agriculture;
+
+    document.getElementById("editRainfedArea").value =
+        btn.dataset.rainfed;
+
+    document.getElementById("editPastures").value =
+        btn.dataset.pastures;
+
+    document.getElementById("editCultivable").value =
+        btn.dataset.cultivable;
+
+    document.getElementById("editNonCultivable").value =
+        btn.dataset.noncultivable;
+
+    //Open Modal
+    
+    console.log(document.getElementById("editModal"));
+    new bootstrap.Modal(
+        document.getElementById("editModal")
+    ).show();
+
+});
+
+</script>
+
+</head>
+<body>
+
+	<div layout:fragment="content">
+
+
+		<div class="card shadow-sm border-0">
+
+			<div class="card-header bg-primary text-white">
+				<h4 class="mb-0">PPR Land Pattern Area</h4>
+			</div>
+		
+
+		<div th:if="${success}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		
+		<div th:if="${error}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${error}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div class="card-body">
+
+			<form id="landPatternAreaForm" th:action="@{/savePPRLandPatternArea}" method="post" novalidate>
+
+				<div class="row mb-4">
+					<div class="col-md-3">
+						<label>District Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="district" name="district"
+							class="form-control form-control-sm" required>
+							<option value="">--Select District--</option>
+							<th:block th:each="dist : ${distList}">
+								<option th:value="${dist.dcode}" th:text="${dist.distName}">
+								</option>
+							</th:block>
+						</select>
+					</div>
+
+					<div class="col-md-2">
+						<label>Project Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="project" name="project" class="form-control form-control-sm" required>
+							   <option value="">--Select Project--</option>
+						</select>
+					</div>
+				</div>
+				
+				<div class="row mb-4">
+					<div class="col-md-3">
+						<label>Micro Watershed Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="watershed" name="watershed"
+							class="form-control form-control-sm" required>
+							<option value="">--Select Micro Watershed--</option>
+						</select>
+					</div>
+
+					<div class="col-md-2">
+						<label>Village Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="village" name="village" class="form-control form-control-sm" required>
+							    <option value="">--Select Village--</option>
+						</select>
+					</div>
+
+				</div>
+
+				<label><b>All Area in Ha.</b></label>
+<br/><br/>
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Geographical Area of the Village</label><span
+							class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="village_area" id="village_area" autocomplete="off" 
+							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+					</div>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Forest Area</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="forest_area" id="forest_area" autocomplete="off" 
+							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+					</div>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Land under agriculture use</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="argiculture_land" id="argiculture_land" autocomplete="off" 
+							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+					</div>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Rainfed Area</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="rainfed_area" id="rainfed_area" autocomplete="off" 
+							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+					</div>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Permanent Pastures</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="pastures" id="pastures" autocomplete="off" 
+							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+					</div>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Cultivable Wasteland Area</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="cultivable_wasteland_area" id="cultivable_wasteland_area" autocomplete="off" 
+							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+					</div>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Non-Cultivable Wasteland Area</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="non_cultivable_wasteland_area" id="non_cultivable_wasteland_area" autocomplete="off" 
+							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+					</div>
+				</div>
+
+					<div class="text-center mt-4">
+						<button type="submit" name="action" value="D"
+							class="btn btn-warning">
+							<i class="fas fa-save"></i> Save as Draft
+						</button>
+						<!--<button class="btn btn-primary">
+									Submit
+								</button>-->
+					</div>
+
+				</form>
+		</div>
+		<br><br>
+			<div class="table-responsive" id="landPatternDiv" style="display:none;">
+    <h4 class="text-center mb-3">
+        <b>List of Land Pattern Area</b>
+    </h4>
+
+    <table class="table table-bordered" id="landPatternTable">
+
+        <thead>
+        <tr>
+            <th class="table-primary">District</th>
+            <th class="table-primary">Project</th>
+            <th class="table-primary">Micro Watershed</th>
+            <th class="table-primary">Village</th>
+            <th class="table-primary">Village Area</th>
+            <th class="table-primary">Forest Area</th>
+            <th class="table-primary">Agriculture Area</th>
+            <th class="table-primary">Rainfed Area</th>
+            <th class="table-primary">Pastures</th>
+            <th class="table-primary">Cultivable Wasteland</th>
+            <th class="table-primary">Non Cultivable Wasteland</th>
+            <th class="table-primary text-center" style="width: 200px;">Action</th>
+        </tr>
+        </thead>
+
+        <tbody id="landPatternTableBody">
+
+        </tbody>
+
+    </table>
+</div>
+		
+		</div>
+		
+		<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Edit Land Pattern Area</h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="editForm"
+                      th:action="@{/updatePPRLandPatternArea}"
+                      method="post">
+
+                    <input type="hidden"
+                           id="editId"
+                           name="ppr_land_pattern_area_id">
+
+                    <!-- District -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>District</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text"
+                                   id="editDistrict"
+                                   class="form-control form-control-sm"
+                                   readonly>
+                        </div>
+                    </div>
+
+                    <!-- Project -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Project</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text"
+                                   id="editProject"
+                                   class="form-control form-control-sm"
+                                   readonly>
+                        </div>
+                    </div>
+
+                    <!-- Watershed -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Micro Watershed</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text"
+                                   id="editWatershed"
+                                   class="form-control form-control-sm"
+                                   readonly>
+                        </div>
+                    </div>
+
+                    <!-- Village -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Village</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text"
+                                   id="editVillage"
+                                   class="form-control form-control-sm"
+                                   readonly>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Village Area -->
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label>Village Area</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text"
+                                   id="editVillageArea"
+                                   name="village_area"
+                                   class="form-control form-control-sm" required
+                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Forest -->
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label>Forest Area</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text"
+                                   id="editForestArea"
+                                   name="forest_area"
+                                   class="form-control form-control-sm" required
+                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Agriculture -->
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label>Agriculture Area</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text"
+                                   id="editAgricultureArea"
+                                   name="argiculture_land"
+                                   class="form-control form-control-sm" required
+                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Rainfed -->
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label>Rainfed Area</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text"
+                                   id="editRainfedArea"
+                                   name="rainfed_area"
+                                   class="form-control form-control-sm" required
+                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Pastures -->
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label>Pastures</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text"
+                                   id="editPastures"
+                                   name="pastures"
+                                   class="form-control form-control-sm" required
+                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Cultivable -->
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label>Cultivable Wasteland</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text"
+                                   id="editCultivable"
+                                   name="cultivable_wasteland_area"
+                                   class="form-control form-control-sm" required
+                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Non Cultivable -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label>Non Cultivable Wasteland</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text"
+                                   id="editNonCultivable"
+                                   name="non_cultivable_wasteland_area"
+                                   class="form-control form-control-sm" required
+                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit"
+                                class="btn btn-success">
+                            <i class="fas fa-save"></i>
+                            Update
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</body>
+
+
+
+</html>

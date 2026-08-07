@@ -17,5 +17,11 @@ public class VillageService {
     public List<MVillage> getVillagesByProject(Integer pprId){
         return villageRepository.getVillagesByProject(pprId);
     }
+    
+    public MVillage getVillageById(Integer id){
+
+        return villageRepository.findById(id).orElse(null);
+
+    }
 
 }

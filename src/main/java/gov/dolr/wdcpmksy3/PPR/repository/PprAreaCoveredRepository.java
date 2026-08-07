@@ -41,7 +41,8 @@ public interface PprAreaCoveredRepository extends JpaRepository<MScheme, Integer
             "JOIN m_ppr p ON p.ppr_id = a.ppr_id " +
             "JOIN m_district d ON d.dcode = p.dcode " +
             "WHERE p.dcode = :dcode " +
-            "GROUP BY a.ppr_id, d.dist_name, w.mw_id, w.mw_name, w.mw_area, a.status",
+            "GROUP BY a.ppr_id, d.dist_name, w.mw_id, w.mw_name, w.mw_area, a.status " +
+            "ORDER BY CASE WHEN a.status = 'D' THEN 0 ELSE 1 END ",
     nativeQuery = true)
 List<Object[]> findWatershedDataByDistrict(@Param("dcode") Integer dcode);
 

@@ -615,12 +615,24 @@ document.getElementById("mw").addEventListener("change", function () {
         if (data.status === "C") {
 
             alert("This Micro-Watershed has already been completed. You cannot create another record.");
+            
+         	// Reset Micro-Watershed
+            document.getElementById("mw").value = "";
+
+            // Clear area
+            document.getElementById("totalMwArea").value = "";
 
             saveBtn.disabled = true;
 
         } else if (data.status === "D") {
 
             alert("A draft already exists for this Micro-Watershed. Please edit the existing draft instead of creating a new one.");
+            
+         	// Reset Micro-Watershed
+            document.getElementById("mw").value = "";
+
+            // Clear area
+            document.getElementById("totalMwArea").value = "";
 
             saveBtn.disabled = true;
 
