@@ -1,0 +1,433 @@
+/*==========================================================
+    WDC-PMKSY 3.0
+    State Dashboard
+===========================================================*/
+
+body{
+    background:#f4f7fc;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+}
+
+/*==========================================================
+    Container
+===========================================================*/
+
+.dashboard-container{
+    padding:0px;
+}
+
+/*==========================================================
+    Header
+===========================================================*/
+
+.dashboard-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 25px;
+    border-radius:0 !important;
+}
+
+.dashboard-header h3{
+    margin:0;
+    font-size:28px;
+    font-weight:600;
+}
+
+.dashboard-header small{
+    opacity:.9;
+    font-size:14px;
+}
+
+.dashboard-state{
+    display:flex;
+    align-items:center;
+    gap:35px;
+}
+
+.dashboard-state h5{
+    margin:0;
+    color:#fff;
+    font-weight:600;
+}
+
+/*==========================================================
+    KPI Cards
+===========================================================*/
+
+.kpi-card{
+
+    background:#fff;
+
+    border-radius:14px;
+
+    padding:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+    transition:.30s;
+
+    height:100%;
+
+}
+
+.kpi-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+}
+
+.kpi-icon{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:#fff;
+
+    font-size:28px;
+
+}
+
+.kpi-content{
+
+    flex:1;
+
+}
+
+.kpi-content h6{
+
+    margin:0;
+
+    color:#6c757d;
+
+    font-weight:600;
+
+}
+
+.kpi-content h2{
+
+    margin-top:8px;
+
+    margin-bottom:0;
+
+    font-size:34px;
+
+    font-weight:700;
+
+    color:#222;
+
+}
+
+/*==========================================================
+    Icon Colors
+===========================================================*/
+
+.blue{
+
+    background:linear-gradient(135deg,#2196f3,#1565c0);
+
+}
+
+.green{
+
+    background:linear-gradient(135deg,#43a047,#2e7d32);
+
+}
+
+.orange{
+
+    background:linear-gradient(135deg,#fb8c00,#ef6c00);
+
+}
+
+.purple{
+
+    background:linear-gradient(135deg,#8e24aa,#6a1b9a);
+
+}
+
+/*==========================================================
+    Dashboard Cards
+===========================================================*/
+
+.dashboard-card{
+
+    background:#fff;
+
+    border-radius:15px;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+    overflow:hidden;
+
+    margin-bottom:10px;
+
+}
+
+.card-header-custom{
+
+    background:#fff;
+
+    border-bottom:1px solid #e5e5e5;
+
+    padding:16px 22px;
+
+}
+
+.card-header-custom h5{
+
+    margin:0;
+
+    color:#0d6efd;
+
+    font-weight:700;
+
+}
+
+.card-header-warning{
+
+    background:#fff3cd;
+
+    padding:16px 22px;
+
+    border-bottom:1px solid #ffe69c;
+
+}
+
+.card-header-warning h5{
+
+    margin:0;
+
+    color:#7a5600;
+
+    font-weight:700;
+
+}
+
+.card-header-success{
+
+    background:#d1e7dd;
+
+    padding:16px 22px;
+
+    border-bottom:1px solid #badbcc;
+
+}
+
+.card-header-success h5{
+
+    margin:0;
+
+    color:#0f5132;
+
+    font-weight:700;
+
+}
+
+.dashboard-card .card-body{
+
+    padding:25px;
+
+}
+
+/*==========================================================
+    Chart Area
+===========================================================*/
+
+.dashboard-card{
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-card .card-body{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#worksChart,
+#progressChart{
+    height: 350px;
+    width: 100%;
+}
+
+/*==========================================================
+    Mini Cards
+===========================================================*/
+
+.mini-card{
+
+    border-radius:12px;
+
+    padding:20px;
+
+    text-align:center;
+
+    transition:.30s;
+
+}
+
+.mini-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.mini-card h6{
+
+    margin-bottom:12px;
+
+    font-weight:600;
+
+}
+
+.mini-card h2{
+
+    margin:0;
+
+    font-size:36px;
+
+    font-weight:700;
+
+}
+
+.warning{
+
+    background:#fff8e1;
+
+    border:1px solid #ffe082;
+
+}
+
+.warning h6{
+
+    color:#996c00;
+
+}
+
+.warning h2{
+
+    color:#ef6c00;
+
+}
+
+.success{
+
+    background:#e8f5e9;
+
+    border:1px solid #a5d6a7;
+
+}
+
+.success h6{
+
+    color:#2e7d32;
+
+}
+
+.success h2{
+
+    color:#1b5e20;
+
+}
+
+/*==========================================================
+    Placeholder Table
+===========================================================*/
+
+.table-placeholder{
+
+    padding:50px;
+
+    text-align:center;
+
+    color:#777;
+
+}
+
+/*==========================================================
+    Responsive
+===========================================================*/
+
+@media(max-width:992px){
+
+.dashboard-header{
+
+    text-align:center;
+
+    justify-content:center;
+
+}
+
+.dashboard-state{
+
+    margin-top:20px;
+
+    justify-content:center;
+
+    width:100%;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.dashboard-state{
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.kpi-card{
+
+    flex-direction:column;
+
+    text-align:center;
+
+}
+
+.kpi-content h2{
+
+    font-size:28px;
+
+}
+
+.dashboard-card .card-body{
+
+    padding:18px;
+
+}
+
+#worksChart{
+
+    min-height:280px;
+
+}
+
+#progressChart{
+
+    min-height:260px;
+
+}
+
+}

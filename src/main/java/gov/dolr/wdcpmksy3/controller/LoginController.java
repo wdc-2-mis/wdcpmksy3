@@ -388,9 +388,13 @@ public class LoginController {
      			model.addAttribute("userList", otpService.getUserVerify(userid));
      			
      			
-     			
+     			if(usertype.equals("SL"))
+     			{
+     				return "redirect:/progressdashboard";
+     			}
+     			else {
      			return "success";
-    			
+     			}
     			
     		}
     		else {

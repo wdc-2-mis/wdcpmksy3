@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>State Dashboard | WDC-PMKSY 3.0</title>
+
+<link rel="stylesheet" th:href="@{/css/slDashboard.css}">
+
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+
+
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+<div class="container-fluid dashboard-container">
+
+    <!-- ================= Dashboard Header ================= -->
+
+  <div class="dashboard-card mb-4">
+
+    <div class="card-header bg-primary text-white dashboard-header">
+
+        <div>
+
+            <h3 class="mb-0">
+            
+                <i class="fa-solid fa-chart-line me-2"></i>
+                State Performance Dashboard
+            </h3>
+
+            <small>
+                Welcome,
+                <strong th:text="${session.username}"></strong>
+            </small>
+
+        </div>
+
+        <div class="dashboard-state">
+
+            <div class="dashboard-info me-4">
+
+    <small class="d-block">State:</small>
+
+    <h5 class="mb-0 text-white"
+        th:text="${session.statename}">
+    </h5>
+
+</div>
+
+            <div class="text-end">
+
+                <small>Financial Year:</small>
+
+                <h5 class="mb-0 text-white">
+                    2026-27
+                </h5>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- ================= KPI CARDS ================= -->
+
+    <div class="row mt-4 g-4">
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+
+                    <i class="fa-solid fa-map-location-dot"></i>
+
+                </div>
+
+                <div class="kpi-content">
+
+                    <h6>Total Districts</h6>
+
+                    <h2>41</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+
+                    <i class="fa-solid fa-diagram-project"></i>
+
+                </div>
+
+                <div class="kpi-content">
+
+                    <h6>Total Projects</h6>
+
+                    <h2>275</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+
+                    <i class="fa-solid fa-building"></i>
+
+                </div>
+
+                <div class="kpi-content">
+
+                    <h6>PIA Assigned</h6>
+
+                    <h2>248</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+
+                    <i class="fa-solid fa-earth-asia"></i>
+
+                </div>
+
+                <div class="kpi-content">
+
+                    <h6>Total Area Covered</h6>
+
+                    <h2>18,520 Ha</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= Charts Row ================= -->
+
+    <div class="row mt-4">
+
+        <!-- Works Chart -->
+
+        <div class="col-lg-7 d-flex">
+
+            <div class="dashboard-card w-100">
+
+                <div class="card-header-custom">
+
+                    <h5>
+
+                        <i class="fa-solid fa-person-digging me-2"></i>
+
+                        Total Works Status
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div id="worksChart"></div>
+                    
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Physical Progress -->
+
+        <div class="col-lg-5 d-flex">
+
+            <div class="dashboard-card w-100">
+
+                <div class="card-header-custom">
+
+                    <h5>
+
+                        <i class="fa-solid fa-chart-column me-2"></i>
+
+                        Physical Progress
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div id="progressChart"></div>
+
+                    <hr>
+
+                    <div class="row text-center">
+
+                        <div class="col">
+
+                            <small>Target</small>
+
+                            <h5>22,000 Ha</h5>
+
+                        </div>
+
+                        <div class="col">
+
+                            <small>Achievement</small>
+
+                            <h5>18,520 Ha</h5>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= Pending & Approval ================= -->
+
+    <div class="row mt-4">
+
+        <div class="col-lg-6">
+
+            <div class="dashboard-card">
+
+                <div class="card-header-warning">
+
+                    <h5>
+
+                        <i class="fa-solid fa-hourglass-half me-2"></i>
+
+                        Pending Approvals
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-6">
+
+                            <div class="mini-card warning">
+
+                                <h6>
+
+                                    Works Pending
+
+                                </h6>
+
+                                <h2>148</h2>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6">
+
+                            <div class="mini-card warning">
+
+                                <h6>
+
+                                    Achievement Pending
+
+                                </h6>
+
+                                <h2>35</h2>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Approval -->
+
+        <div class="col-lg-6">
+
+            <div class="dashboard-card">
+
+                <div class="card-header-success">
+
+                    <h5>
+
+                        <i class="fa-solid fa-circle-check me-2"></i>
+
+                        Approval Summary
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-6">
+
+                            <div class="mini-card success">
+
+                                <h6>
+
+                                    Total Approved Works
+
+                                </h6>
+
+                                <h2>5,425</h2>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6">
+
+                            <div class="mini-card success">
+
+                                <h6>
+
+                                    Approval %
+
+                                </h6>
+
+                                <h2>93%</h2>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= Future Table ================= -->
+
+    <!-- <div class="dashboard-card mt-4">
+
+        <div class="card-header-custom">
+
+            <h5>
+
+                <i class="fa-solid fa-table me-2"></i>
+
+                District Wise Performance
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="text-center text-muted py-5">
+
+                <i class="fa-solid fa-chart-bar fa-3x mb-3"></i>
+
+                <h5>
+
+                    District-wise Performance will appear here.
+
+                </h5>
+
+            </div>
+
+        </div>
+
+    </div> -->
+
+</div>
+
+</div>
+
+</body>
+
+</html>

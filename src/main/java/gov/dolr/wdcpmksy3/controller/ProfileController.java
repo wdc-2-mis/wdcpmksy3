@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import gov.dolr.wdcpmksy3.dto.ProfileBean;
 import gov.dolr.wdcpmksy3.entity.MState;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
-import gov.dolr.wdcpmksy3.service.LoginServices;
 import gov.dolr.wdcpmksy3.service.MenuService;
 import gov.dolr.wdcpmksy3.service.OtpService;
 import gov.dolr.wdcpmksy3.service.ProfileService;
@@ -27,8 +26,6 @@ public class ProfileController {
 	@Autowired
     private OtpService otpService;
 	
-	@Autowired
-    private  LoginServices loginserv;
 	
 	@Autowired
 	private MenuService menuService;
