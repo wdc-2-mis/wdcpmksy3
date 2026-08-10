@@ -34,7 +34,7 @@ public class SecurityConfig {
                         "/wcdcFunctionariesPPR4B", "/saveWCDCFunctionariesPPR4B", "/UpdateWCDCFunctionariesPPR4B", "/deleteWCDCFunctionariesPPR4B", "/editWCDCFunctionariesPPR4B", "/completeWCDCFunctionariesPPR4B", "/pprDistrict", "/savePPRDistrict", "/updatePPRDistrict", "/completePPRDistrict/**", "/deletePPRDistrict/**", "/pprProposedProjectDetails", 
                         "/getMicroWatershedCodeByMwId", "/getProjAndMicroWaterDetailsByDcode", "/savePrioritizedListOfProposedProject", "/agroClimateConditionPPR10", "/getProjectsByDistrictPPR10", "/getVillagesByProjectPPR10", "/saveAgroClimateConditionPPR10", "/deleteAgroClimateConditionPPR10", "/completeAgroClimateConditionPPR10", "/areaCoveredUnderWP", 
                         "/districtStats/**", "/microWatershedArea/**", "/saveAreaWP",  "/preliminaryPPR8" , "/getBlockByProjectPPR8", "/updateAreaWP", "/completeAreaConveredWP", "/deleteAreaConveredWP", "/profile", "/changePassword", "/progressdashboard", "/sl/**",  "/pprLandPatternArea", "/getProjectsByDistrictLandPattern", "/getMicroWatershedsByProject", 
-                        "/getVillagesByProject", "/getLandPatternVillageStatus", "/savePPRLandPatternArea", "/getLandPatternAreaByDistrict", "/updatePPRLandPatternArea", "/deletePPRLandPatternArea", "/completePPRLandPatternArea", 
+                        "/getVillagesByProject", "/getLandPatternVillageStatus", "/savePPRLandPatternArea", "/getLandPatternAreaByDistrict", "/updatePPRLandPatternArea", "/deletePPRLandPatternArea", "/completePPRLandPatternArea", "/getPprProposedProjectForEdit", "/updatePprProposedProject",
                        
                         "/css/**",
                         "/js/**",

@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import gov.dolr.wdcpmksy3.PPR.dto.PprProposedProjectDto;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
+import gov.dolr.wdcpmksy3.PPR.entity.PprProposedProject;
 import gov.dolr.wdcpmksy3.PPR.repository.CriteriaRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
@@ -134,6 +136,35 @@ public class PprProposedProjectController {
 	            "Record saved successfully.");
 	    return "redirect:/pprProposedProjectDetails";
 	}
+	
+	@GetMapping("/getPprProposedProjectForEdit")
+	@ResponseBody
+	public Map<String,Object> getPprProposedProjectForEdit(
+	        @RequestParam Integer id) {
+	    PprProposedProject data = proposedProjectService.findById(id);
+	    Map<String,Object> map = new HashMap<>();
+	    map.put("id", data.getPprProposedProjectId());
+	    map.put("district", data.getPpr().getDistrict().getDistName());
+	    map.put("project", data.getPpr().getProjectName());
+	    map.put("microWatershed", data.getMicroWatershed().getMwName());
+	    map.put("microWatershedCode", data.getMicroWatershed().getMwCode());
+	    map.put("treatedArea", data.getTreatedArea());
+	    map.put("projectType", data.getProjectType().getProjectTypeId());
+	    map.put("proposedCost", data.getProposedCost());
+	    return map;
+	}
+	
+	@PostMapping("/updatePprProposedProject")
+	public String updatePprProposedProject(@ModelAttribute PprProposedProjectDto dto, 
+			HttpSession session, RedirectAttributes redirectAttributes) {
+		String userId = (String) session.getAttribute("userid");
+	    proposedProjectService.updateProposedProject(dto, userId);
+	    redirectAttributes.addFlashAttribute("success",
+	            "Record updated successfully.");
+	    return "redirect:/pprProposedProjectDetails";
+	}
+
+
 
 	
 }

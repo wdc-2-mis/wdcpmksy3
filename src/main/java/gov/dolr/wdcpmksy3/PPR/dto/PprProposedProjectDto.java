@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class PprProposedProjectDto {
 
+	private Integer pprProposedProjectId;
     private Integer pprId;
     private Integer microWatershed;
     private Integer projectType;
@@ -11,6 +12,14 @@ public class PprProposedProjectDto {
     private BigDecimal treatedProjectArea;
     private BigDecimal proposedCost;
     private String criteriaData;
+
+	public Integer getPprProposedProjectId() {
+		return pprProposedProjectId;
+	}
+
+	public void setPprProposedProjectId(Integer pprProposedProjectId) {
+		this.pprProposedProjectId = pprProposedProjectId;
+	}
 
 	public Integer getPprId() {
 		return pprId;

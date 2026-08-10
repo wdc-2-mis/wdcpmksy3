@@ -125,6 +125,105 @@
 		});
 
 	});
+	
+	document.addEventListener("DOMContentLoaded", function () {
+	    document.querySelectorAll(".editBtn").forEach(function (btn) {
+	        btn.addEventListener("click", function () {
+	            let id = this.getAttribute("data-id");
+	            fetch("/getPprProposedProjectForEdit?id=" + id)
+	                .then(response => response.json())
+	                .then(data => {
+	                    // Hidden ID
+	                    document.getElementById("editPprProposedProjectId").value = data.id;
+	                    // Readonly fields
+	                    document.getElementById("editDistrict").value = data.district ?? "";
+	                    document.getElementById("editProject").value = data.project ?? "";
+	                    document.getElementById("editMicroWatershed").value = data.microWatershed ?? "";
+	                    document.getElementById("editMicroWatershedCode").value = data.microWatershedCode ?? "";
+
+	                    // Editable fields
+	                    document.getElementById("editTreatedArea").value = data.treatedArea ?? "";
+	                    document.getElementById("editProposedCost").value = data.proposedCost ?? "";
+	                    // Select Project Type Radio
+	                    document.querySelectorAll(".editProjectType")
+	                    .forEach(function(radio){
+	                        radio.checked = false;
+	                        if(radio.value == data.projectType){
+	                            radio.checked = true;
+	                        }
+	                    });
+	                })
+	                .catch(error => {
+	                    console.error("Error loading edit data:", error);
+	                });
+	        });
+	    });
+	});
+	
+	document.addEventListener("DOMContentLoaded", function () {
+				document.getElementById("editProjectForm").addEventListener("submit", function(e){
+					// Build criteriaData
+					        let result = [];
+					        document.querySelectorAll("#criteriaModal tbody tr").forEach(function(row){
+					            const chk = row.querySelector(".criteriaCheck");
+					            if(chk && chk.checked){
+					                const criteriaId = chk.value;
+					                const marks = row.querySelector(".marks").innerText.trim();
+					                result.push(criteriaId + ":" + marks);
+					            }
+					        });
+					        document.getElementById("criteriaData").value = result.join(",");
+					        console.log("criteriaData =", document.getElementById("criteriaData").value);
+				    const district = document.getElementById("editDistrict").value;
+				    const project = document.getElementById("editProject").value.trim();
+				    const microWatershed = document.getElementById("editMicroWatershed").value;
+				    const treatedArea = document.querySelector("[name='editTreatedArea']").value;
+				    const proposedCost = document.querySelector("[name='editProposedCost']").value;
+				    const projectType = document.querySelector("input[name='editProjectType']:checked");
+				    if(district === ""){
+				        alert("Please select District.");
+				        e.preventDefault();
+				        return;
+				    }
+				    if(project === ""){
+				        alert("Project Name is missing.");
+				        e.preventDefault();
+				        return;
+				    }
+				    if(microWatershed === ""){
+				        alert("Please select Micro-watershed.");
+				        e.preventDefault();
+				        return;
+				    }
+				    if(treatedArea === ""){
+				        alert("Please enter Proposed Project Area.");
+				        e.preventDefault();
+				        return;
+				    }
+				    if(Number(treatedArea) <= 0){
+				        alert("Project Area must be greater than zero.");
+				        e.preventDefault();
+				        return;
+				    }
+				    if(!projectType){
+				        alert("Please select Project Type.");
+				        e.preventDefault();
+				        return;
+				    }
+				    if(proposedCost === ""){
+				        alert("Please enter Proposed Cost.");
+				        e.preventDefault();
+				        return;
+				    }
+				    if(Number(proposedCost) <= 0){
+				        alert("Proposed Cost must be greater than zero.");
+				        e.preventDefault();
+				        return;
+				    }
+				});
+
+			});
+
 		
 </script>
 	
@@ -219,7 +318,7 @@
 	                </div>
 
 					<div class="text-center mt-4">
-						<button type="submit" name="action"  value="D" class="btn btn-warning">
+						<button type="submit" name="action" value="D" class="btn btn-warning">
 					         <i class="fas fa-save"></i>
 					          Save As Draft
 					     </button>
@@ -249,31 +348,37 @@
 		        </thead>
 		        <tbody>
 		        <tr th:each="data : ${detailsOfListOfProposedProject}">
-		            <td th:text="${data.mPpr.iwmpDistrict.distName}"></td>
-		            <td th:text="${data.mPpr.projectName}"></td>
-		            <td th:text="${data.mMicroWatershed.mwName}"></td>
-		            <td th:text="${data.mMicroWatershed.mwCode}"></td>
+		            <td th:text="${data.ppr.district.distName}"></td>
+		            <td th:text="${data.ppr.projectName}"></td>
+		            <td th:text="${data.microWatershed.mwName}"></td>
+		            <td th:text="${data.microWatershed.mwCode}"></td>
 		            <td th:text="${data.treatedArea}"></td>
-		            <td th:text="${data.mProjectType.projectType}"></td>
+		            <td th:text="${data.projectType.projectType}"></td>
 		            <td th:text="${data.proposedCost}"></td>
-		            <td> <a>Link</a></td>
-
-		            <td>
+					<td>
+						<div class="col-md-4">
+							<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+								data-bs-target="#viewcriteriaModal">
+								Link <i class="fas fa-list"></i>
+							</button>
+							<input type="hidden" id="criteriaData" name="criteriaData">
+						</div>
+					</td>
+					<td>
 						<div class="d-flex align-items-center gap-2">
 							<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
-								data-bs-target="#editModal" th:if="${data.status.equals('D')}">
+								data-bs-target="#editModal" th:if="${#strings.trim(data.status) == 'D'}">
 								<i class="fas fa-edit"></i>
 							</button>
 							&nbsp;
-							<a th:if="${data.status.equals('D')}" th:href="@{/deleteDetailsOfSLNA(id=${data.pprProposedProjectId})}"
+							<a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/deleteDetailsOfSLNA(id=${data.pprProposedProjectId})}"
 								class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
 								<i class="fas fa-trash"></i>
 							</a>
-							<a th:if="${data.status.equals('D')}" th:href="@{/completeDetailsOfSLNA(id=${data.pprProposedProjectId})}"
+							<a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/completeDetailsOfSLNA(id=${data.pprProposedProjectId})}"
 								class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
 								<i class="fas fa-check"></i>
 							</a>
-						
 						</div>
 		            </td>
 		        </tr>
@@ -288,7 +393,7 @@
 		<div class="modal fade" id="criteriaModal" tabindex="-1">
 		    <div class="modal-dialog modal-xl">
 		        <div class="modal-content">
-		            <div class="modal-header">
+		            <div class="modal-header bg-primary text-white">
 		                <h5>Criteria Details</h5>
 		                <button class="btn-close" data-bs-dismiss="modal"></button>
 		            </div>
@@ -346,124 +451,94 @@
 		    </div>
 		</div>
 
-		<!-- Edit Popup -->
 		<div class="modal fade" id="editModal">
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header bg-primary text-white">
-						<h5>Edit Details</h5>
-						<button class="btn-close" data-bs-dismiss="modal"></button>
+						<h5>
+							Edit Prioritized Proposed Project
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal">
+						</button>
 					</div>
-					<div class="modal-body">
-						<form id="editForm" th:action="@{/updateDetailsOfSLNA}" method="post">
-						<input type="hidden" id="pprSlna" name="pprSlna">
-						<!-- Member Details -->
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Member Details </label>
-							<input type="hidden" name="stcode" th:value="${stcode}">
-							<div class="col-md-9">
-								<div class="form-check form-check-inline" th:each="member : ${memberDetailsList}">
-									<input class="form-check-input" type="radio" name="memberType" th:id="'member'+${member.memberId}"
-										th:value="${member.memberId}" />
-									<label class="form-check-label" th:for="'member'+${member.memberId}" th:text="${member.memberType}">
-									</label>
+					<form th:action="@{/updatePprProposedProject}" method="post" id="editProjectForm">
+						<div class="modal-body">
+							<input type="hidden" id="editPprProposedProjectId" name="pprProposedProjectId">
+							<div class="row mb-3">
+								<label class="col-md-3 fw-bold">
+									District
+								</label>
+								<div class="col-md-5">
+									<input type="text" class="form-control" id="editDistrict" readonly>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label class="col-md-3 fw-bold">
+									Project Name
+								</label>
+								<div class="col-md-5">
+									<input type="text" class="form-control" id="editProject" readonly>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label class="col-md-3 fw-bold">
+									Name of Micro-watershed Proposed to be covered
+								</label>
+								<div class="col-md-5">
+									<input type="text" class="form-control" id="editMicroWatershed" readonly>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label class="col-md-3 fw-bold">
+									Micro-watershed Code
+								</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" id="editMicroWatershedCode" readonly>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label class="col-md-3 fw-bold">
+									Proposed project area treated(in Ha.)
+								</label>
+								<div class="col-md-3">
+									<input type="number" class="form-control" id="editTreatedArea" name="treatedProjectArea" step="any" min="0">
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label class="col-md-3 fw-bold">
+									Type of Project
+								</label>
+								<div class="col-md-9">
+									<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
+										<input class="form-check-input editProjectType" type="radio" name="projectType"
+											th:id="'editProject'+${project.projectTypeId}" th:value="${project.projectTypeId}">
+										<label class="form-check-label" th:for="'editProject'+${project.projectTypeId}"
+											th:text="${project.projectType}">
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label class="col-md-3 fw-bold">
+									Proposed Cost
+								</label>
+								<div class="col-md-3">
+									<input type="number" class="form-control" id="editProposedCost" name="proposedCost" step="any" min="0">
 								</div>
 							</div>
 						</div>
-						
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold">Name</label>
-							<div class="col-md-4">
-								<input type="text" class="form-control" id="firstName" name="firstName">
-							</div>
-							<div class="col-md-4">
-								<input type="text" class="form-control" id="lastName" name="lastName">
-							</div>
-						</div>
-						
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold">Designation</label>
-							<div class="col-md-5">
-								<select class="form-select" id="designation" name="designation">
-									<option value="">--Select--</option>
-									<option th:each="d : ${designationList}" th:value="${d.designationId}" th:text="${d.designationName}">
-									</option>
-								</select>
-							</div>
-						</div>
-						
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold">Qualification</label>
-							<div class="col-md-5">
-								<select class="form-select" id="qualification" name="qualification">
-									<option value="">--Select--</option>
-									<option th:each="q : ${qualificationList}" th:value="${q.qualificationId}" th:text="${q.qualificationName}">
-									</option>
-								</select>
-							</div>
-						</div>
-						
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold">Appointment Date</label>
-							<div class="col-md-4">
-								<input type="date" id="appointmentDate" class="form-control" name="appointmentDate" min="2025-01-01"
-									th:value="${appointmentDate}" required>
-							</div>
-						</div>
-						
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Nature of Appointment </label>
-							<div class="col-md-9">
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="joiningType" value="F" id="joiningFull">
-									<label class="form-check-label"> Full Time </label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="joiningType" value="P" id="joiningPart">
-									<label class="form-check-label"> Part Time </label>
-								</div>
-							</div>
-						</div>
-						
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Tenure Period </label>
-							<div class="col-md-3">
-								<input type="text" id="tenure" class="form-control" name="tenure">
-							</div>
-						</div>
-						
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Phone No </label>
-							<div class="col-md-4">
-								<input type="text" id="phoneNo" class="form-control" maxlength="10" name="phone">
-							</div>
-						</div>
-						
-						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Email </label>
-							<div class="col-md-5">
-								<input type="email" id="emailId" class="form-control" name="email">
-							</div>
-						</div>
-						
-						<div class="row mb-4 align-items-center">
-							<label class="col-md-3 fw-bold"> Fax </label>
-							<div class="col-md-4">
-								<input type="text" id="fax" class="form-control" name="fax">
-							</div>
-						</div>
-						
-						<div class="text-center mt-4">
-							<button type="submit" name="updateAction" value="D" class="btn btn-warning">
-								<i class="fas fa-save"></i>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+								Close
+							</button>
+							<button type="submit" class="btn btn-success">
 								Update
 							</button>
 						</div>
 					</form>
-					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+		</div>
 </body>
 </html>

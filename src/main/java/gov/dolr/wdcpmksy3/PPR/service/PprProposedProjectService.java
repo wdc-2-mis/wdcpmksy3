@@ -1,7 +1,9 @@
 package gov.dolr.wdcpmksy3.PPR.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,4 +85,23 @@ public class PprProposedProjectService {
     	List<PprProposedProject> list = repository.getListOfPprProposedProjectsByPpr(ppr);
     	return list;
     }
+
+	public PprProposedProject findById(Integer id) {
+		Optional<PprProposedProject> data = repository.findById(id);
+		return data.get();
+	}
+	
+	@Transactional
+	public void updateProposedProject(PprProposedProjectDto dto, String userId) {
+
+	    PprProposedProject entity = repository.findById(dto.getPprProposedProjectId()).orElseThrow(() -> new RuntimeException("Invalid Id"));
+	    // Only editable fields
+	    entity.setTreatedArea(dto.getTreatedProjectArea());
+	    entity.setProposedCost(dto.getProposedCost());
+	    entity.setProjectType(projectTypeRepository.findById(dto.getProjectType()).orElseThrow(() -> new RuntimeException("Invalid Project Type")));
+	    entity.setUpdatedBy(userId);
+	    entity.setUpdatedDate(LocalDate.now());
+	    repository.save(entity);
+	}
+
 }
