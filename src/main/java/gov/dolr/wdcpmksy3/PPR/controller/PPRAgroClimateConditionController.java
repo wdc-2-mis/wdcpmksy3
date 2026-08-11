@@ -16,9 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.dto.PprAgroClimateDTO;
+import gov.dolr.wdcpmksy3.PPR.dto.PprSlnaDetailsDto;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprAgroClimate;
+import gov.dolr.wdcpmksy3.PPR.entity.PprSlnaDetails;
 import gov.dolr.wdcpmksy3.PPR.repository.PprAgroClimateRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.PPR.service.CropTypeServices;
 import gov.dolr.wdcpmksy3.PPR.service.MPprService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRAgroClimateConditionServices;
@@ -55,6 +59,9 @@ public class PPRAgroClimateConditionController {
     @Autowired
     private PprAgroClimateRepository agcrepo;
     
+    @Autowired
+    private VillageRepository villrepo;
+    
 	@GetMapping("/agroClimateConditionPPR10")
     public String agroClimateConditionPPR10(HttpSession session, Model model) 
 	{
@@ -87,6 +94,7 @@ public class PPRAgroClimateConditionController {
 
         model.addAttribute("agroClimateList", finalList);
         model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
+        model.addAttribute("villageList", villrepo.getVillagesByState(stcode));
         model.addAttribute("soilTypeList", soilser.getAllSoilTypeDetails());
         model.addAttribute("cropTypeList", cropser.getAllCropTypeDetails());
 		model.addAttribute("stcode", stcode);
@@ -229,5 +237,74 @@ public class PPRAgroClimateConditionController {
 	        
 	         return "redirect:/agroClimateConditionPPR10";
 	     }
+	 	 
+	 	 @GetMapping("/getAgroClimateConditionPPR10Id")
+		 @ResponseBody
+		 public PprAgroClimateDTO AgroClimateConditionPPR10(@RequestParam Integer id){
+
+	 		List<Object[]> agroList = agcrepo.getPprAgroClimateListById(id);
+	 		PprAgroClimateDTO dto = new PprAgroClimateDTO();
+	 		for (Object[] row : agroList) 
+	 		{
+			    dto.setAgroid((Integer) row[0]);
+			    dto.setArea(new BigDecimal(row[6].toString()));
+			    dto.setDistname(row[1].toString());
+			    dto.setProjname(row[2].toString());
+			    dto.setVillage((Integer) row[3]);
+			    dto.setVillname(row[4].toString());
+			    dto.setZone(row[5].toString());
+			    dto.setGraphy(row[8].toString());
+			    dto.setRainfall(new BigDecimal(row[7].toString()));
+			    dto.setFarea(new BigDecimal(row[9].toString()));
+			    dto.setCroptype((Integer) row[11]);
+			    dto.setCroparea(new BigDecimal(row[13].toString()));
+			    dto.setSoilType((Integer) row[14]);
+			    dto.setSoilarea(new BigDecimal(row[16].toString()));
+	 		}
+	 		return dto;
+		 }
+	 	 
+	 	 @PostMapping("/editAgroClimateConditionPPR10")
+		 public String editAgroClimateConditionPPR10(HttpSession session, Model model, HttpServletRequest request,
+		    		
+		    		@RequestParam Integer agroid,
+		            @RequestParam String zone1,
+		            @RequestParam String graphy1,
+		            @RequestParam BigDecimal rainfall1,
+		            @RequestParam BigDecimal area1,
+		            @RequestParam BigDecimal farea1,
+		            @RequestParam Integer soilType1,
+		            @RequestParam BigDecimal soilarea1,
+		            @RequestParam Integer croptype1,
+		            @RequestParam BigDecimal croparea1,
+		            @RequestParam String updateAction,
+		            RedirectAttributes redirectAttributes) {
+		   
+			    
+					Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+					String userid=(String)session.getAttribute("userid");
+					try {
+						
+						 if(userid==null){
+		
+					            return "redirect:/login";
+					     }
+						boolean save=false;
+				    	
+						save=agroser.editAgroClimateConditionPPR10( agroid, zone1, graphy1, rainfall1, area1, farea1,
+								soilType1, soilarea1, croptype1, croparea1, updateAction, userid, CommonFunctions.getClientIpAddr(request));
+						
+						if(save)
+							redirectAttributes.addFlashAttribute( "success", "Agro-Climatic Condition Update successfully.");
+						else
+							redirectAttributes.addFlashAttribute("error", "Unable to Update Agro-Climatic Condition.");
+						}
+						catch (Exception e) {
+		
+							e.printStackTrace();
+					        redirectAttributes.addFlashAttribute("error", "Unable to Update Agro-Climatic Condition.");
+						}
+					return "redirect:/agroClimateConditionPPR10";	
+		    }
 
 }

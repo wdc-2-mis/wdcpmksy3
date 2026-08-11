@@ -1,6 +1,7 @@
 package gov.dolr.wdcpmksy3.PPR.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,5 +118,58 @@ public class PPRAgroClimateConditionServices {
 
         agcrepo.save(fun);
     }
+	
+	public boolean editAgroClimateConditionPPR10(Integer agroid, String zone, String graphy, BigDecimal rainfall, BigDecimal area, BigDecimal farea,
+			Integer soilType, BigDecimal soilarea, Integer croptype, BigDecimal croparea, String status, String userid, String ip) {
+		
+		boolean state=false;
+		
+		try {
+			CropType ct= ctrep.getReferenceById(croptype);
+			SoilType st= strep.getReferenceById(soilType);
+			
+			
+			PprAgroClimate ac= agcrepo.findById(agroid).get();
+			
+			ac.setZoneName(zone);
+			ac.setTopography(graphy);
+			ac.setAvgRainfall(rainfall);
+			ac.setArea(area);
+			ac.setForestArea(farea);
+			ac.setUpdatedBy(userid);
+			ac.setUpdatedDate(LocalDate.now());
+			ac.setRequestIp(ip);
+			agcrepo.save(ac);
+			
+			acrepo.deleteByAgroClimatePprAgroId(agroid);
+			PprAgroCrop acrop = new PprAgroCrop();
+			acrop.setAgroClimate(ac);
+			acrop.setCropType(ct);
+			acrop.setArea(croparea);
+			acrop.setCreatedBy(userid);
+			acrop.setCreatedDate(LocalDateTime.now());
+			acrop.setRequestIp(ip);
+			acrepo.save(acrop);
+			
+			asrepo.deleteByAgroClimatePprAgroId(agroid);
+			PprAgroSoil asoil = new PprAgroSoil();
+			asoil.setAgroClimate(ac);
+			asoil.setSoilType(st);
+			asoil.setArea(soilarea);
+			asoil.setCreatedBy(userid);
+			asoil.setCreatedDate(LocalDateTime.now());
+			asoil.setRequestIp(ip);
+			asrepo.save(asoil);
+			
+			state=true;
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			state=false;
+		}
+		return state;
+	}
+	
 
 }
