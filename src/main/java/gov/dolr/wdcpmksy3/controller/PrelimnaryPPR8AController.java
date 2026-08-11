@@ -29,7 +29,11 @@ import gov.dolr.wdcpmksy3.service.DistrictService;
 import gov.dolr.wdcpmksy3.service.PprProposedAreaService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.List;
 
+
+import java.util.List;
 
 @Controller
 public class PrelimnaryPPR8AController {
@@ -70,7 +74,17 @@ public class PrelimnaryPPR8AController {
         
         model.addAttribute("projectList",new ArrayList<>());
         model.addAttribute("blockList",new ArrayList<>());
-        model.addAttribute("ppr8List",new ArrayList<>());
+       // model.addAttribute("ppr8List",new ArrayList<>());
+
+        Integer pprId = (Integer) session.getAttribute("pprId");
+        
+        if (pprId != null) {
+            model.addAttribute("draftList",
+                    pprprep.findByPprPprIdAndStatus(pprId, 'D'));
+
+        } else {
+            model.addAttribute("draftList", new ArrayList<>());
+        }
 
         return "ppr8";
     }
@@ -116,16 +130,6 @@ public class PrelimnaryPPR8AController {
 
 	    String userid = (String) session.getAttribute("userid");
 	    
-	    System.out.println("userid = " + userid);
-	    System.out.println("pprId = " + pprId);
-	    System.out.println("bcode = " + bcode);
-	    System.out.println("scheme = " + scheme);
-	    System.out.println("projSanctionedNo = " + projSanctionedNo);
-	    System.out.println("projSanctionedArea = " + projSanctionedArea);
-	    System.out.println("netArea = " + netArea);
-	    System.out.println("proposedArea = " + proposedArea);
-	    System.out.println("proposedAreaOthers = " + proposedAreaOthers);
-	    System.out.println("netBalArea = " + netBalArea);
 
 	    if (userid != null) {
 
@@ -134,8 +138,11 @@ public class PrelimnaryPPR8AController {
 
 	        // Fetch Block
 	        MBlock block = blockRepository.getReferenceById(bcode);
+	        
+	        
+	     // Store pprId in session
+	        session.setAttribute("pprId", pprId);
 
-	     
 			
 	        // Create Entity
 	        PprProposedArea obj = new PprProposedArea();
@@ -165,5 +172,45 @@ public class PrelimnaryPPR8AController {
 
 	        return "redirect:/login";
 	    }
+	}
+	
+	
+	@GetMapping("/getPPR8ById")
+	@ResponseBody
+	public String editPPR8(@RequestParam Long id,
+	                       Model model,
+	                       HttpSession session) {
+
+	    PprProposedArea data = pprprep.findById(id).orElse(null);
+
+	    model.addAttribute("editData", data);
+
+	    String statename = session.getAttribute("statename").toString();
+	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+	    String userid = (String) session.getAttribute("userid");
+
+	    if (userid == null) {
+	        return "redirect:/login";
+	    }
+
+	    model.addAttribute("distList",
+	            districtService.getPPRDistrictsByState(stcode));
+
+	    model.addAttribute("projectList", new ArrayList<>());
+	    model.addAttribute("blockList", new ArrayList<>());
+
+	    Integer pprId = (Integer) session.getAttribute("pprId");
+
+	    if (pprId != null) {
+	        model.addAttribute("draftList",
+	        		pprprep.findByPprPprIdAndStatus(pprId, 'D'));
+	    } else {
+	        model.addAttribute("draftList", new ArrayList<>());
+	    }
+
+	    model.addAttribute("stateName", statename);
+	    model.addAttribute("projectList",new ArrayList<>());
+        model.addAttribute("blockList",new ArrayList<>());
+	    return "editppr8";
 	}
 }

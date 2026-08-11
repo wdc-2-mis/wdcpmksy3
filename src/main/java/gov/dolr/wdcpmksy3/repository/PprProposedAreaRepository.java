@@ -13,5 +13,5 @@ import gov.dolr.wdcpmksy3.entity.PprProposedArea;
 public interface PprProposedAreaRepository extends JpaRepository<PprProposedArea, Long> {
 
     List<PprProposedArea> findByPprPprIdAndStatus(Integer pprId,Character status);
-
+    List<PprProposedArea> findByBlockBcode(Integer bcode);
 }

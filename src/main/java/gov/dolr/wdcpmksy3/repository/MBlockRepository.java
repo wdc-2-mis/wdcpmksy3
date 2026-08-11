@@ -15,7 +15,7 @@ public interface MBlockRepository extends JpaRepository<MBlock, Integer> {
 	
 	List<MBlock> findByBcodeIn(List<Integer> bcodes);
 	
-	 @Query(value="select b.* from m_block b JOIN ppr_proposed_area pa on pa.bcode = b.bcode join m_ppr m on m.ppr_id = pa.ppr_id "
+	 @Query(value="select distinct b.* from m_block b JOIN ppr_proposed_area pa on pa.bcode = b.bcode join m_ppr m on m.ppr_id = pa.ppr_id "
 	 		+ "where m.ppr_id=:pprId order by b.block_name",nativeQuery=true)
 		    List<MBlock> getBlocksByProject(Integer pprId);
 }

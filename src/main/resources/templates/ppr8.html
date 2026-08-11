@@ -1,790 +1,1009 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
 
 <head>
 
-<meta charset="UTF-8">
+	<meta charset="UTF-8">
 
-<title>Preliminary Project Report (PPR8)</title>
+	<title>Preliminary Project Report (PPR8)</title>
 
-<style>
+	<style>
+		.required {
+			color: red;
+		}
 
-.required{
-    color:red;
-}
+		.table th {
+			text-align: center;
+			vertical-align: middle;
+		}
 
-.table th{
-    text-align:center;
-    vertical-align:middle;
-}
+		.table td {
+			vertical-align: middle;
+		}
 
-.table td{
-    vertical-align:middle;
-}
-
-.form-label{
-    font-weight:600;
-}
-
-</style>
+		.form-label {
+			font-weight: 600;
+		}
+	</style>
 
 
-<script>
-	
-	document.addEventListener("DOMContentLoaded", function () {
+	<script>
+
+		document.addEventListener("DOMContentLoaded", function () {
 
 			document.getElementById("district").addEventListener("change", function () {
 
-			    let districtId = this.value;
-			    let project = document.getElementById("project");
+				let districtId = this.value;
+				let project = document.getElementById("project");
 
-			    // Clear existing options
-			    project.innerHTML = '<option value="">--Select Project--</option>';
+				// Clear existing options
+				project.innerHTML = '<option value="">--Select Project--</option>';
 
-			    if (districtId === "") {
-			        return;
-			    }
+				if (districtId === "") {
+					return;
+				}
 
-			    fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
-			        .then(response => response.json())
-			        .then(data => {
+				fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
+					.then(response => response.json())
+					.then(data => {
 
-			            data.forEach(function(item) {
+						data.forEach(function (item) {
 
-			                let option = document.createElement("option");
-			                option.value = item.id;          // PPR ID
-			                option.textContent = item.name;  // Project Name
+							let option = document.createElement("option");
+							option.value = item.id;          // PPR ID
+							option.textContent = item.name;  // Project Name
 
-			                project.appendChild(option);
-			            });
+							project.appendChild(option);
+						});
 
-			        })
-			        .catch(error => {
-			            console.error("Error:", error);
-			        });
+					})
+					.catch(error => {
+						console.error("Error:", error);
+					});
 
 			});
-			
+
 			document.getElementById("project").addEventListener("change", function () {
 
-			    let projectId = this.value;
-			    let village = document.getElementById("block");
+				let projectId = this.value;
+				let village = document.getElementById("block");
 
-			    village.innerHTML =
-			        '<option value="">--Select Block--</option>';
+				village.innerHTML =
+					'<option value="">--Select Block--</option>';
 
-			    if(projectId===""){
-			        return;
-			    }
+				if (projectId === "") {
+					return;
+				}
 
-			    fetch("/getBlockByProjectPPR8?pprId="+projectId)
-			        .then(res=>res.json())
-			        .then(data=>{
+				fetch("/getBlockByProjectPPR8?pprId=" + projectId)
+					.then(res => res.json())
+					.then(data => {
 
-			            data.forEach(function(item){
+						data.forEach(function (item) {
 
-			                let option=document.createElement("option");
+							let option = document.createElement("option");
 
-			                option.value=item.id;
-			                option.text=item.name;
+							option.value = item.id;
+							option.text = item.name;
 
-			                village.appendChild(option);
+							village.appendChild(option);
 
-			            });
+						});
 
-			        })
-			        .catch(err=>console.log(err));
+					})
+					.catch(err => console.log(err));
 
 			});
 
 		});
-		
-		
-		
+
+
+
 		document.addEventListener("DOMContentLoaded", function () {
 
-		    const form = document.getElementById("ppr8Form");
+			const form = document.getElementById("ppr8Form");
 
-		    form.addEventListener("submit", function (e) {
+			form.addEventListener("submit", function (e) {
 
-		        const district = document.getElementById("district");
-		        const project = document.getElementById("project");
-		        const block = document.getElementById("block");
+				const district = document.getElementById("district");
+				const project = document.getElementById("project");
+				const block = document.getElementById("block");
 
-		        const scheme = document.querySelector('input[name="scheme"]:checked');
+				const scheme = document.querySelector('input[name="scheme"]:checked');
 
-		        const projSanctionedNo = document.getElementsByName("projSanctionedNo")[0];
-		        const sanctionArea = document.getElementsByName("projSanctionedArea")[0];
-		        const netArea = document.getElementsByName("netArea")[0];
-		        const proposedArea = document.getElementsByName("proposedArea")[0];
-		        const otherArea = document.getElementsByName("proposedAreaOthers")[0];
-		        const balanceArea = document.getElementsByName("netBalArea")[0];
+				const projSanctionedNo = document.getElementsByName("projSanctionedNo")[0];
+				const sanctionArea = document.getElementsByName("projSanctionedArea")[0];
+				const netArea = document.getElementsByName("netArea")[0];
+				const proposedArea = document.getElementsByName("proposedArea")[0];
+				const otherArea = document.getElementsByName("proposedAreaOthers")[0];
+				const balanceArea = document.getElementsByName("netBalArea")[0];
 
-		        if (district.value === "") {
-		            alert("Please select District.");
-		            district.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (district.value === "") {
+					alert("Please select District.");
+					district.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (project.value === "") {
-		            alert("Please select Project.");
-		            project.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (project.value === "") {
+					alert("Please select Project.");
+					project.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (block.value === "") {
-		            alert("Please select Block.");
-		            block.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (block.value === "") {
+					alert("Please select Block.");
+					block.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (!scheme) {
-		            alert("Please select Scheme.");
-		            e.preventDefault();
-		            return false;
-		        }
+				if (!scheme) {
+					alert("Please select Scheme.");
+					e.preventDefault();
+					return false;
+				}
 
-		        if (projSanctionedNo.value.trim() === "") {
-		            alert("Please enter No. of Pre WDC Projects.");
-		            projSanctionedNo.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (projSanctionedNo.value.trim() === "") {
+					alert("Please enter No. of Pre WDC Projects.");
+					projSanctionedNo.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (sanctionArea.value.trim() === "") {
-		            alert("Please enter Sanctioned Area.");
-		            sanctionArea.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (sanctionArea.value.trim() === "") {
+					alert("Please enter Sanctioned Area.");
+					sanctionArea.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (netArea.value.trim() === "") {
-		            alert("Please enter Net Area.");
-		            netArea.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (netArea.value.trim() === "") {
+					alert("Please enter Net Area.");
+					netArea.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (proposedArea.value.trim() === "") {
-		            alert("Please enter Proposed Area.");
-		            proposedArea.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (proposedArea.value.trim() === "") {
+					alert("Please enter Proposed Area.");
+					proposedArea.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (otherArea.value.trim() === "") {
-		            alert("Please enter Other DoLR Area.");
-		            otherArea.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (otherArea.value.trim() === "") {
+					alert("Please enter Other DoLR Area.");
+					otherArea.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (balanceArea.value.trim() === "") {
-		            alert("Please enter Net Balance Area.");
-		            balanceArea.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (balanceArea.value.trim() === "") {
+					alert("Please enter Net Balance Area.");
+					balanceArea.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		    });
+			});
+
 
 		});
-</script>
+
+
+
+		/* ==========================================================
+		   Load Block according to District
+		========================================================== */
+		document.addEventListener("DOMContentLoaded", function () {
+			document.getElementById("district").addEventListener("change", function () {
+
+				let dcode = this.value;
+
+				if (dcode == "") {
+
+					document.getElementById("block").innerHTML =
+						"<option value=''>--Select Block--</option>";
+
+					return;
+
+				}
+
+				fetch("/getBlocksByDistrict?dcode=" + dcode)
+
+					.then(response => response.json())
+
+					.then(data => {
+
+						let block = document.getElementById("block");
+
+						block.innerHTML =
+							"<option value=''>--Select Block--</option>";
+
+						data.forEach(function (item) {
+
+							let option =
+								document.createElement("option");
+
+							option.value = item.bcode;
+
+							option.text = item.blockName;
+
+							block.appendChild(option);
+
+						});
+
+					})
+
+					.catch(function (error) {
+
+						console.log(error);
+
+					});
+
+			});
+
+
+			/* ==========================================================
+			   Auto Calculate Balance Area
+			========================================================== */
+
+			function calculateBalanceArea() {
+
+				let sanctionArea = parseFloat(document.getElementById("sanctionArea").value) || 0;
+
+				let netArea = parseFloat(document.getElementById("netArea").value) || 0;
+
+				let proposedArea = parseFloat(document.getElementById("proposedArea").value) || 0;
+
+				let otherArea = parseFloat(document.getElementById("otherArea").value) || 0;
+
+				let balance = sanctionArea - (netArea + proposedArea + otherArea);
+
+
+				if (balance < 0) {
+					balance = 0;
+				}
+
+				document.getElementById("balanceArea").value = balance.toFixed(2);
+			}
+
+			document.getElementById("netArea").addEventListener("keyup", calculateBalanceArea);
+
+			document.getElementById("proposedArea").addEventListener("keyup", calculateBalanceArea);
+
+			document.getElementById("otherArea").addEventListener("keyup", calculateBalanceArea);
+
+
+
+		});
+		
+		function validateInteger(input, maxLength) {
+		    input.value = input.value.replace(/[^0-9]/g, '');
+		    if (input.value.length > maxLength) {
+		        input.value = input.value.slice(0, maxLength);
+		    }
+		}
+
+		function validateDecimal(input) {
+		    input.value = input.value.replace(/[^0-9.]/g, '');
+
+		    const parts = input.value.split('.');
+		    if (parts.length > 2) {
+		        input.value = parts[0] + '.' + parts.slice(1).join('');
+		    }
+		}
+
+
+	</script>
 
 </head>
 
 <body>
 
-<div layout:fragment="content">
+	<div layout:fragment="content">
 
-<div class="card shadow-sm border-0">
+		<div class="container-fluid px-4">
 
-<div class="card-header bg-primary text-white">
+			<div class="card shadow-sm border-0 mt-3">
 
-<h3 class="mb-0">
+				<div class="card-header bg-primary text-white">
+				            <h4 class="mb-0">Preliminary Project Report (PPR8)</h4>
+				        </div>
 
-Preliminary Project Report (PPR8)
+			</div>
 
-</h3>
+			<!-- SUCCESS -->
 
-</div>
+			<div th:if="${success}" class="alert alert-success alert-dismissible fade show">
 
-<!-- SUCCESS -->
+				<span th:text="${success}"></span>
 
-<div th:if="${success}"
-     class="alert alert-success alert-dismissible fade show">
+				<button type="button" class="btn-close" data-bs-dismiss="alert">
 
-    <span th:text="${success}"></span>
+				</button>
 
-    <button type="button"
-            class="btn-close"
-            data-bs-dismiss="alert">
+			</div>
 
-    </button>
+			<!-- ERROR -->
 
-</div>
+			<div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
 
-<!-- ERROR -->
+				<span th:text="${error}"></span>
 
-<div th:if="${error}"
-     class="alert alert-danger alert-dismissible fade show">
+				<button type="button" class="btn-close" data-bs-dismiss="alert">
 
-    <span th:text="${error}"></span>
+				</button>
 
-    <button type="button"
-            class="btn-close"
-            data-bs-dismiss="alert">
+			</div>
 
-    </button>
+			<div class="card-body px-4 py-4">
 
-</div>
+			    <h5 class="text-center fw-bold mb-4">
+			        Details of Previously identified DPAP/DDP/IWDP areas proposed users
+			    </h5>
 
-<div class="card-body">
+			    <form th:action="@{/saveDraftPPR8}" method="post">
 
-<div class="container" style="max-width:1000px;">
+			        <!-- Row 1 -->
+			        <div class="row mb-3 align-items-center">
 
-<h4 class="text-center mb-4">
+			            <div class="col-md-2">
+			                <label class="form-label fw-semibold">
+			                    State Name <span class="text-danger">*</span>
+			                </label>
+			            </div>
 
-<b>
+			            <div class="col-md-4">
+			                <input type="text" class="form-control"
+			                       th:value="${stateName}" readonly>
+			            </div>
 
-Details of Previously identified DPAP/DDP/IWDP areas proposed users
+			            <div class="col-md-2">
+			                <label class="form-label fw-semibold">
+			                    District Name <span class="text-danger">*</span>
+			                </label>
+			            </div>
 
-</b>
+			            <div class="col-md-4">
+			                <select class="form-select" id="district" name="dcode">
+			                    <option value="">--Select District--</option>
+			                    <option th:each="d : ${distList}"
+			                            th:value="${d.dcode}"
+			                            th:text="${d.distName}"></option>
+			                </select>
+			            </div>
 
-</h4>
+			        </div>
 
-<form id="ppr8Form"
-      th:action="@{/saveDraftPPR8}"
-      method="post">
+			        <!-- Row 2 -->
+			        <div class="row mb-3 align-items-center">
 
-<!-- ========================= ROW 1 ========================= -->
+			            <div class="col-md-2">
+			                <label class="form-label fw-semibold">
+			                    Name of Project <span class="text-danger">*</span>
+			                </label>
+			            </div>
 
-<div class="row mb-3">
+			            <div class="col-md-4">
+			                <select class="form-select" id="project" name="pprId">
+			                    <option value="">--Select Project--</option>
+			                </select>
+			            </div>
 
-<div class="col-md-2">
+			            <div class="col-md-2">
+			                <label class="form-label fw-semibold">
+			                    Name of Block <span class="text-danger">*</span>
+			                </label>
+			            </div>
 
-<label class="form-label">
+			            <div class="col-md-4">
+			                <select class="form-select" id="block" name="bcode">
+			                    <option value="">--Select Block--</option>
+			                    <option th:each="b : ${blockList}"
+			                            th:value="${b.bcode}"
+			                            th:text="${b.blockName}"></option>
+			                </select>
+			            </div>
+
+			        </div>
+
+			        <!-- Row 3 -->
+			        <div class="row mb-3 align-items-center">
+
+			            <div class="col-md-2">
+			                <label class="form-label fw-semibold">
+			                    Type of Scheme <span class="text-danger">*</span>
+			                </label>
+			            </div>
+
+			            <div class="col-md-10">
+
+			                <div class="form-check form-check-inline">
+			                    <input class="form-check-input" type="radio"
+			                           name="scheme" value="DPAP">
+			                    <label class="form-check-label">DPAP</label>
+			                </div>
+
+			                <div class="form-check form-check-inline">
+			                    <input class="form-check-input" type="radio"
+			                           name="scheme" value="DDP">
+			                    <label class="form-check-label">DDP</label>
+			                </div>
+
+			                <div class="form-check form-check-inline">
+			                    <input class="form-check-input" type="radio"
+			                           name="scheme" value="IWDP">
+			                    <label class="form-check-label">IWDP</label>
+			                </div>
+
+			            </div>
+
+			        </div>
+					
+					<!-- No. of Pre WDC 3.0 Projects sanctioned in the Block -->
+					<div class="row mb-3 align-items-center">
+
+					    <div class="col-md-4">
+					        <label class="form-label fw-semibold">
+					            No. of Pre WDC 3.0 Projects sanctioned in the Block
+					            <span class="text-danger">*</span>
+					        </label>
+					    </div>
+
+					    <div class="col-md-4">
+					        <input type="text"
+					               class="form-control form-control-sm"
+					               name="projSanctionedNo"
+					               maxlength="10"
+					               oninput="validateInteger(this,10)"
+					               required>
+					    </div>
+
+					</div>
+
+					<!-- Area of Sanctioned Projects (ha) -->
+					<div class="row mb-3 align-items-center">
+
+					    <div class="col-md-4">
+					        <label class="form-label fw-semibold">
+					            Area of Sanctioned Projects (ha)
+					            <span class="text-danger">*</span>
+					        </label>
+					    </div>
+
+					    <div class="col-md-4">
+					        <input type="text"
+					               class="form-control form-control-sm"
+					               name="projSanctionedArea"
+					               maxlength="10"
+					               oninput="validateDecimal(this)"
+					               required>
+					    </div>
+
+					</div>
+
+					<!-- Net Area to be Covered -->
+					<div class="row mb-3 align-items-center">
+
+					    <div class="col-md-4">
+					        <label class="form-label fw-semibold">
+					            Net Area to be Covered
+					            <span class="text-danger">*</span>
+					        </label>
+					    </div>
+
+					    <div class="col-md-4">
+					        <input type="text"
+					               class="form-control form-control-sm"
+					               name="netArea"
+					               maxlength="10"
+					               oninput="validateDecimal(this)"
+					               required>
+					    </div>
+
+					</div>
+
+					<!-- Area of Proposed Projects (ha) -->
+					<div class="row mb-3 align-items-center">
+
+					    <div class="col-md-4">
+					        <label class="form-label fw-semibold">
+					            Area of Proposed Projects (ha)
+					            <span class="text-danger">*</span>
+					        </label>
+					    </div>
+
+					    <div class="col-md-4">
+					        <input type="text"
+					               class="form-control form-control-sm"
+					               name="proposedArea"
+					               maxlength="10"
+					               oninput="validateDecimal(this)"
+					               required>
+					    </div>
+
+					</div>
+
+					<!-- Area proposed to be covered by scheme other than DoLR (ha) -->
+					<div class="row mb-3 align-items-center">
+
+					    <div class="col-md-4">
+					        <label class="form-label fw-semibold">
+					            Area proposed to be covered by scheme other than DoLR (ha)
+					            <span class="text-danger">*</span>
+					        </label>
+					    </div>
+
+					    <div class="col-md-4">
+					        <input type="text"
+					               class="form-control form-control-sm"
+					               name="proposedAreaOthers"
+					               maxlength="10"
+					               oninput="validateDecimal(this)"
+					               required>
+					    </div>
 
-State Name
+					</div>
 
-<span class="required">*</span>
+					<!-- Net Balance Area (ha) -->
+					<div class="row mb-3 align-items-center">
 
-</label>
+					    <div class="col-md-4">
+					        <label class="form-label fw-semibold">
+					            Net Balance Area (ha)
+					        </label>
+					    </div>
 
-</div>
+					    <div class="col-md-4">
+					        <input type="text"
+					               class="form-control form-control-sm"
+					               name="netBalArea"
+					               maxlength="10"
+					               oninput="validateDecimal(this)">
+					    </div>
 
-<div class="col-md-4">
+					</div>
 
-<input type="text"
-       class="form-control"
-       name="stateName"
-       th:value="${stateName}"
-       readonly>
+			        <input type="hidden" name="action" value="D">
 
-</div>
+			        <div class="text-center">
+			            <button type="submit" class="btn btn-warning px-4 fw-semibold">
+			                <i class="fa fa-save me-1"></i> Save as Draft
+			            </button>
+			        </div>
 
-<div class="col-md-2">
+			    </form>
+		
 
-<label class="form-label">
+					<!-- ===================================================== -->
+					<!--                  DRAFT DETAILS                        -->
+					<!-- ===================================================== -->
 
-District Name
+					<div class="table-responsive mt-5">
 
-<span class="required">*</span>
+						<h4 class="text-center mb-3">
 
-</label>
+							<b>Draft Details</b>
 
-</div>
+						</h4>
 
-<div class="col-md-4">
+						<table class="table table-bordered table-striped table-hover">
 
-<select class="form-control"
-        id="district"
-        name="district">
+							<thead>
 
-<option value="">--Select District--</option>
+								<tr>
 
-<option th:each="d:${distList}"
-        th:value="${d.dcode}"
-        th:text="${d.distName}">
+									<th class="table-primary">State</th>
 
-</option>
+									<th class="table-primary">District</th>
 
-</select>
+									<th class="table-primary">Project</th>
 
-</div>
+									<th class="table-primary">Block</th>
 
-</div>
+									<th class="table-primary">Scheme</th>
 
-<!-- ========================= ROW 2 ========================= -->
+									<th class="table-primary">
+										No. of Pre WDC Projects
+									</th>
 
-<div class="row mb-3">
+									<th class="table-primary">
+										Sanctioned Area
+									</th>
 
-<div class="col-md-2">
+									<th class="table-primary">
+										Net Area
+									</th>
 
-<label class="form-label">
+									<th class="table-primary">
+										Proposed Area
+									</th>
 
-Name of Project
+									<th class="table-primary">
+										Other DoLR Area
+									</th>
 
-<span class="required">*</span>
+									<th class="table-primary">
+										Balance Area
+									</th>
 
-</label>
+									<th class="table-primary" style="min-width:120px;">
+										Action
+									</th>
 
-</div>
+								</tr>
 
-<div class="col-md-4">
+							</thead>
+							<tbody>
 
-	<select class="form-control"
-	        id="project"
-	        name= "pprId">
 
-	    <option value="">--Select Project--</option>
+								<tr th:each="area : ${draftList}">
 
-	</select>
-</div>
+									<td th:text="${area.ppr.district.state.stName}"></td>
 
-<div class="col-md-2">
+									<td th:text="${area.ppr.district.distName}"></td>
 
-<label class="form-label">
+									<td th:text="${area.ppr.projectName}"></td>
 
-Name of Block
+									<td th:text="${area.block.blockName}"></td>
 
-<span class="required">*</span>
+									<td th:text="${area.scheme.schemeName}"></td>
 
-</label>
+									<td th:text="${area.projSanctionedNo}"></td>
 
-</div>
+									<td th:text="${area.projSanctionedArea}"></td>
 
-<div class="col-md-4">
+									<td th:text="${area.netArea}"></td>
 
-<select class="form-control" id="block"  name= "bcode">
-	<option value="">--Select Block--</option>
-</select>
+									<td th:text="${area.proposedArea}"></td>
 
-</div>
+									<td th:text="${area.proposedAreaOthers}"></td>
 
-</div>
-<!-- ========================= ROW 3 ========================= -->
+									<td th:text="${area.netBalArea}"></td>
 
-<div class="row mb-3">
+									<td>
+										<button type="button" class="btn btn-primary btn-sm"
+											th:data-id="${area.pprProposedAreaId}" data-bs-toggle="modal"
+											data-bs-target="#editModalPPR8">
+											<i class="fas fa-edit"></i>
+										</button>
 
-    <div class="col-md-2">
+										<a th:href="@{/deleteDraftPPR8(id=${area.pprProposedAreaId})}"
+											class="btn btn-danger btn-sm"
+											onclick="return confirm('Are you sure you want to delete this record?');">
+											<i class="fas fa-trash"></i>
+										</a>
 
-        <label class="form-label">
-            Type of Scheme
-            <span class="required">*</span>
-        </label>
+										<a th:href="@{/completeDraftPPR8(id=${area.pprProposedAreaId})}"
+											class="btn btn-success btn-sm"
+											onclick="return confirm('Are you sure you want to complete this record?');">
+											<i class="fas fa-check"></i>
+										</a>
+									</td>
 
-    </div>
+								</tr>
 
-    <div class="col-md-10">
+							</tbody>
 
-        <div class="form-check form-check-inline">
+						</table>
 
-            <input class="form-check-input"
-                   type="radio"
-                   name= "scheme"
-                   id="dpap"
-                   value="DPAP">
+						<!-- ===================== Edit Modal ====================== -->
 
-            <label class="form-check-label" for="dpap">
-                DPAP
-            </label>
+						<div class="modal fade" id="editModalPPR8">
+							<div class="modal-dialog modal-xl">
+								<div class="modal-content">
 
-        </div>
+									<div class="modal-header bg-primary text-white">
+										<h5>Edit PPR8 Details</h5>
 
-        <div class="form-check form-check-inline">
+										<button class="btn-close" data-bs-dismiss="modal"></button>
+									</div>
 
-            <input class="form-check-input"
-                   type="radio"
-                   name= "scheme"
-                   id="ddp"
-                   value="DDP">
+									<div class="modal-body">
 
-            <label class="form-check-label" for="ddp">
-                DDP
-            </label>
+										<form id="editPpr8Form" th:action="@{/updateDraftPPR8}" method="post">
 
-        </div>
+											<!-- Hidden ID -->
+											<input type="hidden" id="editId" name="pprProposedAreaId">
 
-        <div class="form-check form-check-inline">
+											<!-- ========================= ROW 1 ========================= -->
 
-            <input class="form-check-input"
-                   type="radio"
-                   name="scheme"
-                   id="iwdp"
-                   value="IWDP">
+											<div class="row mb-3">
 
-            <label class="form-check-label" for="iwdp">
-                IWDP
-            </label>
+												<div class="col-md-2">
 
-        </div>
+													<label class="form-label">
 
-    </div>
+														State Name
 
-</div>
+														<span class="required">*</span>
 
-<!-- ========================= ROW 4 ========================= -->
+													</label>
 
+												</div>
 
-<div class="row mb-3">
+												<div class="col-md-4">
 
-    <div class="col-md-5">
-        <label>No. of Pre WDC 3.0 Projects sanctioned in the Block
-            <span class="required">*</span>
-        </label>
-    </div>
+													<input type="text" class="form-control" name="stateName"
+														th:value="${stateName}" readonly>
 
-    <div class="col-md-7">
-        <input type="number"
-               class="form-control"
-               name="projSanctionedNo">
-    </div>
+												</div>
 
-</div>
+												<div class="col-md-2">
 
-	<div class="row mb-3">
+													<label class="form-label">
 
-	    <div class="col-md-5">
-	        <label>Area of Sanctioned Projects (ha)</label>
-	        <span class="required">*</span>
-	    </div>
+														District Name
 
-	    <div class="col-md-7">
-			<input type="text"
-			       id="sanctionArea"
-			       class="form-control"
-			       name="projSanctionedArea">
-	    </div>
+														<span class="required">*</span>
 
-	</div>
-<!-- ========================= ROW 5 ========================= -->
+													</label>
 
-<div class="row mb-3">
+												</div>
 
-    <div class="col-md-5">
-        <label>Net Area to be Covered</label>
-        <span class="required">*</span>
-    </div>
+												<div class="col-md-4">
 
-    <div class="col-md-7">
-        <input type="text"
-               class="form-control"
-               name="netArea">
-    </div>
+													<select class="form-control" id="editDistrict" name="dcode"
+														readonly>
 
-</div>
+														<option value="">--Select District--</option>
 
-<div class="row mb-3">
+														<option th:each="d:${distList}" th:value="${d.dcode}"
+															th:text="${d.distName}">
 
-    <div class="col-md-5">
-        <label>Area of Proposed Projects (ha)</label>
-        <span class="required">*</span>
-    </div>
+														</option>
 
-    <div class="col-md-7">
-		<input type="text"
-		       id="proposedArea"
-		       class="form-control"
-		       name="proposedArea">
-    </div>
+													</select>
 
-</div>
-<!-- ========================= ROW 6 ========================= -->
+												</div>
 
-<div class="row mb-3">
+											</div>
 
-    <div class="col-md-5">
-        <label>Area proposed to be covered by scheme other than DoLR (ha)</label>
-        <span class="required">*</span>
-    </div>
+											<!-- ========================= ROW 2 ========================= -->
 
-    <div class="col-md-7">
-		<input type="text"
-		       id="otherArea"
-		       class="form-control"
-		       name="proposedAreaOthers">
-    </div>
+											<div class="row mb-3">
 
-</div>
+												<div class="col-md-2">
 
-<div class="row mb-3">
+													<label class="form-label">
 
-    <div class="col-md-5">
-        <label>Net Balance Area (ha)</label>
-        <span class="required">*</span>
-    </div>
+														Name of Project
 
-    <div class="col-md-7">
-		<input type="text"
-		       id="balanceArea"
-		       class="form-control"
-		       name="netBalArea">
-    </div>
+														<span class="required">*</span>
 
-</div>
+													</label>
 
+												</div>
 
-<!-- ========================= SAVE BUTTON ========================= -->
+												<div class="col-md-4">
 
-<div class="text-center mt-4">
+													<input type="text" class="form-control" id="editProjectName"
+														readonly>
 
-	<button type="submit" class="btn btn-warning">
-	    <i class="fas fa-save"></i> Save as Draft
-	</button>
+													<input type="hidden" id="editProject" name="pprId">
+												</div>
 
-</div>
+												<div class="col-md-2">
 
+													<label class="form-label">
 
-</form>
+														Name of Block
 
-<!-- ===================================================== -->
-<!--                  DRAFT DETAILS                        -->
-<!-- ===================================================== -->
+														<span class="required">*</span>
 
-<div class="table-responsive mt-5">
+													</label>
 
-    <h4 class="text-center mb-3">
+												</div>
 
-        <b>Draft Details</b>
+												<div class="col-md-4">
 
-    </h4>
+													<input type="text" class="form-control" id="editBlockName" readonly>
+													<input type="hidden" id="editBlock" name="bcode">
 
-    <table class="table table-bordered table-striped table-hover">
+												</div>
 
-        <thead>
+											</div>
+											<!-- ========================= ROW 3 ========================= -->
 
-        <tr>
+											<div class="row mb-3">
 
-            <th class="table-primary">State</th>
+												<div class="col-md-2">
 
-            <th class="table-primary">District</th>
+													<label class="form-label">
+														Type of Scheme
+														<span class="required">*</span>
+													</label>
 
-            <th class="table-primary">Project</th>
+												</div>
 
-            <th class="table-primary">Block</th>
+												<div class="col-md-10">
 
-            <th class="table-primary">Scheme</th>
+													<div class="form-check form-check-inline">
 
-            <th class="table-primary">
-                No. of Pre WDC Projects
-            </th>
+														<input class="form-check-input" type="radio" name="scheme"
+															id="editDpap" value="DPAP">
 
-            <th class="table-primary">
-                Sanctioned Area
-            </th>
+														<label class="form-check-label" for="editDpap">
+															DPAP
+														</label>
 
-            <th class="table-primary">
-                Net Area
-            </th>
+													</div>
 
-            <th class="table-primary">
-                Proposed Area
-            </th>
+													<div class="form-check form-check-inline">
 
-            <th class="table-primary">
-                Other DoLR Area
-            </th>
+														<input class="form-check-input" type="radio" name="scheme"
+															id="editDdp" value="DDP">
 
-            <th class="table-primary">
-                Balance Area
-            </th>
+														<label class="form-check-label" for="editDdp">
+															DDP
+														</label>
 
-            <th class="table-primary" style="min-width:120px;">
-                Action
-            </th>
+													</div>
 
-        </tr>
+													<div class="form-check form-check-inline">
 
-        </thead>
-		<tbody>
+														<input class="form-check-input" type="radio" name="scheme"
+															id="editIwdp" value="IWDP">
 
+														<label class="form-check-label" for="editIwdp">
+															IWDP
+														</label>
 
-			<tr th:each="area : ${ppr8List}">
+													</div>
 
-			    <td th:text="${area.ppr.district.state.stateName}"></td>
+												</div>
 
-			    <td th:text="${area.ppr.district.distName}"></td>
+											</div>
 
-			    <td th:text="${area.ppr.projectName}"></td>
+											<!-- ========================= ROW 4 ========================= -->
 
-			    <td th:text="${area.block.blockName}"></td>
 
-			    <td th:text="${area.scheme.schemeName}"></td>
+											<div class="row mb-3">
 
-			    <td th:text="${area.projSanctionedNo}"></td>
+												<div class="col-md-5">
+													<label>No. of Pre WDC 3.0 Projects sanctioned in the Block
+														<span class="required">*</span>
+													</label>
+												</div>
 
-			    <td th:text="${area.projSanctionedArea}"></td>
+												<div class="col-md-7">
+													<input type="text" class="form-control" name="projSanctionedNo"
+														id="editProjSanctionedNo">
+												</div>
 
-			    <td th:text="${area.netArea}"></td>
+											</div>
 
-			    <td th:text="${area.proposedArea}"></td>
+											<div class="row mb-3">
 
-			    <td th:text="${area.proposedAreaOthers}"></td>
+												<div class="col-md-5">
+													<label>Area of Sanctioned Projects (ha)</label>
+													<span class="required">*</span>
+												</div>
 
-			    <td th:text="${area.netBalArea}"></td>
+												<div class="col-md-7">
+													<input type="text" id="editSanctionArea" class="form-control"
+														name="projSanctionedArea">
+												</div>
 
-			    <td>
-			        <a th:href="@{/editDraftPPR8(id=${area.pprProposedAreaId})}"
-			           class="btn btn-warning btn-sm">
-			            Edit
-			        </a>
+											</div>
+											<!-- ========================= ROW 5 ========================= -->
 
-			        <a th:href="@{/deleteDraftPPR8(id=${area.pprProposedAreaId})}"
-			           class="btn btn-danger btn-sm"
-			           onclick="return confirm('Are you sure you want to delete this record?');">
-			            Delete
-			        </a>
-			    </td>
+											<div class="row mb-3">
 
-			</tr>
+												<div class="col-md-5">
+													<label>Net Area to be Covered</label>
+													<span class="required">*</span>
+												</div>
 
-		</tbody>
-        
-    </table>
+												<div class="col-md-7">
+													<input type="text" class="form-control" name="netArea"
+														id="editNetArea">
+												</div>
 
-</div>
-<!-- ========================================================= -->
-<!-- SUCCESS MESSAGE -->
-<!-- ========================================================= -->
+											</div>
 
-<div th:if="${success}"
-     class="alert alert-success alert-dismissible fade show mt-3"
-     role="alert">
+											<div class="row mb-3">
 
-    <span th:text="${success}"></span>
+												<div class="col-md-5">
+													<label>Area of Proposed Projects (ha)</label>
+													<span class="required">*</span>
+												</div>
 
-    <button type="button"
-            class="btn-close"
-            data-bs-dismiss="alert">
-    </button>
+												<div class="col-md-7">
+													<input type="text" id="editProposedArea" class="form-control"
+														name="proposedArea">
+												</div>
 
-</div>
+											</div>
+											<!-- ========================= ROW 6 ========================= -->
 
-<!-- ========================================================= -->
-<!-- ERROR MESSAGE -->
-<!-- ========================================================= -->
+											<div class="row mb-3">
 
-<div th:if="${error}"
-     class="alert alert-danger alert-dismissible fade show mt-3"
-     role="alert">
+												<div class="col-md-5">
+													<label>Area proposed to be covered by scheme other than DoLR
+														(ha)</label>
+													<span class="required">*</span>
+												</div>
 
-    <span th:text="${error}"></span>
+												<div class="col-md-7">
+													<input type="text" id="editOtherArea" class="form-control"
+														name="proposedAreaOthers">
+												</div>
 
-    <button type="button"
-            class="btn-close"
-            data-bs-dismiss="alert">
-    </button>
+											</div>
 
-</div>
+											<div class="row mb-3">
 
-</div>      <!-- container -->
+												<div class="col-md-5">
+													<label>Net Balance Area (ha)</label>
+												</div>
 
-</div>      <!-- card-body -->
+												<div class="col-md-7">
+													<input type="text" id="editBalanceArea" class="form-control"
+														name="netBalArea" readonly>
+												</div>
 
-</div>      <!-- card -->
+											</div>
 
-</div>      <!-- layout fragment -->
 
+											<!-- ========================= SAVE BUTTON ========================= -->
 
-<script>
+											<!--<div class="text-center mt-4">
 
-/* ==========================================================
-   Load Block according to District
-========================================================== */
+												<button type="button" class="btn btn-warning btn-sm"
+												th:onclick="|openEditPPR8(${item.pprProposedAreaId})|">
+												Edit 
+											</button>
 
-document.getElementById("district").addEventListener("change", function () {
+											</div>-->
 
-    let dcode = this.value;
+										</form>
 
-    if (dcode == "") {
+									</div>
 
-        document.getElementById("block").innerHTML =
-                "<option value=''>--Select Block--</option>";
+								</div>
+							</div>
+						</div>
 
-        return;
+					</div>
+					<!-- ========================================================= -->
+					<!-- SUCCESS MESSAGE -->
+					<!-- ========================================================= -->
 
-    }
+					<div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
 
-    fetch("/getBlocksByDistrict?dcode=" + dcode)
+						<span th:text="${success}"></span>
 
-        .then(response => response.json())
+						<button type="button" class="btn-close" data-bs-dismiss="alert">
+						</button>
 
-        .then(data => {
+					</div>
 
-            let block = document.getElementById("block");
+					<!-- ========================================================= -->
+					<!-- ERROR MESSAGE -->
+					<!-- ========================================================= -->
 
-            block.innerHTML =
-                "<option value=''>--Select Block--</option>";
+					<div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
 
-            data.forEach(function(item){
+						<span th:text="${error}"></span>
 
-                let option =
-                    document.createElement("option");
+						<button type="button" class="btn-close" data-bs-dismiss="alert">
+						</button>
 
-                option.value = item.bcode;
+					</div>
 
-                option.text = item.blockName;
+				</div> <!-- container -->
 
-                block.appendChild(option);
+			</div> <!-- card-body -->
 
-            });
+		</div> <!-- card -->
 
-        })
+	</div> <!-- layout fragment -->
 
-        .catch(function(error){
 
-            console.log(error);
-
-        });
-
-});
-
-
-/* ==========================================================
-   Auto Calculate Balance Area
-========================================================== */
-
-function calculateBalance(){
-
-    let sanctioned =
-        parseFloat(document.getElementById("sanctionArea").value) || 0;
-
-    let proposed =
-        parseFloat(document.getElementById("proposedArea").value) || 0;
-
-    let other =
-        parseFloat(document.getElementById("otherArea").value) || 0;
-
-    let balance = sanctioned - proposed - other;
-
-    if(balance < 0){
-
-        balance = 0;
-
-    }
-
-    document.getElementById("balanceArea").value =
-        balance.toFixed(2);
-
-}
-
-
-document.getElementById("sanctionArea")
-        .addEventListener("keyup", calculateBalance);
-
-document.getElementById("proposedArea")
-        .addEventListener("keyup", calculateBalance);
-
-document.getElementById("otherArea")
-        .addEventListener("keyup", calculateBalance);
-
-</script>
 
 </body>
-
