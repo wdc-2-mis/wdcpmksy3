@@ -14,4 +14,5 @@ public interface PprProposedAreaRepository extends JpaRepository<PprProposedArea
 
     List<PprProposedArea> findByPprPprIdAndStatus(Integer pprId,Character status);
     List<PprProposedArea> findByBlockBcode(Integer bcode);
+    List<PprProposedArea> findBycreatedBy(String userid);
 }

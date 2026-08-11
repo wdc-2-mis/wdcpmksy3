@@ -74,17 +74,9 @@ public class PrelimnaryPPR8AController {
         
         model.addAttribute("projectList",new ArrayList<>());
         model.addAttribute("blockList",new ArrayList<>());
-       // model.addAttribute("ppr8List",new ArrayList<>());
-
-        Integer pprId = (Integer) session.getAttribute("pprId");
-        
-        if (pprId != null) {
-            model.addAttribute("draftList",
-                    pprprep.findByPprPprIdAndStatus(pprId, 'D'));
-
-        } else {
-            model.addAttribute("draftList", new ArrayList<>());
-        }
+        model.addAttribute("draftList", pprprep.findBycreatedBy(userid));
+     //   System.out.println("kdy"+pprprep.findBycreatedBy(userid).size());
+       
 
         return "ppr8";
     }
