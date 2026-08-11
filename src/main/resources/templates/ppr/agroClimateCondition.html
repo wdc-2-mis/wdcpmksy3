@@ -47,6 +47,120 @@
 <script>
 
 	document.addEventListener("DOMContentLoaded", function () {
+		
+		document.querySelectorAll(".editBtn").forEach(button => {
+
+				button.addEventListener("click", function () {
+
+					let id = this.dataset.id;
+					fetch("/getAgroClimateConditionPPR10Id?id=" + id).then(response => response.json()).then(data => {
+						
+						const editForm = document.getElementById("editForm");
+						document.getElementById("agroid").value = data.agroid;
+						document.getElementById("district1").value = data.distname;
+						document.getElementById("project1").value = data.projname;
+						document.getElementById("village1").value = data.villname;
+						document.getElementById("zone1").value = data.zone;
+						document.getElementById("graphy1").value = data.graphy;
+						document.getElementById("rainfall1").value = data.rainfall;
+						document.getElementById("area1").value = data.area;
+						document.getElementById("farea1").value = data.farea;
+						document.getElementById("soilType1").value = data.soilType;
+						document.getElementById("soilarea1").value = data.soilarea;
+						document.getElementById("croptype1").value = data.croptype;
+						document.getElementById("croparea1").value = data.croparea;
+					});
+				});
+
+		});
+		
+		function openEditModal(button) {
+
+		    if (confirm('Are you sure you want to edit this record?')) {
+
+		        const id = button.getAttribute('data-id');
+		        console.log("Edit ID:", id);
+		        const modalElement = document.getElementById('editModal');
+		        const modal = new bootstrap.Modal(modalElement);
+		        modal.show();
+
+		    } 
+			else {
+				modal.hide();
+		        return false;
+		    }
+		}
+		
+		const editForm = document.getElementById("editForm");
+		editForm.addEventListener("submit", function (e) {
+
+				const zone = document.getElementById("zone1");
+		        const area = document.getElementById("area1");
+		        const rainfall = document.getElementById("rainfall1");
+		        const graphy = document.getElementById("graphy1");
+		        const farea = document.getElementById("farea1");
+				const soiltype = document.getElementsByName("soiltype1")[0];
+		        const soilarea = document.getElementById("soilarea1");
+				const croptype = document.getElementsByName("croptype1")[0];
+		        const croparea = document.getElementById("croparea1");
+
+				if (zone.value.trim() === "") {
+					 alert("Please enter Name of Agro-Climatic zone Cover Project Area");
+					 zone.focus();
+					 e.preventDefault();
+					 return;
+				}
+		        if (area.value === "") {
+		            alert("Please enter Area (in ha.) ");
+		            area.focus();
+		            e.preventDefault();
+		            return;
+		        }
+		        if (rainfall.value === "") {
+		            alert("Please enter Average Rainfall .");
+		            rainfall.focus();
+		            e.preventDefault();
+		            return;
+		        }
+		        if (graphy.value.trim() === "") {
+		            alert("Please enter TOPO-graphy.");
+		            graphy.focus();
+		            e.preventDefault();
+		            return;
+		        }
+				if (farea.value.trim() === "") {
+					alert("Please enter Forest Area (in ha.) ");
+					farea.focus();
+					e.preventDefault();
+					return;
+				}
+				
+				if (soiltype.value.trim() === "") {
+					alert("Please select Soil Type.");
+					soiltype.focus();
+					e.preventDefault();
+					return;
+				}
+				if (soilarea.value.trim() === "") {
+					alert("Please enter Soil Area in (ha.)");
+					soilarea.focus();
+					e.preventDefault();
+					return;
+				}
+				if (croptype.value.trim() === "") {
+					alert("Please select Crop Name.");
+					croptype.focus();
+					e.preventDefault();
+					return;
+				}			
+				if (croparea.value.trim() === "") {
+					alert("Please enter Crop Area(ha.)");
+					croparea.focus();
+					e.preventDefault();
+					return;
+				}			
+
+		    });
 
 	    const form = document.getElementById("agroClimate");
 
@@ -435,99 +549,253 @@
 
         </div>
 		
-	<!--	<div class="table-responsive mt-4"
-		     th:if="${#lists.size(functionariesList) > 0}">
+		<div class="table-responsive mt-4"
+		     th:if="${#lists.size(agroClimateList) > 0}">
 			 <h4>
 			 <b> <centre> List of Added Agro-Climatic Conditon (PPR-10)</centre>  </b>
 			</h4>
 			<br/>
-		<table class="table table-bordered table-striped" style="min-width:2000px;">
+			<table class="table table-bordered table-striped" style="min-width:2000px;">
 
-		    <thead class="table-primary">
-		    <tr>
-				<th class="table-primary">Sl. No.</th>
-				<th class="table-primary">District Name</th>
-		        <th class="table-primary">First Name</th>
-				<th class="table-primary">Last Name</th>
-		        <th class="table-primary">Designation</th>
-		        <th class="table-primary">Qualification</th>
-		        <th class="table-primary">Work Allocation</th>
-				
-		        <th class="table-primary">Budget of Watershed Cell (R)</th>
-		        <th class="table-primary">Budget of Watershed Cell (NR)</th>
-		        <th class="table-primary">DoLR Funding (R)</th>
-		        <th class="table-primary">DoLR Funding(NR)</th>
-				
-		        <th class="table-primary">Office</th>
-		        <th class="table-primary">Address</th>
-		        <th class="table-primary">Year</th>
-		        <th class="table-primary">Day</th>
-		        <th class="table-primary">Work Details</th>
-				<th class="table-primary" style="width: 200px;" >Action</th>
-		    </tr>
-		    </thead>
+			           <thead class="table-primary">
+			               <tr>
+			                   <th rowspan="2">S.No.</th>
+			                   <th rowspan="2">Project Name</th>
+							   <th rowspan="2">Area <br>(in ha.)</th>
+			                   <th rowspan="2">Name of Agro Climatic <br>
+			                       zone cover project area
+			                   </th>
+			                   <th rowspan="2"> Average rainfed <br>(mm) </th>
+			                   <th rowspan="2"> Name of the Village  </th>
+			                   <th rowspan="2"> TOPO Graphy </th>
+			                   <th rowspan="2"> Forest Area </th>
+			                   <th colspan="2"> Major soil types </th>
+			                   <th colspan="2"> Major Crops </th>
+							   <th rowspan="2"> Action </th>
+			               </tr>
+			               <tr>
+			                   <th> Soil Type </th>
+			                   <th> Area (ha)  </th>
+			                   <th> Crop Name</th>
+			                   <th> Area (ha)</th>
+			               </tr>
+			           </thead>
+			           <tbody>
 
-		    <tbody th:with="sr=0">
+			               <tr th:each="row, stat : ${agroClimateList}">
+			                   <td th:text="${row[17]}"> </td>
+			                   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[2] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[6] : ''}"> </td>
+			                   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[5] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[7] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[4] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[8] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[9] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[15] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[16] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[12] : ''}"> </td>
+							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[13] : ''}"> </td>
+							   
+							   <td th:if="${stat.first || row[0] != agroClimateList[stat.index-1][0]}">
+							   		&nbsp; &nbsp; 
+							   		<a th:if="${row[10].toString().equals('D')}" title="Delete"
+							   			th:href="@{/deleteAgroClimateConditionPPR10(id=${row[0]})}"
+							   			class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+							   			<i class="fas fa-trash"></i>
+							   		</a>
+							   		&nbsp; &nbsp; 
+												
+								<!--	<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${row[0]}" data-bs-toggle="modal" data-bs-target="#editModal">
+											<i class="fas fa-edit"></i>
+									</button>-->
+									<button type="button"
+									        th:if="${row[10].toString().equals('D')}"
+									        title="Edit"
+									        class="btn btn-primary btn-sm editBtn"
+									        th:data-id="${row[0]}"
+									        data-bs-toggle="modal"
+									        data-bs-target="#editModal">
+									    <i class="fas fa-edit"></i>
+									</button>
+							   		&nbsp; &nbsp; 
+							   		<a th:if="${row[10].toString().equals('D')}" title="Complete"
+							   			th:href="@{/completeAgroClimateConditionPPR10(id=${row[0]})}"
+							   			class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
+							   			<i class="fas fa-check"></i>
+							   		</a>
+							   		<span th:if="${row[10].toString().equals('C')}"
+							   			class="badge bg-success">
+							   			<i class="fas fa-check-circle"></i> Completed
+							   		</span>	
+							   	</td>
+							   	<td th:unless="${stat.first || row[0] != agroClimateList[stat.index-1][0]}"></td>
+			                   
+			               </tr>
+			               <tr th:if="${#lists.isEmpty(agroClimateList)}">
+			                   <td colspan="12" class="text-center text-muted">
+			                       Data Not Found
+			                   </td>
+			               </tr>
 
-		    <tr th:each="row, stat : ${functionariesList}">
-				
-				 <td th:text="${row[20]}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[19] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}"></td>
+			           </tbody>
 
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[10] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[11] : ''}"></td>
+			       </table>
 
-		         <td th:text="${row[14]}"></td>
-		         <td th:text="${row[15]}"></td>
-		         <td th:text="${row[16]}"></td>
-		         <td th:text="${row[17]}"></td>
-		         <td th:text="${row[18]}"></td>
-				
-				 <td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
-						&nbsp; &nbsp; 
-						<a th:if="${row[12].toString().equals('D')}" title="Delete"
-							th:href="@{/deleteWCDCFunctionariesPPR4B(id=${row[0]})}"
-							class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-							 <i class="fas fa-trash"></i>
-						</a>
-						&nbsp; &nbsp; 
-						<a th:if="${row[12].toString().equals('D')}" title="Edit"
-							th:href="@{/editWCDCFunctionariesPPR4B(id=${row[0]})}"
-							class="btn btn-primary btn-sm" 
-							onclick="return confirm('Are you sure you want to edit this record?');">
-							 <i class="fas fa-edit"></i>
-						</a>
-						&nbsp; &nbsp; 
-						<a th:if="${row[12].toString().equals('D')}" title="Complete"
-							th:href="@{/completeWCDCFunctionariesPPR4B(id=${row[0]})}"
-							class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-							 <i class="fas fa-check"></i>
-						</a>	
-						<span th:if="${row[12].toString().equals('C')}"
-						      class="badge bg-success">
-						    <i class="fas fa-check-circle"></i> Completed
-						</span>
-				</td>
-				<td th:unless="${stat.first || row[0] != functionariesList[stat.index-1][0]}"></td>
-		    </tr>
-
-		    </tbody>
-
-		</table>
-
-		</div>-->
+		</div>
 		
 		
 		
 
     </div>
+	
+	<div class="modal fade" id="editModal" >
+				<div class="modal-dialog modal-xl">
+					<div class="modal-content">
+						<div class="modal-header bg-primary text-white">
+							<h5>Edit Details</h5>
+							<button class="btn-close" data-bs-dismiss="modal"></button>
+						</div>
+						<div class="modal-body">
+							<form id="editForm" th:action="@{/editAgroClimateConditionPPR10}" method="post">
+							<input type="hidden" id="agroid" name="agroid">
+							<!-- Member Details -->
+							<div class="row g-4">
+												
+											        <div class="col-md-6">
+											             <label class="form-label">
+											                 <b> District </b><span class="required">*</span>
+											             </label>
+														 <input type="text" name="district1" id="district1" class="form-control" readonly>
+														
+											       	</div>
+													
+											        <div class="col-md-6">
+														<label class="form-label">
+															<b> Project </b><span class="required">*</span>
+														</label>
+														<input type="text" name="project1" id="project1" class="form-control" readonly>
+														
+											        </div>
+													<div class="col-md-6">
+														<label class="form-label">
+															<b>Name of the Village</b> <span class="required">*</span>
+														</label>
+														<input type="text" name="village1" id="village1" class="form-control" readonly>
+														
+													</div>
+											        <div class="col-md-6">
+											              <label class="form-label">
+											                     <b>Name of Agro-Climatic zone Cover Project Area</b><span class="required">*</span>
+											              </label>
+														  <input type="text" name="zone1" id="zone1" class="form-control">
+											        </div>
+													<div class="col-md-6">
+														<label class="form-label">
+																<b>TOPO-graphy</b> <span class="required">*</span>
+														</label>
+														<input type="text" name="graphy1" id="graphy1" class="form-control">
+													</div>
+											       	
+													 
+											        <div class="col-md-6">
+											               <label class="form-label">
+											                  <b>Average rainfall ( in mm preceding 5 year average )</b> <span class="required">*</span>
+											               </label>
+														   <input type="text" name="rainfall1" id="rainfall1" class="form-control">
+											        </div>
+													 
+													<div class="col-md-6">
+														<label class="form-label">
+																<b>Area (in ha.)</b> <span class="required">*</span>
+														</label>
+														<input type="text" name="area1" id="area1" maxlength="15" class="form-control"  oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
+													</div>
+													
+													<div class="col-md-6">
+													 		<label class="form-label">
+													 			<b>Forest Area (in ha.)</b> <span class="required">*</span>
+													 		</label>
+													 		<input type="text" name="farea1" id="farea1" maxlength="15" class="form-control"  oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
+													</div>
+													<div class="col-md-6"> 		</div>				 
+													 	
+											</div>
+											
+														<div class="row mb-3">
+															<div class="col-md-3">
+															<label>Major Soil Types </b> <span class="required">*</span></label>
+															</div>
+															<div class="col-md-3">
+															<label class="mb-1">Soil Type</label>
+															
+															</div>
+															<div class="col-md-3">
+															<label class="mb-1">Area in (ha.)</label>
+															
+															</div>
+														</div>
+														<div class="row mb-3">
+															<div class="col-md-3">
+																
+															</div>
+															<div class="col-md-3">
+																<select class="form-select" name="soilType1" id="soilType1">
+																		<option value="">--Select Soil Types--</option>
+																		<th:block th:each="qua : ${soilTypeList}">
+																			<option th:value="${qua.soilTypeId}"
+																					th:text="${qua.soilName}">
+																			</option>
+																		</th:block>
+																</select>
+															</div>
+															<div class="col-md-3">
+																<input type="text" name="soilarea1" id="soilarea1" maxlength="15" class="form-control" style="height:40px; width: 200px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
+															</div>
+														</div>
+														
+														<div class="row mb-3">
+															<div class="col-md-3">
+																<label>Major Crops </b> <span class="required">*</span></label>
+															</div>
+															<div class="col-md-3">
+																<label class="mb-1">Crop Name</label>
+																						
+															</div>
+															<div class="col-md-3">
+																<label class="mb-1">Crop Area(ha.)</label>
+																						
+															</div>
+														</div>
+														<div class="row mb-3">
+															<div class="col-md-3">
+																							
+															</div>
+															<div class="col-md-3">
+																<select class="form-select" name="croptype1" id="croptype1">
+																		<option value="">--Select Crop--</option>
+																		<th:block th:each="qua : ${cropTypeList}">
+																				<option th:value="${qua.cropTypeId}"
+																							th:text="${qua.cropName}">
+																				</option>
+																		</th:block>
+																</select>
+															</div>
+															<div class="col-md-3">
+																<input type="text" name="croparea1" id="croparea1" maxlength="15" class="form-control" style="height:40px; width: 200px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
+															</div>
+														</div>
+							
+							<div class="text-center mt-4">
+								<button type="submit" name="updateAction" value="D" class="btn btn-warning">
+									<i class="fas fa-save"></i>
+									Update
+								</button>
+							</div>
+						</form>
+						</div>
+					</div>
+				</div>
+			</div>
 
 </div>
 
