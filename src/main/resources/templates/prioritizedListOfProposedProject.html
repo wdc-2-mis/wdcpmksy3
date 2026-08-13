@@ -29,22 +29,48 @@
 	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
-		    const microWatershed = document.getElementById("microWatershed");
-		    microWatershed.addEventListener("change", function () {
-		        const mwId = this.value;
-		        const microWatershedCode = document.getElementById("microWatershedCode");
-		        microWatershedCode.value="";
-		        if (!mwId) {
-		            return;
-		        }
-		        fetch("/getMicroWatershedCodeByMwId?mwId=" + mwId)
-				.then(response => response.text())
-				    .then(data => {
-				    	microWatershedCode.value = data;
-				    })
-				    .catch(error => console.error(error));
-		    });
-		});
+	    const districtElement = document.getElementById("district");
+	    const microWatershedElement = document.getElementById("microWatershed");
+	    const microWatershedCodeElement = document.getElementById("microWatershedCode");
+	    microWatershedElement.addEventListener("change", function () {
+	        const district = districtElement.value;
+	        const mwId = this.value;
+	        if (!mwId) {
+	            microWatershedCodeElement.value = "";
+	            return;
+	        }
+	        fetch("/getMicroWatershedCodeByMwId?mwId=" + encodeURIComponent(mwId))
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error("Unable to get Micro-watershed code.");
+	            }
+	            return response.text();
+	        })
+	        .then(code => {
+	            // Set Micro-watershed code
+	            microWatershedCodeElement.value = code || "";
+	            return fetch("/checkPprProposedProjectExists" +"?district=" + encodeURIComponent(district) + "&microWatershed=" + encodeURIComponent(mwId));
+	        })
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error("Unable to check existing project.");
+	            }
+	            return response.json();
+	        })
+	        .then(data => {
+	            if (data.exists) {
+	                alert("This Micro-watershed is already saved for the selected District.");
+	                // Reset Micro-watershed
+	                microWatershedElement.value = "";
+	                // Reset code
+	                microWatershedCodeElement.value = "";
+	            }
+	        })
+	        .catch(error => {
+	            console.error("Error:", error);
+	        });
+	    });
+	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
 			document.querySelectorAll(".scoreRadio").forEach(function (radio) {
@@ -152,28 +178,211 @@
 	                            radio.checked = true;
 	                        }
 	                    });
+						loadSavedCriteria(
+							data.criteriaData || []
+						);
 	                })
 	                .catch(error => {
 	                    console.error("Error loading edit data:", error);
 	                });
 	        });
 	    });
+		
+		function loadSavedCriteria(savedCriteria) {
+		        // First reset all criteria
+		        document.querySelectorAll(".criteriaCheck")
+		            .forEach(function (checkbox) {
+		                checkbox.checked = false;
+		            });
+		        // Reset all radio buttons
+		        document.querySelectorAll(".scoreRadio")
+		            .forEach(function (radio) {
+		                radio.checked = false;
+		            });
+		        // Reset marks
+		        document.querySelectorAll(".marks")
+		            .forEach(function (marks) {
+		                marks.innerText = "0";
+		            });
+		        // =========================
+		        // Restore saved criteria
+		        // =========================
+		        savedCriteria.forEach(function (saved) {
+		            const criteriaId = saved.criteriaId;
+		            const scoredMarks = saved.scoredMarks;
+		            // Find checkbox
+		            const checkbox = document.querySelector('.criteriaCheck[value="' + criteriaId + '"]');
+		            if (!checkbox) {
+		                return;
+		            }
+		            // Select checkbox
+		            checkbox.checked = true;
+		            // Find the row
+		            const row = checkbox.closest("tr");
+		            if (!row) {
+		                return;
+		            }
+		            // =========================
+		            // Find radio by marks
+		            // =========================
+		            const radios = row.querySelectorAll(".scoreRadio");
+		            let selectedRadio = null;
+		            radios.forEach(function (radio) {
+		                const text = radio.value;
+		                const start = text.lastIndexOf("(");
+		                const end = text.lastIndexOf(")");
+		                if (start !== -1 && end !== -1 && end > start) {
+		                    const marks = text.substring(start + 1, end).trim();
+		                    if (Number(marks) === Number(scoredMarks)) {
+		                        selectedRadio = radio;
+		                    }
+		                }
+		            });
+		            // =========================
+		            // Select radio
+		            // =========================
+		            if (selectedRadio) {
+		                selectedRadio.checked = true;
+		            }
+		            // =========================
+		            // Display saved marks
+		            // =========================
+		            const marksCell = row.querySelector(".marks");
+		            if (marksCell) {
+		                marksCell.innerText = scoredMarks ?? "0";
+		            }
+		        });
+		        // Build hidden criteria data
+		        updateEditCriteriaData();
+		    }
+	});
+	
+	function updateEditCriteriaData() {
+	    let result = [];
+	    document.querySelectorAll("#criteriaModal tbody tr").forEach(function (row) {
+	        const chk = row.querySelector(".criteriaCheck");
+	        if (chk && chk.checked) {
+	            const criteriaId = chk.value;
+	            const marks = row.querySelector(".marks").innerText.trim();
+	            result.push(criteriaId + ":" + marks);
+	        }
+	    });
+	    document.getElementById("criteriaData").value = result.join(",");
+	    console.log("Edit criteriaData =", document.getElementById("criteriaData").value);
+	}
+	
+	document.addEventListener("change", function (e) {
+	    // =========================
+	    // Radio changed
+	    // =========================
+	    if (e.target.classList.contains("scoreRadio")) {
+	        const row = e.target.closest("tr");
+	        const text = e.target.value;
+	        const start = text.lastIndexOf("(");
+	        const end = text.lastIndexOf(")");
+	        let marks = "";
+	        if (start !== -1 && end !== -1 && end > start) {
+	            marks = text.substring(start + 1,end);
+	        }
+	        row.querySelector(".marks").innerText = marks;
+	        // Automatically check criteria
+	        const checkbox =row.querySelector(".criteriaCheck");
+	        if (checkbox) {
+	            checkbox.checked = true;
+	        }
+	        updateEditCriteriaData();
+	    }
+	    // =========================
+	    // Checkbox changed
+	    // =========================
+	    if (e.target.classList.contains("criteriaCheck")) {
+	        const row = e.target.closest("tr");
+	        if (!e.target.checked) {
+	            // Remove radio selection
+	            row.querySelectorAll(".scoreRadio")
+	                .forEach(function (radio) {
+	                    radio.checked = false;
+	                });
+	            // Reset marks
+	            row.querySelector(".marks").innerText = "0";
+	        }
+	        updateEditCriteriaData();
+	    }
 	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
+	    document.querySelectorAll(".viewBtn").forEach(function (btn) {
+	        btn.addEventListener("click", function () {
+	            let id = this.getAttribute("data-id");
+	            // Get modal elements
+	            let loading = document.getElementById("criteriaLoading");
+	            let error = document.getElementById("criteriaError");
+	            let noData = document.getElementById("criteriaNoData");
+	            let tableContainer = document.getElementById("criteriaTableContainer");
+	            let tableBody = document.getElementById("criteriaTableBody");
+	            // Reset previous data
+	            tableBody.innerHTML = "";
+	            loading.style.display = "block";
+	            error.style.display = "none";
+	            noData.style.display = "none";
+	            tableContainer.style.display = "none";
+	            fetch("/viewSavedCriteriaDetails?id=" + id)
+	                .then(response => {
+	                    if (!response.ok) {
+	                        throw new Error("Unable to fetch criteria details");
+	                    }
+	                    return response.json();
+	                })
+	                .then(data => {
+	                    console.log("Criteria Details:", data);
+	                    loading.style.display = "none";
+	                    // No records
+	                    if (!data || data.length === 0) {
+	                        noData.style.display = "block";
+	                        return;
+	                    }
+	                    // Create table rows
+	                    data.forEach(function (item, index) {
+	                        let row = document.createElement("tr");
+	                        // S.No.
+	                        let serialCell = document.createElement("td");
+	                        serialCell.textContent = index + 1;
+	                        // Criteria
+	                        let criteriaCell = document.createElement("td");
+	                        if (item.criteriaDesc) {
+	                            criteriaCell.textContent = item.criteriaDesc;
+	                        } else {
+	                            criteriaCell.textContent = "";
+	                        }
+	                        // Scored Marks
+	                        let marksCell = document.createElement("td");
+	                        marksCell.textContent = item.scoredMarks != null ? item.scoredMarks : 0;
+	                        // Add cells to row
+	                        row.appendChild(serialCell);
+	                        row.appendChild(criteriaCell);
+	                        row.appendChild(marksCell);
+	                        // Add row to table
+	                        tableBody.appendChild(row);
+	                    });
+	                    // Show table
+	                    tableContainer.style.display = "block";
+	                })
+	                .catch(errorMessage => {
+	                    console.error("Error:", errorMessage);
+	                    loading.style.display = "none";
+	                    error.textContent =
+	                        "Unable to load criteria details. Please try again.";
+	                    error.style.display = "block";
+
+	                });
+	        });
+	    });
+	});
+
+	
+	document.addEventListener("DOMContentLoaded", function () {
 				document.getElementById("editProjectForm").addEventListener("submit", function(e){
-					// Build criteriaData
-					        let result = [];
-					        document.querySelectorAll("#criteriaModal tbody tr").forEach(function(row){
-					            const chk = row.querySelector(".criteriaCheck");
-					            if(chk && chk.checked){
-					                const criteriaId = chk.value;
-					                const marks = row.querySelector(".marks").innerText.trim();
-					                result.push(criteriaId + ":" + marks);
-					            }
-					        });
-					        document.getElementById("criteriaData").value = result.join(",");
-					        console.log("criteriaData =", document.getElementById("criteriaData").value);
+					updateEditCriteriaData();
 				    const district = document.getElementById("editDistrict").value;
 				    const project = document.getElementById("editProject").value.trim();
 				    const microWatershed = document.getElementById("editMicroWatershed").value;
@@ -357,11 +566,10 @@
 		            <td th:text="${data.proposedCost}"></td>
 					<td>
 						<div class="col-md-4">
-							<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-								data-bs-target="#viewcriteriaModal">
+							<button type="button" class="btn btn-primary btn-sm viewBtn" th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
+								data-bs-target="#viewCriteriaModal">
 								Link <i class="fas fa-list"></i>
 							</button>
-							<input type="hidden" id="criteriaData" name="criteriaData">
 						</div>
 					</td>
 					<td>
@@ -371,14 +579,17 @@
 								<i class="fas fa-edit"></i>
 							</button>
 							&nbsp;
-							<a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/deleteDetailsOfSLNA(id=${data.pprProposedProjectId})}"
+							<a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/deletePprProposedProject(id=${data.pprProposedProjectId})}"
 								class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
 								<i class="fas fa-trash"></i>
 							</a>
-							<a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/completeDetailsOfSLNA(id=${data.pprProposedProjectId})}"
+							<a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/completePprProposedProject(id=${data.pprProposedProjectId})}"
 								class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
 								<i class="fas fa-check"></i>
 							</a>
+							<span th:if="${#strings.trim(data.status) == 'C'}" class="badge bg-success">
+								<i class="fas fa-check-circle"></i> Completed
+							</span>
 						</div>
 		            </td>
 		        </tr>
@@ -526,6 +737,16 @@
 									<input type="number" class="form-control" id="editProposedCost" name="proposedCost" step="any" min="0">
 								</div>
 							</div>
+<!--							<div class="row mb-3 align-items-center">-->
+<!--								<label class="col-md-3 fw-bold"> Weightage under the Criteria </label>-->
+<!--								<div class="col-md-4">-->
+<!--									<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"-->
+<!--										data-bs-target="#criteriaModal">-->
+<!--										Link <i class="fas fa-list"></i>-->
+<!--									</button>-->
+<!--									<input type="hidden" id="criteriaData" name="criteriaData">-->
+<!--								</div>-->
+<!--							</div>-->
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -539,6 +760,53 @@
 				</div>
 			</div>
 		</div>
+		
+		<!-- Criteria Details Modal -->
+		<div class="modal fade" id="viewCriteriaModal" tabindex="-1" aria-labelledby="viewcriteriaModalLabel" aria-hidden="true">
+		    <div class="modal-dialog modal-xl modal-dialog-centered">
+		        <div class="modal-content">
+		            <div class="modal-header bg-primary text-white">
+		                <h5 class="modal-title" id="viewcriteriaModalLabel"> Criteria Details </h5>
+		                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+		            </div>
+		            <div class="modal-body">
+		                <!-- Loading -->
+		                <div id="criteriaLoading" class="text-center" style="display:none;">
+		                    <div class="spinner-border text-primary" role="status">
+		                        <span class="visually-hidden"> Loading... </span>
+		                    </div>
+		                    <p class="mt-2"> Loading criteria details... </p>
+		                </div>
+		                <!-- Error -->
+		                <div id="criteriaError" class="alert alert-danger" style="display:none;"></div>
+		                <!-- No Data -->
+		                <div id="criteriaNoData" class="alert alert-warning" style="display:none;">
+		                    No criteria details found for this project.
+		                </div>
+		                <!-- Criteria Table -->
+		                <div id="criteriaTableContainer"
+		                     style="display:none;">
+		                    <table class="table table-bordered table-striped table-hover">
+		                        <thead class="table-primary">
+		                        <tr>
+		                            <th width="5%">S.No.</th>
+		                            <th>Criteria</th>
+		                            <th>Scored Marks</th>		                            
+		                        </tr>
+		                        </thead>
+		                        <tbody id="criteriaTableBody">
+		                        </tbody>
+		                    </table>
+		                </div>
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
+		
 		</div>
 </body>
 </html>

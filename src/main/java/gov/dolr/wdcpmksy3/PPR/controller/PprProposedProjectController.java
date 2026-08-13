@@ -1,5 +1,6 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +19,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.dto.CriteriaDetailsDto;
 import gov.dolr.wdcpmksy3.PPR.dto.PprProposedProjectDto;
+import gov.dolr.wdcpmksy3.PPR.entity.CriteriaDetails;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProposedProject;
+import gov.dolr.wdcpmksy3.PPR.repository.CriteriaDetailsRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.CriteriaRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
@@ -57,6 +61,9 @@ public class PprProposedProjectController {
 	
 	@Autowired
 	private CriteriaRepository criteriaRepo;
+	
+	@Autowired
+	private CriteriaDetailsRepository criteriaDetailsRepo;
 	
 	@GetMapping("/pprProposedProjectDetails")
     public String pprProposedProjectDetails(@RequestParam(required = false) Integer dcode, HttpSession session, Model model) {
@@ -151,6 +158,16 @@ public class PprProposedProjectController {
 	    map.put("treatedArea", data.getTreatedArea());
 	    map.put("projectType", data.getProjectType().getProjectTypeId());
 	    map.put("proposedCost", data.getProposedCost());
+	 // Saved criteria details
+	    List<CriteriaDetails> savedCriteria = criteriaDetailsRepo.findByProposedProjectPprProposedProjectId(id);
+	    List<Map<String, Object>> criteriaData = new ArrayList<>();
+	    for (CriteriaDetails detail : savedCriteria) {
+	        Map<String, Object> criteria = new HashMap<>();
+	        criteria.put("criteriaId", detail.getCriteria().getCriteriaId());
+	        criteria.put("scoredMarks",detail.getScoredMarks());
+	        criteriaData.add(criteria);
+	    }
+	    map.put("criteriaData", criteriaData);
 	    return map;
 	}
 	
@@ -163,8 +180,60 @@ public class PprProposedProjectController {
 	            "Record updated successfully.");
 	    return "redirect:/pprProposedProjectDetails";
 	}
+	
+	@GetMapping("/viewSavedCriteriaDetails")
+	@ResponseBody
+	public List<CriteriaDetailsDto> viewSavedCriteriaDetails(
+	        @RequestParam Integer id) {
+		List<CriteriaDetails> list = criteriaDetailsRepo.findByProposedProjectPprProposedProjectId(id);
+		List<CriteriaDetailsDto> dtoList = list.stream()
+			    .map(s-> {
+			        CriteriaDetailsDto dto = new CriteriaDetailsDto();
+			        dto.setCriteriaDesc(s.getCriteria().getCriteriaDesc());
+			        dto.setScoredMarks(s.getScoredMarks());
+			        return dto;
+			    })
+			    .toList();
 
+	    return dtoList;
+	}
+	
+	@GetMapping("/deletePprProposedProject")
+	public String deletePprProposedProject(@RequestParam Integer id,
+	        HttpSession session, RedirectAttributes redirectAttributes) {
+	    try {
+	        String userId =(String) session.getAttribute("userid");
+	        proposedProjectService.deletePprProposedProject(id, userId);
+	        redirectAttributes.addFlashAttribute("success","Record deleted successfully.");
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("error","Unable to delete record.");
+	        e.printStackTrace();
+	    }
+	    return "redirect:/pprProposedProjectDetails";
+	}
+	
+	@GetMapping("/completePprProposedProject")
+	public String completePprProposedProject(@RequestParam Integer id,
+	        HttpSession session, RedirectAttributes redirectAttributes) {
+	    try {
+	        String userId = (String) session.getAttribute("userid");
+	        proposedProjectService.completePprProposedProject(id, userId);
+	        redirectAttributes.addFlashAttribute("success", "Project completed successfully.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("error", "Unable to complete the project.");
+	    }
+	    return "redirect:/pprProposedProjectDetails";
+	}
 
+	@GetMapping("/checkPprProposedProjectExists")
+	@ResponseBody
+	public Map<String, Object> checkPprProposedProjectExists(@RequestParam String district, @RequestParam Integer microWatershed) {
+	    boolean exists = proposedProjectService.existsByDistrictAndMicroWatershed(district, microWatershed);
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("exists", exists);
+	    return response;
+	}
 
 	
 }

@@ -17,4 +17,6 @@ public interface PprProposedProjectRepository extends JpaRepository<PprProposedP
 	
 	Optional<PprProposedProject> findById(Integer id);
 
+	boolean existsByPprDistrictDcodeAndMicroWatershedMwId(String district, Integer microWatershed);
+
 }

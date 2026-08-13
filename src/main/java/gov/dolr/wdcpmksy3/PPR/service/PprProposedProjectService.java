@@ -102,6 +102,72 @@ public class PprProposedProjectService {
 	    entity.setUpdatedBy(userId);
 	    entity.setUpdatedDate(LocalDate.now());
 	    repository.save(entity);
+//	    String[] arr=dto.getCriteriaData().split(",");
+//        
+//        for(String s:arr){
+//        	
+//        	if (s.isBlank()) {
+//                continue;
+//            }
+//            String[] value=s.split(":");
+//            if (value.length != 2) {
+//                continue;
+//            }
+//            Integer criteriaId=Integer.parseInt(value[0]);
+//            Integer marks=Integer.parseInt(value[1]);
+//            CriteriaDetails details=new CriteriaDetails();
+//            details.setCriteria(
+//                    criteriaRepo.findById(criteriaId).get());
+//            details.setScoredMarks(marks);
+//            details.setProposedProject(entity);
+//            details.setStatus("D");
+//            details.setCreatedBy(userId);
+//            details.setCreatedDate(LocalDateTime.now());
+//            criteriaDetailsRepo.save(details);
+//
+//        }
+	}
+	
+	@Transactional
+	public void deletePprProposedProject(Integer id, String userId) {
+	    PprProposedProject project = repository.findById(id).orElseThrow(() -> new RuntimeException("Proposed project not found: " + id));
+	    // Delete CriteriaDetails first
+	    criteriaDetailsRepo.deleteByProposedProjectPprProposedProjectId(id);
+
+	    // Delete proposed project
+	    repository.delete(project);
+	}
+	
+	@Transactional
+	public void completePprProposedProject(Integer id, String userId) {
+
+	    // Get proposed project
+	    PprProposedProject project = repository.findById(id).orElseThrow(() -> new RuntimeException("Proposed project not found: " + id));
+
+	    // Change PprProposedProject status
+	    project.setStatus('C');
+	    project.setUpdatedBy(userId);
+	    project.setUpdatedDate(LocalDate.now());
+	    repository.save(project);
+		
+	    // Get all CriteriaDetails belonging to this project
+	    List<CriteriaDetails> criteriaDetails = criteriaDetailsRepo.findByProposedProjectPprProposedProjectId(id);
+
+	    // Change CriteriaDetails status
+	    for (CriteriaDetails detail : criteriaDetails) {
+	        detail.setStatus("C");
+	        detail.setUpdatedBy(userId);
+	        detail.setUpdatedDate(LocalDate.now());
+	    }
+	    // Save all CriteriaDetails
+	    criteriaDetailsRepo.saveAll(criteriaDetails);
+	}
+	
+	public boolean existsByDistrictAndMicroWatershed(
+	        String district,
+	        Integer microWatershed) {
+
+	    return repository.existsByPprDistrictDcodeAndMicroWatershedMwId(district,microWatershed);
 	}
 
 }

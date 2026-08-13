@@ -15,5 +15,9 @@ public interface CriteriaDetailsRepository extends JpaRepository<CriteriaDetails
     List<CriteriaDetails> findByStatus(String status);
 
     List<CriteriaDetails> findByCriteria_CriteriaIdAndStatus(Integer criteriaId, String status);
+    
+    List<CriteriaDetails> findByProposedProjectPprProposedProjectId(Integer pprProposedProjectId);
+    
+    void deleteByProposedProjectPprProposedProjectId(Integer projectId);
 
 }
