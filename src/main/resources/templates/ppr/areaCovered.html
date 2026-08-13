@@ -123,7 +123,7 @@
                    				th:id="'scheme' + ${scheme.schemeId} + 'Area'"
                   	 			th:name="'scheme[' + ${scheme.schemeId} + '].area'"
                    				class="form-control form-control-sm"
-                   				required oninput="validateDecimal(this, 20, 4)" />
+                   				required oninput="validateDecimal(this, 10, 4)" />
             				<div class="invalid-feedback">Please enter Area for <span th:text="${scheme.schemeName}"></span>.</div>
         				</div>
     				</div>
@@ -151,7 +151,7 @@
                     <label>Area covered under these projects(in ha.)</label>
                     </div>
                     <div class="col-md-5">
-                    <input type="text" id="scheme7Area" name="scheme7Area" class="form-control form-control-sm" oninput="validateDecimal(this, 20, 4)" />
+                    <input type="text" id="scheme7Area" name="scheme7Area" class="form-control form-control-sm" oninput="validateDecimal(this, 10, 4)" />
                     <div class="invalid-feedback">Please enter area in hectares.</div>
                     </div>
                 </div>	
@@ -291,7 +291,7 @@
                id="editscheme1Area"
                name="scheme[1].area"
                class="form-control form-control-sm" required
-               oninput="validateDecimal(this,20,4)">
+               oninput="validateDecimal(this,10,4)">
     </div>
     </div>
      
@@ -309,7 +309,7 @@
                id="editscheme2Area"
                name="scheme[2].area"
                class="form-control form-control-sm" required
-               oninput="validateDecimal(this,20,4)">
+               oninput="validateDecimal(this,10,4)">
     </div>
     </div>     
 
@@ -327,7 +327,7 @@
                id="editscheme3Area"
                name="scheme[3].area"
                class="form-control form-control-sm" required
-               oninput="validateDecimal(this,20,4)">
+               oninput="validateDecimal(this,10,4)">
     </div>
      </div>
    
@@ -345,7 +345,7 @@
                id="editscheme4Area"
                name="scheme[4].area"
                class="form-control form-control-sm" required
-               oninput="validateDecimal(this,20,4)">
+               oninput="validateDecimal(this,10,4)">
     </div>
      </div>
      
@@ -363,7 +363,7 @@
                id="editscheme5Area"
                name="scheme[5].area"
                class="form-control form-control-sm" required
-               oninput="validateDecimal(this,20,4)">
+               oninput="validateDecimal(this,10,4)">
     </div>
      </div>
      
@@ -381,7 +381,7 @@
                id="editscheme6Area"
                name="scheme[6].area"
                class="form-control form-control-sm" required
-               oninput="validateDecimal(this,20,4)">
+               oninput="validateDecimal(this,10,4)">
     </div>
      </div>
      
@@ -410,7 +410,7 @@
                id="editscheme7Area"
                name="scheme[7].area"
                class="form-control form-control-sm"
-               oninput="validateDecimal(this,20,4)">
+               oninput="validateDecimal(this,10,4)">
     </div>
     </div> 
           <!-- Update button -->

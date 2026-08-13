@@ -24,4 +24,9 @@ public class VillageService {
 
     }
 
+	public List<MVillage> findVillagesByDistrict(Integer dcode) {
+		// TODO Auto-generated method stub
+		return villageRepository.findVillagesByDistrict(dcode);
+	}
+
 }

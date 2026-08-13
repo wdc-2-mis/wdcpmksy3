@@ -19,7 +19,8 @@ public interface VillageRepository extends JpaRepository<MVillage,Integer>{
     		+ "	join m_ppr m ON m.ppr_id = pg.ppr_id join m_district d ON d.dcode = m.dcode where d.st_code=:stcode and pg.status='C' order by v.village_name",nativeQuery=true)
     List<MVillage> getVillagesByState(Integer stcode);
     
-    
+    @Query("SELECT v FROM MVillage v WHERE v.gramPanchayat.block.district.dcode = :dcode")
+    List<MVillage> findVillagesByDistrict(Integer dcode);
     
     
     
