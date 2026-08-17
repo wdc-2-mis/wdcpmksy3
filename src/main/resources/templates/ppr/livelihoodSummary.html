@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+<meta charset="UTF-8">
+<title>Livelihood Summary </title>
+
+<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<style>
+	.required{
+	    color:red;
+	}
+
+	body{
+	    background:#f8f9fa;
+	}
+
+	.card{
+	    border-radius:0;
+	}
+
+	.table th,.table td{
+	    vertical-align:middle;
+	    text-align:center;
+	}
+
+	.form-control,
+	.form-select{
+	    border-radius:0;
+	}
+
+	.heading{
+	    font-size:22px;
+	    font-weight:bold;
+	    text-align:center;
+	    margin-bottom:25px;
+	}
+
+	label{
+	    font-weight:600;
+	}	
+</style>
+
+
+<script>
+
+	document.addEventListener("DOMContentLoaded", function () {
+		
+			var editModal = document.getElementById('editModal');
+		   	editModal.addEventListener('show.bs.modal', function (event) {
+		       var button = event.relatedTarget;
+
+		       // Get data attributes  
+		       var Id = button.getAttribute('data-id');
+		       var block = button.getAttribute('data-block');
+		       var district = button.getAttribute('data-district');
+		       var project = button.getAttribute('data-project');
+		       var projectId = button.getAttribute('data-projectid');
+			   var watershedid = button.getAttribute('data-watershedid');
+			   var villid = button.getAttribute('data-villid');
+			   var migstatus = button.getAttribute('data-migstatus');
+			   var reson = button.getAttribute('data-reson');
+			   var livelihoodIds = button.getAttribute('data-livelihoodids');
+			   var livelihoodInvIds = button.getAttribute('data-livelihoodinvids');
+			   
+		       // Populate modal fields  reason1
+		       document.getElementById('livsamid').value = Id;
+		       document.getElementById('block1').value = block;
+		       document.getElementById('district1').value = district;
+		       document.getElementById('project1').value = project;
+			   document.getElementById('migrat1').value = migstatus;
+			   document.getElementById('reason1').value = reson;
+			   
+			   let village1 = document.getElementById("village1");
+					  let watershed1 = document.getElementById("watershed1");
+
+					  village1.innerHTML = '<option value="">--Select Village--</option>';
+
+					  if (projectId === "") {
+					      return;
+					  }
+
+					  fetch("/getVillagesByProjectPPR10?pprId=" + projectId)
+					      .then(res => res.json())
+					      .then(data => {
+
+					          data.forEach(function (item) {
+
+					              let option = document.createElement("option");
+
+					              option.value = item.id;
+					              option.text = item.name;
+
+					              // Select village based on villid
+					              if (String(item.id) === String(villid)) {
+					                  option.selected = true;
+					              }
+
+					              village1.appendChild(option);
+					          });
+
+					      })
+					      .catch(err => console.log(err));
+
+					  watershed1.innerHTML = '<option value="">--Select Micro Watershed--</option>';
+
+					  fetch("/getMicroWatershedsByProject?pprId=" + projectId)
+						  .then(response => response.json())
+						  .then(data => {
+							  data.forEach(function (item) {
+								  let option = document.createElement("option");
+								  option.value = item.id;
+								  option.textContent = item.name;
+								  if (String(item.id) === String(watershedid)) {
+								  			option.selected = true;
+								  }
+								  watershed1.appendChild(option);
+
+							  });
+
+						  })
+						  .catch(error => {
+							  console.error("Micro Watershed Loading Error :", error);
+						  });
+
+						  let livelihoodSelect = document.getElementById("livact1");
+						  // Clear previous selections
+						  Array.from(livelihoodSelect.options).forEach(function (option) {
+						      option.selected = false;
+						  });
+
+						  if (livelihoodIds && livelihoodIds.trim() !== "") {
+
+						      // Example: "1,3,5"
+						      let ids = livelihoodIds.split(",");
+
+						      ids.forEach(function (id) {
+
+						          id = id.trim();
+
+						          Array.from(livelihoodSelect.options).forEach(function (option) {
+
+						              if (String(option.value) === String(id)) {
+						                  option.selected = true;
+						              }
+
+						          });
+
+						      });
+						  }
+						  
+						  let livelihoodInvSelect = document.getElementById("livinv1");
+
+						  // Clear previous selections
+						  Array.from(livelihoodInvSelect.options).forEach(function (option) {
+						      option.selected = false;
+						  });
+
+						  if (livelihoodInvIds && livelihoodInvIds.trim() !== "") {
+
+						      let ids = livelihoodInvIds.split(",");
+
+						      ids.forEach(function (id) {
+
+						          id = id.trim();
+
+						          Array.from(livelihoodInvSelect.options).forEach(function (option) {
+
+						              if (String(option.value) === String(id)) {
+						                  option.selected = true;
+						              }
+
+						          });
+
+						      });
+						  }
+						  
+						  
+						  
+						  
+						  
+		   });
+		
+		
+		
+		function openEditModal(button) {
+
+		    if (confirm('Are you sure you want to edit this record?')) {
+
+		        const id = button.getAttribute('data-id');
+		        console.log("Edit ID:", id);
+		        const modalElement = document.getElementById('editModal');
+		        const modal = new bootstrap.Modal(modalElement);
+		        modal.show();
+
+		    } 
+			else {
+				modal.hide();
+		        return false;
+		    }
+		}
+		
+		const editForm = document.getElementById("editForm");
+		editForm.addEventListener("submit", function (e) {
+
+						
+						const village = document.getElementsByName("village1")[0]; 
+						const livact = document.getElementsByName("livact1")[0];
+						const livinv = document.getElementsByName("livinv1")[0];
+						const watershed = document.getElementById("watershed1");
+				        const migrat = document.getElementById("migrat1");
+				        const reason = document.getElementById("reason1");
+
+						
+						if (village.value.trim() === "") {
+							 alert("Please select Village.");
+							 village.focus();
+							 e.preventDefault();
+							 return;
+						}
+						if (livact.value.trim() === "") {
+							alert("Please select Livelihood Activities.");
+							livact.focus();
+							e.preventDefault();
+							return;
+						}
+						if (livinv.value.trim() === "") {
+							 alert("Please select livelihood interventions under Project");
+							 livinv.focus();
+							 e.preventDefault();
+							 return;
+						}
+				        if (watershed.value.trim() === "") {
+				            alert("Please enter  Name of Watershed.");
+				            watershed.focus();
+				            e.preventDefault();
+				            return;
+				        }
+						if (migrat.value.trim() === "") {
+							alert("Please enter Current Migration Status (No. of People) ");
+							migrat.focus();
+							e.preventDefault();
+							return;
+						}
+						
+						if (reason.value.trim() === "") {
+							alert("Please enter Main reason of Migration ");
+							reason.focus();
+							e.preventDefault();
+							return;
+						}		
+
+		    });
+
+	    const form = document.getElementById("livelihoodSummary");
+
+	    form.addEventListener("submit", function (e) {
+
+			const district = document.getElementsByName("district")[0];  
+			const block = document.getElementsByName("block")[0];
+	        const project = document.getElementsByName("project")[0]; 
+			const village = document.getElementsByName("village")[0]; 
+			const livact = document.getElementsByName("livact")[0];
+			const livinv = document.getElementsByName("livinv")[0];
+			const watershed = document.getElementsByName("watershed")[0];
+	        const migrat = document.getElementById("migrat");
+	        const reason = document.getElementById("reason");
+
+			if (district.value.trim() === "") {
+			     alert("Please select District.");
+			     district.focus();
+			     e.preventDefault();
+			     return false;
+			}
+			if (block.value.trim() === "") {
+				 alert("Please select Block.");
+				 block.focus();
+				 e.preventDefault();
+				 return false;
+			}
+	        if (project.value.trim() === "") {
+	             alert("Please select Project.");
+	             project.focus();
+	             e.preventDefault();
+	             return;
+	        }
+			if (village.value.trim() === "") {
+				 alert("Please select Village.");
+				 village.focus();
+				 e.preventDefault();
+				 return;
+			}
+			if (livact.value.trim() === "") {
+				alert("Please select Livelihood Activities.");
+				livact.focus();
+				e.preventDefault();
+				return;
+			}
+			if (livinv.value.trim() === "") {
+				 alert("Please select livelihood interventions under Project");
+				 livinv.focus();
+				 e.preventDefault();
+				 return;
+			}
+	        if (watershed.value.trim() === "") {
+	            alert("Please select  Name of Watershed.");
+	            watershed.focus();
+	            e.preventDefault();
+	            return;
+	        }
+			if (migrat.value.trim() === "") {
+				alert("Please enter Current Migration Status (No. of People) ");
+				migrat.focus();
+				e.preventDefault();
+				return;
+			}
+			
+			if (reason.value.trim() === "") {
+				alert("Please enter Main reason of Migration ");
+				reason.focus();
+				e.preventDefault();
+				return;
+			}
+			
+
+	    });
+
+		document.getElementById("district").addEventListener("change", function () {
+
+		    let districtId = this.value;
+		    let project = document.getElementById("project");
+			let block = document.getElementById("block");
+		    // Clear existing options
+		    project.innerHTML = '<option value="">--Select Project--</option>';
+		    if (districtId === "") {
+		        return;
+		    }
+		    fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
+		        .then(response => response.json())
+		        .then(data => {
+		            data.forEach(function(item) {
+		                let option = document.createElement("option");
+		                option.value = item.id;          // PPR ID
+		                option.textContent = item.name;  // Project Name
+		                project.appendChild(option);
+		            });
+
+		        })
+		        .catch(error => {
+		            console.error("Error:", error);
+		        });
+				
+			block.innerHTML = '<option value="">--Select Block--</option>';
+				
+			fetch('/getBlocksByDistrictPPR13?dcode=' + districtId)
+				.then(response => response.json())
+				.then(data => {
+					data.forEach(function(item) {
+						 let option = document.createElement("option");
+						 option.value = item.id;          // bcode
+						 option.textContent = item.name;  // block Name
+						 block.appendChild(option);
+					});
+			})
+			.catch(error => {
+				console.error("Error:", error);
+			});
+
+		});
+		
+		document.getElementById("project").addEventListener("change", function () {
+
+		    let projectId = this.value;
+		    let village = document.getElementById("village");
+			let watershed = document.getElementById("watershed");
+			
+		    village.innerHTML ='<option value="">--Select Village--</option>';
+		    if(projectId===""){
+		        return;
+		    }
+
+		    fetch("/getVillagesByProjectPPR10?pprId="+projectId)
+		        .then(res=>res.json())
+		        .then(data=>{
+		            data.forEach(function(item){
+		                let option=document.createElement("option");
+		                option.value=item.id;
+		                option.text=item.name;
+		                village.appendChild(option);
+		            });
+
+		        }).catch(err=>console.log(err));
+				
+				watershed.innerHTML ='<option value="">--Select Micro Watershed--</option>';
+				
+				fetch("/getMicroWatershedsByProject?pprId=" + projectId)
+				            .then(response => response.json())
+				            .then(data => {
+				                data.forEach(function(item){
+				                    let option = document.createElement("option");
+				                    option.value = item.id;
+				                    option.textContent = item.name;
+				                    watershed.appendChild(option);
+
+				                });
+
+				            })
+				            .catch(error => {
+				                console.error("Micro Watershed Loading Error :", error);
+				            });
+				
+		});
+	});
+
+</script>
+
+</head>
+
+<body>
+
+
+
+
+
+<div layout:fragment="content">
+
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+               Add Details of Livelihood Summary (PPR-13)
+            </h4>
+        </div>
+		
+		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+		    <span th:text="${error}"></span>
+		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+        <div class="card-body">
+
+             <form id="livelihoodSummary" th:action="@{/saveLivelihoodSummaryPPR13}" method="post">
+				
+				<div class="row g-4">
+					
+				        <div class="col-md-4">
+				             <label class="form-label">
+				                 <b> District </b><span class="required">*</span>
+				              </label>
+								<select id="district" name="district" class="form-select" >
+									<option value="">--Select District--</option>
+										<th:block th:each="dist : ${distList}">
+											<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
+										</th:block>
+								</select>
+
+				       	</div>
+						<div class="col-md-4">
+							<label class="form-label">
+								<b> Block </b><span class="required">*</span>
+							</label>
+							<select id="block" name="block" class="form-select">
+								<option value="">--Select Block--</option>
+							</select>
+						</div>
+						<div class="col-md-4">
+							<label class="form-label">
+								<b> Project </b><span class="required">*</span>
+							</label>
+							<select id="project" name="project" class="form-select">
+								<option value="">--Select Project--</option>
+							</select>					
+						</div>
+				        <div class="col-md-4">
+							<label class="form-label">
+								<b> Name of Watershed </b><span class="required">*</span>
+							</label>
+							<select id="watershed" name="watershed" class="form-select">
+							    <option value="">--Select Micro Watershed--</option>
+							</select>
+				        </div>
+						<div class="col-md-4">
+							<label class="form-label">
+								<b> Village</b> <span class="required">*</span>
+							</label>
+							<select id="village" name="village" class="form-select">
+							    <option value="">--Select Village--</option>
+							</select>
+						</div>
+						
+						<div class="col-md-12"></div>
+						<div class="col-md-6">
+							<label class="form-label">
+								<b> Livelihood Activities </b><span class="required">*</span>
+							</label>
+							<select class="form-select" name="livact" id="livact" multiple>
+									<option value="" disabled>--Select Activities--</option>
+									<th:block th:each="act : ${LivelihoodActList}">
+											<option th:value="${act.livelihoodActivityId}"
+														th:text="${act.livelihoodActivityName}">
+											</option>
+									</th:block>
+							</select>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label">
+								<b> Livelihood Interventions under Project</b> <span class="required">*</span>
+							</label>
+							<select class="form-select" name="livinv" id="livinv" multiple>
+									<option value="" disabled>--Select Livelihood Interventions--</option>
+									<th:block th:each="inv : ${LivelihoodInvList}">
+											<option th:value="${inv.livelihoodInterventionId}"
+													th:text="${inv.livelihoodInterventionName}">
+											</option>
+									</th:block>
+							</select>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label">
+									<b>Current Migration Status (No. of People)</b> <span class="required">*</span>
+							</label>
+							<input type="text" name="migrat" id="migrat" class="form-control" style="height:40px; width: 300px;" oninput="validateInteger(this,10)" >
+						
+						</div>
+				       	
+						 
+				        <div class="col-md-6">
+				               <label class="form-label">
+				                  <b>Main reason of Migration</b> <span class="required">*</span>
+				               </label>
+							  <textarea name="reason" id="reason" class="form-control" rows="2"></textarea>
+				        </div>
+						 
+						
+						<div class="col-md-6"> 		</div>				 
+						 	
+				</div>
+				
+						<div class="text-center mt-4">
+							<button type="submit" name="action"  value="D" class="btn btn-warning">
+							      <i class="fas fa-save"></i>
+							      Save as Draft
+							</button>
+						</div>
+				
+            </form>
+
+        </div>
+		
+		<div class="table-responsive mt-4"
+		     th:if="${#lists.size(records) > 0}">
+			 <h4>
+			 <b> <centre> List of Livelihood Summary (PPR-13)</centre>  </b>
+			</h4>
+			<br/>
+			<table class="table table-bordered table-striped" style="min-width:2000px;">
+
+			           <thead class="table-primary">
+			               <tr>
+			                   <!--<th>S.No.</th>-->
+			                   <th>Block Name</th>
+							   <th>Village Name</th>
+			                   <th>Name of Watershed</th>
+			                   <th>Livelihood Activity</th>
+			                   <th>Livelihood Interventions <br> 
+									under Project
+							   </th>
+			                   <th>Current Migration Status <br>
+								    (No. of People)
+							   </th>
+			                   <th>Main reason of Migration</th>
+							   <th>Action</th>
+			                   
+			               </tr>
+			              
+			           </thead>
+			           <tbody>
+
+			               <tr th:each="rec : ${records}">
+								<td th:text="${rec.village.gramPanchayat.block.blockName}"></td>
+								<td th:text="${rec.village.villageName}"></td>
+								<td th:text="${rec.microWatershed.mwName}"></td>
+								<td>
+								    <ul>
+								        <li style="text-align: left;" th:each="livact : ${rec.existingLivelihoodActivities}"
+								                th:text="${livact.livelihoodActivity.livelihoodActivityName}"></li>
+								    </ul>
+								</td>
+								<td>
+									 <ul>
+										<li style="text-align: left;" th:each="livinv : ${rec.projectLivelihoodInterventions}"
+											th:text="${livinv.livelihoodIntervention.livelihoodInterventionName}"></li>
+										</ul>
+								</td>
+								<td th:text="${rec.migratedPeople}"></td>
+								<td th:text="${rec.migrationReason}"></td>
+								
+							   <td th:if="${rec.status.toString().equals('D')}">
+							   		&nbsp; &nbsp; 
+							   		<a title="Delete" th:href="@{/deleteLivelihoodSummaryPPR13(id=${rec.pprLivelihoodId})}"
+							   			class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+							   			<i class="fas fa-trash"></i>
+							   		</a>
+							   		&nbsp; &nbsp; 
+												
+									<button type="button" title="Edit"  class="btn btn-primary btn-sm editBtn" 	th:attr="data-id=${rec.pprLivelihoodId}, data-block=${rec.village.gramPanchayat.block.blockName}, data-district=${rec.ppr.district.distName},
+												data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, data-watershedid=${rec.microWatershed.mwId}, data-villid=${rec.village.vcode}, data-migstatus=${rec.migratedPeople}, data-reson=${rec.migrationReason}"  
+												th:data-livelihoodids="${#strings.listJoin(rec.existingLivelihoodActivities.![livelihoodActivity.livelihoodActivityId], ',')}" data-bs-toggle="modal"   data-bs-target="#editModal"
+												th:data-livelihoodinvids="${#strings.listJoin(rec.projectLivelihoodInterventions.![livelihoodIntervention.livelihoodInterventionId], ',')}" >
+									    <i class="fas fa-edit"></i>
+									</button>
+									
+							   		&nbsp; &nbsp; 
+							   		<a  title="Complete"	th:href="@{/completeLivelihoodSummaryPPR13(id=${rec.pprLivelihoodId})}"
+							   			class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
+							   			<i class="fas fa-check"></i>
+							   		</a>
+							   		
+							   	</td>
+							   	<td th:if="${rec.status.toString().equals('C')}">
+									
+									<span class="badge bg-success">
+											<i class="fas fa-check-circle"></i> Completed
+									</span>	
+									
+								</td>
+			                   
+			               </tr>
+			               <tr th:if="${#lists.isEmpty(records)}">
+			                   <td colspan="8" class="text-center text-muted">
+			                       Data Not Found
+			                   </td>
+			               </tr>
+
+			           </tbody>
+
+			       </table>
+
+		</div>
+		
+		
+		
+
+    </div>
+	
+			<div class="modal fade" id="editModal" >
+				<div class="modal-dialog modal-xl">
+					<div class="modal-content">
+						<div class="modal-header bg-primary text-white">
+							<h5>Edit Details</h5>
+							<button class="btn-close" data-bs-dismiss="modal"></button>
+						</div>
+						<div class="modal-body">
+							<form id="editForm" th:action="@{/editLivelihoodSummaryPPR13}" method="post">
+							<input type="hidden" id="livsamid" name="livsamid">
+							<!-- Member Details -->
+							<div class="row g-4">
+							
+								<div class="col-md-4">
+									<label class="form-label">
+										<b> District </b><span class="required">*</span>
+									</label>
+									<input type="text" name="district1" id="district1" class="form-control" readonly>
+							
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">
+										<b> Block </b><span class="required">*</span>
+									</label>
+									<input type="text" name="block1" id="block1" class="form-control" readonly>
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">
+										<b> Project </b><span class="required">*</span>
+									</label>
+									<input type="text" name="project1" id="project1" class="form-control" readonly>
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">
+										<b> Name of Watershed </b><span class="required">*</span>
+									</label>
+									<select id="watershed1" name="watershed1" class="form-select">
+										<option value="">--Select Micro Watershed--</option>
+									</select>
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">
+										<b> Village</b> <span class="required">*</span>
+									</label>
+									<select id="village1" name="village1" class="form-select">
+										<option value="">--Select Village--</option>
+									</select>
+								</div>
+							
+								<div class="col-md-12"></div>
+								<div class="col-md-6">
+									<label class="form-label">
+										<b> Livelihood Activities </b><span class="required">*</span>
+									</label>
+									<select class="form-select" name="livact1" id="livact1" multiple>
+										<option value="" disabled>--Select Activities--</option>
+										<th:block th:each="act : ${LivelihoodActList}">
+											<option th:value="${act.livelihoodActivityId}" th:text="${act.livelihoodActivityName}">
+											</option>
+										</th:block>
+									</select>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">
+										<b> Livelihood Interventions under Project</b> <span class="required">*</span>
+									</label>
+									<select class="form-select" name="livinv1" id="livinv1" multiple>
+										<option value="" disabled>--Select Livelihood Interventions--</option>
+										<th:block th:each="inv : ${LivelihoodInvList}">
+											<option th:value="${inv.livelihoodInterventionId}" th:text="${inv.livelihoodInterventionName}">
+											</option>
+										</th:block>
+									</select>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">
+										<b>Current Migration Status (No. of People)</b> <span class="required">*</span>
+									</label>
+									<input type="text" name="migrat1" id="migrat1" class="form-control" style="height:40px; width: 300px;"
+										oninput="validateInteger(this,10)">
+							
+								</div>
+							
+							
+								<div class="col-md-6">
+									<label class="form-label">
+										<b>Main reason of Migration</b> <span class="required">*</span>
+									</label>
+									<textarea name="reason1" id="reason1" class="form-control" rows="2"></textarea>
+								</div>
+							
+							
+								<div class="col-md-6"> </div>
+							
+							</div>
+							
+							<div class="text-center mt-4">
+								<button type="submit" name="updateAction" value="D" class="btn btn-warning">
+									<i class="fas fa-save"></i>
+									Update
+								</button>
+							</div>
+						</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+</div>
+
+</body>
+</html>
