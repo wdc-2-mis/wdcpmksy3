@@ -493,7 +493,7 @@
 					<div class="row mb-3 align-items-center">
 					    <label class="col-md-3 fw-bold"> Proposed project area treated(in Ha.) </label>
 					    <div class="col-md-3">
-							<input type="text" name="argiculture_land" id="argiculture_land" autocomplete="off" 
+							<input type="text" name="treatedProjectArea" id="treatedProjectArea" autocomplete="off" 
 														class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 					    </div>
 					</div>										
@@ -513,8 +513,8 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Proposed Cost </label>
 	                    <div class="col-md-3">
-							<input type="text" name="argiculture_land" id="argiculture_land" autocomplete="off" 
-														class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+							<input type="text" name="proposedCost" id="proposedCost" autocomplete="off" 
+								class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 	                    </div>
 	                </div>
 					
@@ -540,7 +540,7 @@
 		</div>
 		<br/>
 		<div th:if="${detailsOfListOfProposedProject != null}">
-			<h4> <b><center>Save As Draft Details of Prioritized List of Proposed Project</center></b> </h4>
+			<h4> <b><center>Saved As Draft Details of Prioritized List of Proposed Project</center></b> </h4>
 			
 		    <table class="table table-bordered table-striped table-hover">
 		        
@@ -714,7 +714,7 @@
 									Proposed project area treated(in Ha.)
 								</label>
 								<div class="col-md-3">
-									<input type="text" name="argiculture_land" id="argiculture_land" autocomplete="off" 
+									<input type="text" name="editTreatedArea" id="editTreatedArea" autocomplete="off" 
 																class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 								</div>
 							</div>
@@ -737,8 +737,8 @@
 									Proposed Cost
 								</label>
 								<div class="col-md-3">
-									<input type="text" name="argiculture_land" id="argiculture_land" autocomplete="off" 
-																class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+									<input type="text" name="editProposedCost" id="editProposedCost" autocomplete="off" 
+										class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 								</div>
 							</div>
 <!--							<div class="row mb-3 align-items-center">-->

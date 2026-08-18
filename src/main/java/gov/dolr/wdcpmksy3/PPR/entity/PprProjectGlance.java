@@ -48,6 +48,9 @@ public class PprProjectGlance {
 
     @Column(name="status", length = 1)
     private Character status;
+    
+    @OneToMany(mappedBy="projectGlance",cascade=CascadeType.ALL)
+    private List<PprVillage> villages;
 
 	public Integer getPprProjectGlanceId() {
 		return pprProjectGlanceId;

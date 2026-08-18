@@ -27,6 +27,9 @@ public interface MicroWatershedRepository extends JpaRepository<MicroWatershed, 
 	
 	@Query("SELECT mwArea FROM MicroWatershed WHERE mwId = :mwId")
 	Double microWatershedArea(Integer mwId);
+	
+	@Query("from MicroWatershed mw where mw.mwId IN (SELECT pm.microWatershed.mwId FROM PprMicroWatershed pm WHERE pm.ppr.pprId = :pprId)")
+	List<MicroWatershed> getListOfMicroWatershedbyMwIds(Integer pprId);
 }
 
 
