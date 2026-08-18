@@ -180,21 +180,26 @@
 					<th>State Name</th>
 		            <th>District Name</th>
 		            <th>Name of the Project</th>
+					<th>Type of Project</th>
 		            <th>Name of Block</th>
 					<th>Name of Gram Panchayat</th>
 					<th>Villages</th>
 		            <th>Name of Micro-Watershed (Code)</th>
-		            <th>Proposed project area treated(in Ha.)</th>
-		            <th>Type of Project</th>
-		            <th>Proposed Cost</th>
-		            <th>Weightage under the Criteria</th>
+		            <th>Reason for Selection of Watershed</th>
+		            <th>Area of Project (ha)</th>
+					<th>Area Proposed to be treated (ha)</th>
+		            <th>Proposed Cost (Rs in Lakh)</th>
+		            <th>Name of PIA</th>
+					<th>Address of PIA</th>
 		            <th>Action</th>
 		        </tr>
 		        </thead>
 		        <tbody>
-		        <tr th:each="data : ${detailsOfListOfProposedProject}">
+		        <tr th:each="data : ${pprProjectAtGlanceList}">
+					<td th:text="${state}"></td>
 		            <td th:text="${data.ppr.district.distName}"></td>
 		            <td th:text="${data.ppr.projectName}"></td>
+					<td th:text="${data.projectType.projectType}"></td>
 		            <td th:text="${data.microWatershed.mwName}"></td>
 		            <td th:text="${data.microWatershed.mwCode}"></td>
 		            <td th:text="${data.treatedArea}"></td>
