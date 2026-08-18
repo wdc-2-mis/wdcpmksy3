@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+<meta charset="UTF-8">
+<title>Drinking Water Status </title>
+
+<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<style>
+	.required{
+	    color:red;
+	}
+
+	body{
+	    background:#f8f9fa;
+	}
+
+	.card{
+	    border-radius:0;
+	}
+
+	.table th,.table td{
+	    vertical-align:middle;
+	    text-align:center;
+	}
+
+	.form-control,
+	.form-select{
+	    border-radius:0;
+	}
+
+	.heading{
+	    font-size:22px;
+	    font-weight:bold;
+	    text-align:center;
+	    margin-bottom:25px;
+	}
+
+	label{
+	    font-weight:600;
+	}	
+</style>
+
+
+<script>
+
+	document.addEventListener("DOMContentLoaded", function () {
+		
+			var editModal = document.getElementById('editModal');
+		   	editModal.addEventListener('show.bs.modal', function (event) {
+		       var button = event.relatedTarget;
+			   
+		       // Get data attributes  
+		       var Id = button.getAttribute('data-id');
+		       var district = button.getAttribute('data-district');
+		       var project = button.getAttribute('data-project');
+		       var projectId = button.getAttribute('data-projectid');
+			   var watershedid = button.getAttribute('data-watershedid');
+			   var villid = button.getAttribute('data-villid');
+			   var premon = button.getAttribute('data-premon');
+			   var postmon = button.getAttribute('data-postmon');
+			   var preid = button.getAttribute('data-preid');
+			   var postid = button.getAttribute('data-postid');
+			   
+		       // Populate modal fields  reason1
+		       document.getElementById('pprWaterId').value = Id;
+		       document.getElementById('district1').value = district;
+		       document.getElementById('project1').value = project;
+			   document.getElementById('preQualityWater1').value = premon;
+			   document.getElementById('postQualityWater1').value = postmon;
+			   
+			   var preQualityRadio = document.querySelector(
+			       'input[name="preQualityId1"][value="' + preid + '"]'
+			   );
+
+			   if (preQualityRadio) {
+			       preQualityRadio.checked = true;
+			   }
+			   
+			   var postQualityRadio = document.querySelector(
+			       'input[name="postQualityId1"][value="' + postid + '"]'
+			   );
+
+			   if (postQualityRadio) {
+			       postQualityRadio.checked = true;
+			   }
+			   
+			   
+			   
+			   
+			   let village1 = document.getElementById("village1");
+			   let watershed1 = document.getElementById("watershed1");
+
+					  village1.innerHTML = '<option value="">--Select Village--</option>';
+
+					  if (projectId === "") {
+					      return;
+					  }
+
+					  fetch("/getVillagesByProjectPPR10?pprId=" + projectId)
+					      .then(res => res.json())
+					      .then(data => {
+
+					          data.forEach(function (item) {
+
+					              let option = document.createElement("option");
+
+					              option.value = item.id;
+					              option.text = item.name;
+
+					              // Select village based on villid
+					              if (String(item.id) === String(villid)) {
+					                  option.selected = true;
+					              }
+
+					              village1.appendChild(option);
+					          });
+
+					      })
+					      .catch(err => console.log(err));
+
+					  watershed1.innerHTML = '<option value="">--Select Micro Watershed--</option>';
+
+					  fetch("/getMicroWatershedsByProject?pprId=" + projectId)
+						  .then(response => response.json())
+						  .then(data => {
+							  data.forEach(function (item) {
+								  let option = document.createElement("option");
+								  option.value = item.id;
+								  option.textContent = item.name;
+								  if (String(item.id) === String(watershedid)) {
+								  			option.selected = true;
+								  }
+								  watershed1.appendChild(option);
+
+							  });
+
+						  })
+						  .catch(error => {
+							  console.error("Micro Watershed Loading Error :", error);
+						  });
+
+						   
+						  
+						  
+						  
+		   });
+		
+		
+		
+		function openEditModal(button) {
+
+		    if (confirm('Are you sure you want to edit this record?')) {
+
+		        const id = button.getAttribute('data-id');
+		        console.log("Edit ID:", id);
+		        const modalElement = document.getElementById('editModal');
+		        const modal = new bootstrap.Modal(modalElement);
+		        modal.show();
+
+		    } 
+			else {
+				modal.hide();
+		        return false;
+		    }
+		}
+		
+		const editForm = document.getElementById("editForm");
+		editForm.addEventListener("submit", function (e) {
+
+			const village = document.getElementsByName("village1")[0];
+			const watershed = document.getElementsByName("watershed1")[0];
+			const preQualityWater = document.getElementById("preQualityWater1");
+			const postQualityWater = document.getElementById("postQualityWater1");
+			const preQualityId = document.querySelector('input[name="preQualityId1"]:checked');
+			const postQualityId = document.querySelector('input[name="postQualityId1"]:checked');
+
+			if (village.value.trim() === "") {
+				alert("Please select Village.");
+				village.focus();
+				e.preventDefault();
+				return;
+			}
+			if (watershed.value.trim() === "") {
+				alert("Please select  Name of Watershed.");
+				watershed.focus();
+				e.preventDefault();
+				return;
+			}
+			if (preQualityWater.value.trim() === "") {
+				alert("Please enter Pre-Project Availability of Drinking Water (No. of month in a year)  ");
+				preQualityWater.focus();
+				e.preventDefault();
+				return;
+			}
+
+			if (postQualityWater.value.trim() === "") {
+				alert("Please enter Post-Project Expected Availability of Water (No. of month in a year) ");
+				postQualityWater.focus();
+				e.preventDefault();
+				return;
+			}
+			if (!preQualityId) {
+				alert("Please select Pre-Project Quality of Water");
+				e.preventDefault();
+				return;
+			}
+
+			if (!postQualityId) {
+				alert("Please select Post-Project Quality of Water");
+				e.preventDefault();
+				return;
+			}	
+
+		});
+
+	    const form = document.getElementById("drinkingWater");
+
+	    form.addEventListener("submit", function (e) {
+
+			const district = document.getElementsByName("district")[0];  
+	        const project = document.getElementsByName("project")[0]; 
+			const village = document.getElementsByName("village")[0]; 
+			const watershed = document.getElementsByName("watershed")[0];
+	        const preQualityWater = document.getElementById("preQualityWater");
+	        const postQualityWater = document.getElementById("postQualityWater");
+			const preQualityId = document.querySelector('input[name="preQualityId"]:checked');
+			const postQualityId = document.querySelector('input[name="postQualityId"]:checked');
+			
+			if (district.value.trim() === "") {
+			     alert("Please select District.");
+			     district.focus();
+			     e.preventDefault();
+			     return false;
+			}
+			
+	        if (project.value.trim() === "") {
+	             alert("Please select Project.");
+	             project.focus();
+	             e.preventDefault();
+	             return;
+	        }
+			if (village.value.trim() === "") {
+				 alert("Please select Village.");
+				 village.focus();
+				 e.preventDefault();
+				 return;
+			}
+	        if (watershed.value.trim() === "") {
+	            alert("Please select  Name of Watershed.");
+	            watershed.focus();
+	            e.preventDefault();
+	            return;
+	        }
+			if (preQualityWater.value.trim() === "") {
+				alert("Please enter Pre-Project Availability of Drinking Water (No. of month in a year)  ");
+				preQualityWater.focus();
+				e.preventDefault();
+				return;
+			}
+			
+			if (postQualityWater.value.trim() === "") {
+				alert("Please enter Post-Project Expected Availability of Water (No. of month in a year) ");
+				postQualityWater.focus();
+				e.preventDefault();
+				return;
+			}
+			if (!preQualityId) {
+				alert("Please select Pre-Project Quality of Water");
+				e.preventDefault();
+				return;
+			}
+			
+			if (!postQualityId) {
+				alert("Please select Post-Project Quality of Water");
+				e.preventDefault();
+				return;
+			}
+			
+
+	    });
+
+		document.getElementById("district").addEventListener("change", function () {
+
+		    let districtId = this.value;
+		    let project = document.getElementById("project");
+			
+		    // Clear existing options
+		    project.innerHTML = '<option value="">--Select Project--</option>';
+		    if (districtId === "") {
+		        return;
+		    }
+		    fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
+		        .then(response => response.json())
+		        .then(data => {
+		            data.forEach(function(item) {
+		                let option = document.createElement("option");
+		                option.value = item.id;          // PPR ID
+		                option.textContent = item.name;  // Project Name
+		                project.appendChild(option);
+		            });
+
+		        })
+		        .catch(error => {
+		            console.error("Error:", error);
+		        });
+				
+		});
+		
+		document.getElementById("project").addEventListener("change", function () {
+
+		    let projectId = this.value;
+		    let village = document.getElementById("village");
+			let watershed = document.getElementById("watershed");
+			
+		    village.innerHTML ='<option value="">--Select Village--</option>';
+		    if(projectId===""){
+		        return;
+		    }
+
+		    fetch("/getVillagesByProjectPPR10?pprId="+projectId)
+		        .then(res=>res.json())
+		        .then(data=>{
+		            data.forEach(function(item){
+		                let option=document.createElement("option");
+		                option.value=item.id;
+		                option.text=item.name;
+		                village.appendChild(option);
+		            });
+
+		        }).catch(err=>console.log(err));
+				
+				watershed.innerHTML ='<option value="">--Select Micro Watershed--</option>';
+				
+				fetch("/getMicroWatershedsByProject?pprId=" + projectId)
+				            .then(response => response.json())
+				            .then(data => {
+				                data.forEach(function(item){
+				                    let option = document.createElement("option");
+				                    option.value = item.id;
+				                    option.textContent = item.name;
+				                    watershed.appendChild(option);
+
+				                });
+
+				            })
+				            .catch(error => {
+				                console.error("Micro Watershed Loading Error :", error);
+				            });
+				
+		});
+	});
+
+</script>
+
+</head>
+
+<body>
+
+
+
+
+
+<div layout:fragment="content">
+
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+               Add Details of Drinking Water Status
+            </h4>
+        </div>
+		
+		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+		    <span th:text="${error}"></span>
+		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+        <div class="card-body">
+
+             <form id="drinkingWater" th:action="@{/saveDrinkingWaterStatus}" method="post">
+				
+				<div class="row g-4">
+					
+				        <div class="col-md-6">
+				             <label class="form-label">
+				                 District<span class="required">*</span>
+				              </label>
+							<select id="district" name="district" class="form-select">
+								<option value="">--Select District--</option>
+								<th:block th:each="dist : ${distList}">
+									<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
+								</th:block>
+							</select>
+
+				       	</div>
+						
+						<div class="col-md-6">
+							<label class="form-label">
+								Project<span class="required">*</span>
+							</label>
+							<select id="project" name="project" class="form-select">
+								<option value="">--Select Project--</option>
+							</select>
+						</div>
+				        <div class="col-md-6">
+							<label class="form-label">
+								 Name of Watershed<span class="required">*</span>
+							</label>
+							<select id="watershed" name="watershed" class="form-select">
+							    <option value="">--Select Micro Watershed--</option>
+							</select>
+				        </div>
+						<div class="col-md-6">
+							<label class="form-label">
+								 Village <span class="required">*</span>
+							</label>
+							<select id="village" name="village" class="form-select">
+							    <option value="">--Select Village--</option>
+							</select>
+						</div>
+						
+						<div class="col-md-12">
+							
+							<label class="form-label fs-5">
+								<b>Pre-Project Drinking Water Details</b> <span class="required">*</span>
+							</label>
+							
+						</div>
+						
+						<div class="col-md-6">
+							<label class="form-label">
+									Availability of Water (No. of month in a year) 
+							</label>
+							<input type="text" name="preQualityWater" id="preQualityWater" class="form-control" 
+							style="height:40px; width: 300px;" oninput="validateInteger(this,2)"  >
+						
+						</div>
+				       	
+						 
+						<div class="col-md-6">
+						    <label class="form-label">
+						        Quality of Water
+						    </label>
+
+						    <div class="d-flex align-items-center gap-4">
+						        <div th:each="quality : ${waterQualityList}" class="form-check">
+						            <input class="form-check-input"
+						                   type="radio"
+						                   name="preQualityId"
+						                   th:id="'preQuality_' + ${quality.waterQualityId}"
+						                   th:value="${quality.waterQualityId}"
+						                   required />
+
+						            <label class="form-check-label"
+						                   th:for="'preQuality_' + ${quality.waterQualityId}"
+						                   th:text="${quality.waterQualityType}">
+						            </label>
+						        </div>
+						    </div>
+						</div>
+						
+						<div class="col-md-12">
+						
+							<label class="form-label fs-5">
+								<b>Post-Project Drinking Water Details</b> <span class="required">*</span>
+							</label>
+						
+						</div>
+						
+						<div class="col-md-6">
+							<label class="form-label">
+								Expected Availability of Water (No. of month in a year)
+							</label>
+							<input type="text" name="postQualityWater" id="postQualityWater" class="form-control" style="height:40px; width: 300px;"
+								oninput="validateInteger(this,2)">
+						
+						</div>
+						<div class="col-md-6">
+						    <label class="form-label">
+						        Quality of Water
+						    </label>
+
+						    <div class="d-flex align-items-center gap-4">
+						        <div th:each="quality : ${waterQualityList}" class="form-check">
+									<input 	class="form-check-input" 
+											type="radio" 
+											name="postQualityId" 
+											th:id="'postQuality_' + ${quality.waterQualityId}"
+											th:value="${quality.waterQualityId}" required />
+
+						            <label class="form-check-label"
+										th:for="'postQuality_' + ${quality.waterQualityId}"
+											th:text="${quality.waterQualityType}">
+						            </label>
+						        </div>
+						    </div>
+						</div>
+						
+						<div class="col-md-6"> 		</div>				 
+						 	
+				</div>
+				
+						<div class="text-center mt-4">
+							<button type="submit" name="action"  value="D" class="btn btn-warning">
+							      <i class="fas fa-save"></i>
+							      Save as Draft
+							</button>
+						</div>
+				
+            </form>
+
+        </div>
+		
+		<div class="table-responsive mt-4"
+		     th:if="${#lists.size(records) > 0}">
+			 <h4>
+			 <b> <centre> List of Details of Drinking Water Status</centre>  </b>
+			</h4>
+			<br/>
+			<table class="table table-bordered table-striped" style="min-width:2000px;">
+
+			           <thead class="table-primary">
+			               <tr>
+			                   <!--<th>S.No.</th>-->
+			                   <th rowspan="2">Project Name</th>
+							   <th rowspan="2">Village Name</th>
+			                   <th rowspan="2">Name of Watershed</th>
+			                   <th colspan="2">Pre-Project Drinking Water Details</th>
+			                   <th colspan="2">Post-Project Drinking Water Details</th>
+							   <th rowspan="2">Action</th>
+			               </tr>
+							<tr>
+								<th> Availability of Water <br> (No. of month in a year)  </th>
+								<th> Quality of Water</th>
+								<th> Expected Availability of Water <br> (No. of month in a year)</th>
+								<th> Quality of Water</th>
+							</tr>
+			           </thead>
+			           <tbody>
+
+			               <tr th:each="rec : ${records}">
+								<td th:text="${rec.ppr.projectName}"></td>
+								<td th:text="${rec.village.villageName}"></td>
+								<td th:text="${rec.microWatershed.mwName}"></td>
+								<td th:text="${rec.preWaterAvailabilityMonths}"></td>
+								<td th:text="${rec.preWaterQuality.waterQualityType}"></td>
+								<td th:text="${rec.postWaterAvailabilityMonths}"></td>
+								<td th:text="${rec.postWaterQuality.waterQualityType}"></td>
+								
+							   <td th:if="${rec.status.toString().equals('D')}">
+							   		&nbsp; &nbsp; 
+							   		<a title="Delete" th:href="@{/deleteDrinkingWaterStatus(id=${rec.pprWaterId})}"
+							   			class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+							   			<i class="fas fa-trash"></i>
+							   		</a>
+							   		&nbsp; &nbsp; 
+												
+									<button type="button" title="Edit"  class="btn btn-primary btn-sm editBtn" 	th:attr="data-id=${rec.pprWaterId}, data-district=${rec.ppr.district.distName}, data-premon=${rec.preWaterAvailabilityMonths},
+												data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, data-watershedid=${rec.microWatershed.mwId}, data-villid=${rec.village.vcode}, data-postmon=${rec.postWaterAvailabilityMonths},
+												data-preid=${rec.preWaterQuality.waterQualityId}, data-postid=${rec.postWaterQuality.waterQualityId}"  
+												 data-bs-toggle="modal"   data-bs-target="#editModal" >
+									    <i class="fas fa-edit"></i>
+									</button>
+									
+							   		&nbsp; &nbsp; 
+							   		<a  title="Complete" th:href="@{/completeDrinkingWaterStatus(id=${rec.pprWaterId})}"
+							   			class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
+							   			<i class="fas fa-check"></i>
+							   		</a>
+							   		
+							   	</td>
+							   	<td th:if="${rec.status.toString().equals('C')}">
+									
+									<span class="badge bg-success">
+											<i class="fas fa-check-circle"></i> Completed
+									</span>	
+									
+								</td>
+			                   
+			               </tr>
+			               <tr th:if="${#lists.isEmpty(records)}">
+			                   <td colspan="8" class="text-center text-muted">
+			                       Data Not Found
+			                   </td>
+			               </tr>
+
+			           </tbody>
+
+			       </table>
+
+		</div>
+		
+		
+		
+
+    </div>
+	
+			<div class="modal fade" id="editModal" >
+				<div class="modal-dialog modal-xl">
+					<div class="modal-content">
+						<div class="modal-header bg-primary text-white">
+							<h5>Edit Details</h5>
+							<button class="btn-close" data-bs-dismiss="modal"></button>
+						</div>
+						<div class="modal-body">
+							<form id="editForm" th:action="@{/editDrinkingWaterStatus}" method="post">
+							<input type="hidden" id="pprWaterId" name="pprWaterId">
+							<!-- Member Details -->
+							<div class="row g-4">
+							
+								<div class="col-md-6">
+									<label class="form-label">
+										District
+									</label>
+									<input type="text" name="district1" id="district1" class="form-control" readonly>
+							
+								</div>
+							
+								<div class="col-md-6">
+									<label class="form-label">
+										Project
+									</label>
+									<input type="text" name="project1" id="project1" class="form-control" readonly>		
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">
+										Name of Watershed<span class="required">*</span>
+									</label>
+									<select id="watershed1" name="watershed1" class="form-select">
+										<option value="">--Select Micro Watershed--</option>
+									</select>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">
+										Village <span class="required">*</span>
+									</label>
+									<select id="village1" name="village1" class="form-select">
+										<option value="">--Select Village--</option>
+									</select>
+								</div>
+							
+								<div class="col-md-12">
+							
+									<label class="form-label fs-5">
+										<b>Pre-Project Drinking Water Details</b> <span class="required">*</span>
+									</label>
+							
+								</div>
+							
+								<div class="col-md-6">
+									<label class="form-label">
+										Availability of Water (No. of month in a year)
+									</label>
+									<input type="text" name="preQualityWater1" id="preQualityWater1" class="form-control"
+										style="height:40px; width: 300px;" oninput="validateInteger(this,2)" min="1" max="12">
+							
+								</div>
+							
+							
+								<div class="col-md-6">
+									<label class="form-label">
+										Quality of Water
+									</label>
+							
+									<div class="d-flex align-items-center gap-4">
+										<div th:each="quality : ${waterQualityList}" class="form-check">
+											<input class="form-check-input" type="radio" name="preQualityId1"
+												th:id="'preQuality1_' + ${quality.waterQualityId}" th:value="${quality.waterQualityId}" required />
+							
+											<label class="form-check-label" th:for="'preQuality1_' + ${quality.waterQualityId}"
+												th:text="${quality.waterQualityType}">
+											</label>
+										</div>
+									</div>
+								</div>
+							
+								<div class="col-md-12">
+							
+									<label class="form-label fs-5">
+										<b>Post-Project Drinking Water Details</b> <span class="required">*</span>
+									</label>
+							
+								</div>
+							
+								<div class="col-md-6">
+									<label class="form-label">
+										Expected Availability of Water (No. of month in a year)
+									</label>
+									<input type="text" name="postQualityWater1" id="postQualityWater1" class="form-control"
+										style="height:40px; width: 300px;" oninput="validateInteger(this,2)" >
+							
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">
+										Quality of Water
+									</label>
+							
+									<div class="d-flex align-items-center gap-4">
+										<div th:each="quality : ${waterQualityList}" class="form-check">
+											<input class="form-check-input" type="radio" name="postQualityId1"
+												th:id="'postQuality1_' + ${quality.waterQualityId}" th:value="${quality.waterQualityId}" required />
+							
+											<label class="form-check-label" th:for="'postQuality1_' + ${quality.waterQualityId}"
+												th:text="${quality.waterQualityType}">
+											</label>
+										</div>
+									</div>
+								</div>
+							
+								<div class="col-md-6"> </div>
+							
+							</div>
+							
+							<div class="text-center mt-4">
+								<button type="submit" name="updateAction" value="D" class="btn btn-warning">
+									<i class="fas fa-save"></i>
+									Update
+								</button>
+							</div>
+						</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+</div>
+
+</body>
+</html>
