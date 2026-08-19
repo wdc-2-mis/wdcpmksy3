@@ -9,11 +9,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MDisasterType;
+import gov.dolr.wdcpmksy3.PPR.entity.MFinYear;
+import gov.dolr.wdcpmksy3.PPR.entity.MMonth;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprDisasterDetails;
 import gov.dolr.wdcpmksy3.PPR.repository.MDisasterTypeRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.MonthRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprDisasterDetailsRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.WdcpmksyMFinYearRepository;
 import gov.dolr.wdcpmksy3.entity.MVillage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -29,6 +33,12 @@ public class PprDisasterDetailsService {
 	
 	@Autowired
 	private MDisasterTypeRepository disasterRepo;
+	
+	@Autowired
+	WdcpmksyMFinYearRepository finRepo;
+	
+	@Autowired
+	MonthRepository monthRepo;
 	
 	public static String getClientIpAddr(HttpServletRequest request) {  
 	    String ip = request.getHeader("X-Forwarded-For");  
@@ -68,7 +78,7 @@ public class PprDisasterDetailsService {
 	    return ip;  
 	}
 	
-	public void saveRecords(Integer dcode, Integer vcode, Integer disasterTypeId, String periodicity, String affected, String userId,
+	public void saveRecords(Integer dcode, Integer vcode, Integer disasterTypeId, String periodicity, String affected, Integer yearId, Integer monthId, String userId,
 			HttpServletRequest request) {
 		PprDisasterDetails details = new PprDisasterDetails();
 		MPpr ppr = pprRepo.findByDistrict_Dcode(dcode);
@@ -76,6 +86,12 @@ public class PprDisasterDetailsService {
 		vCode.setVcode(vcode);
 		MDisasterType dtype = new MDisasterType();
 		dtype.setDisasterTypeId(disasterTypeId);
+		
+		MFinYear year = finRepo.findById(yearId).orElseThrow(() -> new RuntimeException("Financial year not found"));
+		
+		
+		MMonth month = new MMonth();
+		month.setMonthId(monthId);
 		
 	    details.setPpr(ppr);
 	    details.setVcode(vCode);
@@ -86,6 +102,8 @@ public class PprDisasterDetailsService {
 	    details.setRequestIp(getClientIpAddr(request));
 	    details.setCreatedBy(userId); 
 	    details.setCreatedDate(LocalDateTime.now());
+	    details.setYear(year);
+	    details.setMonth(month);
 	    repository.save(details);
 	}
 
@@ -94,9 +112,8 @@ public class PprDisasterDetailsService {
 	    return repository.findAll(Sort.by(Sort.Direction.DESC, "status"));
 	}
 
-	
 	@Transactional
-	public void updateFloodDroughtArea(Integer pprDisasterId, Integer disasterTypeId, String periodicity,
+	public void updateFloodDroughtArea(Integer editYear, Integer editMonth, Integer pprDisasterId, Integer disasterTypeId, String periodicity,
 			Boolean affected, String updatedBy) {
 		
 		PprDisasterDetails record =
@@ -108,7 +125,10 @@ public class PprDisasterDetailsService {
                                 )
                         );
 
+		MFinYear year = finRepo.findById(editYear).orElseThrow(() -> new RuntimeException("Financial year not found"));
 
+		MMonth month = monthRepo.findById(editMonth).orElseThrow(() -> new RuntimeException("Month not found"));
+		
         MDisasterType disasterType =
         		disasterRepo
                         .findById(disasterTypeId)
@@ -118,14 +138,15 @@ public class PprDisasterDetailsService {
                                 )
                         );
 
-
+        
         record.setDtype(disasterType);
         record.setPeriodicity(periodicity);
         record.setAffected(affected);
 
         record.setUpdatedBy(updatedBy);
         record.setUpdatedDate(LocalDate.now());
-
+        record.setMonth(month);
+        record.setYear(year);
 
         repository.save(record);
     }

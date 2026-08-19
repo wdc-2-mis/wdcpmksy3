@@ -28,6 +28,14 @@ public class PprDisasterDetails {
     @JoinColumn(name = "disaster_type_id", nullable = false)
     private MDisasterType dtype;
     
+    @ManyToOne
+    @JoinColumn(name = "month_id", nullable = false)
+    private MMonth month;
+    
+    @ManyToOne
+    @JoinColumn(name = "year_id", nullable = false)
+    private MFinYear year;
+    
     @Column(name = "periodicity", length = 1)
     private String periodicity;
 
@@ -148,6 +156,22 @@ public class PprDisasterDetails {
 
 	public void setVcode(MVillage vcode) {
 		this.vcode = vcode;
+	}
+
+	public MMonth getMonth() {
+		return month;
+	}
+
+	public void setMonth(MMonth month) {
+		this.month = month;
+	}
+
+	public MFinYear getYear() {
+		return year;
+	}
+
+	public void setYear(MFinYear year) {
+		this.year = year;
 	}
 
 	

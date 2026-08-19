@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import gov.dolr.wdcpmksy3.PPR.entity.DisasterType;
 import gov.dolr.wdcpmksy3.PPR.entity.PprDisasterDetails;
 import gov.dolr.wdcpmksy3.PPR.repository.DisasterTypeRepository;
+import gov.dolr.wdcpmksy3.PPR.service.PPRSoilErosionService;
 import gov.dolr.wdcpmksy3.PPR.service.PprDisasterDetailsService;
 import gov.dolr.wdcpmksy3.PPR.service.VillageService;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
@@ -37,6 +38,9 @@ public class PPRFloodProjectAreaController {
 	@Autowired
 	private PprDisasterDetailsService pprAreaService;
 	
+	@Autowired
+    private PPRSoilErosionService soilErosionService;
+	
 	@GetMapping("/dtlFloodDroughtArea")
     public String dtlFloodDroughtArea(HttpSession session, Model model) 
 	{
@@ -59,17 +63,18 @@ public class PPRFloodProjectAreaController {
 		  model.addAttribute("villages", villages);
 		  List<PprDisasterDetails> records = pprAreaService.findAll(); 
 		  model.addAttribute("records", records);
-		 
+		  model.addAttribute("monthList", soilErosionService.getAllMonths());
+	      model.addAttribute("yearList", soilErosionService.getAllYears());
        return "ppr/floodDroughtArea";
 	}
 	
 	@PostMapping("/saveFloodDrought")
 	public String saveFloodDrought(HttpSession session, @RequestParam("dcode") Integer dcode, @RequestParam("village") Integer vcode, @RequestParam("disasterTypeId") Integer disasterTypeId, @RequestParam("periodicity") String periodicity, @RequestParam("affected") String affected,
-	        RedirectAttributes redirectAttributes, HttpServletRequest request) {
+			@RequestParam("yearId") Integer yearId, @RequestParam("monthId") Integer monthId, RedirectAttributes redirectAttributes, HttpServletRequest request) {
 
 		String userId = (String) session.getAttribute("userid");
 		  try {
-			    pprAreaService.saveRecords(dcode, vcode, disasterTypeId, periodicity, affected, userId, request);
+			    pprAreaService.saveRecords(dcode, vcode, disasterTypeId, periodicity, affected, yearId, monthId, userId, request);
 	            redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
 		    } catch (Exception ex) {
 		        redirectAttributes.addFlashAttribute("error", "Failed to save records: " + ex.getMessage());
@@ -80,13 +85,13 @@ public class PPRFloodProjectAreaController {
 	}
 	
 	@PostMapping("/updateFloodDroughtArea")
-	public String updateFloodDroughtArea(@RequestParam Integer pprDisasterId, @RequestParam Integer disasterTypeId, @RequestParam String periodicity, @RequestParam Boolean affected, RedirectAttributes redirectAttributes, HttpSession session) {
+	public String updateFloodDroughtArea(@RequestParam Integer editYear, @RequestParam Integer editMonth, @RequestParam Integer pprDisasterId, @RequestParam Integer disasterTypeId, @RequestParam String periodicity, @RequestParam Boolean affected, RedirectAttributes redirectAttributes, HttpSession session) {
 
 	    try {
 
 	        String updatedBy = String.valueOf(session.getAttribute("userId"));
 
-	        pprAreaService.updateFloodDroughtArea(pprDisasterId, disasterTypeId, periodicity, affected, updatedBy);
+	        pprAreaService.updateFloodDroughtArea(editYear, editMonth, pprDisasterId, disasterTypeId, periodicity, affected, updatedBy);
 
 	        redirectAttributes.addFlashAttribute(
 	                "success",

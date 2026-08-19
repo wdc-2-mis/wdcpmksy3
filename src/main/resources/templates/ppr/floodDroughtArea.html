@@ -22,7 +22,7 @@
 	        <div class="card-header bg-primary text-white">
 	            <h4 class="mb-0">
 	               Details of Flood and Drought in Project Area (PPR-11)
-	            </h4>
+	            </h4> 	
 	        </div>
 	        
 	        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -62,6 +62,39 @@
         <div class="invalid-feedback">Please select a Village.</div>
     </div>
 </div>
+
+                 <div class="row mb-4">
+
+					<div class="col-md-3">
+							<label class="fw-bold">Year:</label><span class="required">*</span>
+						</div>
+						<div class="col-md-3">
+							<select id="yearId" name="yearId"
+								class="form-control form-control-sm" required>
+								<option value="">--Select Year--</option>
+								<th:block th:each="year : ${yearList}">
+									<option th:value="${year.finYrCd}" th:text="${year.year}"></option>
+								</th:block>
+							</select>
+						</div>
+						
+						<div class="col-md-2">
+							<label class="fw-bold">Month:</label><span class="required">*</span>
+						</div>
+						
+						<div class="col-md-4">
+							<select id="monthId" name="monthId" class="form-control form-control-sm" required>
+								<option value="">--Select Month--</option>
+								<th:block th:each="month : ${monthList}">
+									<option th:value="${month.monthId}"
+										th:text="${month.monthName}"></option>
+								</th:block>
+							</select>
+						</div>
+ 
+						
+					
+					</div>
 
 <!-- Particular Row -->
 <div class="row mb-4 align-items-center">
@@ -155,6 +188,8 @@
             <tr>
                 <th class="table-primary">S No.</th>
                 <th class="table-primary">Village</th>
+                <th class="table-primary">Year</th>
+                <th class="table-primary">Month</th>
                 <th class="table-primary">Particular</th>
                 <th class="table-primary">Periodicity</th>
                 <th class="table-primary">Affected</th>
@@ -165,12 +200,13 @@
             <tr th:each="rec, iterStat : ${records}">
                 <td th:text="${iterStat.index + 1}"></td>
                 <td th:text="${rec.vcode.villageName}"></td>
+                <td th:text="${rec.year.year}"></td>
+                <td th:text="${rec.month.monthName}"></td>
                 <td th:text="${rec.dtype.disasterName}"></td>
                 <td th:text="${rec.periodicity == 'Q' ? 'Quarterly' : 'Annual'}"></td>
-                <td th:text="${rec.affected == 'true' ? 'Yes' : 'No'}"></td>
+                <td th:text="${rec.affected ? 'Yes' : 'No'}"></td>
                 <td>
-                	&nbsp; &nbsp;
-                    <div th:if="${rec.status == 'C'}">
+                	 <div th:if="${rec.status == 'C'}">
                             <span class="badge bg-success">Data Completed</span>
                         </div>
                         <div th:if="${rec.status != 'C'}">
@@ -181,6 +217,9 @@
 						th:data-id="${rec.pprDisasterId}"
    						th:data-district="${rec.ppr.district.distName}"
    						th:data-village="${rec.vcode.villageName}"
+   						th:data-month="${rec.month.monthId}"
+   						th:data-year="${rec.year.finYrCd}"
+   						
    						th:data-disaster="${rec.dtype.disasterTypeId}"
    						th:data-periodicity="${rec.periodicity}"
    						th:data-affected="${rec.affected}">
@@ -263,6 +302,62 @@
 
                     </div>
 
+
+                  <div class="row mb-4">
+
+    <div class="col-md-6">
+
+        <label class="form-label fw-bold">
+            Financial Year
+        </label>
+
+        <select class="form-select"
+                id="editYear"
+                name="editYear"
+                required>
+
+            <option value="">
+                -- Select Financial Year --
+            </option>
+
+            <option th:each="y : ${yearList}"
+                    th:value="${y.finYrCd}"
+                    th:text="${y.year}">
+            </option>
+
+        </select>
+
+    </div>
+    
+    <div class="col-md-6">
+
+        <label class="form-label fw-bold">
+            Month
+        </label>
+
+        <select class="form-select"
+                id="editMonth"
+                name="editMonth"
+                required>
+
+            <option value="">
+                -- Select Month --
+            </option>
+
+            <option th:each="m : ${monthList}"
+                    th:value="${m.monthId}"
+                    th:text="${m.monthName}">
+            </option>
+
+        </select>
+
+    </div>
+
+
+   
+
+</div>
+                   
 
                     <!-- Particular -->
                     <div class="row mb-4">
@@ -490,9 +585,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const editModal = document.getElementById("editModal");
 
     if (!editModal) {
+
         console.error("editModal not found");
+
         return;
     }
+
 
     editModal.addEventListener("show.bs.modal", function (event) {
 
@@ -501,51 +599,90 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Edit button:", button);
 
         if (!button) {
+
             console.error("No relatedTarget found");
+
             return;
         }
 
-        // Read data attributes
-        const id = button.getAttribute("data-id");
-        const district = button.getAttribute("data-district");
-        const village = button.getAttribute("data-village");
-        const disaster = button.getAttribute("data-disaster");
-        const periodicity = button.getAttribute("data-periodicity");
-        const affected = button.getAttribute("data-affected");
+    const id =
+            button.getAttribute("data-id");
 
-        console.log("ID:", id);
+        const district =
+            button.getAttribute("data-district");
+
+        const village =
+            button.getAttribute("data-village");
+
+        const yearId =
+            button.getAttribute("data-year");
+
+        const monthId =
+            button.getAttribute("data-month");
+
+        const disaster =
+            button.getAttribute("data-disaster");
+
+        const periodicity =
+            button.getAttribute("data-periodicity");
+
+        const affected =
+            button.getAttribute("data-affected");
+   console.log("ID:", id);
         console.log("District:", district);
         console.log("Village:", village);
+        console.log("Month ID:", monthId);
+        console.log("Year ID:", yearId);
         console.log("Disaster:", disaster);
         console.log("Periodicity:", periodicity);
         console.log("Affected:", affected);
 
-        // Basic fields
-        document.getElementById("pprDisasterId").value = id || "";
-        document.getElementById("editDistrict").value = district || "";
-        document.getElementById("editVillage").value = village || "";
+    document.getElementById("pprDisasterId").value =
+            id || "";
 
-        // Disaster type
-        document
-            .querySelectorAll('#editParticularRadios input[name="disasterTypeId"]')
+        document.getElementById("editDistrict").value =
+            district || "";
+
+        document.getElementById("editVillage").value =
+            village || "";
+
+       document.getElementById("editMonth").value =
+            monthId || "";
+
+       document.getElementById("editYear").value =
+            yearId || "";
+            
+            
+            console.log("Month ID from button:", monthId);
+            console.log("Year ID from button:", yearId);
+
+       document
+            .querySelectorAll(
+                '#editParticularRadios input[name="disasterTypeId"]'
+            )
             .forEach(function (radio) {
 
-                radio.checked = String(radio.value) === String(disaster);
+                radio.checked =
+                    String(radio.value) === String(disaster);
 
             });
 
-        // Periodicity
-        document
-            .querySelectorAll('#editForm input[name="periodicity"]')
+     document
+            .querySelectorAll(
+                '#editForm input[name="periodicity"]'
+            )
             .forEach(function (radio) {
 
-                radio.checked = String(radio.value) === String(periodicity);
+                radio.checked =
+                    String(radio.value) ===
+                    String(periodicity);
 
             });
 
-        // Affected
-        document
-            .querySelectorAll('#editForm input[name="affected"]')
+      document
+            .querySelectorAll(
+                '#editForm input[name="affected"]'
+            )
             .forEach(function (radio) {
 
                 radio.checked =
@@ -553,6 +690,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     String(affected).toLowerCase();
 
             });
+
+    });
+    editModal.addEventListener("hide.bs.modal", function () {
+
+        if (document.activeElement &&
+            editModal.contains(document.activeElement)) {
+
+            document.activeElement.blur();
+
+        }
 
     });
 
