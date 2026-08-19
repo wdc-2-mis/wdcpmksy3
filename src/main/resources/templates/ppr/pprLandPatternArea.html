@@ -299,44 +299,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-
-/*---------------------------------------------------------
-Decimal Validation
----------------------------------------------------------*/
-function validateDecimal(input, maxIntDigits, maxFractionDigits) {
-
-	// Remove everything except digits and decimal point
-    input.value = input.value.replace(/[^\d.]/g, "");
-
-    // Remove leading decimal point
-    if (input.value.startsWith(".")) {
-        input.value = "";
-        return;
-    }
-
-    let parts = input.value.split('.');
-
-    // Allow only one decimal point
-    if (parts.length > 2) {
-        input.value = parts[0] + '.' + parts[1];
-        parts = input.value.split('.');
-    }
-
-    // Maximum digits before decimal
-    if (parts[0].length > maxIntDigits) {
-        parts[0] = parts[0].slice(0, maxIntDigits);
-    }
-
-    // Maximum digits after decimal
-    if (parts[1] && parts[1].length > maxFractionDigits) {
-        parts[1] = parts[1].slice(0, maxFractionDigits);
-    }
-
-    input.value = parts.join('.');
-    
-    input.setCustomValidity("");
-}
-
 /*---------------------------------------------------------
 Land Area Data Display
 ---------------------------------------------------------*/
@@ -374,15 +336,28 @@ function loadLandPatternTable(dcode) {
             }
 
             let rows = "";
+            let previousDistrict = "";
+            let previousProject = "";
+            let previousWatershed = "";
 
             data.forEach(function(item) {
+            	
+            	const district = item.dist_name;
+                const project = item.project_name;
+                const watershed = item.mw_name;
 
+                const showDistrict = district !== previousDistrict;
+                const showProject = showDistrict || project !== previousProject;
+                const showMw = showProject || watershed !== previousWatershed;
+				
                 rows += `
                     <tr>
-                        <td>${item.dist_name}</td>
-                        <td>${item.project_name}</td>
-                        <td>${item.mw_name}</td>
-                        <td>${item.village_name}</td>
+                        
+						
+						<td>${showDistrict ? district : ""}</td>
+						<td>${showProject ? project : ""}</td>
+						<td>${showMw ? watershed : ""}</td>
+						<td>${item.village_name}</td>
                         <td class="text-end">${item.village_area}</td>
                         <td class="text-end">${item.forest_area}</td>
                         <td class="text-end">${item.argiculture_land}</td>
@@ -448,6 +423,11 @@ function loadLandPatternTable(dcode) {
 
                     </td>
                     </tr>`;
+                    
+                    
+                previousDistrict = district;
+                previousProject = project;
+                previousWatershed = watershed;
             });
 
             tableBody.innerHTML = rows;
@@ -616,7 +596,7 @@ document.addEventListener("click", function(e){
 					</div>
 					<div class="col-md-3">
 						<input type="text" name="village_area" id="village_area" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+							class="form-control form-control-sm" oninput="validateDecimal(this,10,4)" required />
 					</div>
 				</div>
 
@@ -626,7 +606,7 @@ document.addEventListener("click", function(e){
 					</div>
 					<div class="col-md-3">
 						<input type="text" name="forest_area" id="forest_area" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+							class="form-control form-control-sm" oninput="validateDecimal(this,10,4)" required />
 					</div>
 				</div>
 
@@ -636,7 +616,7 @@ document.addEventListener("click", function(e){
 					</div>
 					<div class="col-md-3">
 						<input type="text" name="argiculture_land" id="argiculture_land" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+							class="form-control form-control-sm" oninput="validateDecimal(this,10,4)" required />
 					</div>
 				</div>
 
@@ -646,7 +626,7 @@ document.addEventListener("click", function(e){
 					</div>
 					<div class="col-md-3">
 						<input type="text" name="rainfed_area" id="rainfed_area" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+							class="form-control form-control-sm" oninput="validateDecimal(this,10,4)" required />
 					</div>
 				</div>
 
@@ -656,7 +636,7 @@ document.addEventListener("click", function(e){
 					</div>
 					<div class="col-md-3">
 						<input type="text" name="pastures" id="pastures" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+							class="form-control form-control-sm" oninput="validateDecimal(this,10,4)" required />
 					</div>
 				</div>
 
@@ -666,7 +646,7 @@ document.addEventListener("click", function(e){
 					</div>
 					<div class="col-md-3">
 						<input type="text" name="cultivable_wasteland_area" id="cultivable_wasteland_area" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+							class="form-control form-control-sm" oninput="validateDecimal(this,10,4)" required />
 					</div>
 				</div>
 
@@ -676,7 +656,7 @@ document.addEventListener("click", function(e){
 					</div>
 					<div class="col-md-3">
 						<input type="text" name="non_cultivable_wasteland_area" id="non_cultivable_wasteland_area" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,2)" required />
+							class="form-control form-control-sm" oninput="validateDecimal(this,10,4)" required />
 					</div>
 				</div>
 
@@ -812,7 +792,7 @@ document.addEventListener("click", function(e){
                                    id="editVillageArea"
                                    name="village_area"
                                    class="form-control form-control-sm" required
-                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                                   oninput="validateDecimal(this,10,4)" autocomplete="off">
                         </div>
                     </div>
 
@@ -826,7 +806,7 @@ document.addEventListener("click", function(e){
                                    id="editForestArea"
                                    name="forest_area"
                                    class="form-control form-control-sm" required
-                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                                   oninput="validateDecimal(this,10,4)" autocomplete="off">
                         </div>
                     </div>
 
@@ -840,7 +820,7 @@ document.addEventListener("click", function(e){
                                    id="editAgricultureArea"
                                    name="argiculture_land"
                                    class="form-control form-control-sm" required
-                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                                   oninput="validateDecimal(this,10,4)" autocomplete="off">
                         </div>
                     </div>
 
@@ -854,7 +834,7 @@ document.addEventListener("click", function(e){
                                    id="editRainfedArea"
                                    name="rainfed_area"
                                    class="form-control form-control-sm" required
-                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                                   oninput="validateDecimal(this,10,4)" autocomplete="off">
                         </div>
                     </div>
 
@@ -868,7 +848,7 @@ document.addEventListener("click", function(e){
                                    id="editPastures"
                                    name="pastures"
                                    class="form-control form-control-sm" required
-                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                                   oninput="validateDecimal(this,10,4)" autocomplete="off">
                         </div>
                     </div>
 
@@ -882,7 +862,7 @@ document.addEventListener("click", function(e){
                                    id="editCultivable"
                                    name="cultivable_wasteland_area"
                                    class="form-control form-control-sm" required
-                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                                   oninput="validateDecimal(this,10,4)" autocomplete="off">
                         </div>
                     </div>
 
@@ -896,7 +876,7 @@ document.addEventListener("click", function(e){
                                    id="editNonCultivable"
                                    name="non_cultivable_wasteland_area"
                                    class="form-control form-control-sm" required
-                                   oninput="validateDecimal(this,11,2)" autocomplete="off">
+                                   oninput="validateDecimal(this,10,4)" autocomplete="off">
                         </div>
                     </div>
 

@@ -35,7 +35,7 @@ public interface PPRLandPatternAreaRepository extends JpaRepository<PPRLandPatte
 		    join m_village mv on l.vcode = mv.vcode
 		    where m.dcode = :dcode
 		    order by case when l.status = 'D' then 0 else 1 end, 
-		    m.project_name, mw.mw_name, mv.village_name
+		    d.dist_name, m.project_name, mw.mw_name, mv.village_name
 		    """, nativeQuery = true)
 		List<Map<String,Object>> getLandPatternAreaByDistrict(@Param("dcode") Integer dcode);
 	

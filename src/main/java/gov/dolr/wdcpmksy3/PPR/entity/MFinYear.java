@@ -46,6 +46,9 @@ public class MFinYear {
 
     @Column(name = "achiev_status", length = 1)
     private String achievStatus;
+    
+    @Column(name = "year")
+    private Integer year;
 
 
     @OneToMany(mappedBy = "finYear")
@@ -147,6 +150,14 @@ public class MFinYear {
 
 	public void setPprs(List<MPpr> pprs) {
 		this.pprs = pprs;
+	}
+
+	public Integer getYear() {
+		return year;
+	}
+
+	public void setYear(Integer year) {
+		this.year = year;
 	}
 
     

@@ -12,5 +12,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MFinYear;
 public interface WdcpmksyMFinYearRepository extends JpaRepository<MFinYear, Integer> {
 
 	List<MFinYear> findAll();
+	
+	List<MFinYear> findAllByOrderByYearDesc();
 }
 
