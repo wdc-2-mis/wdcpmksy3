@@ -32,9 +32,6 @@ public class DrinkingWaterController {
     private MWaterQualityRepository wtrqua;
 	
 	@Autowired
-    private PprLivelihoodRepository livrepo;
-	
-	@Autowired
     private DrinkingWaterServices serv;
 	
 	@Autowired
