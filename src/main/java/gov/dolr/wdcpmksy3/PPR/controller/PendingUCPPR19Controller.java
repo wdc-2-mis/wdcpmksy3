@@ -190,12 +190,12 @@ public class PendingUCPPR19Controller {
 						redirectAttributes.addFlashAttribute( "success", "Details of Pending UC`s Update successfully.");
 					else
 						redirectAttributes.addFlashAttribute("error", "Unable to Update Details of Pending UC`s");
-					}
-					catch (Exception e) {
+				}
+				catch (Exception e) {
 	
 						e.printStackTrace();
 				        redirectAttributes.addFlashAttribute("error", "Unable to Update Details of Pending UC`s");
-					}
+				}
 				return "redirect:/pendingUCPPR19";	
 	    }
 
