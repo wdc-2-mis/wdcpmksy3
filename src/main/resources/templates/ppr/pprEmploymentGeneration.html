@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+<meta charset="UTF-8">
+<title>PPR Employment Generation</title>
+
+<style>
+.required { color: red; }
+.table th { vertical-align: middle; text-align: center; }
+.table td { vertical-align: middle; }
+.employment-input { width: 80px; text-align: center; }
+.duplicate-row td { background-color: #f8d7da !important; }
+</style>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const district = document.getElementById("district");
+    const project = document.getElementById("project");
+    const watershed = document.getElementById("watershed");
+    const village = document.getElementById("village");
+    const form = document.getElementById("employmentForm");
+    const saveBtn = document.getElementById("saveBtn");
+
+    // =========================================================
+    // CALCULATE TOTAL
+    // =========================================================
+    function calculateTotal(row) {
+        const sc = parseInt(row.querySelector('input[name$=".sc"]').value) || 0;
+        const st = parseInt(row.querySelector('input[name$=".st"]').value) || 0;
+        const others = parseInt(row.querySelector('input[name$=".others"]').value) || 0;
+        const women = parseInt(row.querySelector('input[name$=".women"]').value) || 0;
+        const total = sc + st + others + women;
+        row.querySelector('input[name$=".total"]').value = total;
+        return total;
+    }
+
+    // =========================================================
+    // DISTRICT -> PROJECT
+    // =========================================================
+    district.addEventListener("change", function() {
+        let districtId = this.value;
+        
+        if (districtId !== "") {
+            loadEmploymentTable(districtId);
+        } else {
+            document.getElementById("employmentListDiv").style.display = "none";
+        }
+
+        project.innerHTML = '<option value="">--Select Project--</option>';
+        watershed.innerHTML = '<option value="">--Select Micro Watershed--</option>';
+        village.innerHTML = '<option value="">--Select Village--</option>';
+
+        if (districtId === "") {
+            return;
+        }
+
+        fetch("/getProjectsByDistrictEmployment?dcode=" + districtId)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(function(item) {
+                    let option = document.createElement("option");
+                    option.value = item.id;
+                    option.textContent = item.name;
+                    project.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Project Loading Error:", error));
+    });
+
+    // =========================================================
+    // PROJECT -> MICRO WATERSHED
+    // =========================================================
+    project.addEventListener("change", function() {
+        let pprId = this.value;
+
+        watershed.innerHTML = '<option value="">--Select Micro Watershed--</option>';
+        village.innerHTML = '<option value="">--Select Village--</option>';
+
+        if (pprId === "") {
+            return;
+        }
+
+        fetch("/getMicroWatershedsByProjectEmployment?pprId=" + pprId)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(function(item) {
+                    let option = document.createElement("option");
+                    option.value = item.id;
+                    option.textContent = item.name;
+                    watershed.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Micro Watershed Loading Error:", error));
+    });
+
+    // =========================================================
+    // WATERSHED -> VILLAGE
+    // =========================================================
+    watershed.addEventListener("change", function() {
+        let pprId = project.value;
+
+        village.innerHTML = '<option value="">--Select Village--</option>';
+
+        if (pprId === "") {
+            return;
+        }
+
+        fetch("/getVillagesByProjectEmployment?pprId=" + pprId)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(function(item) {
+                    let option = document.createElement("option");
+                    option.value = item.id;
+                    option.textContent = item.name;
+                    village.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Village Loading Error:", error));
+    });
+
+    // =========================================================
+    // VILLAGE STATUS CHECK
+    // =========================================================
+    village.addEventListener("change", function() {
+        const pprId = project.value;
+        const vcode = this.value;
+        const mwId = watershed.value;
+
+        if (!pprId || !vcode || !mwId) {
+            saveBtn.disabled = false;
+            return;
+        }
+
+        saveBtn.disabled = true;
+
+        fetch("/getEmploymentVillageStatus?pprId=" + pprId + "&vcode=" + vcode + "&mwId=" + mwId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "C") {
+                    alert("This village has already been completed. You cannot create another record.");
+                    village.value = "";
+                    saveBtn.disabled = true;
+                } else if (data.status === "D") {
+                    alert("A draft already exists for this village. Please edit the existing draft instead.");
+                    village.value = "";
+                    saveBtn.disabled = true;
+                } else {
+                    saveBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error("Village Status Check Error:", error);
+                saveBtn.disabled = true;
+            });
+    });
+
+    // =========================================================
+    // LOAD EMPLOYMENT TABLE
+    // =========================================================
+    function loadEmploymentTable(dcode) {
+        const tableDiv = document.getElementById("employmentListDiv");
+        const tableBody = document.getElementById("employmentTableBody");
+
+        tableBody.innerHTML = "";
+
+        if (!dcode) {
+            tableDiv.style.display = "none";
+            return;
+        }
+
+        fetch("/getEmploymentGenerationByDistrict?dcode=" + dcode)
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.length === 0) {
+                    tableDiv.style.display = "none";
+                    return;
+                }
+
+                tableDiv.style.display = "block";
+                let rows = "";
+                let previousDistrict = "";
+                let previousProject = "";
+                let previousWatershed = "";
+                let previousVillage = "";
+
+                data.forEach(function(item) {
+                    const district = item.dist_name;
+                    const project = item.project_name;
+                    const watershed = item.mw_name;
+                    const village = item.village_name;
+
+                    const showDistrict = district !== previousDistrict;
+                    const showProject = showDistrict || project !== previousProject;
+                    const showWatershed = showProject || watershed !== previousWatershed;
+                    const showVillage = showWatershed || village !== previousVillage;
+
+                    const sc = parseInt(item.sc) || 0;
+                    const st = parseInt(item.st) || 0;
+                    const others = parseInt(item.others) || 0;
+                    const women = parseInt(item.women) || 0;
+                    const total = sc + st + others + women;
+
+                    rows += `
+                        <tr>
+                            <td>${showDistrict ? district : ""}</td>
+                            <td>${showProject ? project : ""}</td>
+                            <td>${showWatershed ? watershed : ""}</td>
+                            <td>${showVillage ? village : ""}</td>
+                            <td>${item.employment_type_name}</td>
+                            <td class="text-end">${sc}</td>
+                            <td class="text-end">${st}</td>
+                            <td class="text-end">${others}</td>
+                            <td class="text-end">${women}</td>
+                            <td class="text-end">${total}</td>
+                            <td class="text-center">
+                                ${item.status === "D" ?
+                                    `<a href="/deletePPREmployment?id=${item.ppr_employment_id}" 
+                                        class="btn btn-danger btn-sm" title="Delete"
+                                        onclick="return confirm('Are you sure you want to delete this record?');">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    &nbsp;&nbsp;
+                                    <a href="javascript:void(0)" class="btn btn-primary btn-sm edit-btn"
+                                        data-id="${item.ppr_employment_id}"
+                                        data-district="${district}"
+                                        data-project="${project}"
+                                        data-watershed="${watershed}"
+                                        data-village="${village}"
+                                        data-type="${item.employment_type_name}"
+                                        data-sc="${sc}"
+                                        data-st="${st}"
+                                        data-others="${others}"
+                                        data-women="${women}"
+                                        title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    &nbsp;&nbsp;
+                                    <a href="/completePPREmployment?id=${item.ppr_employment_id}" 
+                                        class="btn btn-success btn-sm" title="Complete"
+                                        onclick="return confirm('Are you sure you want to complete this record?');">
+                                        <i class="fas fa-check"></i>
+                                    </a>`
+                                    :
+                                    `<span class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i> Completed
+                                    </span>`
+                                }
+                            </td>
+                        </tr>
+                    `;
+
+                    previousDistrict = district;
+                    previousProject = project;
+                    previousWatershed = watershed;
+                    previousVillage = village;
+                });
+
+                tableBody.innerHTML = rows;
+            })
+            .catch(error => {
+                console.error("Error loading employment:", error);
+                tableDiv.style.display = "block";
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="text-center text-danger">Unable to load records.</td>
+                    </tr>
+                `;
+            });
+    }
+
+    // =========================================================
+    // EDIT BUTTON CLICK
+    // =========================================================
+    document.addEventListener("click", function(e) {
+        const btn = e.target.closest(".edit-btn");
+        if (!btn) return;
+
+        document.getElementById("editId").value = btn.dataset.id || "";
+        document.getElementById("editDistrict").value = btn.dataset.district || "";
+        document.getElementById("editProject").value = btn.dataset.project || "";
+        document.getElementById("editWatershed").value = btn.dataset.watershed || "";
+        document.getElementById("editVillage").value = btn.dataset.village || "";
+        document.getElementById("editType").value = btn.dataset.type || "";
+        document.getElementById("editSc").value = btn.dataset.sc || 0;
+        document.getElementById("editSt").value = btn.dataset.st || 0;
+        document.getElementById("editOthers").value = btn.dataset.others || 0;
+        document.getElementById("editWomen").value = btn.dataset.women || 0;
+
+        const sc = parseInt(document.getElementById("editSc").value) || 0;
+        const st = parseInt(document.getElementById("editSt").value) || 0;
+        const others = parseInt(document.getElementById("editOthers").value) || 0;
+        const women = parseInt(document.getElementById("editWomen").value) || 0;
+        document.getElementById("editTotal").value = sc + st + others + women;
+
+        new bootstrap.Modal(document.getElementById("editModal")).show();
+    });
+
+    // =========================================================
+    // CALCULATE TOTAL IN EDIT MODAL
+    // =========================================================
+    document.querySelectorAll('#editSc, #editSt, #editOthers, #editWomen').forEach(function(input) {
+        input.addEventListener('input', function() {
+            const sc = parseInt(document.getElementById('editSc').value) || 0;
+            const st = parseInt(document.getElementById('editSt').value) || 0;
+            const others = parseInt(document.getElementById('editOthers').value) || 0;
+            const women = parseInt(document.getElementById('editWomen').value) || 0;
+            document.getElementById('editTotal').value = sc + st + others + women;
+        });
+    });
+
+    // =========================================================
+    // FORM VALIDATION
+    // =========================================================
+    if (form) {
+        form.addEventListener("submit", function(e) {
+            const requiredFields = form.querySelectorAll("select[required]");
+            
+            for (const field of requiredFields) {
+                if (field.value.trim() === "") {
+                    e.preventDefault();
+                    let fieldName = field.id.charAt(0).toUpperCase() + field.id.slice(1);
+                    alert("Please select " + fieldName);
+                    field.focus();
+                    return;
+                }
+            }
+
+            const rows = document.querySelectorAll("#employmentEntryBody tr");
+            let hasData = false;
+            rows.forEach(function(row) {
+                const sc = parseInt(row.querySelector('input[name$=".sc"]').value) || 0;
+                const st = parseInt(row.querySelector('input[name$=".st"]').value) || 0;
+                const others = parseInt(row.querySelector('input[name$=".others"]').value) || 0;
+                const women = parseInt(row.querySelector('input[name$=".women"]').value) || 0;
+                if (sc > 0 || st > 0 || others > 0 || women > 0) {
+                    hasData = true;
+                }
+            });
+
+            if (!hasData) {
+                e.preventDefault();
+                alert("Please enter at least one value for SC, ST, Others, or Women.");
+                return;
+            }
+        });
+    }
+
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('input[name$=".sc"], input[name$=".st"], input[name$=".others"], input[name$=".women"]')) {
+            const row = e.target.closest('tr');
+            if (row) {
+                calculateTotal(row);
+            }
+        }
+    });
+
+});
+
+function validateNumber(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+}
+</script>
+
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">PPR Employment Generation</h4>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card-body">
+                <form id="employmentForm" th:action="@{/savePPREmployment}" method="post" novalidate>
+
+                    <!-- District & Project -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <label>District Name:</label><span class="required">*</span>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="district" name="dcode" class="form-control form-control-sm" required>
+                                <option value="">--Select District--</option>
+                                <th:block th:each="dist : ${distList}">
+                                    <option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label>Project Name:</label><span class="required">*</span>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="project" name="project" class="form-control form-control-sm" required>
+                                <option value="">--Select Project--</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Micro Watershed & Village -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <label>Micro Watershed Name:</label><span class="required">*</span>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="watershed" name="watershed" class="form-control form-control-sm" required>
+                                <option value="">--Select Micro Watershed--</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label>Village Name:</label><span class="required">*</span>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="village" name="village" class="form-control form-control-sm" required>
+                                <option value="">--Select Village--</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- EMPLOYMENT GENERATION TABLE -->
+                    <div class="table-responsive mt-4">
+                        <table class="table table-bordered" id="employmentEntryTable">
+                            <thead>
+                                <tr>
+                                    <th class="table-primary" style="width: 50px;">S.No.</th>
+                                    <th class="table-primary" style="width: 200px;">Employment Type</th>
+                                    <th class="table-primary" style="width: 80px;">SC</th>
+                                    <th class="table-primary" style="width: 80px;">ST</th>
+                                    <th class="table-primary" style="width: 80px;">Others</th>
+                                    <th class="table-primary" style="width: 80px;">Women</th>
+                                    <th class="table-primary" style="width: 80px;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employmentEntryBody">
+                                
+                                <!-- ROW 1: No of Man-days -->
+                                <tr>
+                                    <td class="text-center">1</td>
+                                    <td>
+                                        <b>Wage Employment (No. of Man-days)</b>
+                                        <input type="hidden" name="employmentList[0].employmentTypeId" value="1">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[0].sc" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[0].st" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[0].others" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[0].women" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[0].total" 
+                                               class="form-control form-control-sm employment-input" readonly>
+                                    </td>
+                                </tr>
+
+                                <!-- ROW 2: Wage Employment -->
+                                <tr>
+                                    <td class="text-center">2</td>
+                                    <td>
+                                        <b>Wage Employment (No. of Beneficiaries)</b>
+                                        <input type="hidden" name="employmentList[1].employmentTypeId" value="3">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[1].sc" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[1].st" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[1].others" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[1].women" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[1].total" 
+                                               class="form-control form-control-sm employment-input" readonly>
+                                    </td>
+                                </tr>
+
+                                <!-- ROW 3: Self Employment -->
+                                <tr>
+                                    <td class="text-center">3</td>
+                                    <td>
+                                        <b>Self Employment (No. of Beneficiaries)</b>
+                                        <input type="hidden" name="employmentList[2].employmentTypeId" value="2">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[2].sc" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[2].st" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[2].others" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[2].women" 
+                                               class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="employmentList[2].total" 
+                                               class="form-control form-control-sm employment-input" readonly>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" id="saveBtn" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Save as Draft
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <br><br>
+
+            <!-- EXISTING EMPLOYMENT RECORDS -->
+            <div class="table-responsive" id="employmentListDiv" style="display:none;">
+                <h4 class="text-center mb-3"><b>List of Employment Generation Details</b></h4>
+                <table class="table table-bordered" id="employmentTable">
+                    <thead>
+                        <tr>
+                            <th class="table-primary">District</th>
+                            <th class="table-primary">Project</th>
+                            <th class="table-primary">Micro Watershed</th>
+                            <th class="table-primary">Village</th>
+                            <th class="table-primary">Employment Type</th>
+                            <th class="table-primary">SC</th>
+                            <th class="table-primary">ST</th>
+                            <th class="table-primary">Others</th>
+                            <th class="table-primary">Women</th>
+                            <th class="table-primary">Total</th>
+                            <th class="table-primary text-center" style="width:200px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employmentTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EDIT MODAL -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Edit Employment Generation</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="editForm" th:action="@{/updatePPREmployment}" method="post">
+
+                            <input type="hidden" id="editId" name="ppr_employment_id">
+
+                            <div class="row mb-3">
+                                <div class="col-md-3"><label>District</label></div>
+                                <div class="col-md-9">
+                                    <input type="text" id="editDistrict" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3"><label>Project</label></div>
+                                <div class="col-md-9">
+                                    <input type="text" id="editProject" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3"><label>Micro Watershed</label></div>
+                                <div class="col-md-9">
+                                    <input type="text" id="editWatershed" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3"><label>Village</label></div>
+                                <div class="col-md-9">
+                                    <input type="text" id="editVillage" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3"><label>Employment Type</label></div>
+                                <div class="col-md-9">
+                                    <input type="text" id="editType" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label>SC</label></div>
+                                <div class="col-md-4">
+                                    <input type="text" id="editSc" name="sc"
+                                           class="form-control form-control-sm" 
+                                           oninput="validateNumber(this)">
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label>ST</label></div>
+                                <div class="col-md-4">
+                                    <input type="text" id="editSt" name="st"
+                                           class="form-control form-control-sm"
+                                           oninput="validateNumber(this)">
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label>Others</label></div>
+                                <div class="col-md-4">
+                                    <input type="text" id="editOthers" name="others"
+                                           class="form-control form-control-sm"
+                                           oninput="validateNumber(this)">
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label>Women</label></div>
+                                <div class="col-md-4">
+                                    <input type="text" id="editWomen" name="women"
+                                           class="form-control form-control-sm"
+                                           oninput="validateNumber(this)">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4"><label>Total</label></div>
+                                <div class="col-md-4">
+                                    <input type="text" id="editTotal" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> Update
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
