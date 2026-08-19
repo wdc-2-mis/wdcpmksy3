@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<head>
+<meta charset="UTF-8">
+<title>Average ground water table depth in Project Area (PPR-16)</title>
+
+<style>
+.required {
+	color: red;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const district = document.getElementById("district");
+    const project = document.getElementById("project");
+    const watershed = document.getElementById("watershed");
+    const village = document.getElementById("village");
+    const form = document.getElementById("groundWaterDepthArea");
+    
+
+    district.addEventListener("change", function () {
+    let districtId = this.value;
+    const recordsTableBody = document.getElementById("recordsTableBody");
+    const recordsDiv = document.getElementById("recordsDiv");
+
+    // reset dependent dropdowns
+    project.innerHTML = '<option value="">--Select Project--</option>';
+    watershed.innerHTML = '<option value="">--Select Micro Watershed--</option>';
+    village.innerHTML = '<option value="">--Select Village--</option>';
+
+    recordsTableBody.innerHTML = "";
+    recordsDiv.style.display = "none";
+
+    if (districtId === "") return;
+
+    // load projects (already in your code)
+    fetch("/getProjectsByDistrictLandPattern?dcode=" + districtId)
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(function(item) {
+                let option = document.createElement("option");
+                option.value = item.id;
+                option.textContent = item.name;
+                project.appendChild(option);
+            });
+        })
+        .catch(error => console.error("Project Loading Error :", error));
+        
+console.log("Calling getWaterOutcomesByDistrict with dcode:", districtId);
+  fetch("/getWaterOutcomesByDistrict?dcode=" + districtId)
+    .then(response => response.text())
+    .then(text => {
+
+        console.log("Records API Response:", text);
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error("Invalid JSON response:", text);
+            throw new Error("Server returned HTML instead of JSON");
+        }
+
+        recordsTableBody.innerHTML = "";
+
+        // Login/session error
+        if (data.length === 1 && data[0].error) {
+
+            recordsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center text-danger">
+                        ${data[0].error}
+                    </td>
+                </tr>
+            `;
+
+            recordsDiv.style.display = "block";
+            return;
+        }
+
+        // No records
+        if (data.length === 0) {
+
+            recordsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center text-danger">
+                        No data found
+                    </td>
+                </tr>
+            `;
+
+        } else {
+
+            // Records found
+            data.forEach(function(rec, index) {
+
+                let actionHtml = "";
+
+                if (rec.status === "D") {
+
+                    actionHtml = `
+                    
+                    
+                    <button type="button"
+                class="btn btn-sm btn-primary editBtn"
+                data-id="${rec.id}"
+                data-district="${rec.district || ''}"
+                data-project="${rec.project || ''}"
+                data-watershed="${rec.watershed || ''}"
+                data-village="${rec.village || ''}"
+                data-source-id="${rec.sourceId || ''}"
+                data-source="${rec.source || ''}"
+                data-pre-project="${rec.preProject || ''}"
+                data-post-project="${rec.postProject || ''}"
+                data-remarks="${rec.remarks || ''}"
+                data-bs-toggle="modal"
+                data-bs-target="#editModal">
+
+            <i class="fas fa-edit"></i>
+        </button>
+
+                       &nbsp; &nbsp;
+                    <a href="/completeWaterOutcome?id=${rec.id}" 
+                    
+                      class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to complete this record?');"><i class="fas fa-check"></i></a>
+                      
+                          &nbsp; &nbsp;
+                    <a href="/deleteWaterOutcome?id=${rec.id}" 
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Are you sure you want to delete this record?');">
+                       <i class="fas fa-trash"></i>
+                    </a>
+                        
+                    `;
+
+                } else {
+
+                    actionHtml = `
+                        <span class="badge bg-success">
+                            Data Completed
+                        </span>
+                    `;
+                }
+
+                recordsTableBody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${rec.project}</td>
+                        <td>${rec.watershed}</td>
+                        <td>${rec.village}</td>
+                        <td>${rec.source}</td>
+                        <td>${rec.preProject}</td>
+                        <td>${rec.postProject}</td>
+                        <td>${rec.remarks || ""}</td>
+                        <td>${actionHtml}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        recordsDiv.style.display = "block";
+    })
+    .catch(error => {
+
+        console.error("Records Loading Error:", error);
+
+        recordsTableBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center text-danger">
+                    Unable to load records
+                </td>
+            </tr>
+        `;
+
+        recordsDiv.style.display = "block";
+    });
+  
+
+});
+    
+document.addEventListener("click", function (e) {
+
+    const editBtn = e.target.closest(".editBtn");
+
+    if (!editBtn) {
+        return;
+    }
+
+    document.getElementById("editId").value =
+        editBtn.dataset.id;
+
+    document.getElementById("editDistrict").value =
+        editBtn.dataset.district;
+    document.getElementById("editProject").value =
+        editBtn.dataset.project;
+
+    document.getElementById("editWatershed").value =
+        editBtn.dataset.watershed;
+
+    document.getElementById("editVillage").value =
+        editBtn.dataset.village;
+
+   const sourceId = editBtn.dataset.sourceId;
+
+    document.querySelectorAll(".editSourceRadio")
+        .forEach(function (radio) {
+
+            radio.checked =
+                radio.value === sourceId;
+
+        });
+
+    document.getElementById("editPreProject").value =
+        editBtn.dataset.preProject;
+
+   document.getElementById("editPostProject").value =
+        editBtn.dataset.postProject;
+
+   document.getElementById("editRemarks").value =
+        editBtn.dataset.remarks;
+
+});
+
+  project.addEventListener("change", function () {
+
+        let pprId = this.value;
+
+        watershed.innerHTML =
+            '<option value="">--Select Micro Watershed--</option>';
+
+        village.innerHTML =
+            '<option value="">--Select Village--</option>';
+
+        if (pprId === "") {
+            return;
+        }
+
+        fetch("/getMicroWatershedsByProject?pprId=" + pprId)
+            .then(response => response.json())
+            .then(data => {
+
+                data.forEach(function(item){
+
+                    let option = document.createElement("option");
+
+                    option.value = item.id;
+                    option.textContent = item.name;
+
+                    watershed.appendChild(option);
+
+                });
+
+            })
+            .catch(error => {
+                console.error("Micro Watershed Loading Error :", error);
+            });
+
+    });
+
+   watershed.addEventListener("change", function () {
+
+        let pprId = project.value;
+
+        village.innerHTML =
+            '<option value="">--Select Village--</option>';
+
+        if (pprId === "") {
+            return;
+        }
+
+        fetch("/getVillagesByProject?pprId=" + pprId)
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Village API failed: " + response.status
+                    );
+                }
+
+                return response.json();
+            })
+            .then(data => {
+
+                data.forEach(function(item) {
+
+                    let option = document.createElement("option");
+
+                    option.value = item.id;
+                    option.textContent = item.name;
+
+                    village.appendChild(option);
+
+                });
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Village Loading Error :",
+                    error
+                );
+
+            });
+
+    });
+    
+   }); 
+   
+  
+
+   
+</script>
+
+</head>
+
+<body>
+
+	<div layout:fragment="content">
+
+
+		<div class="card shadow-sm border-0">
+
+			<div class="card-header bg-primary text-white">
+				<h4 class="mb-0">Average ground water table depth in Project Area (PPR-16)</h4>
+			</div>
+		
+
+		<div th:if="${success}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		
+		<div th:if="${error}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${error}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div class="card-body">
+
+			<form id="groundWaterDepthArea" th:action="@{/savegroundWaterDepthArea}" method="post" novalidate>
+
+				<div class="row mb-4">
+					<div class="col-md-3">
+						<label>District Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="district" name="district"
+							class="form-control form-control-sm" required>
+							<option value="">--Select District--</option>
+							<th:block th:each="dist : ${distList}">
+								<option th:value="${dist.dcode}" th:text="${dist.distName}">
+								</option>
+							</th:block>
+						</select>
+					</div>
+
+					<div class="col-md-2">
+						<label>Project Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="project" name="project" class="form-control form-control-sm" required>
+							   <option value="">--Select Project--</option>
+						</select>
+					</div>
+				</div>
+				
+				<div class="row mb-4">
+					<div class="col-md-3">
+						<label>Micro Watershed Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="watershed" name="watershed"
+							class="form-control form-control-sm" required>
+							<option value="">--Select Micro Watershed--</option>
+						</select>
+					</div>
+
+					<div class="col-md-2">
+						<label>Village Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="village" name="village" class="form-control form-control-sm" required>
+							    <option value="">--Select Village--</option>
+						</select>
+					</div>
+
+				</div>
+				
+				
+				<div class="row mb-4 align-items-center">
+    				<label class="col-md-3 fw-bold">Sources:<span class="required">*</span></label>
+    				<div class="col-md-9">
+        				<div th:each="ws : ${mWaterSource}" class="form-check form-check-inline me-5">
+            				<input class="form-check-input" type="radio" name="sourceTypeId" th:value="${ws.waterSourceId}" required/>
+            		<label class="form-check-label" th:text="${ws.sourceName}"></label>
+        			</div>
+        			<div class="invalid-feedback" style="display:none;">Please select Sources.</div>
+    				</div>
+				</div>
+				
+				 <div class="row mb-2">
+					<div class="col-md-3">
+						<label>Pre-Project Level:</label><span
+							class="required">*</span>
+					</div>
+					<div class="col-md-5">
+						<input type="text" name="pre_project" id="pre_project" autocomplete="off" 
+							class="form-control form-control-sm"  maxlength = "10" required />
+					</div>
+				</div>
+				
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Expected post project Level:</label><span
+							class="required">*</span>
+					</div>
+					<div class="col-md-5">
+						<input type="text" name="expected_post" id="expected_post" autocomplete="off" 
+							class="form-control form-control-sm" maxlength = "10" required />
+					</div>
+				</div>
+				
+				<div class="row mb-2">
+					<div class="col-md-3">
+						<label>Remarks:</label>
+					</div>
+					<div class="col-md-5">
+						<textarea name="remarks" id="remarks" autocomplete="off" 
+							class="form-control form-control-sm"  rows="4" maxlength = "500" required ></textarea>
+							
+					</div>
+				</div>	
+				<div class="text-center mt-4">
+						<button type="submit" name="action" value="D" class="btn btn-warning"><i class="fas fa-save"></i> Save as Draft
+						</button>
+						
+					</div>		
+	</form>
+	
+	<div id="recordsDiv" class="mt-4" style="display:none;">
+    <h5 class="fw-bold">Saved Records</h5>
+    <table class="table table-bordered table-sm">
+        <thead class="table-light">
+            <tr>
+                <th>S.No</th>
+                <th>Project</th>
+                <th>Watershed</th>
+                <th>Village</th>
+                <th>Source</th>
+                <th>Pre-Project</th>
+                <th>Post-Project</th>
+                <th>Remarks</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="recordsTableBody"></tbody>
+    </table>
+</div>
+	
+	<div class="modal fade" id="editModal" tabindex="-1">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+
+                <h5 class="modal-title">
+                    Edit Details
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <!-- Body -->
+             
+            <div class="modal-body">
+
+               <form id="editForm" th:action="@{/updateWaterOutcome}" method="post">
+
+                    <!-- Hidden ID -->
+                    <input type="hidden" id="editId" name="pprWaterOutcomeId">
+
+                    <div class="row">
+                    
+                    <div class="col-md-6 mb-3">
+
+                            <label class="form-label fw-bold">
+                                District Name
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="editDistrict"
+                                   readonly>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label fw-bold">
+                                Project Name
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="editProject"
+                                   readonly>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label fw-bold">
+                                Micro Watershed
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="editWatershed"
+                                   readonly>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label fw-bold">
+                                Village Name
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   id="editVillage"
+                                   readonly>
+
+                        </div>
+
+                        <div class="row mb-4 align-items-center">
+
+    <label class="col-md-3 fw-bold">
+        Sources:
+        <span class="required">*</span>
+    </label>
+
+    <div class="col-md-9">
+
+        <div th:each="ws : ${mWaterSource}"
+             class="form-check form-check-inline me-5">
+
+            <input class="form-check-input editSourceRadio"
+                   type="radio"
+                   name="editSourceTypeId"
+                   th:value="${ws.waterSourceId}"
+                   th:id="'editSource_' + ${ws.waterSourceId}"
+                   required>
+
+            <label class="form-check-label"
+                   th:for="'editSource_' + ${ws.waterSourceId}"
+                   th:text="${ws.sourceName}">
+            </label>
+
+        </div>
+
+        <div class="invalid-feedback">
+            Please select Sources.
+        </div>
+
+    </div>
+
+</div>
+
+                 <div class="row mb-3">
+
+    <label class="col-md-3 fw-bold">
+        Pre Project Level:
+        <span class="required">*</span>
+    </label>
+
+    <div class="col-md-9">
+
+        <input type="text" class="form-control" id="editPreProject" name="editPreProject" required>
+
+    </div>
+
+</div>
+
+
+<div class="row mb-3">
+
+    <label class="col-md-3 fw-bold">
+        Post Project Level:
+        <span class="required">*</span>
+    </label>
+
+    <div class="col-md-9">
+
+        <input type="text" class="form-control" id="editPostProject" name="editPostProject" required>
+
+    </div>
+
+</div>
+
+
+<div class="row mb-3">
+
+    <label class="col-md-3 fw-bold">
+        Remarks:
+    </label>
+
+    <div class="col-md-9">
+
+        <textarea class="form-control"
+                  id="editRemarks"
+                  name="editRemarks"
+                  rows="3"></textarea>
+
+    </div>
+
+</div>
+
+                    </div>
+
+                    <div class="text-end">
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Update
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+	
+	</div>
+	</div>
+	</div>
+	</body>
+	</html>
+				
