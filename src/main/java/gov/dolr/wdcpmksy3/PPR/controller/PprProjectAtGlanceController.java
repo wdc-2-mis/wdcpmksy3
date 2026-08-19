@@ -6,17 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import gov.dolr.wdcpmksy3.PPR.dto.PprProjectAtGlanceDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
-import gov.dolr.wdcpmksy3.PPR.repository.PprMicroWatershedRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRDistrictService;
 import gov.dolr.wdcpmksy3.PPR.service.PprProjectGlanceService;
 import gov.dolr.wdcpmksy3.PPR.service.ProjectTypeService;
+import gov.dolr.wdcpmksy3.entity.MGramPanchayat;
+import gov.dolr.wdcpmksy3.entity.MVillage;
 import gov.dolr.wdcpmksy3.repository.MBlockRepository;
+import gov.dolr.wdcpmksy3.repository.MGramPanchayatRepository;
 import gov.dolr.wdcpmksy3.service.DistrictService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -24,9 +32,6 @@ public class PprProjectAtGlanceController {
 	
 	@Autowired
     private DistrictService districtService;
-	
-	@Autowired
-	private PPRDistrictService pprService;
 	
 	@Autowired
 	private MPprRepository mPprRepo;
@@ -42,6 +47,12 @@ public class PprProjectAtGlanceController {
 	
 	@Autowired
 	private MicroWatershedRepository microWatershedRepo;
+	
+	@Autowired
+	private MGramPanchayatRepository mGPRepo;
+	
+	@Autowired
+	private VillageRepository villageRepo;
 	 
 	@GetMapping("/pprProjectAtGlance")
     public String pprProjectAtGlance(@RequestParam(required = false) Integer dcode, HttpSession session, Model model) {
@@ -54,15 +65,13 @@ public class PprProjectAtGlanceController {
             return "redirect:/login";
         }
 		if(dcode != null){
-
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
-
 	        if(!pprList.isEmpty()){
 
 	            MPpr ppr = pprList.get(0);
 	            model.addAttribute("pprId", ppr.getPprId());
 	            model.addAttribute("selectedDistrict", dcode);
-	            model.addAttribute("detailsOfListOfProposedProject",
+	            model.addAttribute("pprProjectAtGlanceList",
 	            		pprProjectGlanceServ.getPprProjectGlanceList(ppr));
 
 	            model.addAttribute("project", ppr.getProjectName());
@@ -75,7 +84,51 @@ public class PprProjectAtGlanceController {
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("state", statename);
 		
-		return "prioritizedListOfProposedProject";
+		return "pprProjectAtGlance";
+	}
+	
+	@GetMapping("/getGPlistbyBlock")
+	@ResponseBody
+	public List<MGramPanchayat> getGPlistbyBlock(@RequestParam Integer blockcode) {
+	    List<MGramPanchayat> gpList = mGPRepo.getListMGramPanchayatByBlock(blockcode);
+	    return gpList;
+	}
+	
+	@GetMapping("/getVillageListByGcode")
+	@ResponseBody
+	public List<MVillage> getVillageListByGcode(
+	        @RequestParam Integer gcode) {
+		return villageRepo.findByGramPanchayat_Gcode(gcode);
+	}
+	
+	@PostMapping("/savePprProjectAtGlance")
+	public String savePprProjectAtGlance(
+	        @ModelAttribute PprProjectAtGlanceDTO dto,
+	        HttpSession session,
+	        HttpServletRequest request) {
+	    String userid = (String) session.getAttribute("userid");
+	    if (userid == null) {
+	        return "redirect:/login";
+	    }
+	    pprProjectGlanceServ.savePprProjectAtGlance(dto, userid, request.getRemoteAddr());
+	    return "redirect:/pprProjectAtGlance";
+	}
+	
+	@GetMapping("/getPprProjectGlanceById")
+	@ResponseBody
+	public PprProjectAtGlanceDTO getPprProjectGlanceById(@RequestParam Integer id) {
+	    return pprProjectGlanceServ.getPprProjectGlanceById(id);
+	}
+	
+	@PostMapping("/updatePprProjectAtGlance")
+	public String updatePprProjectAtGlance(@ModelAttribute PprProjectAtGlanceDTO dto, HttpSession session, HttpServletRequest request) {
+	    String userid =(String) session.getAttribute("userid");
+	    if (userid == null) {
+	        return "redirect:/login";
+	    }
+	    pprProjectGlanceServ.updatePprProjectAtGlance(dto, userid, request.getRemoteAddr());
+
+	    return "redirect:/pprProjectAtGlance";
 	}
 
 }

@@ -22,6 +22,8 @@ public interface VillageRepository extends JpaRepository<MVillage,Integer>{
     @Query("SELECT v FROM MVillage v WHERE v.gramPanchayat.block.district.dcode = :dcode")
     List<MVillage> findVillagesByDistrict(Integer dcode);
     
+    List<MVillage> findByGramPanchayat_Gcode(Integer gcode);
+    
     
     
 

@@ -1,14 +1,15 @@
 package gov.dolr.wdcpmksy3.PPR.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class PprProjectAtGlanceDTO {
 	
 	private Integer pprProjectGlanceId;
     private Integer pprId;
-    private Integer microWatershedCode;
+    private Integer mwId;
     private Integer projectType;
-    private String villages;
+    private List<Integer> villages;
     private String selectionReason;
     private BigDecimal projectArea;
 
@@ -30,11 +31,12 @@ public class PprProjectAtGlanceDTO {
 	public void setPprId(Integer pprId) {
 		this.pprId = pprId;
 	}
-	public Integer getMicroWatershedCode() {
-		return microWatershedCode;
+	
+	public Integer getMwId() {
+		return mwId;
 	}
-	public void setMicroWatershedCode(Integer microWatershedCode) {
-		this.microWatershedCode = microWatershedCode;
+	public void setMwId(Integer mwId) {
+		this.mwId = mwId;
 	}
 	public Integer getProjectType() {
 		return projectType;
@@ -42,10 +44,10 @@ public class PprProjectAtGlanceDTO {
 	public void setProjectType(Integer projectType) {
 		this.projectType = projectType;
 	}
-	public String getVillages() {
+	public List<Integer> getVillages() {
 		return villages;
 	}
-	public void setVillages(String villages) {
+	public void setVillages(List<Integer> villages) {
 		this.villages = villages;
 	}
 	public String getSelectionReason() {

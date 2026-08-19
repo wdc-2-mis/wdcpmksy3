@@ -26,6 +26,205 @@
 				       }
 		    });
 		});
+		
+	document.addEventListener("DOMContentLoaded", function () {
+		const blockElement = document.getElementById("block");
+		const gpElement = document.getElementById("grampanchayat");
+		const villageElement = document.getElementById("village");
+		blockElement.addEventListener("change", function () {
+			const block = blockElement.value;
+			gpElement.innerHTML = '<option value="">--Select--</option>';
+			villageElement.innerHTML = "";
+			if (!block) {
+				return;
+			}
+			fetch(/*[[@{/getGPlistbyBlock}]]*/ + "?blockcode=" + encodeURIComponent(block))
+				.then(response => {
+					if (!response.ok) {
+						throw new Error("Failed to load Gram Panchayat");
+					}
+					return response.json();
+				})
+				.then(data => {
+					data.forEach(function (gp) {
+						const option = document.createElement("option");
+						option.value = gp.gcode;
+						option.textContent = gp.gramPanchayatName;
+						gpElement.appendChild(option);
+					});
+				})
+				.catch(error => {
+					console.error("Error loading Gram Panchayat:", error);
+				});
+			});
+
+
+		// GP change
+		gpElement.addEventListener("change", function () {
+			const gcode = gpElement.value;
+			// Clear villages
+			villageElement.innerHTML = "";
+			if (!gcode) {
+				return;
+			}
+			fetch(/*[[@{/getVillageListByGcode}]]*/ + "?gcode=" + encodeURIComponent(gcode))
+				.then(response => {
+					if (!response.ok) {
+						throw new Error("Failed to load villages");
+					}
+					return response.json();
+				})
+				.then(data => {
+					data.forEach(function (village) {
+						const option = document.createElement("option");
+						option.value = village.vcode;
+						option.textContent = village.villageName;
+						villageElement.appendChild(option);
+					});
+				})
+				.catch(error => {
+					console.error("Error loading villages:", error);
+				});
+		});
+	});
+	
+	$(document).ready(function () {
+	    $(document).on("click", ".editBtn", function () {
+	        const id = $(this).data("id");
+	        console.log("Editing ID:", id);
+	        // Clear old values
+	        $("#editVillage").empty();
+	        $("#editGrampanchayat").html('<option value="">--Select--</option>');
+
+	        // Get record
+	        fetch("/getPprProjectGlanceById?id=" + encodeURIComponent(id))
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error("Failed to load project details");
+	            }
+	            return response.json();
+	        })
+	        .then(data => {
+	            console.log("Edit data:", data);
+	            // Basic values
+	            $("#editPprProjectGlanceId").val(data.pprProjectGlanceId);
+	            $("#editPprId").val(data.pprId);
+	            $("#editSelectionReason").val(data.selectionReason);
+	            $("#editProjectArea").val(data.projectArea);
+	            $("#editProposedArea").val(data.proposedArea);
+	            $("#editProjectCost").val(data.projectCost);
+	            $("#editPiaName").val(data.piaName);
+	            $("#editAddress").val(data.address);
+	            $("#editComments").val(data.comments);
+	            // Micro Watershed
+	            $("#editMicroWatershed").val(data.mwId);
+				 $("input[name='editProjectType']").prop("checked", false);
+				 $("input[name='editProjectType'][value='" + data.projectType + "']").prop("checked", true);
+	            // Now load GP and villages
+	            loadEditVillages(data);
+	        })
+	        .catch(error => {
+	            console.error("Error loading edit details:", error);
+	            alert("Unable to load project details.");
+	        });
+	    });
+	    function loadEditVillages(data) {
+	        
+	        if (!data.villages || data.villages.length === 0) {
+	            return;
+	        }
+	        const villageId = data.villages[0];
+	        
+	        fetch("/getVillageDetailsByVcode?vcode=" + encodeURIComponent(villageId))
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error("Failed to load village details");
+	            }
+	            return response.json();
+	        })
+	        .then(village => {
+	            const gcode = village.gramPanchayat.gcode;
+	            const bcode = village.gramPanchayat.block.bcode;
+	            // Set block
+	            $("#editBlock").val(bcode);
+	            // Load GP
+	            loadEditGP(bcode, gcode, data.villages);
+	        })
+	        .catch(error => {
+	            console.error( "Error loading village details:", error);
+	        });
+	    }
+	    function loadEditGP(bcode, selectedGcode, selectedVillages) {
+	        fetch("/getGPlistbyBlock?blockcode=" + encodeURIComponent(bcode))
+	        .then(response => response.json())
+	        .then(data => {
+	            const gpElement = $("#editGrampanchayat");
+	            gpElement.html('<option value="">--Select--</option>');
+	            data.forEach(function (gp) {
+	                gpElement.append(new Option(gp.gramPanchayatName, gp.gcode));
+	            });
+	            // Select existing GP
+	            gpElement.val(selectedGcode);
+	            // Load villages
+	            loadEditVillageList(selectedGcode, selectedVillages);
+	        });
+	    }
+	    function loadEditVillageList(gcode, selectedVillages) {
+	        if (!gcode) {
+	            return;
+	        }
+	        fetch("/getVillageListByGcode?gcode=" + encodeURIComponent(gcode))
+	        .then(response => response.json())
+	        .then(data => {
+	            const villageElement = $("#editVillage");
+	            villageElement.empty();
+	            data.forEach(function (village) {
+	                const option = new Option(village.villageName, village.vcode);
+	                /*
+	                 * Automatically select villages
+	                 * already saved.
+	                 */
+	                if (selectedVillages.includes(village.vcode)){
+	                    option.selected = true;
+	                }
+	                villageElement.append(option);
+	            });
+	        });
+	    }
+		
+		$("#updateProjectBtn").on("click", function () {
+		    const form = document.getElementById("editProjectForm");
+		    const formData = new FormData(form);
+		    // Add project type
+		    const projectType = $("input[name='editProjectType']:checked").val();
+		    formData.set("projectType", projectType);
+		    // Add selected villages
+		    const villages = $("#editVillage").val() || [];
+		    villages.forEach(function (villageId) {
+		        formData.append("villages", villageId);
+		    });
+		    fetch("/updatePprProjectAtGlance", {
+		        method: "POST",
+		        body: formData
+		    })
+		    .then(response => {
+		        if (!response.ok) {
+		            throw new Error("Update failed");
+		        }
+		        return response.text();
+		    })
+		    .then(() => {
+		        // Close modal
+		        $("#editModal").modal("hide");
+		        // Reload page
+		        window.location.reload();
+		    })
+		    .catch(error => {
+		        console.error("Update error:", error);
+		        alert("Unable to update record.");
+		    });
+		});
+	});
 
 </script>
 	
@@ -104,16 +303,18 @@
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold"> Villages</label>
 						<div class="col-md-5">
-							<select class="form-select" id="village" name="village">
-								<option value="">--Select--</option>
-							</select>
+							<select class="form-select" id="villages" name="villages" multiple size="6"></select>
+							<small class="text-muted"> Hold Ctrl and select multiple villages</small>
 						</div>
 					</div>
 
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold">Name of Micro-Watershed (Code)</label>
-						<div class="col-md-3">
-						    <input type="text" class="form-control" id="microWatershedCode" name="microWatershedCode" readonly>
+						<div class="col-md-5">
+							<select class="form-select" id="mwId" name="mwId">
+								<option value="">--Select--</option>
+								<option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"> </option>
+							</select>
 						</div>
 	                </div>
 
@@ -180,7 +381,7 @@
 			</div>
 		</div>
 		<br/>
-		<div th:if="${detailsOfListOfProposedProject != null}">
+		<div th:if="${pprProjectAtGlanceList != null}">
 			<h4> <b><center>Saved As Draft Details of Project at a Glance</center></b> </h4>
 			
 		    <table class="table table-bordered table-striped table-hover">
@@ -209,17 +410,30 @@
 					<td th:text="${state}"></td>
 		            <td th:text="${data.ppr.district.distName}"></td>
 		            <td th:text="${data.ppr.projectName}"></td>
-					<td th:text="${data.projectType}"></td>
-		            <td th:text="${data.villages.blockName}"></td>
-					<td th:text="${data.gpName}"></td>
-					<td th:text="${data.villages}"></td>
-		            <td th:text="${data.mwCode}"></td>
+					<td th:text="${data.projectType.projectType}"></td>
+					<td>
+						<span th:if="${data.villages != null and !data.villages.isEmpty()}"
+							th:text="${data.villages[0].village.gramPanchayat.block.blockName}">
+						</span>
+					</td>
+					<td>
+						<span th:if="${data.villages != null and !data.villages.isEmpty()}"
+							th:text="${data.villages[0].village.gramPanchayat.gramPanchayatName}">
+						</span>
+					</td>
+					<td>
+						<span th:each="pv, iterStat : ${data.villages}">
+							<span th:text="${pv.village.villageName}"></span>
+							<span th:if="${!iterStat.last}">, </span>
+						</span>
+					</td>
+		            <td th:text="${data.microWatershed.mwCode}"></td>
 					<td th:text="${data.selectionReason}"></td>
 		            <td th:text="${data.projectArea}"></td>
 		            <td th:text="${data.proposedArea}"></td>
 		            <td th:text="${data.projectCost}"></td>
-					<td th:text="${data.piaName}"></td>
-					<td th:text="${data.address}"></td>
+					<td th:text="${data.pia.piaName}"></td>
+					<td th:text="${data.pia.address}"></td>
 					<td>
 						<div class="d-flex align-items-center gap-2">
 							<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${data.pprProjectGlanceId}" data-bs-toggle="modal"
@@ -251,103 +465,138 @@
 		</div>
 		
 
-		<div class="modal fade" id="editModal">
-			<div class="modal-dialog modal-lg">
-				<div class="modal-content">
-					<div class="modal-header bg-primary text-white">
-						<h5>
-							Edit Project at a Glance
-						</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal">
-						</button>
-					</div>
-					<form th:action="@{/updatePprProjectGlance}" method="post" id="editProjectForm">
-						<div class="modal-body">
-							<input type="hidden" id="editPprProposedProjectId" name="pprProposedProjectId">
-							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									District
-								</label>
-								<div class="col-md-5">
-									<input type="text" class="form-control" id="editDistrict" readonly>
-								</div>
-							</div>
-							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Project Name
-								</label>
-								<div class="col-md-5">
-									<input type="text" class="form-control" id="editProject" readonly>
-								</div>
-							</div>
-							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Name of Micro-watershed Proposed to be covered
-								</label>
-								<div class="col-md-5">
-									<input type="text" class="form-control" id="editMicroWatershed" readonly>
-								</div>
-							</div>
-							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Micro-watershed Code
-								</label>
-								<div class="col-md-3">
-									<input type="text" class="form-control" id="editMicroWatershedCode" readonly>
-								</div>
-							</div>
-							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Proposed project area treated(in Ha.)
-								</label>
-								<div class="col-md-3">
-									<input type="number" class="form-control" id="editTreatedArea" name="treatedProjectArea" step="any" min="0">
-								</div>
-							</div>
-							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Type of Project
-								</label>
-								<div class="col-md-9">
+		<!-- EDIT MODAL -->
+		<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+		    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <h5 class="modal-title" id="editModalLabel"> Edit Project at a Glance </h5>
+		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+		            </div>
+
+		            <div class="modal-body">
+		                <form id="editProjectForm">
+		                    <!-- ID -->
+		                    <input type="hidden" id="editPprProjectGlanceId" name="pprProjectGlanceId">
+		                    <!-- PPR ID -->
+		                    <input type="hidden" id="editPprId" name="pprId">
+		                    <!-- Project -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Name of the Project </label>
+		                        <div class="col-md-6">
+		                            <input type="text" class="form-control" id="editProject" readonly>
+		                        </div>
+		                    </div>
+		                    <!-- Project Type -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Type of Project </label>
+		                        <div class="col-md-9"> 
 									<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
-										<input class="form-check-input editProjectType" type="radio" name="projectType"
-											th:id="'editProject'+${project.projectTypeId}" th:value="${project.projectTypeId}">
-										<label class="form-check-label" th:for="'editProject'+${project.projectTypeId}"
-											th:text="${project.projectType}">
+										<input class="form-check-input editProjectType" type="radio" name="editProjectType"
+											th:id="'editProject' + ${project.projectTypeId}" th:value="${project.projectTypeId}">
+										<label class="form-check-label" th:for="'editProject' + ${project.projectTypeId}" th:text="${project.projectType}">
 										</label>
 									</div>
+								 </div>
+		                    </div>
+		                    <!-- Block -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Name of Block</label>
+		                        <div class="col-md-6">
+		                            <select class="form-select" id="editBlock">
+		                                <option value="">--Select--</option>
+		                                <option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}"> </option>
+		                            </select>
+		                        </div>
+		                    </div>
+		                    <!-- GP -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Name of Gram Panchayat </label>
+		                        <div class="col-md-6">
+		                            <select class="form-select" id="editGrampanchayat">
+		                                <option value="">--Select--</option>
+		                            </select>
+		                        </div>
+		                    </div>
+		                    <!-- Villages -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Villages </label>
+		                        <div class="col-md-6">
+		                            <select class="form-select" id="editVillage" name="villages" multiple size="6"></select>
+		                            <small class="text-muted">
+		                                Hold Ctrl and select multiple villages
+		                            </small>
+		                        </div>
+		                    </div>
+		                    <!-- Micro Watershed -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Name of Micro-Watershed (Code) </label>
+		                        <div class="col-md-6">
+		                            <select class="form-select" id="editMicroWatershed" name="mwId">
+		                                <option value="">--Select--</option>
+		                                <option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"> </option>
+		                            </select>
+		                        </div>
+		                    </div>
+		                    <!-- Selection Reason -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Reason for Selection of Watershed </label>
+		                        <div class="col-md-6">
+		                            <input type="text" class="form-control" id="editSelectionReason" name="selectionReason">
+		                        </div>
+		                    </div>
+		                    <!-- Project Area -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Area of Project (ha) </label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" id="editProjectArea" name="projectArea">
+		                        </div>
+		                    </div>
+		                    <!-- Proposed Area -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Area Proposed to be treated (ha) </label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" id="editProposedArea" name="proposedArea">
 								</div>
-							</div>
-							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Proposed Cost
-								</label>
-								<div class="col-md-3">
-									<input type="number" class="form-control" id="editProposedCost" name="proposedCost" step="any" min="0">
-								</div>
-							</div>
-<!--							<div class="row mb-3 align-items-center">-->
-<!--								<label class="col-md-3 fw-bold"> Weightage under the Criteria </label>-->
-<!--								<div class="col-md-4">-->
-<!--									<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"-->
-<!--										data-bs-target="#criteriaModal">-->
-<!--										Link <i class="fas fa-list"></i>-->
-<!--									</button>-->
-<!--									<input type="hidden" id="criteriaData" name="criteriaData">-->
-<!--								</div>-->
-<!--							</div>-->
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-								Close
-							</button>
-							<button type="submit" class="btn btn-success">
-								Update
-							</button>
-						</div>
-					</form>
-				</div>
-			</div>
+		                    </div>
+		                    <!-- Project Cost -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Project Cost (Rs in Lakh) </label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" id="editProjectCost" name="projectCost">
+		                        </div>
+		                    </div>
+		                    <!-- PIA Name -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Name of PIA </label>
+		                        <div class="col-md-6">
+		                            <input type="text" class="form-control" id="editPiaName" name="piaName">
+		                        </div>
+		                    </div>
+		                    <!-- PIA Address -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Address of PIA </label>
+		                        <div class="col-md-6">
+		                            <input type="text" class="form-control" id="editAddress" name="address">
+		                        </div>
+		                    </div>
+		                    <!-- Comments -->
+		                    <div class="row mb-3 align-items-center">
+		                        <label class="col-md-3 fw-bold"> Any Comments </label>
+		                        <div class="col-md-6">
+		                            <input type="text" class="form-control" id="editComments" name="comments">
+		                        </div>
+		                    </div>
+		                </form>
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
+		                <button type="button" class="btn btn-primary" id="updateProjectBtn">
+		                    <i class="fas fa-save"></i> Update
+		                </button>
+		            </div>
+		        </div>
+		    </div>
 		</div>		
 	</div>
 </body>
