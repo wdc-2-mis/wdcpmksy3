@@ -30,7 +30,7 @@
 	document.addEventListener("DOMContentLoaded", function () {
 		const blockElement = document.getElementById("block");
 		const gpElement = document.getElementById("grampanchayat");
-		const villageElement = document.getElementById("village");
+		const villageElement = document.getElementById("villages");
 		blockElement.addEventListener("change", function () {
 			const block = blockElement.value;
 			gpElement.innerHTML = '<option value="">--Select--</option>';
@@ -38,24 +38,24 @@
 			if (!block) {
 				return;
 			}
-			fetch(/*[[@{/getGPlistbyBlock}]]*/ + "?blockcode=" + encodeURIComponent(block))
-				.then(response => {
-					if (!response.ok) {
-						throw new Error("Failed to load Gram Panchayat");
-					}
-					return response.json();
-				})
-				.then(data => {
-					data.forEach(function (gp) {
-						const option = document.createElement("option");
-						option.value = gp.gcode;
-						option.textContent = gp.gramPanchayatName;
-						gpElement.appendChild(option);
-					});
-				})
-				.catch(error => {
-					console.error("Error loading Gram Panchayat:", error);
-				});
+			fetch("/getGPlistbyBlock?blockcode=" + encodeURIComponent(block))
+			    .then(response => {
+			        if (!response.ok) {
+			            throw new Error("Failed to load Gram Panchayat");
+			        }
+			        return response.json();
+			    })
+			    .then(data => {
+			        data.forEach(function (gp) {
+			            const option = document.createElement("option");
+			            option.value = gp.gcode;
+			            option.textContent = gp.gramPanchayatName;
+			            gpElement.appendChild(option);
+			        });
+			    })
+			    .catch(error => {
+			        console.error("Error loading Gram Panchayat:", error);
+			    });
 			});
 
 
@@ -67,74 +67,71 @@
 			if (!gcode) {
 				return;
 			}
-			fetch(/*[[@{/getVillageListByGcode}]]*/ + "?gcode=" + encodeURIComponent(gcode))
-				.then(response => {
-					if (!response.ok) {
-						throw new Error("Failed to load villages");
-					}
-					return response.json();
-				})
-				.then(data => {
-					data.forEach(function (village) {
-						const option = document.createElement("option");
-						option.value = village.vcode;
-						option.textContent = village.villageName;
-						villageElement.appendChild(option);
-					});
-				})
-				.catch(error => {
-					console.error("Error loading villages:", error);
-				});
+			fetch("/getVillageListByGcode?gcode=" + encodeURIComponent(gcode))
+			    .then(response => {
+			        if (!response.ok) {
+			            throw new Error("Failed to load villages");
+			        }
+			        return response.json();
+			    })
+			    .then(data => {
+			        data.forEach(function (village) {
+			            const option = document.createElement("option");
+			            option.value = village.vcode;
+			            option.textContent = village.villageName;
+			            villageElement.appendChild(option);
+			        });
+			    })
+			    .catch(error => {
+			        console.error("Error loading villages:", error);
+			    });
 		});
 	});
 	
-	$(document).ready(function () {
-	    $(document).on("click", ".editBtn", function () {
-	        const id = $(this).data("id");
-	        console.log("Editing ID:", id);
-	        // Clear old values
-	        $("#editVillage").empty();
-	        $("#editGrampanchayat").html('<option value="">--Select--</option>');
-
-	        // Get record
-	        fetch("/getPprProjectGlanceById?id=" + encodeURIComponent(id))
-	        .then(response => {
-	            if (!response.ok) {
-	                throw new Error("Failed to load project details");
-	            }
-	            return response.json();
-	        })
-	        .then(data => {
-	            console.log("Edit data:", data);
-	            // Basic values
-	            $("#editPprProjectGlanceId").val(data.pprProjectGlanceId);
-	            $("#editPprId").val(data.pprId);
-	            $("#editSelectionReason").val(data.selectionReason);
-	            $("#editProjectArea").val(data.projectArea);
-	            $("#editProposedArea").val(data.proposedArea);
-	            $("#editProjectCost").val(data.projectCost);
-	            $("#editPiaName").val(data.piaName);
-	            $("#editAddress").val(data.address);
-	            $("#editComments").val(data.comments);
-	            // Micro Watershed
-	            $("#editMicroWatershed").val(data.mwId);
-				 $("input[name='editProjectType']").prop("checked", false);
-				 $("input[name='editProjectType'][value='" + data.projectType + "']").prop("checked", true);
-	            // Now load GP and villages
-	            loadEditVillages(data);
-	        })
-	        .catch(error => {
-	            console.error("Error loading edit details:", error);
-	            alert("Unable to load project details.");
+	document.addEventListener("DOMContentLoaded", function () {
+	    document.querySelectorAll(".editBtn").forEach(function (btn) {
+	        btn.addEventListener("click", function () {
+	            const id = this.getAttribute("data-id");
+	            console.log("Editing ID:", id);
+	            fetch("/getPprProjectGlanceById?id=" + encodeURIComponent(id))
+	                .then(response => {
+	                    if (!response.ok) {
+	                        throw new Error("Failed to load project details");
+	                    }
+	                    return response.json();
+	                })
+	                .then(data => {
+	                    console.log("Edit data:", data);
+	                    // Basic values
+	                    document.getElementById("editPprProjectGlanceId").value = data.pprProjectGlanceId;
+	                    document.getElementById("editPprId").value = data.pprId;
+	                    document.getElementById("editSelectionReason").value = data.selectionReason;
+	                    document.getElementById("editProjectArea").value = data.projectArea;
+	                    document.getElementById("editProposedArea").value = data.proposedArea;
+	                    document.getElementById("editProjectCost").value = data.projectCost;
+	                    document.getElementById("editPiaName").value = data.piaName;
+	                    document.getElementById("editAddress").value = data.address;
+	                    document.getElementById("editComments").value = data.comments;
+	                  
+	                    document.getElementById("editMicroWatershed").value = data.mwId;
+	                    // Project Type
+	                    document.querySelectorAll(".editProjectType").forEach(function (radio) {
+	                            radio.checked = String(radio.value) === String(data.projectType);
+	                        });
+	                    // Load GP and villages
+	                    loadEditVillages(data);
+	                })
+	                .catch(error => {
+	                    console.error("Error loading edit details:", error);
+	                    alert("Unable to load project details.");
+	                });
 	        });
 	    });
 	    function loadEditVillages(data) {
-	        
 	        if (!data.villages || data.villages.length === 0) {
 	            return;
 	        }
 	        const villageId = data.villages[0];
-	        
 	        fetch("/getVillageDetailsByVcode?vcode=" + encodeURIComponent(villageId))
 	        .then(response => {
 	            if (!response.ok) {
@@ -143,34 +140,44 @@
 	            return response.json();
 	        })
 	        .then(village => {
-				if (!village) {
-					console.error("Village not found for vcode:", villageId);
-					return;
-				}
+	            if (!village) {
+	                console.error("Village not found for vcode:", villageId);
+	                return;
+	            }
 	            const gcode = village.gramPanchayat.gcode;
 	            const bcode = village.gramPanchayat.block.bcode;
+
 	            // Set block
-	            $("#editBlock").val(bcode);
+	            document.getElementById("editBlock").value = bcode;
 	            // Load GP
 	            loadEditGP(bcode, gcode, data.villages);
 	        })
 	        .catch(error => {
-	            console.error( "Error loading village details:", error);
+	            console.error("Error loading village details:", error);
 	        });
 	    }
 	    function loadEditGP(bcode, selectedGcode, selectedVillages) {
 	        fetch("/getGPlistbyBlock?blockcode=" + encodeURIComponent(bcode))
-	        .then(response => response.json())
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error("Failed to load GP list");
+	            }
+	            return response.json();
+	        })
 	        .then(data => {
-	            const gpElement = $("#editGrampanchayat");
-	            gpElement.html('<option value="">--Select--</option>');
+	            const gpElement = document.getElementById("editGrampanchayat");
+	            gpElement.innerHTML = '<option value="">--Select--</option>';
 	            data.forEach(function (gp) {
-	                gpElement.append(new Option(gp.gramPanchayatName, gp.gcode));
+	                const option = new Option(gp.gramPanchayatName, gp.gcode);
+	                gpElement.appendChild(option);
 	            });
 	            // Select existing GP
-	            gpElement.val(selectedGcode);
+	            gpElement.value = selectedGcode;
 	            // Load villages
 	            loadEditVillageList(selectedGcode, selectedVillages);
+	        })
+	        .catch(error => {
+	            console.error("Error loading GP:", error);
 	        });
 	    }
 	    function loadEditVillageList(gcode, selectedVillages) {
@@ -178,56 +185,28 @@
 	            return;
 	        }
 	        fetch("/getVillageListByGcode?gcode=" + encodeURIComponent(gcode))
-	        .then(response => response.json())
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error("Failed to load village list");
+	            }
+	            return response.json();
+	        })
 	        .then(data => {
-	            const villageElement = $("#editVillage");
-	            villageElement.empty();
+	            const villageElement = document.getElementById("editVillage");
+	            villageElement.innerHTML = "";
 	            data.forEach(function (village) {
 	                const option = new Option(village.villageName, village.vcode);
-	                /*
-	                 * Automatically select villages
-	                 * already saved.
-	                 */
-	                if (selectedVillages.includes(village.vcode)){
+	                // Select already saved villages
+	                if (selectedVillages.map(String).includes(String(village.vcode))) {
 	                    option.selected = true;
 	                }
-	                villageElement.append(option);
+	                villageElement.appendChild(option);
 	            });
+	        })
+	        .catch(error => {
+	            console.error("Error loading villages:", error);
 	        });
 	    }
-		
-		$("#updateProjectBtn").on("click", function () {
-		    const form = document.getElementById("editProjectForm");
-		    const formData = new FormData(form);
-		    // Add project type
-		    const projectType = $("input[name='editProjectType']:checked").val();
-		    formData.set("projectType", projectType);
-		    // Add selected villages
-		    const villages = $("#editVillage").val() || [];
-		    villages.forEach(function (villageId) {
-		        formData.append("villages", villageId);
-		    });
-		    fetch("/updatePprProjectAtGlance", {
-		        method: "POST",
-		        body: formData
-		    })
-		    .then(response => {
-		        if (!response.ok) {
-		            throw new Error("Update failed");
-		        }
-		        return response.text();
-		    })
-		    .then(() => {
-		        // Close modal
-		        $("#editModal").modal("hide");
-		        // Reload page
-		        window.location.reload();
-		    })
-		    .catch(error => {
-		        console.error("Update error:", error);
-		        alert("Unable to update record.");
-		    });
-		});
 	});
 
 </script>
@@ -473,13 +452,13 @@
 		<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
 		    <div class="modal-dialog modal-xl modal-dialog-scrollable">
 		        <div class="modal-content">
-		            <div class="modal-header">
+		            <div class="modal-header bg-primary text-white">
 		                <h5 class="modal-title" id="editModalLabel"> Edit Project at a Glance </h5>
 		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
 		            </div>
 
 		            <div class="modal-body">
-		                <form id="editProjectForm">
+		                <form th:action="@{/updatePprProposedProject}" method="post" id="editProjectForm">
 		                    <!-- ID -->
 		                    <input type="hidden" id="editPprProjectGlanceId" name="pprProjectGlanceId">
 		                    <!-- PPR ID -->
@@ -488,7 +467,7 @@
 		                    <div class="row mb-3 align-items-center">
 		                        <label class="col-md-3 fw-bold"> Name of the Project </label>
 		                        <div class="col-md-6">
-		                            <input type="text" class="form-control" id="editProject" readonly>
+		                            <input type="text" class="form-control" id="editProject" th:value="${project}" readonly>
 		                        </div>
 		                    </div>
 		                    <!-- Project Type -->

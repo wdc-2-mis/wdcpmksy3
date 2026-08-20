@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.dto.GPDropdownDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.PprProjectAtGlanceDTO;
+import gov.dolr.wdcpmksy3.PPR.dto.VillageDropdownDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
-import gov.dolr.wdcpmksy3.PPR.service.PPRDistrictService;
 import gov.dolr.wdcpmksy3.PPR.service.PprProjectGlanceService;
 import gov.dolr.wdcpmksy3.PPR.service.ProjectTypeService;
 import gov.dolr.wdcpmksy3.entity.MGramPanchayat;
@@ -85,21 +86,28 @@ public class PprProjectAtGlanceController {
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("state", statename);
 		
-		return "pprProjectAtGlance";
+		return "ppr/pprProjectAtGlance";
 	}
 	
 	@GetMapping("/getGPlistbyBlock")
 	@ResponseBody
-	public List<MGramPanchayat> getGPlistbyBlock(@RequestParam Integer blockcode) {
+	public List<GPDropdownDTO> getGPlistbyBlock(@RequestParam Integer blockcode) {
 	    List<MGramPanchayat> gpList = mGPRepo.getListMGramPanchayatByBlock(blockcode);
-	    return gpList;
+	    return gpList.stream().map(gp -> new GPDropdownDTO(
+	                    gp.getGcode(),
+	                    gp.getGramPanchayatName()
+	            )).toList();
 	}
 	
 	@GetMapping("/getVillageListByGcode")
 	@ResponseBody
-	public List<MVillage> getVillageListByGcode(
+	public List<VillageDropdownDTO> getVillageListByGcode(
 	        @RequestParam Integer gcode) {
-		return villageRepo.findByGramPanchayat_Gcode(gcode);
+	    List<MVillage> villageList = villageRepo.findByGramPanchayat_Gcode(gcode);
+	    return villageList.stream().map(village -> new VillageDropdownDTO(
+	                    village.getVcode(),
+	                    village.getVillageName()
+	            )).toList();
 	}
 	
 	@PostMapping("/savePprProjectAtGlance")
