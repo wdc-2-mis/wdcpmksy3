@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.dto.PprProjectAtGlanceDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
@@ -127,6 +128,33 @@ public class PprProjectAtGlanceController {
 	        return "redirect:/login";
 	    }
 	    pprProjectGlanceServ.updatePprProjectAtGlance(dto, userid, request.getRemoteAddr());
+
+	    return "redirect:/pprProjectAtGlance";
+	}
+	
+	@GetMapping("/getVillageDetailsByVcode")
+	@ResponseBody
+	public MVillage getVillageDetailsByVcode(@RequestParam Integer vcode) {
+	    return villageRepo.findByVcode(vcode);
+	}
+	
+	@GetMapping("/deletePprProProjectGlance")
+	public String deletePprProProjectGlance(@RequestParam Integer id, RedirectAttributes redirectAttributes) {
+
+	    try {
+	        pprProjectGlanceServ.deletePprProjectGlance(id);
+	        redirectAttributes.addFlashAttribute("success", "Project Glance deleted successfully.");
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("error", "Unable to delete Project Glance.");
+	    }
+	    return "redirect:/pprProjectAtGlance";
+	}
+	
+	@GetMapping("/completePprProProjectGlance")
+	public String completePprProProjectGlance(@RequestParam("id") Integer id,
+	        RedirectAttributes redirectAttributes) {
+	    pprProjectGlanceServ.completePprProjectGlance(id);
+	    redirectAttributes.addFlashAttribute("success", "Project Glance completed successfully.");
 
 	    return "redirect:/pprProjectAtGlance";
 	}

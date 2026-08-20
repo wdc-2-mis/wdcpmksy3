@@ -17,6 +17,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.MPiaDetailsRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprVillageRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.ProjectTypeRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.entity.MVillage;
@@ -44,39 +45,29 @@ public class PprProjectGlanceService {
 	@Autowired
 	private VillageRepository villageRepo;
 	
+	@Autowired
+	private PprVillageRepository pprVillageRepo;
+	
 	public List<PprProjectGlance> getPprProjectGlanceList(MPpr ppr){
 		return pprProjectGlanceRepo.getListOfPprProjectGlanceByPpr(ppr);
 	}
 	
 	@Transactional
-	public void savePprProjectAtGlance(
-	        PprProjectAtGlanceDTO dto,
-	        String userid,
-	        String requestIp) {
-
+	public void savePprProjectAtGlance(PprProjectAtGlanceDTO dto, String userid, String requestIp) {
 	    // 1. Get PPR
-	    MPpr ppr = mPprRepo.findById(dto.getPprId())
-	            .orElseThrow(() ->
+	    MPpr ppr = mPprRepo.findById(dto.getPprId()).orElseThrow(() ->
 	                new RuntimeException("PPR not found"));
 
-
 	    // 2. Get Micro Watershed
-	    MicroWatershed microWatershed =
-	            microWatershedRepo.findById(dto.getMwId())
-	            .orElseThrow(() ->
+	    MicroWatershed microWatershed = microWatershedRepo.findById(dto.getMwId()).orElseThrow(() ->
 	                new RuntimeException("Micro Watershed not found"));
 
-
 	    // 3. Get Project Type
-	    ProjectType projectType =
-	            projectTypeRepo.findById(dto.getProjectType())
-	            .orElseThrow(() ->
+	    ProjectType projectType = projectTypeRepo.findById(dto.getProjectType()).orElseThrow(() ->
 	                new RuntimeException("Project Type not found"));
-
 
 	    // 4. Create PIA
 	    MPiaDetails pia = new MPiaDetails();
-
 	    pia.setPiaName(dto.getPiaName());
 	    pia.setAddress(dto.getAddress());
 	    pia.setCreatedBy(userid);
@@ -84,10 +75,8 @@ public class PprProjectGlanceService {
 
 	    piaRepository.save(pia);
 
-
 	    // 5. Create Project Glance
-	    PprProjectGlance projectGlance =
-	            new PprProjectGlance();
+	    PprProjectGlance projectGlance = new PprProjectGlance();
 
 	    projectGlance.setPpr(ppr);
 	    projectGlance.setMicroWatershed(microWatershed);
@@ -99,24 +88,15 @@ public class PprProjectGlanceService {
 	    projectGlance.setProposedArea(dto.getProposedArea());
 	    projectGlance.setProjectCost(dto.getProjectCost());
 	    projectGlance.setComments(dto.getComments());
-
 	    projectGlance.setStatus('D');
-
-
 	    // 6. Create PprVillage records
 	    List<PprVillage> villageList = new ArrayList<>();
-
 	    if (dto.getVillages() != null) {
-
 	        for (Integer vcode : dto.getVillages()) {
-
-	            MVillage village = villageRepo.findById(vcode)
-	                    .orElseThrow(() ->
-	                        new RuntimeException(
-	                            "Village not found: " + vcode));
+	            MVillage village = villageRepo.findById(vcode).orElseThrow(() ->
+	                        new RuntimeException("Village not found: " + vcode));
 
 	            PprVillage pprVillage = new PprVillage();
-
 	            pprVillage.setVillage(village);
 	            pprVillage.setProjectGlance(projectGlance);
 	            pprVillage.setStatus('D');
@@ -134,55 +114,22 @@ public class PprProjectGlanceService {
 	
 	public PprProjectAtGlanceDTO getPprProjectGlanceById(Integer id) {
 
-	    PprProjectGlance entity =
-	            pprProjectGlanceRepo.findById(id)
-	                    .orElseThrow(() ->
-	                            new RuntimeException(
-	                                    "Project Glance not found: " + id));
+	    PprProjectGlance entity = pprProjectGlanceRepo.findById(id).orElseThrow(() ->
+	                            new RuntimeException("Project Glance not found: " + id));
+	    PprProjectAtGlanceDTO dto = new PprProjectAtGlanceDTO();
+	    dto.setPprProjectGlanceId(entity.getPprProjectGlanceId());
+	    dto.setPprId(entity.getPpr().getPprId());
+	    dto.setMwId(entity.getMicroWatershed().getMwId());
+	    dto.setProjectType(entity.getProjectType().getProjectTypeId());
+	    dto.setSelectionReason(entity.getSelectionReason());
+	    dto.setProjectArea(entity.getProjectArea());
+	    dto.setProposedArea(entity.getProposedArea());
+	    dto.setProjectCost(entity.getProjectCost());
+	    dto.setPiaName(entity.getPia().getPiaName());
+	    dto.setAddress(entity.getPia().getAddress());
+	    dto.setComments(entity.getComments());
 
-	    PprProjectAtGlanceDTO dto =
-	            new PprProjectAtGlanceDTO();
-
-	    dto.setPprProjectGlanceId(
-	            entity.getPprProjectGlanceId());
-
-	    dto.setPprId(
-	            entity.getPpr().getPprId());
-
-	    dto.setMwId(
-	            entity.getMicroWatershed().getMwId());
-
-	    dto.setProjectType(
-	            entity.getProjectType().getProjectTypeId());
-
-	    dto.setSelectionReason(
-	            entity.getSelectionReason());
-
-	    dto.setProjectArea(
-	            entity.getProjectArea());
-
-	    dto.setProposedArea(
-	            entity.getProposedArea());
-
-	    dto.setProjectCost(
-	            entity.getProjectCost());
-
-	    dto.setPiaName(
-	            entity.getPia().getPiaName());
-
-	    dto.setAddress(
-	            entity.getPia().getAddress());
-
-	    dto.setComments(
-	            entity.getComments());
-
-
-	    List<Integer> villageIds =
-	            entity.getVillages()
-	                    .stream()
-	                    .map(pv -> pv.getVillage().getVcode())
-	                    .toList();
-
+	    List<Integer> villageIds = entity.getVillages().stream().map(pv -> pv.getVillage().getVcode()).toList();
 	    dto.setVillages(villageIds);
 
 	    return dto;
@@ -225,6 +172,31 @@ public class PprProjectGlanceService {
 
 	    // Update villages
 	    // ...
+	}
+	
+	@Transactional
+	public void deletePprProjectGlance(Integer id) {
+	    PprProjectGlance data = pprProjectGlanceRepo.findById(id).orElse(null);
+	    if (data != null) {
+	    	pprVillageRepo.deleteByProjectGlance_PprProjectGlanceId(id);
+	        pprProjectGlanceRepo.delete(data);
+	    }
+	}
+	
+	@Transactional
+	public void completePprProjectGlance(Integer id) {
+	    PprProjectGlance data = pprProjectGlanceRepo.findById(id).orElse(null);
+	    if (data != null) {
+	        data.setStatus('C');
+	        pprProjectGlanceRepo.save(data);
+
+	        List<PprVillage> villages = pprVillageRepo.findByProjectGlance_PprProjectGlanceId(id);
+	        for (PprVillage village : villages) {
+	            village.setStatus('C');
+	        }
+
+	        pprVillageRepo.saveAll(villages);
+	    }
 	}
 	
 	

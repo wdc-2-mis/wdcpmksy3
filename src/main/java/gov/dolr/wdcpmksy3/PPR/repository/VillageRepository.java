@@ -24,6 +24,8 @@ public interface VillageRepository extends JpaRepository<MVillage,Integer>{
     
     List<MVillage> findByGramPanchayat_Gcode(Integer gcode);
     
+    MVillage findByVcode(Integer vcode);
+    
     
     
 
