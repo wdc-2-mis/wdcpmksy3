@@ -1,6 +1,7 @@
 package gov.dolr.wdcpmksy3.controller;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -261,4 +262,47 @@ public class PrelimnaryPPR8AController {
        
         return "redirect:/preliminaryPPR8";
     }
+	
+	@PostMapping("/updateDraftPPR8")
+	public String updateDraftPPR8(HttpSession session, Model model,
+	                            @RequestParam Integer pprProposedAreaId,
+	                            @RequestParam Integer projSanctionedNo1,
+	                            @RequestParam BigDecimal projSanctionedArea1,
+	                            @RequestParam BigDecimal netArea1,
+	                            @RequestParam BigDecimal proposedArea1,
+	                            @RequestParam BigDecimal proposedAreaOthers1,
+	                            @RequestParam BigDecimal netBalArea1,
+	                            @RequestParam String updateAction,
+
+	                            RedirectAttributes redirectAttributes) {
+
+	    String userid = (String) session.getAttribute("userid");
+	    
+
+	    if (userid != null) {
+
+	        PprProposedArea obj = pprprep.findById(pprProposedAreaId.longValue()).get();
+
+	        obj.setProjSanctionedNo(projSanctionedNo1);
+	        obj.setProjSanctionedArea(projSanctionedArea1);
+	        obj.setNetArea(netArea1);
+	        obj.setProposedArea(proposedArea1);
+	        obj.setProposedAreaOthers(proposedAreaOthers1);
+	        obj.setNetBalArea(netBalArea1);
+	        obj.setStatus(updateAction.charAt(0));
+	        obj.setUpdatedBy(userid);
+	        obj.setUpdatedDate(LocalDateTime.now());
+	        // obj.setRequestIp(getClientIpAddr(request));
+
+	        pprprep.save(obj);
+	        
+	        redirectAttributes.addFlashAttribute("success", "Record Update Successfully.");
+
+	        return "redirect:/preliminaryPPR8";
+
+	    } else {
+
+	        return "redirect:/login";
+	    }
+	}
 }
