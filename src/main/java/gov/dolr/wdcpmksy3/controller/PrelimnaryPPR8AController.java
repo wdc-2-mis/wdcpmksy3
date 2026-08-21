@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MScheme;
+import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.entity.MBlock;
 import gov.dolr.wdcpmksy3.entity.MVillage;
@@ -103,10 +104,7 @@ public class PrelimnaryPPR8AController {
 	}
 	 
 	@PostMapping("/saveDraftPPR8")
-	public String saveDraftPPR8(HttpSession session,
-	                            Model model,
-	                            
-
+	public String saveDraftPPR8(HttpSession session, Model model,
 	                            @RequestParam Integer pprId,
 	                            @RequestParam Integer bcode,
 	                            @RequestParam String scheme,
@@ -205,4 +203,62 @@ public class PrelimnaryPPR8AController {
         model.addAttribute("blockList",new ArrayList<>());
 	    return "editppr8";
 	}
+	
+	@GetMapping("/deleteDraftPPR8")
+    public String deleteDraftPPR8(HttpSession session, Model model, @RequestParam("id") Integer id,  
+    		RedirectAttributes redirectAttributes) {
+
+		
+		String userid=(String)session.getAttribute("userid");
+		try {
+			
+	        if(userid==null){
+	
+	            return "redirect:/login";
+	        }
+	        PprProposedArea data = pprprep.findById(id.longValue()).orElse(null);
+            if (data == null) {
+                redirectAttributes.addFlashAttribute("error", "Record not found.");
+                return "redirect:/pendingUCPPR19";
+            }
+            
+            if (pprprep.existsById(id.longValue())) {
+            	pprprep.deleteById(id.longValue());
+            	redirectAttributes.addFlashAttribute("success", "Record deleted successfully.");
+            }
+            else {
+            	redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+            }
+            
+        } 
+        catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+            e.printStackTrace();
+        }
+		return "redirect:/preliminaryPPR8";
+    }
+	
+	@GetMapping("/completeDraftPPR8")
+    public String completeDraftPPR8(HttpSession session, Model model, @RequestParam("id") Integer id,  
+    		RedirectAttributes redirectAttributes) {
+
+		
+			String userid=(String)session.getAttribute("userid");
+		 	try {
+		 		
+		 		if(userid==null){
+
+		            return "redirect:/login";
+		        }
+		 		pprProposedAreaService.completeRecord(id);
+		        redirectAttributes.addFlashAttribute("success", "Record completed successfully.");
+		    } 
+		 	catch (Exception e) {
+		 		e.printStackTrace();
+		        redirectAttributes.addFlashAttribute("error", "Unable to complete record.");
+		    }
+       
+        return "redirect:/preliminaryPPR8";
+    }
 }

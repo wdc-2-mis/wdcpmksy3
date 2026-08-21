@@ -387,12 +387,12 @@ public class PPR1Controller {
     public String updateInstitutionalStructurePPR1(HttpSession session, Model model, HttpServletRequest request,
 
             @RequestParam Long pprid,
-            @RequestParam String stateName,
-            @RequestParam String slnaType,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate notificationDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate mouDate,
-            @RequestParam(required = false) MultipartFile notificationFile,
-            @RequestParam(required = false) MultipartFile mouFile,
+            @RequestParam String stateName1,
+            @RequestParam String slnaType1,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate notificationDate1,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate mouDate1,
+            @RequestParam(required = false) MultipartFile notificationFile1,
+            @RequestParam(required = false) MultipartFile mouFile1,
             RedirectAttributes redirectAttributes) throws IOException {
     	
 		String userid=(String)session.getAttribute("userid");
@@ -409,25 +409,25 @@ public class PPR1Controller {
 	        
 	        InstitutionalStructure data = isserv.getById(pprid);	
 			
-	        if (notificationFile != null && !notificationFile.isEmpty()) {
+	        if (notificationFile1 != null && !notificationFile1.isEmpty()) {
 	        	deleteFile(data.getNotificationFile());
-	        	notificationFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ notificationFile.getOriginalFilename();
-	        	notificationFile.transferTo(new File(uploadPath + notificationFileName));
+	        	notificationFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ notificationFile1.getOriginalFilename();
+	        	notificationFile1.transferTo(new File(uploadPath + notificationFileName));
 	 	        data.setNotificationFile(uploadPath+notificationFileName);
 	        }
-	        if (mouFile != null && !mouFile.isEmpty()) {
+	        if (mouFile1 != null && !mouFile1.isEmpty()) {
 	        	deleteFile(data.getMouFile());
-	        	mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ mouFile.getOriginalFilename();
+	        	mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ mouFile1.getOriginalFilename();
 	        	data.setMouFile(uploadPath+mouFileName);
-	        	mouFile.transferTo(new File(uploadPath + mouFileName));
+	        	mouFile1.transferTo(new File(uploadPath + mouFileName));
 	        }
 	        
-	        if(slnaType!=null)
-	        data.setSlnaType(slnaType);
-	        if(notificationDate!=null)
-	        data.setNotificationDate(notificationDate);
-	        if(mouDate!=null)
-	        data.setMouDate(mouDate);
+	        if(slnaType1!=null)
+	        data.setSlnaType(slnaType1);
+	        if(notificationDate1!=null)
+	        data.setNotificationDate(notificationDate1);
+	        if(mouDate1!=null)
+	        data.setMouDate(mouDate1);
 	        
 	        data.setUpdatedBy(userid);
 	        data.setUpdatedDate(LocalDate.now());

@@ -137,7 +137,6 @@ public class PendingUCPPR19Controller {
     public String completePendingUCPPR19(HttpSession session, Model model, @RequestParam("id") Integer id,  
     		RedirectAttributes redirectAttributes) {
 
-		
 			String userid=(String)session.getAttribute("userid");
 		 	try {
 		 		
@@ -152,8 +151,7 @@ public class PendingUCPPR19Controller {
 		 		e.printStackTrace();
 		        redirectAttributes.addFlashAttribute("error", "Unable to complete record.");
 		    }
-       
-        return "redirect:/pendingUCPPR19";
+		 	return "redirect:/pendingUCPPR19";
     }
 	@PostMapping("/editPendingUCPPR19")
 	 public String editPendingUCPPR19(HttpSession session, Model model, HttpServletRequest request,

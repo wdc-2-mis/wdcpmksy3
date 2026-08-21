@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MScheme;
+import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
 import gov.dolr.wdcpmksy3.repository.MSchemeRepository;
 import gov.dolr.wdcpmksy3.repository.PprProposedAreaRepository;
@@ -35,5 +36,16 @@ public class PprProposedAreaService {
 
         return repository.findByPprPprIdAndStatus(pprId, 'D');
 
+    }
+    
+    @Transactional
+    public void completeRecord(Integer id) {
+
+    	PprProposedArea ub = repository.findById(id.longValue())
+                .orElseThrow(() -> new RuntimeException("Record not found"));
+
+		ub.setStatus('C');
+
+		repository.save(ub);
     }
 }

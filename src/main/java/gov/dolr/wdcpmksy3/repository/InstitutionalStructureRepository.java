@@ -15,7 +15,7 @@ public interface InstitutionalStructureRepository extends JpaRepository<Institut
 	
 	 	@Query(value = "select ppr_inst_str_id, st_code, (select st_name from m_state where st_code=ins.st_code) as statename, slna_type, "
 	 		+ "TO_CHAR(ins.notification_date, 'DD/MM/YYYY') as notification_date, notification_file, TO_CHAR(ins.mou_date, 'DD/MM/YYYY') as mou_date, "
-	 		+ "mou_file, status from ppr_slna_institutional_structure ins where st_code=:stcode",nativeQuery = true)
+	 		+ "mou_file, status, notification_date, mou_date from ppr_slna_institutional_structure ins where st_code=:stcode",nativeQuery = true)
 	    List<Object[]> getPPR1List(@Param("stcode") int stcode);
 	    
 	    

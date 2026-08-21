@@ -64,7 +64,7 @@
 			   var total = button.getAttribute('data-total');
 			   var balance = button.getAttribute('data-balance');
 			   
-		       // Populate modal fields  reason1
+		       // Populate modal fields  pprUnspentBalanceId
 		       document.getElementById('pprUnspentBalanceId').value = Id;
 		       document.getElementById('district1').value = district;
 		       document.getElementById('project1').value = project;
@@ -384,7 +384,7 @@
 		<div class="table-responsive mt-4"
 		     th:if="${#lists.size(records) > 0}">
 			 <h4>
-			 <b> <centre> List of Details of Unspent balance as on date District-wise (PPR20)</centre>  </b>
+			 <b><centre>List of Details of Unspent balance as on date District-wise (PPR20)</centre></b>
 			</h4>
 			<br/>
 			<table class="table table-bordered table-striped" style="min-width:1800px;">
@@ -425,7 +425,6 @@
 							   			<i class="fas fa-trash"></i>
 							   		</a>
 							   		&nbsp; &nbsp; 
-												
 									<button type="button" title="Edit"  class="btn btn-primary btn-sm editBtn" 	
 									th:attr="data-id=${rec.pprUnspentBalanceId}, data-district=${rec.ppr.district.distName}, data-project=${rec.ppr.projectName},  
 									data-projectid=${rec.ppr.pprId}, data-totCost=${rec.totCost}, data-state=${rec.stReleasedFund}, data-dolr=${rec.dolrReleasedFund},  
@@ -433,22 +432,17 @@
 												 data-bs-toggle="modal"   data-bs-target="#editModal" >
 									    <i class="fas fa-edit"></i>
 									</button>
-									
 							   		&nbsp; &nbsp; 
 							   		<a  title="Complete" th:href="@{/completeUnspentBalancePPR20(id=${rec.pprUnspentBalanceId})}"
 							   			class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
 							   			<i class="fas fa-check"></i>
 							   		</a>
-							   		
 							   	</td>
 							   	<td th:if="${rec.status.toString().equals('C')}">
-									
 									<span class="badge bg-success">
 											<i class="fas fa-check-circle"></i> Completed
 									</span>	
-									
 								</td>
-			                   
 			               </tr>
 			               <tr th:if="${#lists.isEmpty(records)}">
 			                   <td colspan="8" class="text-center text-muted">

@@ -32,6 +32,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Allow only PDF files
 document.addEventListener("DOMContentLoaded", function () {
+	
+				var editModal = document.getElementById('editModal');
+			   	editModal.addEventListener('show.bs.modal', function (event) {
+			       var button = event.relatedTarget;
+				   
+			       // Get data attributes  
+			       var Id = button.getAttribute('data-id');
+			       var stname = button.getAttribute('data-stname');
+			       var stid = button.getAttribute('data-stid');
+			       var sltype = button.getAttribute('data-sltype');
+				   var notificationd = button.getAttribute('data-notificationd');
+				   var moud = button.getAttribute('data-moud');
+				  
+			       // Populate modal fields  pprUnspentBalanceId
+			       document.getElementById('pprid').value = Id;
+			       document.getElementById('stateName1').value = stname;
+				   document.getElementById("slnaType1").value =sltype;
+				   document.getElementById("notificationDate1").value =notificationd;
+				   document.getElementById("mouDate1").value =moud;
+				  
+			   });
+	
+	
+	
 
     const form = document.getElementById("institutionForm");
 	const notificationFile = document.getElementById("notificationFile");
@@ -230,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </label>
 
 						<input type="text" class="form-control"name="slnaType"
-						        th:value="${slnaType}" placeholder="Enter Type of SLNA" required>
+						         placeholder="Enter Type of SLNA" required>
 
                     </div>
 
@@ -243,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </label>
 
 						<input type="date" class="form-control" name="notificationDate"
-						            min="2026-01-01" th:value="${notificationDate}" required>
+						            min="2026-01-01"  required>
 
                     </div>
 
@@ -271,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </label>
 
 						<input type="date" class="form-control" name="mouDate"
-						          min="2026-01-01" th:value="${mouDate}" required>
+						          min="2026-01-01"  required>
 
                     </div>
                     <div class="col-md-6">
@@ -364,12 +388,21 @@ document.addEventListener("DOMContentLoaded", function () {
 										     <i class="fas fa-trash"></i>
 										</a>
 										&nbsp; &nbsp; 
-										<a th:if="${user[8].toString().equals('D')}" title="Edit"
+										<!--<a th:if="${user[8].toString().equals('D')}" title="Edit"
 										   th:href="@{/editInstitutionalStructurePPR1(id=${user[0]})}"
 										   class="btn btn-primary btn-sm"
 										   onclick="return confirm('Are you sure you want to edit this record?');">
 										     <i class="fas fa-edit"></i>
-										</a>
+										</a>-->
+										
+										<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn" th:attr="data-id=${user[0]}, 
+										data-stname=${user[2]}, data-stid=${user[1]}, data-sltype=${user[3]}, data-notificationd=${user[9]}, data-moud=${user[10]}"
+											data-bs-toggle="modal" data-bs-target="#editModal">
+											<i class="fas fa-edit"></i>
+										</button>
+										
+										
+										
 										&nbsp; &nbsp; 
 									    <a th:if="${user[8].toString().equals('D')}" title="Complete"
 										th:href="@{/completeInstitutionalStructurePPR1(id=${user[0]})}"
@@ -389,7 +422,74 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		                </div>
 		
-		
+						<div class="modal fade" id="editModal">
+							<div class="modal-dialog modal-xl">
+								<div class="modal-content">
+									<div class="modal-header bg-primary text-white">
+										<h5>Edit Details</h5>
+										<button class="btn-close" data-bs-dismiss="modal"></button>
+									</div>
+									<div class="modal-body">
+										<form id="editForm" th:action="@{/updateInstitutionalStructurePPR1}" method="post" enctype="multipart/form-data" novalidate>
+											<input type="hidden" id="pprid" name="pprid">
+											<!-- Member Details -->
+											<div class="row g-4">
+											
+												<!-- State -->
+											
+												<div class="col-md-6">
+													<label class="form-label">
+														<b> State Name </b><span class="required">*</span>
+													</label>
+													<input type="text" class="form-control" name="stateName1" id="stateName1" readonly>
+												</div>
+												<div class="col-md-6">
+													<label class="form-label">
+														<b> Type of SLNA </b><span class="required">*</span>
+													</label>
+													<input type="text" class="form-control" name="slnaType1" id="slnaType1" placeholder="Enter Type of SLNA" required>
+												</div>
+												<div class="col-md-6">
+													<label class="form-label">
+														<b> Date of Notification </b><span class="required">*</span>
+													</label>
+													<input type="date" class="form-control" name="notificationDate1" id="notificationDate1" min="2026-01-01" required>
+												</div>
+												<div class="col-md-6">
+													<label class="form-label">
+														<b> Upload Notification </b> <span class="required">*</span>
+													</label>
+													<input type="file" id="notificationFile1" name="notificationFile1" class="form-control"
+														accept=".pdf,application/pdf" required>
+													<small class="form-text text-muted">Only PDF file is allowed.</small>
+												</div>
+												<div class="col-md-6">
+													<label class="form-label">
+														<b> Date of MoU with DoLR </b> <span class="required">*</span>
+													</label>
+													<input type="date" class="form-control" name="mouDate1" id="mouDate1" min="2026-01-01"  required>
+												</div>
+												<div class="col-md-6">
+													<label class="form-label">
+														<b> Upload MoU </b> <span class="required">*</span>
+													</label>
+													<input type="file" id="mouFile1" name="mouFile1" class="form-control" accept=".pdf,application/pdf" required>
+													<small class="form-text text-muted">Only PDF file is allowed.</small>
+												</div>
+											
+											</div>
+						
+											<div class="text-center mt-4">
+												<button type="submit" name="updateAction" value="D" class="btn btn-warning">
+													<i class="fas fa-save"></i>
+													Update
+												</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
 
     </div>
 
