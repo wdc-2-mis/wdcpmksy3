@@ -1,6 +1,7 @@
 package gov.dolr.wdcpmksy3.PPR.entity;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class PprProjectGlance {
     private Character status;
     
     @OneToMany(mappedBy="projectGlance",cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<PprVillage> villages;
+    private List<PprVillage> villages = new ArrayList<>();
 
 	public List<PprVillage> getVillages() {
 		return villages;

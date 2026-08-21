@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.dto.GPDropdownDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.PprProjectAtGlanceDTO;
+import gov.dolr.wdcpmksy3.PPR.dto.VillageDetailsDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.VillageDropdownDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
@@ -101,8 +102,7 @@ public class PprProjectAtGlanceController {
 	
 	@GetMapping("/getVillageListByGcode")
 	@ResponseBody
-	public List<VillageDropdownDTO> getVillageListByGcode(
-	        @RequestParam Integer gcode) {
+	public List<VillageDropdownDTO> getVillageListByGcode(@RequestParam Integer gcode) {
 	    List<MVillage> villageList = villageRepo.findByGramPanchayat_Gcode(gcode);
 	    return villageList.stream().map(village -> new VillageDropdownDTO(
 	                    village.getVcode(),
@@ -111,15 +111,18 @@ public class PprProjectAtGlanceController {
 	}
 	
 	@PostMapping("/savePprProjectAtGlance")
-	public String savePprProjectAtGlance(
-	        @ModelAttribute PprProjectAtGlanceDTO dto,
-	        HttpSession session,
-	        HttpServletRequest request) {
+	public String savePprProjectAtGlance(@ModelAttribute PprProjectAtGlanceDTO dto, HttpSession session, 
+			HttpServletRequest request, RedirectAttributes redirectAttributes) {
 	    String userid = (String) session.getAttribute("userid");
 	    if (userid == null) {
 	        return "redirect:/login";
 	    }
-	    pprProjectGlanceServ.savePprProjectAtGlance(dto, userid, request.getRemoteAddr());
+		try {
+			pprProjectGlanceServ.savePprProjectAtGlance(dto, userid, request.getRemoteAddr());
+			redirectAttributes.addFlashAttribute("success", "Project Glance saved successfully.");
+		}catch(Exception e) {
+	    	redirectAttributes.addFlashAttribute("error", "Unable to save Project Glance.");
+	    }
 	    return "redirect:/pprProjectAtGlance";
 	}
 	
@@ -130,20 +133,34 @@ public class PprProjectAtGlanceController {
 	}
 	
 	@PostMapping("/updatePprProjectAtGlance")
-	public String updatePprProjectAtGlance(@ModelAttribute PprProjectAtGlanceDTO dto, HttpSession session, HttpServletRequest request) {
+	public String updatePprProjectAtGlance(@ModelAttribute PprProjectAtGlanceDTO dto, HttpSession session, 
+			HttpServletRequest request, RedirectAttributes redirectAttributes) {
 	    String userid =(String) session.getAttribute("userid");
 	    if (userid == null) {
 	        return "redirect:/login";
 	    }
-	    pprProjectGlanceServ.updatePprProjectAtGlance(dto, userid, request.getRemoteAddr());
+		try {
+			pprProjectGlanceServ.updatePprProjectAtGlance(dto, userid, request.getRemoteAddr());
+			redirectAttributes.addFlashAttribute("success", "Project Glance updated successfully.");
+		}catch(Exception e) {
+	    	redirectAttributes.addFlashAttribute("error", "Unable to update Project Glance.");
+	    }
 
 	    return "redirect:/pprProjectAtGlance";
 	}
 	
 	@GetMapping("/getVillageDetailsByVcode")
 	@ResponseBody
-	public MVillage getVillageDetailsByVcode(@RequestParam Integer vcode) {
-	    return villageRepo.findByVcode(vcode);
+	public VillageDetailsDTO getVillageDetailsByVcode(@RequestParam Integer vcode) {
+	    MVillage village = villageRepo.findByVcode(vcode);
+	    if (village == null) {
+	        return null;
+	    }
+	    return new VillageDetailsDTO(
+	        village.getVcode(),
+	        village.getGramPanchayat().getGcode(),
+	        village.getGramPanchayat().getBlock().getBcode()
+	    );
 	}
 	
 	@GetMapping("/deletePprProProjectGlance")
@@ -159,10 +176,14 @@ public class PprProjectAtGlanceController {
 	}
 	
 	@GetMapping("/completePprProProjectGlance")
-	public String completePprProProjectGlance(@RequestParam("id") Integer id,
+	public String completePprProProjectGlance(@RequestParam Integer id,
 	        RedirectAttributes redirectAttributes) {
+		try {
 	    pprProjectGlanceServ.completePprProjectGlance(id);
 	    redirectAttributes.addFlashAttribute("success", "Project Glance completed successfully.");
+		}catch(Exception e) {
+			redirectAttributes.addFlashAttribute("error", "Unable to complete Project Glance.");
+		}
 
 	    return "redirect:/pprProjectAtGlance";
 	}

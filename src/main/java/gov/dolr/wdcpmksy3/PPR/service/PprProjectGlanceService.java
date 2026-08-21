@@ -137,8 +137,7 @@ public class PprProjectGlanceService {
 	
 	@Transactional
 	public void updatePprProjectAtGlance(PprProjectAtGlanceDTO dto, String userid, String ip) {
-	    PprProjectGlance projectGlance = pprProjectGlanceRepo.findById(dto.getPprProjectGlanceId())
-	                .orElseThrow(() ->
+	    PprProjectGlance projectGlance = pprProjectGlanceRepo.findById(dto.getPprProjectGlanceId()).orElseThrow(() ->
 	                    new RuntimeException("Project Glance not found"));
 
 	    // Update basic fields
@@ -149,37 +148,53 @@ public class PprProjectGlanceService {
 	    projectGlance.setComments(dto.getComments());
 
 	    // Update project type
-	    ProjectType projectType =
-	            projectTypeRepo.findById(dto.getProjectType())
-	                .orElseThrow(() ->
+	    ProjectType projectType = projectTypeRepo.findById(dto.getProjectType()).orElseThrow(() ->
 	                    new RuntimeException("Project Type not found"));
-
 	    projectGlance.setProjectType(projectType);
 
 	    // Update Micro Watershed
-	    MicroWatershed mw =
-	            microWatershedRepo.findById(dto.getMwId())
-	                .orElseThrow(() ->
+	    MicroWatershed mw = microWatershedRepo.findById(dto.getMwId()).orElseThrow(() ->
 	                    new RuntimeException("Micro Watershed not found"));
-
 	    projectGlance.setMicroWatershed(mw);
+	    
+	    MPiaDetails pia = piaRepository.findById(projectGlance.getPia().getPiaId()).orElseThrow(() ->
+        				new RuntimeException("Pia not found"));
+	    pia.setPiaName(dto.getPiaName());
+	    pia.setAddress(dto.getAddress());
+	    pia.setUpdatedBy(userid);
+	    piaRepository.save(pia);
+	    
+	    projectGlance.getVillages().clear();
+	    
+	    if (dto.getVillages() != null) {
+	        for (Integer vcode : dto.getVillages()) {
+	            MVillage village = villageRepo.findById(vcode).orElseThrow(() ->
+	                        new RuntimeException("Village not found: " + vcode));
 
-	    // Update PIA
-	    // handle according to whether you want to create/reuse MPiaDetails
-	    // ...
-
+	            PprVillage pprVillage = new PprVillage();
+	            pprVillage.setVillage(village);
+	            pprVillage.setProjectGlance(projectGlance);
+	            pprVillage.setCreatedBy(userid);
+	            projectGlance.getVillages().add(pprVillage);
+	        }
+	    }
 	    pprProjectGlanceRepo.save(projectGlance);
-
-	    // Update villages
-	    // ...
 	}
 	
 	@Transactional
 	public void deletePprProjectGlance(Integer id) {
-	    PprProjectGlance data = pprProjectGlanceRepo.findById(id).orElse(null);
+	    PprProjectGlance data = pprProjectGlanceRepo.findById(id).orElseThrow(() ->
+					new RuntimeException("Project Glance not found"));
 	    if (data != null) {
-	    	pprVillageRepo.deleteByProjectGlance_PprProjectGlanceId(id);
+	    	MPiaDetails pia = piaRepository.findById(data.getPia().getPiaId()).orElseThrow(() -> new RuntimeException("Pia not found"));
+	    	List<PprVillage> villList = pprVillageRepo.findByProjectGlance_PprProjectGlanceId(id);
+		    for(PprVillage village : villList) {
+		    	if(village != null)
+		    		pprVillageRepo.delete(village);
+		    }
 	        pprProjectGlanceRepo.delete(data);
+	        if(pia != null)
+	        	piaRepository.delete(pia);
 	    }
 	}
 	

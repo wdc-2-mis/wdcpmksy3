@@ -144,8 +144,8 @@
 	                console.error("Village not found for vcode:", villageId);
 	                return;
 	            }
-	            const gcode = village.gramPanchayat.gcode;
-	            const bcode = village.gramPanchayat.block.bcode;
+				const gcode = village.gcode;
+				const bcode = village.bcode;
 
 	            // Set block
 	            document.getElementById("editBlock").value = bcode;
@@ -267,7 +267,7 @@
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold"> Name of Block</label>
 						<div class="col-md-5">
-							<select class="form-select" id="block" name="block">
+							<select class="form-select" id="block" name="block" required>
 								<option value="">--Select--</option>
 								<option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}"> </option>
 							</select>
@@ -277,7 +277,7 @@
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold"> Name of Gram Panchayat</label>
 						<div class="col-md-5">
-							<select class="form-select" id="grampanchayat" name="grampanchayat">
+							<select class="form-select" id="grampanchayat" name="grampanchayat" required>
 								<option value="">--Select--</option>
 							</select>
 						</div>
@@ -286,7 +286,7 @@
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold"> Villages</label>
 						<div class="col-md-5">
-							<select class="form-select" id="villages" name="villages" multiple size="6"></select>
+							<select class="form-select" id="villages" name="villages" multiple size="6" required></select>
 							<small class="text-muted"> Hold Ctrl and select multiple villages</small>
 						</div>
 					</div>
@@ -294,7 +294,7 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold">Name of Micro-Watershed (Code)</label>
 						<div class="col-md-5">
-							<select class="form-select" id="mwId" name="mwId">
+							<select class="form-select" id="mwId" name="mwId" required>
 								<option value="">--Select--</option>
 								<option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"> </option>
 							</select>
@@ -304,7 +304,7 @@
 					<div class="row mb-3 align-items-center">
 					    <label class="col-md-3 fw-bold"> Reason for Selection of watershed </label>
 					    <div class="col-md-3">
-					        <input type="text" class="form-control" name="selectionReason" id="selectionReason">
+					        <input type="text" class="form-control" name="selectionReason" id="selectionReason" required>
 					    </div>
 					</div>										
 
@@ -335,14 +335,14 @@
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold"> Name of PIA </label>
 						<div class="col-md-3">
-							<input type="text" class="form-control" name="piaName" id="piaName">
+							<input type="text" class="form-control" name="piaName" id="piaName" required>
 						</div>
 					</div>
 					
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold"> Address of PIA </label>
 						<div class="col-md-3">
-							<input type="text" class="form-control" name="address" id="address">
+							<input type="text" class="form-control" name="address" id="address" required>
 						</div>
 					</div>
 					
@@ -439,7 +439,7 @@
 		            </td>
 		        </tr>
 		        <tr th:if="${#lists.isEmpty(pprProjectAtGlanceList)}">
-		            <td colspan="12" class="text-center text-danger">
+		            <td colspan="15" class="text-center text-danger">
 		                No records found.
 		            </td>
 		        </tr>
@@ -458,7 +458,7 @@
 		            </div>
 
 		            <div class="modal-body">
-		                <form th:action="@{/updatePprProposedProject}" method="post" id="editProjectForm">
+		                <form th:action="@{/updatePprProjectAtGlance}" method="post" id="editProjectForm">
 		                    <!-- ID -->
 		                    <input type="hidden" id="editPprProjectGlanceId" name="pprProjectGlanceId">
 		                    <!-- PPR ID -->
@@ -475,7 +475,7 @@
 		                        <label class="col-md-3 fw-bold"> Type of Project </label>
 		                        <div class="col-md-9"> 
 									<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
-										<input class="form-check-input editProjectType" type="radio" name="editProjectType"
+										<input class="form-check-input editProjectType" type="radio" name="projectType"
 											th:id="'editProject' + ${project.projectTypeId}" th:value="${project.projectTypeId}">
 										<label class="form-check-label" th:for="'editProject' + ${project.projectTypeId}" th:text="${project.projectType}">
 										</label>
@@ -532,21 +532,21 @@
 		                    <div class="row mb-3 align-items-center">
 		                        <label class="col-md-3 fw-bold"> Area of Project (ha) </label>
 		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" id="editProjectArea" name="projectArea">
+		                            <input type="text" class="form-control" id="editProjectArea" name="projectArea" oninput="validateDecimal(this,11,4)" required>
 		                        </div>
 		                    </div>
 		                    <!-- Proposed Area -->
 		                    <div class="row mb-3 align-items-center">
 		                        <label class="col-md-3 fw-bold"> Area Proposed to be treated (ha) </label>
 		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" id="editProposedArea" name="proposedArea">
+		                            <input type="text" class="form-control" id="editProposedArea" name="proposedArea" oninput="validateDecimal(this,11,4)" required>
 								</div>
 		                    </div>
 		                    <!-- Project Cost -->
 		                    <div class="row mb-3 align-items-center">
 		                        <label class="col-md-3 fw-bold"> Project Cost (Rs in Lakh) </label>
 		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" id="editProjectCost" name="projectCost">
+		                            <input type="text" class="form-control" id="editProjectCost" name="projectCost" oninput="validateDecimal(this,11,4)" required>
 		                        </div>
 		                    </div>
 		                    <!-- PIA Name -->
@@ -570,14 +570,15 @@
 		                            <input type="text" class="form-control" id="editComments" name="comments">
 		                        </div>
 		                    </div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
+								<button type="submit" name="action" value="D" class="btn btn-primary">
+									<i class="fas fa-save"></i> Update
+								</button>
+							</div>
 		                </form>
 		            </div>
-		            <div class="modal-footer">
-		                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
-		                <button type="button" class="btn btn-primary" id="updateProjectBtn">
-		                    <i class="fas fa-save"></i> Update
-		                </button>
-		            </div>
+		            
 		        </div>
 		    </div>
 		</div>		
