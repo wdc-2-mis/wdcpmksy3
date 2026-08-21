@@ -17,6 +17,9 @@
 
 <script>
 
+let existingEmploymentTypeIds = [];
+let existingStatus = null;
+
 document.addEventListener("DOMContentLoaded", function() {
 
     const district = document.getElementById("district");
@@ -26,9 +29,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("employmentForm");
     const saveBtn = document.getElementById("saveBtn");
 
-    // =========================================================
-    // CALCULATE TOTAL
-    // =========================================================
+    /* =========================================================
+     CALCULATE TOTAL
+     ========================================================= */
     function calculateTotal(row) {
         const sc = parseInt(row.querySelector('input[name$=".sc"]').value) || 0;
         const st = parseInt(row.querySelector('input[name$=".st"]').value) || 0;
@@ -39,9 +42,140 @@ document.addEventListener("DOMContentLoaded", function() {
         return total;
     }
 
-    // =========================================================
-    // DISTRICT -> PROJECT
-    // =========================================================
+    /* =========================================================
+     CLEAR ROW DATA
+     ========================================================= */
+    function clearRowData(row) {
+        const inputs = row.querySelectorAll('input[type="text"]');
+        inputs.forEach(function(input) {
+            input.value = '';
+        });
+        row.classList.remove('duplicate-row');
+    }
+
+    /* =========================================================
+     FIELD VALIDATION WITH CUSTOM ALERTS
+     ========================================================= */
+    function validateFields(row) {
+        const fields = [
+            { input: row.querySelector('input[name$=".sc"]'), name: "SC" },
+            { input: row.querySelector('input[name$=".st"]'), name: "ST" },
+            { input: row.querySelector('input[name$=".others"]'), name: "Others" },
+            { input: row.querySelector('input[name$=".women"]'), name: "Women" }
+        ];
+        
+        let hasError = false;
+        let firstInvalidField = null;
+        let fieldName = "";
+        
+        // Only validate if at least one field has data
+        let hasAnyData = false;
+        fields.forEach(function(item) {
+            if (item.input && item.input.value.trim() !== "") {
+                hasAnyData = true;
+            }
+        });
+        
+        if (!hasAnyData) {
+            return true;
+        }
+        
+        for (const item of fields) {
+            if (!item.input) continue;
+            const value = item.input.value.trim();
+            if (value === "" || isNaN(parseInt(value))) {
+                hasError = true;
+                firstInvalidField = item.input;
+                fieldName = item.name;
+                break;
+            }
+        }
+        
+        if (hasError) {
+            alert("Please enter " + fieldName + ".");
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.select();
+            }
+            return false;
+        }
+        
+        return true;
+    }
+
+    /* =========================================================
+     CHECK EXISTING EMPLOYMENT TYPES FOR THE VILLAGE
+     ========================================================= */
+    function checkExistingEmploymentTypes(pprId, vcode, mwId) {
+        if (!pprId || !vcode || !mwId) {
+            existingEmploymentTypeIds = [];
+            existingStatus = null;
+            saveBtn.disabled = false;
+            document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
+                clearRowData(row);
+            });
+            return;
+        }
+
+        saveBtn.disabled = true;
+
+        fetch("/getEmploymentVillageStatus?pprId=" + pprId + "&vcode=" + vcode + "&mwId=" + mwId)
+            .then(response => response.json())
+            .then(data => {
+                existingStatus = data.status;
+                
+                document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
+                    clearRowData(row);
+                });
+                
+                if (data.status === "C") {
+                    alert("This village has already been completed. You cannot add new records.");
+                    saveBtn.disabled = true;
+                    existingEmploymentTypeIds = [];
+                } else if (data.status === "D") {
+                    if (data.records && data.records.length > 0) {
+                        existingEmploymentTypeIds = data.records.map(r => r.employmentTypeId);
+                        const allTypes = [1, 2, 3];
+                        const missingTypes = allTypes.filter(id => !existingEmploymentTypeIds.includes(id));
+                        
+                        if (missingTypes.length === 0) {
+                            alert("Draft already exists for all employment types. Please edit existing records.");
+                            saveBtn.disabled = true;
+                        } else {
+                            const typeNames = getTypeNames(missingTypes);
+                            alert("Draft exists for some employment types. You can add data for: " + typeNames);
+                            saveBtn.disabled = false;
+                        }
+                    } else {
+                        existingEmploymentTypeIds = [];
+                        saveBtn.disabled = false;
+                    }
+                } else {
+                    existingEmploymentTypeIds = [];
+                    saveBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error("Village Status Check Error:", error);
+                saveBtn.disabled = true;
+            });
+    }
+
+    /* =========================================================
+     GET TYPE NAMES BY IDS
+     ========================================================= */
+    function getTypeNames(typeIds) {
+        const typeMap = {
+            1: "No of Man-days",
+            2: "Self Employment",
+            3: "Wage Employment"
+        };
+        return typeIds.map(id => typeMap[id] || id).join(", ");
+    }
+
+    /* =========================================================
+     DISTRICT -> PROJECT
+     ========================================================= */
     district.addEventListener("change", function() {
         let districtId = this.value;
         
@@ -72,9 +206,9 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => console.error("Project Loading Error:", error));
     });
 
-    // =========================================================
-    // PROJECT -> MICRO WATERSHED
-    // =========================================================
+    /* =========================================================
+     PROJECT -> MICRO WATERSHED
+     ========================================================= */
     project.addEventListener("change", function() {
         let pprId = this.value;
 
@@ -98,9 +232,9 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => console.error("Micro Watershed Loading Error:", error));
     });
 
-    // =========================================================
-    // WATERSHED -> VILLAGE
-    // =========================================================
+    /* =========================================================
+     WATERSHED -> VILLAGE
+     ========================================================= */
     watershed.addEventListener("change", function() {
         let pprId = project.value;
 
@@ -123,45 +257,111 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => console.error("Village Loading Error:", error));
     });
 
-    // =========================================================
-    // VILLAGE STATUS CHECK
-    // =========================================================
+    /* =========================================================
+     VILLAGE STATUS CHECK
+     ========================================================= */
     village.addEventListener("change", function() {
         const pprId = project.value;
         const vcode = this.value;
         const mwId = watershed.value;
 
         if (!pprId || !vcode || !mwId) {
+            existingEmploymentTypeIds = [];
+            existingStatus = null;
             saveBtn.disabled = false;
+            document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
+                clearRowData(row);
+            });
             return;
         }
 
-        saveBtn.disabled = true;
-
-        fetch("/getEmploymentVillageStatus?pprId=" + pprId + "&vcode=" + vcode + "&mwId=" + mwId)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "C") {
-                    alert("This village has already been completed. You cannot create another record.");
-                    village.value = "";
-                    saveBtn.disabled = true;
-                } else if (data.status === "D") {
-                    alert("A draft already exists for this village. Please edit the existing draft instead.");
-                    village.value = "";
-                    saveBtn.disabled = true;
-                } else {
-                    saveBtn.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error("Village Status Check Error:", error);
-                saveBtn.disabled = true;
-            });
+        checkExistingEmploymentTypes(pprId, vcode, mwId);
     });
 
-    // =========================================================
-    // LOAD EMPLOYMENT TABLE
-    // =========================================================
+    /* =========================================================
+     FORM SUBMIT VALIDATION
+     ========================================================= */
+    if (form) {
+        form.addEventListener("submit", function(e) {
+            // Check required dropdowns
+            const requiredFields = form.querySelectorAll("select[required]");
+            
+            for (const field of requiredFields) {
+                if (field.value.trim() === "") {
+                    e.preventDefault();
+                    let fieldName = field.id.charAt(0).toUpperCase() + field.id.slice(1);
+                    alert("Please select " + fieldName);
+                    field.focus();
+                    return;
+                }
+            }
+
+            // Validate each row with data
+            const rows = document.querySelectorAll("#employmentEntryBody tr");
+            let hasValidData = false;
+            let duplicateTypesEntered = [];
+            let rowsToClear = [];
+
+            for (const row of rows) {
+                const typeIdInput = row.querySelector('input[name$=".employmentTypeId"]');
+                if (!typeIdInput) continue;
+                
+                const typeId = parseInt(typeIdInput.value);
+                const sc = parseInt(row.querySelector('input[name$=".sc"]').value) || 0;
+                const st = parseInt(row.querySelector('input[name$=".st"]').value) || 0;
+                const others = parseInt(row.querySelector('input[name$=".others"]').value) || 0;
+                const women = parseInt(row.querySelector('input[name$=".women"]').value) || 0;
+                
+                const hasData = sc > 0 || st > 0 || others > 0 || women > 0;
+                
+                if (hasData) {
+                    // Validate fields
+                    const isValid = validateFields(row);
+                    if (!isValid) {
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    hasValidData = true;
+                    
+                    if (existingEmploymentTypeIds.includes(typeId)) {
+                        duplicateTypesEntered.push({ typeId: typeId, row: row });
+                        rowsToClear.push(row);
+                    }
+                }
+            }
+
+            rowsToClear.forEach(function(row) {
+                clearRowData(row);
+            });
+
+            if (!hasValidData) {
+                e.preventDefault();
+                alert("Please enter at least one value for SC, ST, Others, or Women.");
+                return;
+            }
+
+            if (duplicateTypesEntered.length > 0) {
+                e.preventDefault();
+                const typeNames = duplicateTypesEntered.map(item => {
+                	
+                    const typeMap = { 
+                    		1: "Wage Employment (No. of Man-days)", 
+                    		2: "Self Employment (No. of Beneficiaries)", 
+                    		3: "Wage Employment (No. of Beneficiaries)" };
+                    
+                    return typeMap[item.typeId] || item.typeId;
+                }).join(", ");
+                alert("You cannot enter data for: " + typeNames + 
+                	". These types already have draft records. Please edit existing records instead.");
+                return;
+            }
+        });
+    }
+
+    /* =========================================================
+     LOAD EMPLOYMENT TABLE
+     ========================================================= */
     function loadEmploymentTable(dcode) {
         const tableDiv = document.getElementById("employmentListDiv");
         const tableBody = document.getElementById("employmentTableBody");
@@ -273,9 +473,9 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
-    // =========================================================
-    // EDIT BUTTON CLICK
-    // =========================================================
+    /* =========================================================
+     EDIT BUTTON CLICK
+     ========================================================= */
     document.addEventListener("click", function(e) {
         const btn = e.target.closest(".edit-btn");
         if (!btn) return;
@@ -300,9 +500,9 @@ document.addEventListener("DOMContentLoaded", function() {
         new bootstrap.Modal(document.getElementById("editModal")).show();
     });
 
-    // =========================================================
-    // CALCULATE TOTAL IN EDIT MODAL
-    // =========================================================
+    /* =========================================================
+     CALCULATE TOTAL IN EDIT MODAL
+     ========================================================= */
     document.querySelectorAll('#editSc, #editSt, #editOthers, #editWomen').forEach(function(input) {
         input.addEventListener('input', function() {
             const sc = parseInt(document.getElementById('editSc').value) || 0;
@@ -312,43 +512,6 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('editTotal').value = sc + st + others + women;
         });
     });
-
-    // =========================================================
-    // FORM VALIDATION
-    // =========================================================
-    if (form) {
-        form.addEventListener("submit", function(e) {
-            const requiredFields = form.querySelectorAll("select[required]");
-            
-            for (const field of requiredFields) {
-                if (field.value.trim() === "") {
-                    e.preventDefault();
-                    let fieldName = field.id.charAt(0).toUpperCase() + field.id.slice(1);
-                    alert("Please select " + fieldName);
-                    field.focus();
-                    return;
-                }
-            }
-
-            const rows = document.querySelectorAll("#employmentEntryBody tr");
-            let hasData = false;
-            rows.forEach(function(row) {
-                const sc = parseInt(row.querySelector('input[name$=".sc"]').value) || 0;
-                const st = parseInt(row.querySelector('input[name$=".st"]').value) || 0;
-                const others = parseInt(row.querySelector('input[name$=".others"]').value) || 0;
-                const women = parseInt(row.querySelector('input[name$=".women"]').value) || 0;
-                if (sc > 0 || st > 0 || others > 0 || women > 0) {
-                    hasData = true;
-                }
-            });
-
-            if (!hasData) {
-                e.preventDefault();
-                alert("Please enter at least one value for SC, ST, Others, or Women.");
-                return;
-            }
-        });
-    }
 
     document.addEventListener('input', function(e) {
         if (e.target.matches('input[name$=".sc"], input[name$=".st"], input[name$=".others"], input[name$=".women"]')) {
@@ -364,6 +527,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function validateNumber(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
 }
+
 </script>
 
 </head>
@@ -457,24 +621,20 @@ function validateNumber(input) {
                                         <input type="hidden" name="employmentList[0].employmentTypeId" value="1">
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[0].sc" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[0].sc" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[0].st" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[0].st" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[0].others" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[0].others" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[0].women" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[0].women" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[0].total" 
@@ -490,24 +650,20 @@ function validateNumber(input) {
                                         <input type="hidden" name="employmentList[1].employmentTypeId" value="3">
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[1].sc" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[1].sc" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[1].st" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[1].st" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[1].others" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[1].others" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[1].women" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[1].women" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[1].total" 
@@ -523,24 +679,20 @@ function validateNumber(input) {
                                         <input type="hidden" name="employmentList[2].employmentTypeId" value="2">
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[2].sc" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[2].sc" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[2].st" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[2].st" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[2].others" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[2].others" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
-                                        <input type="text" name="employmentList[2].women" 
-                                               class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)">
+                                        <input type="text" name="employmentList[2].women" class="form-control form-control-sm employment-input"
+                                               oninput="validateNumber(this)" autocomplete="off" required >
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[2].total" 
@@ -642,36 +794,32 @@ function validateNumber(input) {
                             <div class="row mb-2">
                                 <div class="col-md-4"><label>SC</label></div>
                                 <div class="col-md-4">
-                                    <input type="text" id="editSc" name="sc"
-                                           class="form-control form-control-sm" 
-                                           oninput="validateNumber(this)">
+                                    <input type="text" id="editSc" name="sc" class="form-control form-control-sm"
+                                           oninput="validateNumber(this)" autocomplete="off" required >
                                 </div>
                             </div>
 
                             <div class="row mb-2">
                                 <div class="col-md-4"><label>ST</label></div>
                                 <div class="col-md-4">
-                                    <input type="text" id="editSt" name="st"
-                                           class="form-control form-control-sm"
-                                           oninput="validateNumber(this)">
+                                    <input type="text" id="editSt" name="st" class="form-control form-control-sm"
+                                           oninput="validateNumber(this)" autocomplete="off" required >
                                 </div>
                             </div>
 
                             <div class="row mb-2">
                                 <div class="col-md-4"><label>Others</label></div>
                                 <div class="col-md-4">
-                                    <input type="text" id="editOthers" name="others"
-                                           class="form-control form-control-sm"
-                                           oninput="validateNumber(this)">
+                                    <input type="text" id="editOthers" name="others" class="form-control form-control-sm"
+                                           oninput="validateNumber(this)" autocomplete="off" required >
                                 </div>
                             </div>
 
                             <div class="row mb-2">
                                 <div class="col-md-4"><label>Women</label></div>
                                 <div class="col-md-4">
-                                    <input type="text" id="editWomen" name="women"
-                                           class="form-control form-control-sm"
-                                           oninput="validateNumber(this)">
+                                    <input type="text" id="editWomen" name="women" class="form-control form-control-sm"
+                                           oninput="validateNumber(this)" autocomplete="off" required >
                                 </div>
                             </div>
 
@@ -697,3 +845,4 @@ function validateNumber(input) {
     </div>
 </body>
 </html>
+

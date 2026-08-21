@@ -1,5 +1,6 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,12 +120,25 @@ public class PPREmploymentGenerationController {
         List<PPREmploymentGeneration> existingRecords = employmentService.findExistingRecords(pprId, vcode, mwId);
         
         Character status = null;
+        
+        List<Map<String, Object>> records = new ArrayList<>();
+        
         if (!existingRecords.isEmpty()) {
             status = existingRecords.get(0).getStatus();
+            
+            for (PPREmploymentGeneration record : existingRecords) {
+                Map<String, Object> recordMap = new HashMap<>();
+                recordMap.put("employmentTypeId", record.getEmploymentType().getEmploymentTypeId());
+                recordMap.put("employmentTypeName", record.getEmploymentType().getEmploymentTypeName());
+                recordMap.put("status", record.getStatus());
+                records.add(recordMap);
+            }
+            
         }
         
         result.put("status", status);
         result.put("exists", !existingRecords.isEmpty());
+        result.put("records", records);
         
         return result;
     }
@@ -147,8 +161,7 @@ public class PPREmploymentGenerationController {
             List<PPREmploymentGenerationDTO> employmentList = form.getEmploymentList();
 
             // Check for duplicates
-            List<Integer> duplicateTypes = employmentService.findDuplicateEmploymentTypes(
-                    project, village, watershed, employmentList);
+            List<Integer> duplicateTypes = employmentService.findDuplicateEmploymentTypes(project, village, watershed, employmentList);
 
             if (!duplicateTypes.isEmpty()) {
                 String typeNames = employmentService.getEmploymentTypeNames(duplicateTypes);

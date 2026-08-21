@@ -14,11 +14,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PPREmploymentGeneration;
 public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmploymentGeneration, Integer> {
 
 	boolean existsByPprIdPprIdAndVillageVcodeAndMicroWatershedMwIdAndEmploymentTypeEmploymentTypeId(
-            Integer pprId,
-            Integer vcode,
-            Integer mwId,
-            Integer employmentTypeId
-    );
+            Integer pprId, Integer vcode, Integer mwId, Integer employmentTypeId);
 
 
     @Query(value = """

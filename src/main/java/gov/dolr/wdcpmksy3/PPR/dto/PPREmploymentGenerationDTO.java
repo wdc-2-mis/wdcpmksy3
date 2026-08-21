@@ -16,9 +16,6 @@ public class PPREmploymentGenerationDTO {
 
     private Integer women;
     
-//  private Integer total;
-    
-    
     
 	
 
