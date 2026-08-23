@@ -50,6 +50,23 @@ public class PprProjectGlance {
     @Column(name="status", length = 1)
     private Character status;
     
+    @Column(name = "request_ip", length = 20)
+    private String requestIp;
+
+    @Column(name = "created_by", length = 20)
+    private String createdBy;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date", insertable = false, updatable = false)
+    private Date createdDate;
+
+    @Column(name = "updated_by", length = 20)
+    private String updatedBy;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "updated_date")
+    private Date updatedDate;
+    
     @OneToMany(mappedBy="projectGlance",cascade=CascadeType.ALL, orphanRemoval = true)
     private List<PprVillage> villages = new ArrayList<>();
 
@@ -147,6 +164,46 @@ public class PprProjectGlance {
 
 	public void setStatus(Character status) {
 		this.status = status;
+	}
+
+	public String getRequestIp() {
+		return requestIp;
+	}
+
+	public void setRequestIp(String requestIp) {
+		this.requestIp = requestIp;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public Date getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
 	}
 
 

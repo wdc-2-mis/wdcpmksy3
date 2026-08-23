@@ -89,6 +89,8 @@ public class PprProjectGlanceService {
 	    projectGlance.setProjectCost(dto.getProjectCost());
 	    projectGlance.setComments(dto.getComments());
 	    projectGlance.setStatus('D');
+	    projectGlance.setRequestIp(requestIp);
+	    projectGlance.setCreatedBy(requestIp);
 	    // 6. Create PprVillage records
 	    List<PprVillage> villageList = new ArrayList<>();
 	    if (dto.getVillages() != null) {

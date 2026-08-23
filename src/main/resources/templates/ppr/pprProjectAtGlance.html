@@ -208,6 +208,205 @@
 	        });
 	    }
 	});
+	
+	// =========================
+	// FORM VALIDATION
+	// =========================
+
+	document.addEventListener("DOMContentLoaded", function () {
+		function showError(field, message) {
+			field.classList.add("is-invalid");
+			let error = field.parentElement.querySelector(".validation-error");
+			if (!error) {
+				error = document.createElement("div");
+				error.className = "validation-error text-danger small mt-1";
+				field.parentElement.appendChild(error);
+			}
+			error.textContent = message;
+		}
+		function removeError(field) {
+			field.classList.remove("is-invalid");
+			let error = field.parentElement.querySelector(".validation-error");
+			if (error) {
+				error.remove();
+			}
+		}
+		function validateRequiredField(field, message) {
+			if (!field || field.value.trim() === "") {
+				showError(field, message);
+				return false;
+			}
+			removeError(field);
+			return true;
+		}
+		function validateSelect(field, message) {
+			if (!field || field.value === "") {
+				showError(field, message);
+				return false;
+			}
+			removeError(field);
+			return true;
+		}
+		function validateVillages(field, message) {
+			if (!field || field.selectedOptions.length === 0) {
+				showError(field, message);
+				return false;
+			}
+			removeError(field);
+			return true;
+		}
+		function validateProjectType(form, message) {
+			const projectTypes = form.querySelectorAll('input[name="projectType"]');
+			let selected = false;
+			projectTypes.forEach(function (radio) {
+				if (radio.checked) {
+					selected = true;
+				}
+			});
+			const container = projectTypes[0].closest(".col-md-9");
+			let error = container.querySelector(".validation-error");
+			if (!selected) {
+				if (!error) {
+					error = document.createElement("div");
+					error.className = "validation-error text-danger small mt-1";
+					container.appendChild(error);
+				}
+				error.textContent = message;
+				return false;
+			}
+			if (error) {
+				error.remove();
+			}
+			return true;
+		}
+		function validateDecimalField(field, message) {
+			if (!field || field.value.trim() === "") {
+				showError(field, message);
+				return false;
+			}
+			if (isNaN(field.value) || Number(field.value) <= 0) {
+				showError(field, "Please enter a valid value.");
+				return false;
+			}
+			removeError(field);
+			return true;
+		}
+		// =========================
+		// SAVE FORM VALIDATION
+		// =========================
+		function validateSaveForm() {
+			const form = document.getElementById("projectForm");
+			let valid = true;
+			if (!validateSelect(document.getElementById("district"), "Please select District.")) {
+				valid = false;
+			}
+			if (!validateProjectType(form, "Please select Type of Project.")) {
+				valid = false;
+			}
+			if (!validateSelect(document.getElementById("block"), "Please select Block.")) {
+				valid = false;
+			}
+			if (!validateSelect(document.getElementById("grampanchayat"), "Please select Gram Panchayat.")) {
+				valid = false;
+			}
+			if (!validateVillages(document.getElementById("villages"), "Please select at least one Village.")) {
+				valid = false;
+			}
+			if (!validateSelect(document.getElementById("mwId"), "Please select Micro-Watershed.")) {
+				valid = false;
+			}
+			if (!validateRequiredField(document.getElementById("selectionReason"), "Please enter Reason for Selection of Watershed.")) {
+				valid = false;
+			}
+			if (!validateDecimalField(document.getElementById("projectArea"), "Please enter Area of Project.")) {
+				valid = false;
+			}
+			if (!validateDecimalField(document.getElementById("proposedArea"), "Please enter Area Proposed to be treated.")) {
+				valid = false;
+			}
+			if (!validateDecimalField(document.getElementById("projectCost"), "Please enter Project Cost.")) {
+				valid = false;
+			}
+			if (!validateRequiredField(document.getElementById("piaName"), "Please enter Name of PIA.")) {
+				valid = false;
+			}
+			if (!validateRequiredField(document.getElementById("address"), "Please enter Address of PIA.")) {
+				valid = false;
+			}
+			return valid;
+		}
+		// =========================
+		// UPDATE FORM VALIDATION
+		// =========================
+		function validateEditForm() {
+			const form = document.getElementById("editProjectForm");
+			let valid = true;
+			if (!validateProjectType(form, "Please select Type of Project.")) {
+				valid = false;
+			}
+			if (!validateSelect(document.getElementById("editBlock"), "Please select Block.")) {
+				valid = false;
+			}
+			if (!validateSelect(document.getElementById("editGrampanchayat"), "Please select Gram Panchayat.")) {
+				valid = false;
+			}
+			if (!validateVillages(document.getElementById("editVillage"), "Please select at least one Village.")) {
+				valid = false;
+			}
+			if (!validateSelect(document.getElementById("editMicroWatershed"), "Please select Micro-Watershed.")) {
+				valid = false;
+			}
+			if (!validateRequiredField(document.getElementById("editSelectionReason"), "Please enter Reason for Selection of Watershed.")) {
+				valid = false;
+			}
+			if (!validateDecimalField(document.getElementById("editProjectArea"), "Please enter Area of Project.")) {
+				valid = false;
+			}
+			if (!validateDecimalField(document.getElementById("editProposedArea"), "Please enter Area Proposed to be treated.")) {
+				valid = false;
+			}
+			if (!validateDecimalField(document.getElementById("editProjectCost"), "Please enter Project Cost.")) {
+				valid = false;
+			}
+			if (!validateRequiredField(document.getElementById("editPiaName"), "Please enter Name of PIA.")) {
+				valid = false;
+			}
+			if (!validateRequiredField(document.getElementById("editAddress"), "Please enter Address of PIA.")) {
+				valid = false;
+			}
+			return valid;
+		}
+		// =========================
+		// SAVE SUBMIT
+		// =========================
+		const projectForm = document.getElementById("projectForm");
+		if (projectForm) {
+			projectForm.addEventListener("submit", function (event) {
+				if (!validateSaveForm()) {
+					event.preventDefault();
+					const firstError = projectForm.querySelector(".is-invalid");
+					if (firstError) {
+						firstError.focus();
+					}
+				}
+			});
+		}
+		// =========================
+		// UPDATE SUBMIT
+		// =========================
+		const editProjectForm = document.getElementById("editProjectForm");
+		if (editProjectForm) {
+			editProjectForm.addEventListener("submit", function (event) {
+				if (!validateEditForm()) {
+					event.preventDefault();
+					const firstError = editProjectForm.querySelector(".is-invalid");
+					if (firstError) {
+						firstError.focus();
+					}
+				}
+			});
+		}
+	});
 
 </script>
 	
@@ -227,7 +426,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 	        <div class="card-body">
-	            <form th:action="@{/savePprProjectAtGlance}" method="post" id="projectForm">
+	            <form th:action="@{/savePprProjectAtGlance}" method="post" id="projectForm" novalidate>
 	                
 					<input type="hidden" id="pprId" name="pprId" th:value="${pprId}">
 					<div class="row mb-3 align-items-center">
@@ -236,118 +435,118 @@
 							<input type="text" class="form-control" id="state" name="state" th:value="${state}" readonly>
 						</div>
 					</div>
-	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> District Name</label>
+					<div class="row mb-3 align-items-center">
+						<label class="col-md-3 fw-bold">District Name <span class="required">*</span></label>
 						<div class="col-md-5">
-							<select class="form-select" id="district" name="district">
+							<select class="form-select" id="district" name="district" required>
 								<option value="">--Select--</option>
 								<option th:each="d : ${districtList}" th:value="${d.dcode}" th:text="${d.distName}" 
-									th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"> </option>
+									th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"></option>
 							</select>
 						</div>
-	                </div>
+					</div>
 
 					<div class="row mb-3 align-items-center">
-					    <label class="col-md-3 fw-bold">Name of the Project</label>
+						<label class="col-md-3 fw-bold">Name of the Project</label>
 						<div class="col-md-5">
 							<input type="text" class="form-control" id="project" name="project" th:value="${project}" readonly>
 						</div>
 					</div>
-					
+
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Type of Project </label>
+						<label class="col-md-3 fw-bold">Type of Project <span class="required">*</span></label>
 						<div class="col-md-9">
 							<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
-								<input class="form-check-input" type="radio" name="projectType" th:id="'project'+${project.projectTypeId}" th:value="${project.projectTypeId}"/>
+								<input class="form-check-input" type="radio" name="projectType" th:id="'project'+${project.projectTypeId}" th:value="${project.projectTypeId}" required/>
 								<label class="form-check-label" th:for="'project'+${project.projectTypeId}" th:text="${project.projectType}"></label>
 							</div>
 						</div>
 					</div>
 
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Name of Block</label>
+						<label class="col-md-3 fw-bold">Name of Block <span class="required">*</span></label>
 						<div class="col-md-5">
 							<select class="form-select" id="block" name="block" required>
 								<option value="">--Select--</option>
-								<option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}"> </option>
+								<option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}"></option>
 							</select>
 						</div>
 					</div>
-					
+
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Name of Gram Panchayat</label>
+						<label class="col-md-3 fw-bold">Name of Gram Panchayat <span class="required">*</span></label>
 						<div class="col-md-5">
 							<select class="form-select" id="grampanchayat" name="grampanchayat" required>
 								<option value="">--Select--</option>
 							</select>
 						</div>
 					</div>
-					
+
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Villages</label>
+						<label class="col-md-3 fw-bold">Villages <span class="required">*</span></label>
 						<div class="col-md-5">
 							<select class="form-select" id="villages" name="villages" multiple size="6" required></select>
-							<small class="text-muted"> Hold Ctrl and select multiple villages</small>
+							<small class="text-muted">Hold Ctrl and select multiple villages</small>
 						</div>
 					</div>
 
-	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold">Name of Micro-Watershed (Code)</label>
+					<div class="row mb-3 align-items-center">
+						<label class="col-md-3 fw-bold">Name of Micro-Watershed (Code) <span class="required">*</span></label>
 						<div class="col-md-5">
 							<select class="form-select" id="mwId" name="mwId" required>
 								<option value="">--Select--</option>
-								<option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"> </option>
+								<option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"></option>
 							</select>
 						</div>
-	                </div>
+					</div>
 
 					<div class="row mb-3 align-items-center">
-					    <label class="col-md-3 fw-bold"> Reason for Selection of watershed </label>
-					    <div class="col-md-3">
-					        <input type="text" class="form-control" name="selectionReason" id="selectionReason" required>
-					    </div>
-					</div>										
+						<label class="col-md-3 fw-bold">Reason for Selection of watershed <span class="required">*</span></label>
+						<div class="col-md-3">
+							<input type="text" class="form-control" name="selectionReason" id="selectionReason" required>
+						</div>
+					</div>
 
-	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Area of Project (ha) </label>
-	                    <div class="col-md-3">
+					<div class="row mb-3 align-items-center">
+						<label class="col-md-3 fw-bold">Area of Project (ha) <span class="required">*</span></label>
+						<div class="col-md-3">
 							<input type="text" name="projectArea" id="projectArea" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
-	                    </div>
-	                </div>
-					
+								class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+						</div>
+					</div>
+
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Area proposed to be treated (ha) </label>
+						<label class="col-md-3 fw-bold">Area proposed to be treated (ha) <span class="required">*</span></label>
 						<div class="col-md-3">
 							<input type="text" name="proposedArea" id="proposedArea" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+								class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 						</div>
 					</div>
-					
+
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Project Cost (Rs in Lakh) </label>
+						<label class="col-md-3 fw-bold">Project Cost (Rs in Lakh) <span class="required">*</span></label>
 						<div class="col-md-3">
 							<input type="text" name="projectCost" id="projectCost" autocomplete="off" 
-							class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+								class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 						</div>
 					</div>
-					
+
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Name of PIA </label>
+						<label class="col-md-3 fw-bold">Name of PIA <span class="required">*</span></label>
 						<div class="col-md-3">
 							<input type="text" class="form-control" name="piaName" id="piaName" required>
 						</div>
 					</div>
-					
+
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Address of PIA </label>
+						<label class="col-md-3 fw-bold">Address of PIA <span class="required">*</span></label>
 						<div class="col-md-3">
 							<input type="text" class="form-control" name="address" id="address" required>
 						</div>
 					</div>
-					
+
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold"> Any Comments </label>
+						<label class="col-md-3 fw-bold">Any Comments</label>
 						<div class="col-md-3">
 							<input type="text" class="form-control" name="comments" id="comments">
 						</div>
@@ -458,7 +657,7 @@
 		            </div>
 
 		            <div class="modal-body">
-		                <form th:action="@{/updatePprProjectAtGlance}" method="post" id="editProjectForm">
+		                <form th:action="@{/updatePprProjectAtGlance}" method="post" id="editProjectForm" novalidate>
 		                    <!-- ID -->
 		                    <input type="hidden" id="editPprProjectGlanceId" name="pprProjectGlanceId">
 		                    <!-- PPR ID -->
@@ -471,105 +670,105 @@
 		                        </div>
 		                    </div>
 		                    <!-- Project Type -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Type of Project </label>
-		                        <div class="col-md-9"> 
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Type of Project <span class="required">*</span></label>
+								<div class="col-md-9"> 
 									<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
 										<input class="form-check-input editProjectType" type="radio" name="projectType"
-											th:id="'editProject' + ${project.projectTypeId}" th:value="${project.projectTypeId}">
+											th:id="'editProject' + ${project.projectTypeId}" th:value="${project.projectTypeId}" required>
 										<label class="form-check-label" th:for="'editProject' + ${project.projectTypeId}" th:text="${project.projectType}">
 										</label>
 									</div>
-								 </div>
-		                    </div>
-		                    <!-- Block -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Name of Block</label>
-		                        <div class="col-md-6">
-		                            <select class="form-select" id="editBlock">
-		                                <option value="">--Select--</option>
-		                                <option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}"> </option>
-		                            </select>
-		                        </div>
-		                    </div>
-		                    <!-- GP -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Name of Gram Panchayat </label>
-		                        <div class="col-md-6">
-		                            <select class="form-select" id="editGrampanchayat">
-		                                <option value="">--Select--</option>
-		                            </select>
-		                        </div>
-		                    </div>
-		                    <!-- Villages -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Villages </label>
-		                        <div class="col-md-6">
-		                            <select class="form-select" id="editVillage" name="villages" multiple size="6"></select>
-		                            <small class="text-muted">
-		                                Hold Ctrl and select multiple villages
-		                            </small>
-		                        </div>
-		                    </div>
-		                    <!-- Micro Watershed -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Name of Micro-Watershed (Code) </label>
-		                        <div class="col-md-6">
-		                            <select class="form-select" id="editMicroWatershed" name="mwId">
-		                                <option value="">--Select--</option>
-		                                <option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"> </option>
-		                            </select>
-		                        </div>
-		                    </div>
-		                    <!-- Selection Reason -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Reason for Selection of Watershed </label>
-		                        <div class="col-md-6">
-		                            <input type="text" class="form-control" id="editSelectionReason" name="selectionReason">
-		                        </div>
-		                    </div>
-		                    <!-- Project Area -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Area of Project (ha) </label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" id="editProjectArea" name="projectArea" oninput="validateDecimal(this,11,4)" required>
-		                        </div>
-		                    </div>
-		                    <!-- Proposed Area -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Area Proposed to be treated (ha) </label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" id="editProposedArea" name="proposedArea" oninput="validateDecimal(this,11,4)" required>
 								</div>
-		                    </div>
-		                    <!-- Project Cost -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Project Cost (Rs in Lakh) </label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" id="editProjectCost" name="projectCost" oninput="validateDecimal(this,11,4)" required>
-		                        </div>
-		                    </div>
-		                    <!-- PIA Name -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Name of PIA </label>
-		                        <div class="col-md-6">
-		                            <input type="text" class="form-control" id="editPiaName" name="piaName">
-		                        </div>
-		                    </div>
-		                    <!-- PIA Address -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Address of PIA </label>
-		                        <div class="col-md-6">
-		                            <input type="text" class="form-control" id="editAddress" name="address">
-		                        </div>
-		                    </div>
-		                    <!-- Comments -->
-		                    <div class="row mb-3 align-items-center">
-		                        <label class="col-md-3 fw-bold"> Any Comments </label>
-		                        <div class="col-md-6">
-		                            <input type="text" class="form-control" id="editComments" name="comments">
-		                        </div>
-		                    </div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Name of Block <span class="required">*</span></label>
+								<div class="col-md-6">
+									<select class="form-select" id="editBlock" required>
+										<option value="">--Select--</option>
+										<option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}"></option>
+									</select>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Name of Gram Panchayat <span class="required">*</span></label>
+								<div class="col-md-6">
+									<select class="form-select" id="editGrampanchayat" required>
+										<option value="">--Select--</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Villages <span class="required">*</span></label>
+								<div class="col-md-6">
+									<select class="form-select" id="editVillage" name="villages" multiple size="6" required></select>
+									<small class="text-muted">
+										Hold Ctrl and select multiple villages
+									</small>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Name of Micro-Watershed (Code) <span class="required">*</span></label>
+								<div class="col-md-6">
+									<select class="form-select" id="editMicroWatershed" name="mwId" required>
+										<option value="">--Select--</option>
+										<option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"></option>
+									</select>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Reason for Selection of Watershed <span class="required">*</span></label>
+								<div class="col-md-6">
+									<input type="text" class="form-control" id="editSelectionReason" name="selectionReason" required>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Area of Project (ha) <span class="required">*</span></label>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="editProjectArea" name="projectArea" oninput="validateDecimal(this,11,4)" required>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Area Proposed to be treated (ha) <span class="required">*</span></label>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="editProposedArea" name="proposedArea" oninput="validateDecimal(this,11,4)" required>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Project Cost (Rs in Lakh) <span class="required">*</span></label>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="editProjectCost" name="projectCost" oninput="validateDecimal(this,11,4)" required>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Name of PIA <span class="required">*</span></label>
+								<div class="col-md-6">
+									<input type="text" class="form-control" id="editPiaName" name="piaName" required>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Address of PIA <span class="required">*</span></label>
+								<div class="col-md-6">
+									<input type="text" class="form-control" id="editAddress" name="address" required>
+								</div>
+							</div>
+
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold">Any Comments</label>
+								<div class="col-md-6">
+									<input type="text" class="form-control" id="editComments" name="comments">
+								</div>
+							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
 								<button type="submit" name="action" value="D" class="btn btn-primary">
