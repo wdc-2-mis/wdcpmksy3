@@ -68,8 +68,8 @@ public class PprDetailsOfSlnaController {
 		qualificationList = qualificationService.getAllQualification();
 		List<PprSlnaDetails> detailsOfSLNAList = new ArrayList<>();
 		detailsOfSLNAList = pprSlnaDetailsService.getDraftdataOfSlnaDetails();
-		List<PprSlnaDetails> detailsOfSLNAComList = new ArrayList<>();
-		detailsOfSLNAComList = pprSlnaDetailsService.getComdataOfSlnaDetails();
+//		List<PprSlnaDetails> detailsOfSLNAComList = new ArrayList<>();
+//		detailsOfSLNAComList = pprSlnaDetailsService.getComdataOfSlnaDetails();
 		
 		List<Object[]> object = isserv.getPPR1List(stcode);
 		Integer instId = object.stream().mapToInt(arr -> (Integer) arr[0]).findFirst().orElse(0);
@@ -92,7 +92,7 @@ public class PprDetailsOfSlnaController {
 		model.addAttribute("stcode", stcode);
 		model.addAttribute("memberDetailsList", memberDetailsList);
 		model.addAttribute("designationList",designationList);
-		model.addAttribute("detailsOfSLNAComList",detailsOfSLNAComList);
+//		model.addAttribute("detailsOfSLNAComList",detailsOfSLNAComList);
 		model.addAttribute("qualificationList",qualificationList);
 		model.addAttribute("detailsOfSLNAList",detailsOfSLNAList);
 		model.addAttribute("chairpersonExists", chairpersonExists);
@@ -198,24 +198,14 @@ public class PprDetailsOfSlnaController {
 	        return "redirect:/detailsOfSLNA";
 	    }
 	 
-	 @PostMapping("/completeDetailsOfSLNA")
-	 public String completeDetailsOfSLNA(@RequestParam List<Integer> selectedIds, 
-			 RedirectAttributes redirectAttributes, HttpSession session) {
+	 @GetMapping("/completeDetailsOfSLNA")
+	 public String completeDetailsOfSLNA(@RequestParam Integer id, RedirectAttributes redirectAttributes, HttpSession session) {
 		 String userid=(String)session.getAttribute("userid");
 			try {
 				if(userid==null){
 		            return "redirect:/login";
 		        }
-				if (selectedIds == null || selectedIds.isEmpty()) {
-					redirectAttributes.addFlashAttribute("error", "Please select at least one record.");
-					return "detailsOfSLNA";
-				}
-
-				// Process selected records
-				for (Integer id : selectedIds) {
-					// Call service here
-					pprSlnaDetailsService.completeRecord(id, userid);
-				}
+				pprSlnaDetailsService.completeRecord(id, userid);
 				redirectAttributes.addFlashAttribute("success", "Selected Records Completed successfully.");
 			}catch (Exception e) {
 

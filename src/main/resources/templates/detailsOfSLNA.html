@@ -297,7 +297,7 @@
 	            <form th:action="@{/saveDetailsOfSLNA}" method="post">
 	                <!-- Member Details -->
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Member Details </label>
+	                    <label class="col-md-3 fw-bold"> Member Details <span class="required">*</span></label>
 						<input type="hidden" name="stcode"  th:value="${stcode}" >
 	                    <div class="col-md-9">
 	                        <div class="form-check form-check-inline" th:each="member : ${memberDetailsList}">
@@ -308,7 +308,7 @@
 	                </div>
 
 					<div class="row mb-3 align-items-center">
-					    <label class="col-md-3 fw-bold">Name</label>
+					    <label class="col-md-3 fw-bold">Name <span class="required">*</span></label>
 					    <div class="col-md-4">
 					        <input type="text" class="form-control" name="firstName" placeholder="First Name">
 					    </div>
@@ -318,7 +318,7 @@
 					</div>
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold">Designation</label>
+	                    <label class="col-md-3 fw-bold">Designation <span class="required">*</span></label>
 	                    <div class="col-md-5">
 	                        <select class="form-select" name="designation">
 	                            <option value="">--Select--</option>
@@ -328,7 +328,7 @@
 	                </div>
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold">Qualification</label>
+	                    <label class="col-md-3 fw-bold">Qualification <span class="required">*</span></label>
 	                    <div class="col-md-5">
 	                        <select class="form-select" name="qualification">
 	                            <option value="">--Select--</option>
@@ -338,14 +338,14 @@
 	                </div>
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold">Appointment Date</label>
+	                    <label class="col-md-3 fw-bold">Appointment Date <span class="required">*</span></label>
 	                    <div class="col-md-4">
 	                        <input type="date" class="form-control" name="appointmentDate" min="2025-01-01" th:value="${appointmentDate}" required>
 	                    </div>
 	                </div>
 					
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Nature of Appointment </label>
+	                    <label class="col-md-3 fw-bold"> Nature of Appointment <span class="required">*</span></label>
 	                    <div class="col-md-9">
 	                        <div class="form-check form-check-inline">
 	                            <input class="form-check-input" type="radio" name="joiningType" value="F">
@@ -359,21 +359,21 @@
 	                </div>
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Tenure Period (in years) </label>
+	                    <label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 	                    <div class="col-md-3">
 	                        <input type="text" class="form-control" name="tenure">
 	                    </div>
 	                </div>
 					
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Phone No </label>
+	                    <label class="col-md-3 fw-bold"> Phone No <span class="required">*</span></label>
 	                    <div class="col-md-4">
 	                        <input type="text" class="form-control" maxlength="10" name="phone">
 	                    </div>
 	                </div>
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Email </label>
+	                    <label class="col-md-3 fw-bold"> Email <span class="required">*</span></label>
 	                    <div class="col-md-5">
 	                        <input type="email" class="form-control" name="email">
 	                    </div>
@@ -397,13 +397,12 @@
 			</div>
 		</div>
 		<br/>
-		<form th:action="@{/completeDetailsOfSLNA}" method="post">
+		<div th:if="${detailsOfSLNAList != null}">
 		    <table class="table table-bordered table-striped table-hover">
 		        <h4> <b><center>List of Save As Draft SLNA Details</center></b> </h4>
 		        <br/>
 		        <thead class="table-primary">
 		        <tr>
-		            <th> <input type="checkbox" id="selectAll"> </th>
 		            <th>Member Details</th>
 		            <th>Name</th>
 		            <th>Designation</th>
@@ -419,9 +418,6 @@
 		        </thead>
 		        <tbody>
 		        <tr th:each="data : ${detailsOfSLNAList}">
-		            <td>
-		                <input type="checkbox" class ="rowCheckbox" name="selectedIds" th:value="${data.pprSlnaId}">
-		            </td>
 		            <td th:text="${data.member.memberType}"></td>
 		            <td th:text="${data.firstName+' '+data.lastName}"></td>
 		            <td th:text="${data.designation.designationName}"></td>
@@ -435,31 +431,33 @@
 
 		            <td>
 						<div class="d-flex align-items-center gap-2">
-						<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${data.pprSlnaId}" data-bs-toggle="modal" data-bs-target="#editModal">
+						<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${data.pprSlnaId}" data-bs-toggle="modal" data-bs-target="#editModal" th:if="${#strings.trim(data.status) == 'D'}">
 						       <i class="fas fa-edit"></i>
 						    </button>
 							&nbsp;
-		                <a th:href="@{/deleteDetailsOfSLNA(id=${data.pprSlnaId})}"
+		                <a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/deleteDetailsOfSLNA(id=${data.pprSlnaId})}"
 		                   class="btn btn-danger btn-sm"
 		                   onclick="return confirm('Are you sure you want to delete this record?');">
 		                    <i class="fas fa-trash"></i>
 		                </a>
+						<a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/completeDetailsOfSLNA(id=${data.pprSlnaId})}"
+							class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to Complete this record?');">
+							<i class="fas fa-check"></i>
+						</a>
+						<span th:if="${#strings.trim(data.status) == 'C'}" class="badge bg-success">
+							<i class="fas fa-check-circle"></i> Completed
+						</span>
 						</div>
 		            </td>
 		        </tr>
 		        <tr th:if="${#lists.isEmpty(detailsOfSLNAList)}">
-		            <td colspan="12" class="text-center text-danger">
+		            <td colspan="11" class="text-center text-danger">
 		                No records found.
 		            </td>
 		        </tr>
 		        </tbody>
 		    </table>
-		    <div class="text-center mb-5">
-		        <button type="submit" class="btn btn-primary btn-lg">
-		            Complete
-		        </button>
-		    </div>
-		</form>
+		 </div>   
 
 		<!-- Edit Popup -->
 		<div class="modal fade" id="editModal">
@@ -474,7 +472,7 @@
 						<input type="hidden" id="pprSlna" name="pprSlna">
 						<!-- Member Details -->
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Member Details </label>
+							<label class="col-md-3 fw-bold"> Member Details <span class="required">*</span></label>
 							<input type="hidden" name="stcode" th:value="${stcode}">
 							<div class="col-md-9">
 								<div class="form-check form-check-inline" th:each="member : ${memberDetailsList}">
@@ -487,7 +485,7 @@
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold">Name</label>
+							<label class="col-md-3 fw-bold">Name <span class="required">*</span></label>
 							<div class="col-md-4">
 								<input type="text" class="form-control" id="firstName" name="firstName">
 							</div>
@@ -497,7 +495,7 @@
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold">Designation</label>
+							<label class="col-md-3 fw-bold">Designation <span class="required">*</span></label>
 							<div class="col-md-5">
 								<select class="form-select" id="designation" name="designation">
 									<option value="">--Select--</option>
@@ -508,7 +506,7 @@
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold">Qualification</label>
+							<label class="col-md-3 fw-bold">Qualification <span class="required">*</span></label>
 							<div class="col-md-5">
 								<select class="form-select" id="qualification" name="qualification">
 									<option value="">--Select--</option>
@@ -519,7 +517,7 @@
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold">Appointment Date</label>
+							<label class="col-md-3 fw-bold">Appointment Date <span class="required">*</span></label>
 							<div class="col-md-4">
 								<input type="date" id="appointmentDate" class="form-control" name="appointmentDate" min="2025-01-01"
 									th:value="${appointmentDate}" required>
@@ -527,7 +525,7 @@
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Nature of Appointment </label>
+							<label class="col-md-3 fw-bold"> Nature of Appointment <span class="required">*</span></label>
 							<div class="col-md-9">
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio" name="joiningType" value="F" id="joiningFull">
@@ -541,21 +539,21 @@
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Tenure Period (in years)</label>
+							<label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 							<div class="col-md-3">
 								<input type="text" id="tenure" class="form-control" name="tenure">
 							</div>
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Phone No </label>
+							<label class="col-md-3 fw-bold"> Phone No <span class="required">*</span></label>
 							<div class="col-md-4">
 								<input type="text" id="phoneNo" class="form-control" maxlength="10" name="phone">
 							</div>
 						</div>
 						
 						<div class="row mb-3 align-items-center">
-							<label class="col-md-3 fw-bold"> Email </label>
+							<label class="col-md-3 fw-bold"> Email <span class="required">*</span></label>
 							<div class="col-md-5">
 								<input type="email" id="emailId" class="form-control" name="email">
 							</div>
@@ -579,48 +577,6 @@
 				</div>
 			</div>
 		</div>
-		<table class="table table-bordered table-striped table-hover">
-				        <h4>
-				            <b><center>List of Complete SLNA Details</center></b>
-				        </h4>
-				        <br/>
-				        <thead class="table-primary">
-				        <tr>
-				            <th>S.No.</th>
-				            <th>Member Details</th>
-				            <th>Name</th>
-				            <th>Designation</th>
-				            <th>Qualification</th>
-				            <th>Appointment Date</th>
-				            <th>Nature of Appointment</th>
-				            <th>Tenure</th>
-				            <th>Phone</th>
-				            <th>Email</th>
-				            <th>Fax</th>
-				        </tr>
-				        </thead>
-				        <tbody>
-				        <tr th:each="data, stat : ${detailsOfSLNAComList}">
-				           <td th:text="${stat.count}"></td>
-				            <td th:text="${data.member.memberType}"></td>
-				            <td th:text="${data.firstName+' '+data.lastName}"></td>
-				            <td th:text="${data.designation.designationName}"></td>
-				            <td th:text="${data.qualification.qualificationName}"></td>
-				            <td th:text="${data.appointmentDate}"></td>
-				            <td th:text="${data.joiningType == 'F' ? 'Full Time' : 'Part Time'}"></td>
-				            <td th:text="${data.tenurePeriodYr}"></td>
-				            <td th:text="${data.phoneNo}"></td>
-				            <td th:text="${data.emailId}"></td>
-				            <td th:text="${data.fax}"></td>
-				           
-				        </tr>
-				        <tr th:if="${#lists.isEmpty(detailsOfSLNAComList)}">
-				            <td colspan="12" class="text-center text-danger">
-				                No records found.
-				            </td>
-				        </tr>
-				        </tbody>
-				    </table>
 	</div>
 </body>
 </html>

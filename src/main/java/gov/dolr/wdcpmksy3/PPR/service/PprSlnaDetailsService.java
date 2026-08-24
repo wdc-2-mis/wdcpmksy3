@@ -18,10 +18,8 @@ public class PprSlnaDetailsService {
 	PprSlnaDetailsRepository pprSlnaDetailsRepo;
 	
 	public List<PprSlnaDetails> getDraftdataOfSlnaDetails(){
-		List<PprSlnaDetails> draftSlnaDetails = new ArrayList<>();
 		List<PprSlnaDetails> list = pprSlnaDetailsRepo.findAll();
-		draftSlnaDetails = list.stream().filter(s-> s.getStatus().equals('D')).toList();
-		return draftSlnaDetails;
+		return list;
 	}
 	
 	public List<PprSlnaDetails> getComdataOfSlnaDetails(){
