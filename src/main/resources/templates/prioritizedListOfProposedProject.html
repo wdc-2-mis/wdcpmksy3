@@ -190,17 +190,17 @@
 		
 		function loadSavedCriteria(savedCriteria) {
 		        // First reset all criteria
-		        document.querySelectorAll(".criteriaCheck")
+		        document.querySelectorAll(".editCriteriaCheck")
 		            .forEach(function (checkbox) {
 		                checkbox.checked = false;
 		            });
 		        // Reset all radio buttons
-		        document.querySelectorAll(".scoreRadio")
+		        document.querySelectorAll(".editScoreRadio")
 		            .forEach(function (radio) {
 		                radio.checked = false;
 		            });
 		        // Reset marks
-		        document.querySelectorAll(".marks")
+		        document.querySelectorAll(".editMarks")
 		            .forEach(function (marks) {
 		                marks.innerText = "0";
 		            });
@@ -211,7 +211,7 @@
 		            const criteriaId = saved.criteriaId;
 		            const scoredMarks = saved.scoredMarks;
 		            // Find checkbox
-		            const checkbox = document.querySelector('.criteriaCheck[value="' + criteriaId + '"]');
+		            const checkbox = document.querySelector('.editCriteriaCheck[value="' + criteriaId + '"]');
 		            if (!checkbox) {
 		                return;
 		            }
@@ -225,7 +225,7 @@
 		            // =========================
 		            // Find radio by marks
 		            // =========================
-		            const radios = row.querySelectorAll(".scoreRadio");
+		            const radios = row.querySelectorAll(".editScoreRadio");
 		            let selectedRadio = null;
 		            radios.forEach(function (radio) {
 		                const text = radio.value;
@@ -247,7 +247,7 @@
 		            // =========================
 		            // Display saved marks
 		            // =========================
-		            const marksCell = row.querySelector(".marks");
+		            const marksCell = row.querySelector(".editMarks");
 		            if (marksCell) {
 		                marksCell.innerText = scoredMarks ?? "0";
 		            }
@@ -259,11 +259,11 @@
 	
 	function updateEditCriteriaData() {
 	    let result = [];
-	    document.querySelectorAll("#criteriaModal tbody tr").forEach(function (row) {
-	        const chk = row.querySelector(".criteriaCheck");
+	    document.querySelectorAll("#editCriteriaModal tbody tr").forEach(function (row) {
+	        const chk = row.querySelector(".editCriteriaCheck");
 	        if (chk && chk.checked) {
 	            const criteriaId = chk.value;
-	            const marks = row.querySelector(".marks").innerText.trim();
+	            const marks = row.querySelector(".editMarks").innerText.trim();
 	            result.push(criteriaId + ":" + marks);
 	        }
 	    });
@@ -272,9 +272,7 @@
 	}
 	
 	document.addEventListener("change", function (e) {
-	    // =========================
 	    // Radio changed
-	    // =========================
 	    if (e.target.classList.contains("scoreRadio")) {
 	        const row = e.target.closest("tr");
 	        const text = e.target.value;
@@ -292,9 +290,7 @@
 	        }
 	        updateEditCriteriaData();
 	    }
-	    // =========================
 	    // Checkbox changed
-	    // =========================
 	    if (e.target.classList.contains("criteriaCheck")) {
 	        const row = e.target.closest("tr");
 	        if (!e.target.checked) {
@@ -308,6 +304,39 @@
 	        }
 	        updateEditCriteriaData();
 	    }
+		
+		//Edit Radio changed
+			    if (e.target.classList.contains("editScoreRadio")) {
+			        const row = e.target.closest("tr");
+			        const text = e.target.value;
+			        const start = text.lastIndexOf("(");
+			        const end = text.lastIndexOf(")");
+			        let marks = "";
+			        if (start !== -1 && end !== -1 && end > start) {
+			            marks = text.substring(start + 1,end);
+			        }
+			        row.querySelector(".editdMarks").innerText = marks;
+			        // Automatically check criteria
+			        const checkbox =row.querySelector(".editCriteriaCheck");
+			        if (checkbox) {
+			            checkbox.checked = true;
+			        }
+			        updateEditCriteriaData();
+			    }
+			    //Edit Checkbox changed
+			    if (e.target.classList.contains("editCriteriaCheck")) {
+			        const row = e.target.closest("tr");
+			        if (!e.target.checked) {
+			            // Remove radio selection
+			            row.querySelectorAll(".editScoreRadio")
+			                .forEach(function (radio) {
+			                    radio.checked = false;
+			                });
+			            // Reset marks
+			            row.querySelector(".editMarks").innerText = "0";
+			        }
+			        updateEditCriteriaData();
+			    }
 	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
@@ -741,16 +770,16 @@
 										class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 								</div>
 							</div>
-<!--							<div class="row mb-3 align-items-center">-->
-<!--								<label class="col-md-3 fw-bold"> Weightage under the Criteria </label>-->
-<!--								<div class="col-md-4">-->
-<!--									<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"-->
-<!--										data-bs-target="#criteriaModal">-->
-<!--										Link <i class="fas fa-list"></i>-->
-<!--									</button>-->
-<!--									<input type="hidden" id="criteriaData" name="criteriaData">-->
-<!--								</div>-->
-<!--							</div>-->
+							<div class="row mb-3 align-items-center">
+								<label class="col-md-3 fw-bold"> Weightage under the Criteria </label>
+								<div class="col-md-4">
+									<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+										data-bs-target="#editCriteriaModal">
+										Link <i class="fas fa-list"></i>
+									</button>
+									<input type="hidden" id="criteriaData" name="criteriaData">
+								</div>
+							</div>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -809,6 +838,67 @@
 		        </div>
 		    </div>
 		</div>
+		
+		<div class="modal fade" id="editCriteriaModal" tabindex="-1">
+				    <div class="modal-dialog modal-xl">
+				        <div class="modal-content">
+				            <div class="modal-header bg-primary text-white">
+				                <h5>Criteria Details</h5>
+				                <button class="btn-close" data-bs-dismiss="modal"></button>
+				            </div>
+				            <div class="modal-body">
+				                <table class="table table-bordered table-striped">
+				                    <thead>
+				                    <tr>
+				                        <th>Select</th>
+				                        <th>Criteria Description</th>
+				                        <th>Range 1</th>
+				                        <th>Range 2</th>
+				                        <th>Range 3</th>
+				                        <th>Range 4</th>
+				                        <th>Marks</th>
+				                    </tr>
+				                    </thead>
+				                    <tbody>
+				                    <tr th:each="c : ${criteriaList}">
+				                        <td>
+				                            <input type="checkbox"
+				                                   class="editCriteriaCheck"
+				                                   th:value="${c.criteriaId}">
+				                        </td>
+				                        <td th:text="${c.criteriaDesc}"></td>
+				                        <td>
+											<div class="form-check" th:if="${c.rangeOne != null and !#strings.isEmpty(c.rangeOne)}">
+											        <input class="form-check-input editScoreRadio" type="radio" th:name="'criteria_'+${c.criteriaId}" th:value="${c.rangeOne}">
+											        <label class="form-check-label" th:text="${c.rangeOne}"></label>
+											 </div>
+				                        </td>
+				                        <td>
+											<div class="form-check" th:if="${c.rangeTwo != null and !#strings.isEmpty(c.rangeTwo)}">
+											        <input class="form-check-input editScoreRadio" type="radio" th:name="'criteria_'+${c.criteriaId}" th:value="${c.rangeTwo}">
+											        <label class="form-check-label" th:text="${c.rangeTwo}"></label>
+											</div>
+				                        </td>
+				                        <td>
+											<div class="form-check" th:if="${c.rangeThree != null and !#strings.isEmpty(c.rangeThree)}">
+											       <input class="form-check-input editScoreRadio" type="radio" th:name="'criteria_'+${c.criteriaId}" th:value="${c.rangeThree}">
+											       <label class="form-check-label" th:text="${c.rangeThree}"></label>
+											</div>
+				                        </td>
+				                        <td>
+											<div class="form-check" th:if="${c.rangeFour != null and !#strings.isEmpty(c.rangeFour)}">
+											       <input class="form-check-input editScoreRadio" type="radio" th:name="'criteria_'+${c.criteriaId}" th:value="${c.rangeFour}">
+											       <label class="form-check-label" th:text="${c.rangeFour}"></label>
+											</div>
+				                        </td>
+				                        <td class="editMarks">0</td>
+				                    </tr>
+				                    </tbody>
+				                </table>
+				            </div>
+				        </div>
+				    </div>
+				</div>
 
 		
 		</div>
