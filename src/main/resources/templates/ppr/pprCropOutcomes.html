@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<head>
+<meta charset="UTF-8">
+<title>Major crops grown and their productivity in the Project (PPR-18)</title>
+
+<style>
+.required {
+	color: red;
+}
+
+.row.mb-4 {
+    margin-bottom: 3.5rem !important; /* increase gap */
+}
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const district = document.getElementById("district");
+    const project = document.getElementById("project");
+    const cropTable = document.getElementById("cropTable").querySelector("tbody");
+
+   let usedCrops = [];
+
+    district.addEventListener("change", function () {
+
+    let districtId = this.value;
+
+    project.innerHTML =
+        '<option value="">--Select Project--</option>';
+
+    usedCrops = [];
+
+    updateCropOptions();
+
+    document.getElementById("savedCropOutcomes").innerHTML = "";
+
+    if (districtId === "") {
+        return;
+    }
+
+       fetch("/getProjectsByDistrictLandPattern?dcode=" + districtId)
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    "Project API error: " + response.status
+                );
+            }
+
+            return response.json();
+        })
+
+        .then(data => {
+
+            data.forEach(function (item) {
+
+                let option = document.createElement("option");
+
+                option.value = item.id;
+                option.textContent = item.name;
+
+                project.appendChild(option);
+
+            });
+
+        })
+
+        .catch(error =>
+            console.error(
+                "Project Loading Error:",
+                error
+            )
+        );
+
+   fetch(
+        "/getCropOutcomesByDistrict?dcode=" +
+        encodeURIComponent(districtId)
+    )
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    "Crop outcome API error: " +
+                    response.status
+                );
+            }
+
+            return response.text();
+        })
+
+        .then(html => {
+
+            document.getElementById(
+                "savedCropOutcomes"
+            ).innerHTML = html;
+
+        })
+
+        .catch(error =>
+            console.error(
+                "Crop Outcome Loading Error:",
+                error
+            )
+        );
+
+});
+
+
+    function updateCropOptions() {
+
+    const selectedCrops = Array.from(
+        cropTable.querySelectorAll(".crop-select")
+    )
+    .map(select => select.value)
+    .filter(value => value !== "");
+
+    cropTable.querySelectorAll(".crop-select").forEach(function (select) {
+
+        const currentValue = select.value;
+
+        Array.from(select.options).forEach(function (option) {
+
+            const cropId = option.value;
+
+            if (cropId === "") {
+                option.style.display = "block";
+                return;
+            }
+
+            const selectedInAnotherRow =
+                selectedCrops.includes(cropId) &&
+                cropId !== currentValue;
+
+            const alreadyInDatabase =
+                usedCrops.includes(Number(cropId));
+
+            if (selectedInAnotherRow || alreadyInDatabase) {
+                option.style.display = "none";
+            } else {
+                option.style.display = "block";
+            }
+        });
+    });
+}
+
+  cropTable.addEventListener("change", function (e) {
+
+        if (e.target.classList.contains("crop-select")) {
+
+            updateCropOptions();
+        }
+    });
+  cropTable.addEventListener("click", function (e) {
+
+        if (e.target.classList.contains("add-row")) {
+
+            const firstRow = cropTable.rows[0];
+
+            const newRow = firstRow.cloneNode(true);
+
+            newRow.querySelectorAll("input").forEach(function (input) {
+                input.value = "";
+            });
+
+            const cropSelect = newRow.querySelector(".crop-select");
+
+            if (cropSelect) {
+                cropSelect.value = "";
+            }
+
+            const button = newRow.querySelector("button");
+
+            button.classList.remove("btn-success", "add-row");
+            button.classList.add("btn-danger", "remove-row");
+            button.textContent = "-";
+
+            cropTable.appendChild(newRow);
+
+           updateCropOptions();
+        }
+
+
+        if (e.target.classList.contains("remove-row")) {
+
+            e.target.closest("tr").remove();
+
+            updateCropOptions();
+        }
+
+    });
+
+
+    project.addEventListener("change", function () {
+
+    const projectId = this.value;
+
+    console.log("Project selected:", projectId);
+
+    const existingRow = cropTable.querySelector("tr");
+
+    if (!existingRow) {
+        console.error("Crop row not found");
+        return;
+    }
+
+    const newRow = existingRow.cloneNode(true);
+
+    const cropSelect = newRow.querySelector(".crop-select");
+
+    if (cropSelect) {
+        cropSelect.value = "";
+    }
+
+   newRow.querySelectorAll("input").forEach(function (input) {
+        input.value = "";
+    });
+
+    const button = newRow.querySelector("button");
+
+    if (button) {
+        button.type = "button";
+        button.className = "btn btn-sm btn-success add-row";
+        button.textContent = "+";
+    }
+
+    cropTable.innerHTML = "";
+    cropTable.appendChild(newRow);
+
+    console.log("Crop table reset to one row");
+
+  if (!projectId) {
+
+        usedCrops = [];
+
+        updateCropOptions();
+
+        return;
+    }
+
+  fetch("/getUsedCropsByPpr?pprId=" + encodeURIComponent(projectId))
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("HTTP error: " + response.status);
+            }
+
+            return response.text();
+        })
+        .then(text => {
+
+            console.log("Used crops response:", text);
+
+            if (text.trim() === "") {
+
+                usedCrops = [];
+
+            } else {
+
+                usedCrops = text
+                    .split(",")
+                    .map(Number)
+                    .filter(Number.isFinite);
+            }
+
+            console.log("Used crops:", usedCrops);
+
+            updateCropOptions();
+
+        })
+        .catch(error => {
+
+            console.error("Used crops loading error:", error);
+
+            usedCrops = [];
+
+            updateCropOptions();
+        });
+
+});
+
+
+
+
+
+});
+
+
+document.addEventListener("click", function (e) {
+
+    const button = e.target.closest(".edit-crop-btn");
+
+    if (!button) {
+        return;
+    }
+
+    console.log("Edit button clicked");
+
+    const id =
+        button.getAttribute("data-id");
+
+    const districtId =
+        button.getAttribute("data-district");
+
+    const districtName =
+        button.getAttribute("data-district-name");
+
+    const projectId =
+        button.getAttribute("data-project");
+
+    const projectName =
+        button.getAttribute("data-project-name");
+
+    const seasonId =
+        button.getAttribute("data-season");
+
+    const cropId =
+        button.getAttribute("data-crop");
+
+    const currentArea =
+        button.getAttribute("data-current-area");
+
+    const currentProd =
+        button.getAttribute("data-current-prod");
+
+    const expectedArea =
+        button.getAttribute("data-expected-area");
+
+    const expectedProd =
+        button.getAttribute("data-expected-prod");
+
+  document.getElementById(
+        "editPprCropOutcomeId"
+    ).value = id;
+
+  document.getElementById(
+        "editDistrict"
+    ).value = districtName || "";
+
+    document.getElementById(
+        "editDistrictId"
+    ).value = districtId || "";
+
+   document.getElementById(
+        "editProject"
+    ).value = projectName || "";
+
+    document.getElementById(
+        "editProjectId"
+    ).value = projectId || "";
+
+   document.querySelectorAll(
+        ".edit-season"
+    ).forEach(function (radio) {
+
+        radio.checked =
+            String(radio.value) === String(seasonId);
+
+    });
+
+   const editCrop =
+        document.getElementById("editCropType");
+
+    editCrop.value = cropId || "";
+
+  document.getElementById(
+        "editCurrentArea"
+    ).value = currentArea || "";
+
+    document.getElementById(
+        "editCurrentProd"
+    ).value = currentProd || "";
+
+    document.getElementById(
+        "editExpectedArea"
+    ).value = expectedArea || "";
+
+    document.getElementById(
+        "editExpectedProd"
+    ).value = expectedProd || "";
+
+
+    updateEditCropOptions(
+        projectId,
+        cropId
+    );
+
+});
+   
+   function updateEditCropOptions(projectId, currentCropId) {
+
+    console.log("Edit Project:", projectId);
+    console.log("Current Crop:", currentCropId);
+
+    fetch(
+        "/getUsedCropsByPpr?pprId=" +
+        encodeURIComponent(projectId)
+    )
+    .then(function (response) {
+
+        if (!response.ok) {
+            throw new Error(
+                "Used crops API error: " + response.status
+            );
+        }
+
+        return response.text();
+    })
+    .then(function (text) {
+
+        console.log("Used crops response:", text);
+
+        let usedCrops = [];
+
+        if (text.trim() !== "") {
+
+            usedCrops = text
+                .split(",")
+                .map(function (value) {
+                    return Number(value.trim());
+                })
+                .filter(function (value) {
+                    return Number.isFinite(value);
+                });
+        }
+
+        console.log("Used crops:", usedCrops);
+
+        const cropSelect =
+            document.getElementById("editCropType");
+
+        if (!cropSelect) {
+            console.error("editCropType not found");
+            return;
+        }
+
+        Array.from(cropSelect.options).forEach(function (option) {
+  if (option.value === "") {
+                option.style.display = "block";
+                return;
+            }
+
+            const cropId = Number(option.value);
+
+           if (cropId === Number(currentCropId)) {
+
+                option.style.display = "block";
+
+            }
+            else if (usedCrops.includes(cropId)) {
+
+                option.style.display = "none";
+
+            }
+            else {
+
+                option.style.display = "block";
+            }
+
+        });
+
+    })
+    .catch(function (error) {
+
+        console.error(
+            "Edit crop loading error:",
+            error
+        );
+
+    });
+}
+   
+</script>
+
+
+</head>
+<body>
+
+	<div layout:fragment="content">
+
+
+		<div class="card shadow-sm border-0">
+
+			<div class="card-header bg-primary text-white">
+				<h4 class="mb-0">Major crops grown and their productivity in the Project (PPR-18)</h4>
+			</div>
+		
+
+		<div th:if="${success}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		
+		<div th:if="${error}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${error}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div class="card-body">
+
+			<form id="cropRelatedOutcome" th:action="@{/savecropRelatedOutcome}" method="post">
+
+				<div class="row mb-4">
+					<div class="col-md-3">
+						<label>District Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="district" name="district"
+							class="form-control form-control-sm" required>
+							<option value="">--Select District--</option>
+							<th:block th:each="dist : ${distList}">
+								<option th:value="${dist.dcode}" th:text="${dist.distName}">
+								</option>
+							</th:block>
+						</select>
+					</div>
+
+					<div class="col-md-2">
+						<label>Project Name:</label><span class="required">*</span>
+					</div>
+					<div class="col-md-3">
+						<select id="project" name="project" class="form-control form-control-sm" required>
+							   <option value="">--Select Project--</option>
+						</select>
+					</div>
+				</div>
+		
+		<div class="row mb-4 align-items-center">
+
+
+    <div class="row mb-4 align-items-center">
+    				<label class="col-md-3">Season:<span class="required">*</span></label>
+    				<div class="col-md-9">
+        				<div th:each="ms : ${mseason}" class="form-check form-check-inline me-5">
+            				<input class="form-check-input" type="radio" name="seasonTypeId" th:value="${ms.seasonId}" required/>
+            		<label class="form-check-label" th:text="${ms.seasonName}"></label>
+        			</div>
+        			<div class="invalid-feedback" style="display:none;">Please select Season.</div>
+    				</div>
+				</div>
+
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <table id="cropTable" class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th class="table-primary text-center">Name of the Crop <span class="required">*</span></th> 
+                    <th class="table-primary text-center" colspan="2">Current Status <span class="required">*</span></th>
+                    <th class="table-primary text-center" colspan="2">Expected Post Project Status <span class="required">*</span></th>
+                    <th class="table-primary text-center">Action</th>
+                </tr>
+                <tr>
+                    <th class="table-primary"></th>
+                    <th class="table-primary text-center">Area (ha.)</th>
+                    <th class="table-primary text-center">Productivity (kg/ha.)</th>
+                    <th class="table-primary text-center">Area (ha.)</th>
+                    <th class="table-primary text-center">Productivity (kg/ha.)</th>
+                    <th class="table-primary"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select class="form-control form-control-sm crop-select" name="cropTypeId" required>
+                            <option value="">--Select Crop--</option>
+                            <th:block th:each="crop : ${cropTypeList}">
+                                <option th:value="${crop.cropTypeId}" th:text="${crop.cropName}"></option>
+                            </th:block>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control form-control-sm" name="currentArea" required oninput="validateDecimal(this, 10, 4)"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="currentProd" required oninput="validateDecimal(this, 10, 4)"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="expectedArea" required oninput="validateDecimal(this, 10, 4)"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="expectedProd" required oninput="validateDecimal(this, 10, 4)"></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-success add-row">+</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="text-center mt-3">
+    <button type="submit" name="action" value="D" class="btn btn-warning">
+        <i class="fas fa-save"></i> Save As Draft
+    </button>
+</div>
+</div>
+				
+			</form>
+			
+			<div id="savedCropOutcomes"
+     th:fragment="cropOutcomeTable">
+
+    <div th:if="${cropOutcomes != null and !cropOutcomes.isEmpty()}">
+
+        <h5 class="fw-bold mb-3"><center>List of Crop Related Outcomes</center></h5>
+
+    <div th:if="${#lists.isEmpty(cropOutcomes)}" class="alert alert-info">
+        No Records Found
+    </div>
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-light">
+                <tr>
+                    <th class="table-primary">S.No</th>
+                    <th class="table-primary">Season</th>
+                    <th class="table-primary">Crop</th>
+                    <th class="table-primary">Current Area</th>
+                    <th class="table-primary">Current Productivity</th>
+                    <th class="table-primary">Expected Area</th>
+                    <th class="table-primary">Expected Productivity</th>
+                    <th class="table-primary">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr th:each="rec,  iterStat : ${cropOutcomes}">
+              
+                 <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${rec.season.seasonName}">
+                    </td>
+              
+                    <td th:text="${rec.cropType.cropName}">
+                    </td>
+
+                    <td th:text="${rec.currentArea}">
+                    </td>
+
+                    <td th:text="${rec.currentProd}">
+                    </td>
+
+                    <td th:text="${rec.expectedArea}">
+                    </td>
+
+                    <td th:text="${rec.expectedProd}">
+                    </td>
+
+
+                    <td>
+
+                        <!-- Draft -->
+                        <div th:if="${rec.status == 'D'}">
+
+                            <!-- <a th:href="@{/editCropOutcome/{id}(id=${rec.pprCropOutcomeId})}"
+                               class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a> -->
+                            
+                            <a href="#"
+   								class="btn btn-sm btn-primary edit-crop-btn"
+   							data-bs-toggle="modal"
+   							data-bs-target="#editModal"
+
+   							th:data-id="${rec.pprCropOutcomeId}"
+   							th:data-district="${rec.ppr.district.dcode}"
+   							th:data-district-name="${rec.ppr.district.distName}"
+   							th:data-project="${rec.ppr.pprId}"
+   							th:data-project-name="${rec.ppr.projectName}"
+   							th:data-season="${rec.season.seasonId}"
+   							th:data-crop="${rec.cropType.cropTypeId}"
+   							th:data-current-area="${rec.currentArea}"
+   							th:data-current-prod="${rec.currentProd}"
+   							th:data-expected-area="${rec.expectedArea}"
+   							th:data-expected-prod="${rec.expectedProd}">
+
+    						<i class="fas fa-edit"></i>
+    						
+    							</a>
+    							
+    						
+    							
+                             &nbsp; &nbsp;
+                            <a th:href="@{/completeCropOutcome(id=${rec.pprCropOutcomeId})}"
+                               class="btn btn-sm btn-success"
+                               onclick="return confirm('Are you sure you want to complete this record?');">
+                                <i class="fas fa-check"></i>
+                            </a>
+							&nbsp; &nbsp;
+                            <a th:href="@{/deleteCropOutcome(id=${rec.pprCropOutcomeId})}"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this record?');">
+                                <i class="fas fa-trash"></i>
+                            </a>
+
+                        </div>
+
+                        <div th:if="${rec.status == 'C'}">
+                            <span class="badge bg-success">Data Completed</span>
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade"
+     id="editModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+
+                <h5 class="modal-title">
+                    Edit Crop Outcome
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form id="editForm"
+                      th:action="@{/updateCropOutcome}"
+                      method="post">
+
+                    <input type="hidden"
+                           id="editPprCropOutcomeId"
+                           name="pprCropOutcomeId">
+
+                    <!-- District + Project -->
+
+                    <div class="row mb-4">
+
+                        <div class="col-md-2">
+                            <label class="fw-bold">
+                                District Name:
+                            </label>
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <input type="text"
+                                   id="editDistrict"
+                                   class="form-control form-control-sm"
+                                   readonly>
+
+                            <input type="hidden"
+                                   id="editDistrictId"
+                                   name="district">
+
+                        </div>
+
+
+                        <div class="col-md-2">
+
+                            <label class="fw-bold">
+                                Project Name:
+                            </label>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <input type="text"
+                                   id="editProject"
+                                   class="form-control form-control-sm"
+                                   readonly>
+
+                            <input type="hidden"
+                                   id="editProjectId"
+                                   name="project">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Season -->
+
+                    <div class="row mb-4">
+
+                        <label class="col-md-2 fw-bold">
+                            Season:
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="col-md-10">
+
+                            <div id="editSeasonContainer">
+
+                                <div th:each="ms : ${mseason}"
+                                     class="form-check form-check-inline me-5">
+
+                                    <input class="form-check-input edit-season"
+                                           type="radio"
+                                           name="seasonTypeId"
+                                           th:value="${ms.seasonId}"
+                                           required>
+
+                                    <label class="form-check-label"
+                                           th:text="${ms.seasonName}">
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Crop -->
+                    
+                    
+       <div class="row mb-4">
+    <div class="col-md-12">
+        <table id="cropTable" class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th class="table-primary text-center">Name of the Crop <span class="required">*</span></th> 
+                    <th class="table-primary text-center" colspan="2">Current Status <span class="required">*</span></th>
+                    <th class="table-primary text-center" colspan="2">Expected Post Project Status <span class="required">*</span></th>
+                </tr>
+                <tr>
+                    <th class="table-primary"></th>
+                    <th class="table-primary text-center">Area (ha.)</th>
+                    <th class="table-primary text-center">Productivity (kg/ha.)</th>
+                    <th class="table-primary text-center">Area (ha.)</th>
+                    <th class="table-primary text-center">Productivity (kg/ha.)</th>
+                  
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select id="editCropType"
+                                    name="cropTypeId"
+                                    class="form-control form-control-sm"
+                                    required>
+
+                                <option value="">
+                                    --Select Crop--
+                                </option>
+
+                                <th:block th:each="crop : ${cropTypeList}">
+
+                                    <option th:value="${crop.cropTypeId}"
+                                            th:text="${crop.cropName}">
+                                    </option>
+
+                                </th:block>
+
+                            </select>
+                    </td>
+                    <td><input type="text" id="editCurrentArea" name="currentArea" class="form-control form-control-sm" required oninput="validateDecimal(this, 10, 4)"></td>
+                    <td><input type="text" id="editCurrentProd" class="form-control form-control-sm" name="currentProd" required oninput="validateDecimal(this, 10, 4)"></td>
+                    <td><input type="text" id="editExpectedArea" class="form-control form-control-sm" name="expectedArea" required oninput="validateDecimal(this, 10, 4)"></td>
+                    <td><input type="text" id="editExpectedProd" class="form-control form-control-sm" name="expectedProd" required oninput="validateDecimal(this, 10, 4)"></td>
+                   
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>             
+
+                    <div class="text-end">
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Update
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+			</div>
+			</div>
+			</div>
+			</body>
+			</html>
+				
