@@ -267,8 +267,8 @@
 	            result.push(criteriaId + ":" + marks);
 	        }
 	    });
-	    document.getElementById("criteriaData").value = result.join(",");
-	    console.log("Edit criteriaData =", document.getElementById("criteriaData").value);
+	    document.getElementById("editCriteriaData").value = result.join(",");
+	    console.log("Edit criteriaData =", document.getElementById("editCriteriaData").value);
 	}
 	
 	document.addEventListener("change", function (e) {
@@ -315,7 +315,7 @@
 			        if (start !== -1 && end !== -1 && end > start) {
 			            marks = text.substring(start + 1,end);
 			        }
-			        row.querySelector(".editdMarks").innerText = marks;
+			        row.querySelector(".editMarks").innerText = marks;
 			        // Automatically check criteria
 			        const checkbox =row.querySelector(".editCriteriaCheck");
 			        if (checkbox) {
@@ -417,7 +417,7 @@
 				    const microWatershed = document.getElementById("editMicroWatershed").value;
 				    const treatedArea = document.querySelector("[name='editTreatedArea']").value;
 				    const proposedCost = document.querySelector("[name='editProposedCost']").value;
-				    const projectType = document.querySelector("input[name='editProjectType']:checked");
+				    const projectType = document.querySelector("input[name='projectType']:checked");
 				    if(district === ""){
 				        alert("Please select District.");
 				        e.preventDefault();
@@ -460,6 +460,29 @@
 				    }
 				});
 
+			});
+			
+			document.addEventListener("DOMContentLoaded", function () {
+				const editCriteriaLink = document.getElementById("editCriteriaLink");
+				const editModalElement = document.getElementById("editModal");
+				const editCriteriaModalElement = document.getElementById("editCriteriaModal");
+				if (editCriteriaLink && editModalElement && editCriteriaModalElement) {
+					const editModal = bootstrap.Modal.getOrCreateInstance(editModalElement);
+					const editCriteriaModal = bootstrap.Modal.getOrCreateInstance(editCriteriaModalElement);
+					editCriteriaLink.addEventListener("click", function () {
+						// Hide Edit Project modal
+						editModal.hide();
+						// Open Criteria modal after Edit Project modal is completely hidden
+						editModalElement.addEventListener("hidden.bs.modal", function openCriteria() {
+							editCriteriaModal.show();
+							editModalElement.removeEventListener("hidden.bs.modal", openCriteria);
+						});
+					});
+					// When Criteria modal is closed, reopen Edit Project modal
+					editCriteriaModalElement.addEventListener("hidden.bs.modal", function () {
+						editModal.show();
+					});
+				}
 			});
 
 		
@@ -773,11 +796,10 @@
 							<div class="row mb-3 align-items-center">
 								<label class="col-md-3 fw-bold"> Weightage under the Criteria </label>
 								<div class="col-md-4">
-									<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-										data-bs-target="#editCriteriaModal">
+									<button type="button" class="btn btn-outline-primary btn-sm" id="editCriteriaLink">
 										Link <i class="fas fa-list"></i>
 									</button>
-									<input type="hidden" id="criteriaData" name="criteriaData">
+									<input type="hidden" id="editCriteriaData" name="criteriaData">
 								</div>
 							</div>
 						</div>

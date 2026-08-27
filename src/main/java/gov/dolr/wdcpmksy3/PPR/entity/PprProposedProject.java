@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "ppr_proposed_project", schema = "public")
@@ -52,6 +54,9 @@ public class PprProposedProject {
 
     @Column(name = "updated_date")
     private LocalDate updatedDate;
+    
+    @OneToMany(mappedBy="proposedProject",cascade=CascadeType.ALL, orphanRemoval = true)
+    private List<CriteriaDetails> details = new ArrayList<>();
 
 	public Integer getPprProposedProjectId() {
 		return pprProposedProjectId;
@@ -147,6 +152,14 @@ public class PprProposedProject {
 
 	public void setUpdatedDate(LocalDate updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public List<CriteriaDetails> getDetails() {
+		return details;
+	}
+
+	public void setDetails(List<CriteriaDetails> details) {
+		this.details = details;
 	}
     
 }

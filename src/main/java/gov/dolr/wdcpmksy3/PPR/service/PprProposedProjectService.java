@@ -2,6 +2,7 @@ package gov.dolr.wdcpmksy3.PPR.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,31 +102,36 @@ public class PprProposedProjectService {
 	    entity.setProjectType(projectTypeRepository.findById(dto.getProjectType()).orElseThrow(() -> new RuntimeException("Invalid Project Type")));
 	    entity.setUpdatedBy(userId);
 	    entity.setUpdatedDate(LocalDate.now());
+	    
+	    if (dto.getCriteriaData() != null) {
+	    	entity.getDetails().clear();
+			String[] arr = dto.getCriteriaData().split(",");
+
+			for (String s : arr) {
+
+				if (s.isBlank()) {
+					continue;
+				}
+				String[] value = s.split(":");
+				if (value.length != 2) {
+					continue;
+				}
+				Integer criteriaId = Integer.parseInt(value[0]);
+				Integer marks = Integer.parseInt(value[1]);
+				CriteriaDetails details = new CriteriaDetails();
+				details.setCriteria(criteriaRepo.findById(criteriaId).get());
+				details.setScoredMarks(marks);
+				details.setProposedProject(entity);
+				details.setStatus("D");
+				details.setCreatedBy(userId);
+				details.setCreatedDate(LocalDateTime.now());
+				entity.getDetails().add(details);
+
+			}
+		}
+	    
 	    repository.save(entity);
-//	    String[] arr=dto.getCriteriaData().split(",");
-//        
-//        for(String s:arr){
-//        	
-//        	if (s.isBlank()) {
-//                continue;
-//            }
-//            String[] value=s.split(":");
-//            if (value.length != 2) {
-//                continue;
-//            }
-//            Integer criteriaId=Integer.parseInt(value[0]);
-//            Integer marks=Integer.parseInt(value[1]);
-//            CriteriaDetails details=new CriteriaDetails();
-//            details.setCriteria(
-//                    criteriaRepo.findById(criteriaId).get());
-//            details.setScoredMarks(marks);
-//            details.setProposedProject(entity);
-//            details.setStatus("D");
-//            details.setCreatedBy(userId);
-//            details.setCreatedDate(LocalDateTime.now());
-//            criteriaDetailsRepo.save(details);
-//
-//        }
+		
 	}
 	
 	@Transactional
