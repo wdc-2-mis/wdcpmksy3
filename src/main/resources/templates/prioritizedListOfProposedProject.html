@@ -9,11 +9,19 @@
 
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<style>
-		.required{
-		    color:red;
+		.required {
+			color: red;
 		}
-
-		
+	
+		.validation-error {
+			color: red;
+			font-size: 14px;
+			margin-top: 4px;
+		}
+	
+		.is-invalid {
+			border-color: #dc3545 !important;
+		}
 	</style>
 <script th:inline="javascript">
 
@@ -88,69 +96,135 @@
 			});
 		});
 	
-	document.addEventListener("DOMContentLoaded", function () {
-		document.getElementById("projectForm").addEventListener("submit", function(e){
-			// Build criteriaData
-			        let result = [];
-			        document.querySelectorAll("#criteriaModal tbody tr").forEach(function(row){
-			            const chk = row.querySelector(".criteriaCheck");
-			            if(chk && chk.checked){
-			                const criteriaId = chk.value;
-			                const marks = row.querySelector(".marks").innerText.trim();
-			                result.push(criteriaId + ":" + marks);
-			            }
-			        });
-			        document.getElementById("criteriaData").value = result.join(",");
-			        console.log("criteriaData =", document.getElementById("criteriaData").value);
-		    const district = document.getElementById("district").value;
-		    const project = document.getElementById("project").value.trim();
-		    const microWatershed = document.getElementById("microWatershed").value;
-		    const treatedArea = document.querySelector("[name='treatedProjectArea']").value;
-		    const proposedCost = document.querySelector("[name='proposedCost']").value;
-		    const projectType = document.querySelector("input[name='projectType']:checked");
-		    if(district === ""){
-		        alert("Please select District.");
-		        e.preventDefault();
-		        return;
-		    }
-		    if(project === ""){
-		        alert("Project Name is missing.");
-		        e.preventDefault();
-		        return;
-		    }
-		    if(microWatershed === ""){
-		        alert("Please select Micro-watershed.");
-		        e.preventDefault();
-		        return;
-		    }
-		    if(treatedArea === ""){
-		        alert("Please enter Proposed Project Area.");
-		        e.preventDefault();
-		        return;
-		    }
-		    if(Number(treatedArea) <= 0){
-		        alert("Project Area must be greater than zero.");
-		        e.preventDefault();
-		        return;
-		    }
-		    if(!projectType){
-		        alert("Please select Project Type.");
-		        e.preventDefault();
-		        return;
-		    }
-		    if(proposedCost === ""){
-		        alert("Please enter Proposed Cost.");
-		        e.preventDefault();
-		        return;
-		    }
-		    if(Number(proposedCost) <= 0){
-		        alert("Proposed Cost must be greater than zero.");
-		        e.preventDefault();
-		        return;
-		    }
+		
+		document.addEventListener("DOMContentLoaded", function () {
+			const form = document.getElementById("projectForm");
+			form.addEventListener("submit", function (e) {
+				// Build criteriaData
+				let result = [];
+				document.querySelectorAll("#criteriaModal tbody tr").forEach(function(row){
+					const chk = row.querySelector(".criteriaCheck");
+					if(chk && chk.checked){
+						const criteriaId = chk.value;
+						const marks = row.querySelector(".marks").innerText.trim();
+						result.push(criteriaId + ":" + marks);
+					}
+				});
+				document.getElementById("criteriaData").value = result.join(",");
+				// Remove previous validation errors
+				form.querySelectorAll(".validation-error").forEach(function(error){
+					error.remove();
+				});
+				form.querySelectorAll(".is-invalid").forEach(function(field){
+					field.classList.remove("is-invalid");
+				});
+				// =========================
+				// VALIDATION FUNCTION
+				// =========================
+				function showError(field, message){
+					field.classList.add("is-invalid");
+					const error = document.createElement("div");
+					error.className = "validation-error";
+					error.innerText = message;
+					field.parentNode.appendChild(error);
+					field.focus();
+					return false;
+				}
+				// =========================
+				// GET FIELD VALUES
+				// =========================
+				const district = document.getElementById("district");
+				const project = document.getElementById("project");
+				const microWatershed = document.getElementById("microWatershed");
+				const treatedArea = document.getElementById("treatedProjectArea");
+				const proposedCost = document.getElementById("proposedCost");
+				const projectType = document.querySelector("input[name='projectType']:checked");
+				// =========================
+				// DISTRICT
+				// =========================
+				if(district.value.trim() === ""){
+					e.preventDefault();
+					showError(district,"Please select District.");
+					return;
+				}
+				// =========================
+				// PROJECT NAME
+				// =========================
+				if(project.value.trim() === ""){
+					e.preventDefault();
+					showError(project,"Project Name is missing.");
+					return;
+				}
+				// =========================
+				// MICRO-WATERSHED
+				// =========================
+				if(microWatershed.value.trim() === ""){
+					e.preventDefault();
+					showError(microWatershed,"Please select Micro-watershed.");
+					return;
+				}
+				// =========================
+				// PROJECT AREA
+				// =========================
+				if(treatedArea.value.trim() === ""){
+					e.preventDefault();
+					showError(treatedArea,"Please enter Proposed Project Area.");
+					return;
+				}
+				if(Number(treatedArea.value) <= 0){
+					e.preventDefault();
+					showError(treatedArea,"Project Area must be greater than zero.");
+					return;
+				}
+				// =========================
+				// PROJECT TYPE
+				// =========================
+				if(!projectType){
+					e.preventDefault();
+					const projectTypeContainer = document.querySelector("input[name='projectType']").closest(".row").querySelector(".col-md-9");
+					const error = document.createElement("div");
+					error.className = "validation-error";
+					error.innerText = "Please select Project Type.";
+					projectTypeContainer.appendChild(error);
+					document.querySelector("input[name='projectType']").focus();
+					return;
+				}
+				// =========================
+				// PROPOSED COST
+				// =========================
+				if(proposedCost.value.trim() === ""){
+					e.preventDefault();
+					showError(proposedCost,"Please enter Proposed Cost.");
+					return;
+				}
+				if(Number(proposedCost.value) <= 0){
+					e.preventDefault();
+					showError(proposedCost,"Proposed Cost must be greater than zero.");
+					return;
+				}
+			});
+			// =========================
+			// REMOVE ERROR ON CHANGE
+			// =========================
+			form.addEventListener("input", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
+			form.addEventListener("change", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
 		});
-
-	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
 	    document.querySelectorAll(".editBtn").forEach(function (btn) {
@@ -415,8 +489,8 @@
 				    const district = document.getElementById("editDistrict").value;
 				    const project = document.getElementById("editProject").value.trim();
 				    const microWatershed = document.getElementById("editMicroWatershed").value;
-				    const treatedArea = document.querySelector("[name='editTreatedArea']").value;
-				    const proposedCost = document.querySelector("[name='editProposedCost']").value;
+				    const treatedArea = document.getElementById("editTreatedArea").value;
+				    const proposedCost = document.getElementById("editProposedCost").value;
 				    const projectType = document.querySelector("input[name='projectType']:checked");
 				    if(district === ""){
 				        alert("Please select District.");
@@ -508,7 +582,7 @@
 	                
 					<input type="hidden" id="pprId" name="pprId" th:value="${pprId}">
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> District</label>
+	                    <label class="col-md-3 fw-bold"> District <span class="required">*</span></label>
 						<div class="col-md-5">
 							<select class="form-select" id="district" name="district">
 								<option value="">--Select--</option>
@@ -519,14 +593,14 @@
 	                </div>
 
 					<div class="row mb-3 align-items-center">
-					    <label class="col-md-3 fw-bold">Project Name</label>
+					    <label class="col-md-3 fw-bold">Project Name </label>
 						<div class="col-md-5">
 							<input type="text" class="form-control" id="project" name="project" th:value="${project}" readonly>
 						</div>
 					</div>
 
 					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold">Name of Micro-watershed Proposed to be covered</label>
+						<label class="col-md-3 fw-bold">Name of Micro-watershed Proposed to be covered <span class="required">*</span></label>
 						<div class="col-md-5">
 							<select class="form-select" id="microWatershed" name="microWatershed">
 								<option value="">--Select--</option>
@@ -536,14 +610,14 @@
 					</div>
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold">Micro-watershed Code</label>
+	                    <label class="col-md-3 fw-bold">Micro-watershed Code </label>
 						<div class="col-md-3">
 						    <input type="text" class="form-control" id="microWatershedCode" name="microWatershedCode" readonly>
 						</div>
 	                </div>
 
 					<div class="row mb-3 align-items-center">
-					    <label class="col-md-3 fw-bold"> Proposed project area treated(in Ha.) </label>
+					    <label class="col-md-3 fw-bold"> Proposed project area treated(in Ha.) <span class="required">*</span></label>
 					    <div class="col-md-3">
 							<input type="text" name="treatedProjectArea" id="treatedProjectArea" autocomplete="off" 
 														class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
@@ -551,7 +625,7 @@
 					</div>										
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Type of Project </label>
+	                    <label class="col-md-3 fw-bold"> Type of Project <span class="required">*</span></label>
 						<div class="col-md-9">
 							<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
 								<input class="form-check-input" type="radio" name="projectType" th:id="'project'+${project.projectTypeId}"
@@ -563,7 +637,7 @@
 	                </div>
 
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Proposed Cost </label>
+	                    <label class="col-md-3 fw-bold"> Proposed Cost <span class="required">*</span></label>
 	                    <div class="col-md-3">
 							<input type="text" name="proposedCost" id="proposedCost" autocomplete="off" 
 								class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
@@ -730,50 +804,38 @@
 						<div class="modal-body">
 							<input type="hidden" id="editPprProposedProjectId" name="pprProposedProjectId">
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									District
-								</label>
+								<label class="col-md-3 fw-bold">District </label>
 								<div class="col-md-5">
 									<input type="text" class="form-control" id="editDistrict" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Project Name
-								</label>
+								<label class="col-md-3 fw-bold">Project Name </label>
 								<div class="col-md-5">
 									<input type="text" class="form-control" id="editProject" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Name of Micro-watershed Proposed to be covered
-								</label>
+								<label class="col-md-3 fw-bold">Name of Micro-watershed Proposed to be covered </label>
 								<div class="col-md-5">
 									<input type="text" class="form-control" id="editMicroWatershed" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Micro-watershed Code
-								</label>
+								<label class="col-md-3 fw-bold">Micro-watershed Code </label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" id="editMicroWatershedCode" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Proposed project area treated(in Ha.)
-								</label>
+								<label class="col-md-3 fw-bold">Proposed project area treated(in Ha.) <span class="required">*</span></label>
 								<div class="col-md-3">
-									<input type="text" name="editTreatedArea" id="editTreatedArea" autocomplete="off" 
+									<input type="text" name="treatedProjectArea" id="editTreatedArea" autocomplete="off" 
 																class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Type of Project
-								</label>
+								<label class="col-md-3 fw-bold"> Type of Project <span class="required">*</span></label>
 								<div class="col-md-9">
 									<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
 										<input class="form-check-input editProjectType" type="radio" name="projectType"
@@ -785,20 +847,16 @@
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">
-									Proposed Cost
-								</label>
+								<label class="col-md-3 fw-bold">Proposed Cost <span class="required">*</span></label>
 								<div class="col-md-3">
-									<input type="text" name="editProposedCost" id="editProposedCost" autocomplete="off" 
+									<input type="text" name="proposedCost" id="editProposedCost" autocomplete="off" 
 										class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
 								</div>
 							</div>
 							<div class="row mb-3 align-items-center">
 								<label class="col-md-3 fw-bold"> Weightage under the Criteria </label>
 								<div class="col-md-4">
-									<button type="button" class="btn btn-outline-primary btn-sm" id="editCriteriaLink">
-										Link <i class="fas fa-list"></i>
-									</button>
+									<button type="button" class="btn btn-outline-primary btn-sm" id="editCriteriaLink">Link <i class="fas fa-list"></i> </button>
 									<input type="hidden" id="editCriteriaData" name="criteriaData">
 								</div>
 							</div>
