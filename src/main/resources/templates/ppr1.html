@@ -395,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
 										     <i class="fas fa-edit"></i>
 										</a>-->
 										
-										<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn" th:attr="data-id=${user[0]}, 
+										<button th:if="${user[8].toString().equals('D')}" type="button" title="Edit" class="btn btn-primary btn-sm editBtn" th:attr="data-id=${user[0]}, 
 										data-stname=${user[2]}, data-stid=${user[1]}, data-sltype=${user[3]}, data-notificationd=${user[9]}, data-moud=${user[10]}"
 											data-bs-toggle="modal" data-bs-target="#editModal">
 											<i class="fas fa-edit"></i>
