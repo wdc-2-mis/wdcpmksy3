@@ -223,6 +223,294 @@ body{
 
 }
 
+/* =====================================================
+   SESSION WARNING OVERLAY
+===================================================== */
+
+.session-warning-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.65);
+
+    backdrop-filter: blur(7px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 99999;
+
+    animation: sessionFadeIn 0.3s ease;
+
+}
+
+
+/* =====================================================
+   WARNING CARD
+===================================================== */
+
+.session-warning-card {
+
+    width: 430px;
+
+    max-width: 90%;
+
+    background: #ffffff;
+
+    border-radius: 24px;
+
+    padding: 35px 30px;
+
+    text-align: center;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.35);
+
+    animation: sessionPopup 0.35s ease;
+
+}
+
+
+/* =====================================================
+   ICON
+===================================================== */
+
+.session-warning-icon {
+
+    width: 75px;
+
+    height: 75px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #fff3cd;
+
+    color: #f0ad00;
+
+    font-size: 32px;
+
+    animation: clockPulse 1.5s infinite;
+
+}
+
+
+/* =====================================================
+   TITLE
+===================================================== */
+
+.session-warning-card h3 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    color: #17324d;
+
+}
+
+
+/* =====================================================
+   TEXT
+===================================================== */
+
+.session-warning-text {
+
+    margin: 15px 0 5px;
+
+    color: #667085;
+
+    font-size: 15px;
+
+}
+
+
+.session-warning-subtext {
+
+    margin: 10px 0 25px;
+
+    color: #667085;
+
+    font-size: 14px;
+
+}
+
+
+/* =====================================================
+   COUNTDOWN
+===================================================== */
+
+.warning-countdown {
+
+    font-size: 42px;
+
+    font-weight: 800;
+
+    letter-spacing: 3px;
+
+    color: #e67e22;
+
+    margin: 8px 0;
+
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.session-warning-buttons {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+.extend-session-btn {
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding: 13px 20px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    background: #198754;
+
+    color: #ffffff;
+
+    transition: 0.25s;
+
+}
+
+
+.extend-session-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(25, 135, 84, 0.3);
+
+}
+
+
+.extend-session-btn:disabled {
+
+    opacity: 0.7;
+
+    cursor: wait;
+
+}
+
+
+.logout-session-btn {
+
+    border: 1px solid #dee2e6;
+
+    border-radius: 12px;
+
+    padding: 11px 20px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    background: #ffffff;
+
+    color: #6c757d;
+
+}
+
+
+.logout-session-btn:hover {
+
+    background: #f8f9fa;
+
+}
+
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes sessionFadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes sessionPopup {
+
+    from {
+
+        opacity: 0;
+
+        transform: scale(0.85)
+                   translateY(20px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: scale(1)
+                   translateY(0);
+
+    }
+
+}
+
+
+@keyframes clockPulse {
+
+    0%,
+    100% {
+
+        transform: scale(1);
+
+    }
+
+    50% {
+
+        transform: scale(1.08);
+
+    }
+
+}
+
 /*=====================================================
                 USER BOX
 ======================================================*/

@@ -41,6 +41,28 @@ function initializePage() {
 
     $("#emailMessage").hide();
 
+   
+    const selectedMethod =
+        $('input[name="loginMethod"]:checked').val();
+
+    console.log("Selected login method:", selectedMethod);
+
+    if (selectedMethod === "pass") {
+
+        $("#pass").show();
+
+        $("#otpe").hide();
+        $("#otp1").hide();
+
+    } 
+    else if (selectedMethod === "otp") {
+
+        $("#pass").hide();
+
+        $("#otpe").show();
+        $("#otp1").show();
+
+    }
 }
 
 function startResendCountdown() {

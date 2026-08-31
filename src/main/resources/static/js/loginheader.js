@@ -38,47 +38,225 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-let timeLeft = typeof sessionTimeout !== "undefined"
-    ? sessionTimeout
+let sessionDuration = typeof sessionTimeout !== "undefined"
+    ? Number(sessionTimeout)
     : 1800;
 
-	function updateSessionTimer(){
+let sessionExpiryTime = Date.now() + (sessionDuration * 1000);
 
-	    const timerElement = document.getElementById("sessionTimer");
+let timer;
+let warningShown = false;
+let expiredShown = false;
 
-	    if(!timerElement){
-	        return;
-	    }
 
-	    let minutes = Math.floor(timeLeft/60);
-	    let seconds = timeLeft%60;
+// =====================================================
+// SESSION TIMER
+// =====================================================
 
-	    timerElement.innerHTML =
-	        String(minutes).padStart(2,'0') + ":" +
-	        String(seconds).padStart(2,'0');
+function updateSessionTimer() {
 
-	    if(timeLeft === 120){
-	        showExtendPopup();
-	    }
+    const timerElement = document.getElementById("sessionTimer");
 
-	    if(timeLeft <= 0){
-	        clearInterval(timer);
-	        showExpiredPopup();
-	        return;
-	    }
+    if (!timerElement) {
+        return;
+    }
 
-	    timeLeft--;
-	}
-	updateSessionTimer();
-	const timer = setInterval(updateSessionTimer,1000);
+    // Calculate remaining time from real clock
+    const remainingMilliseconds = sessionExpiryTime - Date.now();
 
-function showExtendPopup(){
+    const timeLeft = Math.max(
+        0,
+        Math.ceil(remainingMilliseconds / 1000)
+    );
 
-    if(confirm("Your session will expire in 2 minutes.\n\nDo you want to extend your session?")){
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
 
-        extendSession();
+    timerElement.innerHTML =
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0");
+
+
+    // =================================================
+    // WARNING AT 2 MINUTES
+    // =================================================
+
+    if (timeLeft <= 120 && timeLeft > 0 && !warningShown) {
+
+        warningShown = true;
+
+        showExtendPopup(timeLeft);
+    }
+
+
+    // =================================================
+    // SESSION EXPIRED
+    // =================================================
+
+    if (timeLeft <= 0 && !expiredShown) {
+
+        expiredShown = true;
+
+        clearInterval(timer);
+
+        showExpiredPopup();
 
     }
+
+}
+
+
+// Start timer immediately
+updateSessionTimer();
+
+
+// Update every second
+timer = setInterval(updateSessionTimer, 1000);
+
+function showExtendPopup(timeLeft) {
+
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+
+    const remainingText =
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0");
+
+
+    const popup = document.createElement("div");
+
+    popup.id = "sessionWarningPopup";
+
+    popup.innerHTML = `
+
+        <div class="session-warning-overlay">
+
+            <div class="session-warning-card">
+
+                <div class="session-warning-icon">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+
+                <h3>Session Expiring Soon</h3>
+
+                <p class="session-warning-text">
+                    Your session will expire in
+                </p>
+
+                <div class="warning-countdown" id="warningCountdown">
+                    ${remainingText}
+                </div>
+
+                <p class="session-warning-subtext">
+                    Would you like to continue your session?
+                </p>
+
+                <div class="session-warning-buttons">
+
+                    <button
+                        type="button"
+                        id="extendSessionBtn"
+                        class="extend-session-btn">
+
+                        <i class="fa-solid fa-rotate"></i>
+                        Yes, Continue Session
+
+                    </button>
+
+                    <button
+                        type="button"
+                        id="logoutSessionBtn"
+                        class="logout-session-btn">
+
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Logout
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(popup);
+
+
+    // =================================================
+    // UPDATE POPUP COUNTDOWN
+    // =================================================
+
+    const countdownElement =
+        document.getElementById("warningCountdown");
+
+
+    const popupTimer = setInterval(function () {
+
+        const remaining =
+            Math.max(
+                0,
+                Math.ceil(
+                    (sessionExpiryTime - Date.now()) / 1000
+                )
+            );
+
+
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+
+
+        if (countdownElement) {
+
+            countdownElement.innerHTML =
+                String(mins).padStart(2, "0") +
+                ":" +
+                String(secs).padStart(2, "0");
+
+        }
+
+
+        if (remaining <= 0) {
+
+            clearInterval(popupTimer);
+
+        }
+
+    }, 1000);
+
+
+    // =================================================
+    // YES / CONTINUE
+    // =================================================
+
+    document
+        .getElementById("extendSessionBtn")
+        .addEventListener("click", function () {
+
+            clearInterval(popupTimer);
+
+            extendSession();
+
+        });
+
+
+    // =================================================
+    // LOGOUT
+    // =================================================
+
+    document
+        .getElementById("logoutSessionBtn")
+        .addEventListener("click", function () {
+
+            clearInterval(popupTimer);
+
+            window.location.href = "/customLogout";
+
+        });
 
 }
 
@@ -90,21 +268,85 @@ function showExpiredPopup(){
 
 }
 
-function extendSession(){
+function extendSession() {
 
-    fetch("/extendSession")
+    const button =
+        document.getElementById("extendSessionBtn");
 
-    .then(response=>response.text())
+    if (button) {
 
-    .then(data=>{
+        button.disabled = true;
 
-        if(data==="extended"){
+        button.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Extending...';
 
-            timeLeft = 30 * 60;
+    }
 
-            alert("Session extended successfully.");
+
+    fetch("/extendSession", {
+        method: "GET",
+        credentials: "same-origin"
+    })
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("Session extension failed");
+        }
+
+        return response.text();
+
+    })
+
+    .then(data => {
+
+        if (data.trim() === "extended") {
+
+            // =========================================
+            // RESET CLIENT TIMER TO 30 MINUTES
+            // =========================================
+
+            sessionDuration = 30 * 60;
+
+            sessionExpiryTime =
+                Date.now() + (sessionDuration * 1000);
+
+            warningShown = false;
+            expiredShown = false;
+
+
+            // Remove popup
+            const popup =
+                document.getElementById("sessionWarningPopup");
+
+            if (popup) {
+                popup.remove();
+            }
+
+
+            // Immediately update timer
+            updateSessionTimer();
+
+
+            console.log("Session extended successfully.");
+
+        } else {
+
+            alert("Unable to extend session. Please login again.");
+
+            window.location.href = "/login";
 
         }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Unable to extend session. Please login again.");
+
+        window.location.href = "/login";
 
     });
 
