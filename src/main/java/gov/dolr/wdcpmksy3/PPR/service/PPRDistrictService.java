@@ -106,30 +106,43 @@ public class PPRDistrictService {
         }
     }
 
-	public String updatePreliminaryPPR(Integer pprId, List<Integer> microIds, String userId, HttpServletRequest request) {
-		 try {
-	        MPpr ppr = pprRepo.findById(pprId).orElseThrow();
+	public String updatePreliminaryPPR(Integer pprId,
+            List<Integer> microIds,
+            String projectName,
+            String userId,
+            HttpServletRequest request) {
+try {
+MPpr ppr = pprRepo.findById(pprId)
+   .orElseThrow(() -> new IllegalArgumentException("Invalid PPR ID: " + pprId));
 
-	        pmwRepo.deleteAll(ppr.getMicroWatersheds());
+// Update project name
+ppr.setProjectName(projectName);
+pprRepo.save(ppr);
 
-	        for (Integer mwId : microIds) {
-	            MicroWatershed micro = microRepo.findById(mwId).orElseThrow();
+// Remove old associations
+pmwRepo.deleteAll(ppr.getMicroWatersheds());
 
-	            PprMicroWatershed pmw = new PprMicroWatershed();
-	            pmw.setPpr(ppr);
-	            pmw.setMicroWatershed(micro);
-	            pmw.setStatus("D");
-	            pmw.setCreatedBy(userId);
-	            pmw.setRequestIp(getClientIpAddr(request));
+// Add new associations
+for (Integer mwId : microIds) {
+MicroWatershed micro = microRepo.findById(mwId)
+                     .orElseThrow(() -> new IllegalArgumentException("Invalid MicroWatershed ID: " + mwId));
 
-	            pmwRepo.save(pmw);
-	        }
+PprMicroWatershed pmw = new PprMicroWatershed();
+pmw.setPpr(ppr);
+pmw.setMicroWatershed(micro);
+pmw.setStatus("D");
+pmw.setCreatedBy(userId);
+pmw.setRequestIp(getClientIpAddr(request));
 
-	        return "Record updated successfully!";
-	    } catch (Exception e) {
-	        return "Error updating record: " + e.getMessage();
-	    }
-	}
+pmwRepo.save(pmw);
+}
+
+return "Record updated successfully!";
+} catch (Exception e) {
+return "Error updating record: " + e.getMessage();
+}
+}
+
 
 	public String completePPRDist(Integer id, String userId) {
         try {

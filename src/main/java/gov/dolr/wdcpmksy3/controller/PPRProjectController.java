@@ -54,63 +54,127 @@ public class PPRProjectController {
         model.addAttribute("microwatershedList", microService.getMicroServiceIdandName());
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
-		List<MPpr> records = pprRepo.findAll();
+		List<MPpr> records = pprRepo.findAllOrderByStatusAndId();
 	    model.addAttribute("records", records);
         return "ppr/pprDistrict";
     }
 	
 	@PostMapping("/savePPRDistrict")
-	public String savePreliminaryPPR4A(@RequestParam("fyear") Integer finYrCd, @RequestParam("district") Integer dcode, @RequestParam("agency") String projectName, @RequestParam("micro") List<Integer> mwIds,
-	        HttpSession session, Model model, HttpServletRequest servletRequest, RedirectAttributes redirectAttributes) {
+	public String savePreliminaryPPR(@RequestParam("fyear") Integer finYrCd,
+	                                 @RequestParam("district") Integer dcode,
+	                                 @RequestParam("agency") String projectName,
+	                                 @RequestParam("micro") List<Integer> mwIds,
+	                                 HttpSession session,
+	                                 HttpServletRequest servletRequest,
+	                                 RedirectAttributes redirectAttributes) {
 
 	    String userId = (String) session.getAttribute("userid");
 	    Integer stCode = (Integer) session.getAttribute("stcode");
-	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-	    String message = pprService.savePreliminaryPPR(finYrCd, dcode, projectName, mwIds, userId,  stCode, servletRequest);
-	    model.addAttribute("distList", districtService.getDistrictsByState(stcode));
-        model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
-        model.addAttribute("microwatershedList", microService.getMicroServiceIdandName());
-        List<MPpr> records = pprRepo.findAll();
-	    model.addAttribute("records", records);
-        model.addAttribute("saveMessage", message);
-        redirectAttributes.addFlashAttribute("saveMessage", message);
+
+	    try {
+	        pprService.savePreliminaryPPR(finYrCd, dcode, projectName, mwIds, userId, stCode, servletRequest);
+
+	        redirectAttributes.addFlashAttribute("success", "Record saved successfully!");
+
+	    } catch (Exception e) {
+	       redirectAttributes.addFlashAttribute("error", "Error saving record: " + e.getMessage());
+	    }
+
 	    return "redirect:/pprDistrict";
 	}
+
 	
 	@PostMapping("/updatePPRDistrict")
-	public String updatePPRDistrict(@RequestParam("pprId") Integer pprId, @RequestParam("microIds") List<Integer> microIds, HttpSession session, HttpServletRequest request, Model model,
-			RedirectAttributes redirectAttributes) {
+	public String updatePPRDistrict(@RequestParam("pprId") Integer pprId,
+	                                @RequestParam("microIds") List<Integer> microIds,
+	                                @RequestParam("projectName") String projectName,
+	                                HttpSession session,
+	                                HttpServletRequest request,
+	                                RedirectAttributes redirectAttributes) {
 
 	    String userId = (String) session.getAttribute("userid");
-	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 
-	    String message = pprService.updatePreliminaryPPR(pprId, microIds, userId, request);
+	    try {
+	        // Call service update method with projectName
+	        pprService.updatePreliminaryPPR(pprId, microIds, projectName, userId, request);
 
-	    // ✅ reload fresh data
-	    model.addAttribute("distList", districtService.getDistrictsByState(stcode));
-	    model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
-	    model.addAttribute("microwatershedList", microService.getMicroServiceIdandName());
-	    List<MPpr> records = pprRepo.findAll();  // fresh fetch
-	    model.addAttribute("records", records);
-	    model.addAttribute("saveMessage", message);
+	        redirectAttributes.addFlashAttribute("success", "Record updated successfully!");
 
-	    redirectAttributes.addFlashAttribute("saveMessage", message);
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("error", "Error updating record: " + e.getMessage());
+	    }
+
 	    return "redirect:/pprDistrict";
 	}
 
+
+
  
-	@GetMapping("/completePPRDistrict/{id}")
-	public String completePPRDistrict(@PathVariable Integer id, RedirectAttributes redirectAttributes, HttpSession session) {
-		 String userId = (String) session.getAttribute("userid");
-	    String message = pprService.completePPRDist(id, userId);
-	    redirectAttributes.addFlashAttribute("saveMessage", message);
+	@GetMapping("/completePPRDistrict")
+	public String completePPRDistrict(
+	        @RequestParam("id") Integer id,
+	        RedirectAttributes redirectAttributes,
+	        HttpSession session) {
+
+	    try {
+
+	        System.out.println(
+	                "UserId in session: " +
+	                session.getAttribute("userId")
+	        );
+
+	        String updatedBy =
+	                String.valueOf(session.getAttribute("userId"));
+
+	        pprService.completePPRDist(id, updatedBy);
+
+	        redirectAttributes.addFlashAttribute(
+	                "success",
+	                "Record completed successfully."
+	        );
+
+	    } catch (Exception e) {
+
+	        redirectAttributes.addFlashAttribute(
+	                "error",
+	                e.getMessage()
+	        );
+	    }
+
 	    return "redirect:/pprDistrict";
 	}
 	
-	@GetMapping("/deletePPRDistrict/{id}")
-	public String deletePPRDistrict(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
-		 String message = pprService.deletePPRDist(id);
-	    redirectAttributes.addFlashAttribute("saveMessage", message);
+	@GetMapping("/deletePPRDistrict")
+	public String deletePPRDistrict(
+	        @RequestParam("id") Integer id,
+	        RedirectAttributes redirectAttributes,
+	        HttpSession session) {
+
+	    try {
+
+	        System.out.println(
+	                "UserId in session: " +
+	                session.getAttribute("userId")
+	        );
+
+	        String updatedBy =
+	                String.valueOf(session.getAttribute("userId"));
+
+	        pprService.deletePPRDist(id);
+
+	        redirectAttributes.addFlashAttribute(
+	                "success",
+	                "Record deleted successfully."
+	        );
+
+	    } catch (Exception e) {
+
+	        redirectAttributes.addFlashAttribute(
+	                "error",
+	                e.getMessage()
+	        );
+	    }
+
 	    return "redirect:/pprDistrict";
 	}
 

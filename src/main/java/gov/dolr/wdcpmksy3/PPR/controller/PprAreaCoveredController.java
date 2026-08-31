@@ -50,6 +50,38 @@ public class PprAreaCoveredController {
 	}
 	
 
+	@GetMapping("/areaCoveredUnderWP/{dcode}")
+	public String areaCoveredUnderWPByDistrict(
+	        @PathVariable Integer dcode,
+	        HttpSession session,
+	        Model model) {
+
+	    Object userid = session.getAttribute("userid");
+
+	    if (userid == null) {
+	        return "redirect:/login";
+	    }
+
+	    Integer stcode = Integer.parseInt(
+	            session.getAttribute("stcode").toString()
+	    );
+
+	    model.addAttribute(
+	            "distList",
+	            districtService.getPPRDistrictsByState(stcode)
+	    );
+
+	    model.addAttribute(
+	            "schemeList",
+	            pprAreaService.getAllSchemes().stream().limit(6)
+	    );
+
+	    // District received from Next button
+	    model.addAttribute("selectedDcode", dcode);
+
+	    return "ppr/areaCovered";
+	}
+	
 	@GetMapping("/districtStats/{dcode}")
 	@ResponseBody
 	public Map<String, Object> getDistrictStats(@PathVariable Integer dcode, Model model) {

@@ -13,77 +13,191 @@
 	    color:red;
 	}
 
-	
+	.next-btn {
+    animation: nextButtonPulse 1.2s infinite;
+}
+
+@keyframes nextButtonPulse {
+
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+}
 </style>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
+
+    /* =====================================================
+       CREATE FORM VALIDATION
+       ===================================================== */
+
     const form = document.getElementById("institutionForm");
-    const inputs = form.querySelectorAll("input[required], select[required]");
 
-    inputs.forEach(input => {
-        input.addEventListener("blur", function () {
-            if (!input.value) {
-                input.classList.add("is-invalid");
-            } else {
-                input.classList.remove("is-invalid");
-                input.classList.add("is-valid");
+    if (form) {
+
+        const inputs =
+            form.querySelectorAll("input[required], select[required]");
+
+        inputs.forEach(function (input) {
+
+            input.addEventListener("blur", function () {
+
+                if (!input.value) {
+
+                    input.classList.add("is-invalid");
+                    input.classList.remove("is-valid");
+
+                } else {
+
+                    input.classList.remove("is-invalid");
+                    input.classList.add("is-valid");
+
+                }
+
+            });
+
+        });
+
+
+        form.addEventListener("submit", function (event) {
+
+            if (!form.checkValidity()) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
             }
-        });
-    });
 
-    form.addEventListener("submit", function (event) {
-        if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
+            form.classList.add("was-validated");
+
+        });
+
+    }
+
+
+    /* =====================================================
+       EDIT PPR BUTTON
+       ===================================================== */
+
+    document.addEventListener("click", function (e) {
+
+        const btn = e.target.closest(".edit-btn");
+
+        if (!btn) {
+            return;
         }
-        form.classList.add("was-validated");
-    });
-});
 
-function confirmDelete(pprId) {
-    if (confirm("Are you sure you want to delete this record?")) {
-        window.location.href = '/deletePPRDistrict/' + pprId;
-    }
-}
-
-function confirmComplete(pprId) {
-    if (confirm("Are you sure you want to complete this record?")) {
-        window.location.href = '/completePPRDistrict/' + pprId;
-    }
-}
+        console.log("Edit button clicked:", btn);
 
 
-document.addEventListener('DOMContentLoaded', function () {
-    var editModal = document.getElementById('editModal');
-    editModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
+        /* -----------------------------
+           PPR ID
+           ----------------------------- */
 
-        // Get data attributes
-        var pprId = button.getAttribute('data-id');
-        var finYear = button.getAttribute('data-finyear');
-        var district = button.getAttribute('data-district');
-        var project = button.getAttribute('data-project');
-        var microIds = button.getAttribute('data-micro');
+        document.getElementById("pprId").value =
+            btn.dataset.pprid || "";
 
-        // Populate modal fields
-        document.getElementById('pprId').value = pprId;
-        document.getElementById('finYear').value = finYear;
-        document.getElementById('districtName').value = district;
-        document.getElementById('projectName').value = project;
 
-        // Pre-select micro-watersheds
-        var select = document.getElementById('microEdit');
-        Array.from(select.options).forEach(opt => {
-            opt.selected = microIds.split(',').includes(opt.value);
+        /* -----------------------------
+           Financial Year
+           ----------------------------- */
+
+        document.getElementById("finYear").value =
+            btn.dataset.finyear || "";
+
+
+        /* -----------------------------
+           District
+           ----------------------------- */
+
+        document.getElementById("districtName").value =
+            btn.dataset.district || "";
+
+
+        /* -----------------------------
+           Project Name
+           ----------------------------- */
+
+        document.getElementById("projectName").value =
+            btn.dataset.project || "";
+
+
+        /* -----------------------------
+           Micro-Watersheds
+           ----------------------------- */
+
+        const microEdit =
+            document.getElementById("microEdit");
+
+
+        // Clear previous selection
+
+        Array.from(microEdit.options).forEach(function (option) {
+
+            option.selected = false;
+
         });
-    });
-});
 
-var microIds = button.getAttribute('data-micro');
-var select = document.getElementById('microEdit');
-Array.from(select.options).forEach(opt => {
-    opt.selected = microIds.split(',').includes(opt.value);
+
+        // Get comma-separated MW IDs
+
+        const microIds =
+            btn.dataset.micro || "";
+
+
+        console.log("Micro IDs:", microIds);
+
+
+        if (microIds.trim() !== "") {
+
+            const selectedIds =
+                microIds
+                    .split(",")
+                    .map(function (id) {
+                        return id.trim();
+                    });
+
+
+            Array.from(microEdit.options).forEach(function (option) {
+
+                if (selectedIds.includes(option.value)) {
+
+                    option.selected = true;
+
+                }
+
+            });
+
+        }
+
+
+        /* -----------------------------
+           Open Edit Modal
+           ----------------------------- */
+
+        const editModal =
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById("editModal")
+            );
+
+        editModal.show();
+
+    });
+
 });
 
 </script>
@@ -99,7 +213,18 @@ Array.from(select.options).forEach(opt => {
 	               Preliminary Project Report (PPR1)
 	            </h4>
 	        </div>
+	        
+	        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		   </div>
+		
+		   <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+		    <span th:text="${error}"></span>
+		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		   </div>
 	        <div th:if="${saveMessage}" class="alert alert-success" th:text="${saveMessage}"></div>
+	        
 	        
 	         <div class="card-body">
 
@@ -203,15 +328,57 @@ Array.from(select.options).forEach(opt => {
                     <td>
                         <!-- Conditional buttons -->
                         <div th:if="${rec.status == 'C'}">
-                            <span class="badge bg-success">Data Completed</span>
-                        </div>
+
+    <span class="badge bg-success">
+        Data Completed
+    </span>
+
+    <a th:href="@{/areaCoveredUnderWP/{dcode}(dcode=${rec.district.dcode})}"
+   class="btn btn-primary btn-sm ms-2 next-btn"
+   title="Go to Next Form">
+
+    Next <i class="fas fa-arrow-right"></i>
+
+</a>
+
+</div>
                         <div th:if="${rec.status != 'C'}">
-                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" th:attr="data-id=${rec.pprId}, data-finyear=${rec.finYear.finYrDesc}, data-district=${rec.district.distName},
-                            data-project=${rec.projectName}, data-micro=${rec.microIdsCsv}"> Update</button>
-                            
-                               <button class="btn btn-primary btn-sm" th:onclick="'confirmComplete(' + ${rec.pprId} + ')'">Complete</button>
-                            <button class="btn btn-danger btn-sm" th:onclick="'confirmDelete(' + ${rec.pprId} + ')'">Delete</button>
-                        </div>
+
+    <!-- Edit -->
+    <a href="javascript:void(0)"
+   class="btn btn-primary btn-sm edit-btn"
+   th:attr="
+       data-pprid=${rec.pprId},
+       data-finyear=${rec.finYear.finYrDesc},
+       data-district=${rec.district.distName},
+       data-project=${rec.projectName},
+       data-micro=${rec.microIdsCsv}">
+
+    <i class="fas fa-edit"></i>
+
+</a>
+
+&nbsp; &nbsp;
+    <!-- Complete -->
+    <a th:href="@{/completePPRDistrict(id=${rec.pprId})}"
+   class="btn btn-success btn-sm"
+   onclick="return confirm('Are you sure you want to complete this record?');">
+
+    <i class="fas fa-check"></i>
+
+</a>
+
+&nbsp; &nbsp;
+    <!-- Delete -->
+    <a th:href="@{/deletePPRDistrict(id=${rec.pprId})}"
+   class="btn btn-danger btn-sm"
+   onclick="return confirm('Are you sure you want to delete this record?');">
+
+    <i class="fas fa-trash"></i>
+
+</a>
+
+</div>
                     </td>
                 </tr>
             </tbody>
@@ -220,59 +387,147 @@ Array.from(select.options).forEach(opt => {
 </div>
 
 <div class="modal fade" id="editModal">
+
     <div class="modal-dialog modal-lg">
+
         <div class="modal-content">
+
             <div class="modal-header bg-primary text-white">
+
                 <h5>Edit Details</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
             </div>
+
+
             <div class="modal-body">
-                <form id="editForm" th:action="@{/updatePPRDistrict}" method="post">
-                    <input type="hidden" id="pprId" name="pprId">
+
+                <form id="editForm"
+                      th:action="@{/updatePPRDistrict}"
+                      method="post">
+
+                    <input type="hidden"
+                           id="pprId"
+                           name="pprId">
+
+
+                    <!-- Financial Year -->
 
                     <div class="row mb-3">
-                        <label class="col-md-3 fw-bold">Financial Year</label>
+
+                        <label class="col-md-3 fw-bold">
+                            Financial Year
+                        </label>
+
                         <div class="col-md-9">
-                            <input type="text" id="finYear" name="finYear"
-                                   class="form-control" readonly>
+
+                            <input type="text"
+                                   id="finYear"
+                                   name="finYear"
+                                   class="form-control"
+                                   readonly>
+
                         </div>
+
                     </div>
 
 
-                    <div class="row mb-3">
-                        <label class="col-md-3 fw-bold">District</label>
-                        <div class="col-md-9">
-                            <input type="text" id="districtName" name="districtName"
-                                   class="form-control" readonly>
-                        </div>
-                    </div>
+                    <!-- District -->
 
                     <div class="row mb-3">
-                        <label class="col-md-3 fw-bold">Project Name</label>
+
+                        <label class="col-md-3 fw-bold">
+                            District
+                        </label>
+
                         <div class="col-md-9">
-                            <input type="text" id="projectName" name="projectName"
-                                   class="form-control" readonly>
+
+                            <input type="text"
+                                   id="districtName"
+                                   name="districtName"
+                                   class="form-control"
+                                   readonly>
+
                         </div>
+
                     </div>
 
+
+                    <!-- Project -->
+
                     <div class="row mb-3">
-                        <label class="col-md-3 fw-bold">Micro-Watershed</label>
+
+                        <label class="col-md-3 fw-bold">
+                            Project Name
+                        </label>
+
                         <div class="col-md-9">
-                            <select id="microEdit" name="microIds" class="form-control" multiple>
+
+                            <input type="text"
+                                   id="projectName"
+                                   name="projectName"
+                                   class="form-control">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Micro-Watershed -->
+
+                    <div class="row mb-3">
+
+                        <label class="col-md-3 fw-bold">
+                            Micro-Watershed
+                        </label>
+
+                        <div class="col-md-9">
+
+                            <select id="microEdit"
+                                    name="microIds"
+                                    class="form-control"
+                                    multiple>
+
                                 <th:block th:each="mw : ${microwatershedList}">
-                                    <option th:value="${mw.mwId}" th:text="${mw.mwName}"></option>
+
+                                    <option th:value="${mw.mwId}"
+                                            th:text="${mw.mwName}">
+                                    </option>
+
                                 </th:block>
+
                             </select>
+
                         </div>
+
                     </div>
+
+
+                    <!-- Update -->
 
                     <div class="text-end">
-                        <button type="submit" class="btn btn-success">Update</button>
+
+                        <button type="submit"
+                                class="btn btn-success">
+
+                            Update
+
+                        </button>
+
                     </div>
+
                 </form>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
 

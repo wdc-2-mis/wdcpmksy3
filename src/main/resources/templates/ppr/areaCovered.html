@@ -45,12 +45,24 @@
 										<label>District Name:</label><span class="required">*</span>
 									</div>
 									<div class="col-md-3">
-										<select id="district" name="district" class="form-control form-control-sm" required>
+										<!-- <select id="district" name="district" class="form-control form-control-sm" required>
 										<option value="">--Select District--</option>
 										<th:block th:each="dist : ${distList}">
 										<option th:value="${dist.dcode}" th:text="${dist.distName}"> </option>
 										</th:block>
-									    </select>
+									    </select> -->
+									    
+									    <select id="district" class="form-select">
+
+    <option value="">--Select District--</option>
+
+    <option th:each="dist : ${distList}"
+            th:value="${dist.dcode}"
+            th:text="${dist.distName}"
+            th:selected="${selectedDcode != null and selectedDcode == dist.dcode}">
+    </option>
+
+</select>
                                    <div class="invalid-feedback">Please select a District.</div>
 									</div>
 									
@@ -426,312 +438,412 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("district").addEventListener("change", function() {
-        var dcode = this.value;
-        if (dcode) {
-            fetch('/districtStats/' + dcode)
-                .then(response => response.json())
-                .then(data => {
-                    // update total MW
-                    document.getElementById("totalMw").value = data.totalMw || "";
+document.addEventListener("DOMContentLoaded", function () {
 
-                    // populate micro-watershed dropdown
-                    var mwSelect = document.getElementById("mw");
-                    mwSelect.innerHTML = '<option value="">--Select Micro-Watershed--</option>';
-                    if (data.microWatersheds) {
-                        data.microWatersheds.forEach(function(mw) {
-                            var opt = document.createElement("option");
-                            opt.value = mw.mwId;
-                            opt.text = mw.mwName;
-                            mwSelect.appendChild(opt);
-                        });
-                    }
+    function loadDistrictStats(dcode) {
 
-                    // build records grid from pivoted query
-                    if (data.records) {
-                        let headerrecords = data.records[0];
-                        let html = `
-                            <h4><center>List of Area covered under the watershed programme</center></h4>
-                            <table class="table table-bordered table-striped text-center">
-                                <thead>
-                                    <tr>
-                                        <th rowspan="2" class="table-primary">S No.</th>
-                                        <th rowspan="2" class="table-primary">Micro-Watershed</th>
-                                        <th colspan="2" class="table-primary">${headerrecords.pre_scheme}</th>
-                                        <th colspan="2" class="table-primary">${headerrecords.dpap_scheme}</th>
-                                        <th colspan="2" class="table-primary">${headerrecords.ddp_scheme}</th>
-                                        <th colspan="2" class="table-primary">${headerrecords.iwdp_scheme}</th>
-                                        <th colspan="2" class="table-primary">${headerrecords.iwmp_scheme}</th>
-                                        <th colspan="2" class="table-primary">${headerrecords.wdc_scheme}</th>
-                                        <th colspan="2" class="table-primary">Others</th>
-                                        <th rowspan="2" class="table-primary">Action</th>
-                                    </tr>
-                                    <tr>
-                                        <th class="table-primary">No.</th><th class="table-primary">Area</th>
-                                        <th class="table-primary">No.</th><th class="table-primary">Area</th>
-                                        <th class="table-primary">No.</th><th class="table-primary">Area</th>
-                                        <th class="table-primary">No.</th><th class="table-primary">Area</th>
-                                        <th class="table-primary">No.</th><th class="table-primary">Area</th>
-                                        <th class="table-primary">No.</th><th class="table-primary">Area</th>
-                                        <th class="table-primary">No.</th><th class="table-primary">Area</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                        `;
-                        data.records.forEach((record, index) => {
-                            html += `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${record.mw_name ?? ''}</td>
-                                    <td>${record.pre_no ?? ''}</td><td>${record.pre_area ?? ''}</td>
-                                    <td>${record.dpap_no ?? ''}</td><td>${record.dpap_area ?? ''}</td>
-                                    <td>${record.ddp_no ?? ''}</td><td>${record.ddp_area ?? ''}</td>
-                                    <td>${record.iwdp_no ?? ''}</td><td>${record.iwdp_area ?? ''}</td>
-                                    <td>${record.iwmp_no ?? ''}</td><td>${record.iwmp_area ?? ''}</td>
-                                    <td>${record.wdc_no ?? ''}</td><td>${record.wdc_area ?? ''}</td>
-                                    <td>${record.other_no ?? ''}</td><td>${record.other_area ?? ''}</td>
-                                    <td>
-                                        ${
-                                            record.status === 'D'
-                                            ? `
-                                                <a href="javascript:void(0)"
-   class="btn btn-primary btn-sm edit-btn"
-   data-pprid="${record.pprId}"
-   data-district="${record.dist_name}"
-   data-mwid="${record.mw_id}"
-   data-mwname="${record.mw_name}"
-   data-totalmwarea="${record.mw_area}"
-   data-pre-no="${record.pre_no}"
-   data-pre-area="${record.pre_area}"
-   data-dpap-no="${record.dpap_no}"
-   data-dpap-area="${record.dpap_area}"
-   data-ddp-no="${record.ddp_no}"
-   data-ddp-area="${record.ddp_area}"
-   data-iwdp-no="${record.iwdp_no}"
-   data-iwdp-area="${record.iwdp_area}"
-   data-iwmp-no="${record.iwmp_no}"
-   data-iwmp-area="${record.iwmp_area}"
-   data-wdc-no="${record.wdc_no}"
-   data-wdc-area="${record.wdc_area}"
-   data-other-no="${record.other_no ?? ''}"
-   data-other-area="${record.other_area ?? ''}">
-    
-   
-   <i class="fas fa-edit"></i>
-</a>
-
-                                               
-                                                <a href="/completeAreaConveredWP?id=${record.pprId}&mwId=${record.mw_id}" class="btn btn-success btn-sm" 
-                                                onclick="return confirm('Are you sure you want to complete this record?');">
-                                               <i class="fas fa-check"></i>
-                                               </a>
-                                                
-                                                <a href="/deleteAreaConveredWP?id=${record.pprId}&mwId=${record.mw_id}" class="btn btn-danger btn-sm" 
-                                                onclick="return confirm('Are you sure you want to delete this record?');">
-                                               <i class="fas fa-trash"></i>
-                                               </a>
-                                              `
-                                            : `<span class="badge bg-success">Data Completed</span>`
-                                        }
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                        html += `</tbody></table>`;
-                        document.getElementById("recordsGrid").innerHTML = html;
-                    }
-                })
-                .catch(err => console.error("Error fetching district stats:", err));
-        }
-    });
-    
-   const form = document.getElementById("institutionForm");
-    const validationModalEl = document.getElementById("validationModal");
-    const saveConfirmModalEl = document.getElementById("saveConfirmModal");
-
-    const validationModal = new bootstrap.Modal(validationModalEl);
-    const saveConfirmModal = new bootstrap.Modal(saveConfirmModalEl);
-
-    form.addEventListener("submit", function(e) {
-        e.preventDefault(); // stop default submit
-
-        // check required fields
-        const requiredFields = form.querySelectorAll("input[required], select[required]");
-        let firstMissing = null;
-
-        requiredFields.forEach(function(field) {
-            if (!field.value || field.value.trim() === "") {
-                if (!firstMissing) {
-                    firstMissing = field;
-                }
-            }
-        });
-
-        if (firstMissing) {
-            const label = firstMissing.closest(".row").querySelector("label, span");
-            const nameText = label ? label.innerText.replace("*", "").trim() : firstMissing.name;
-
-            document.getElementById("validationMessage").innerText =
-                "Please fill the required field: " + nameText;
-
-             validationModal.show();
-
-            validationModalEl.addEventListener('hidden.bs.modal', function () {
-                firstMissing.focus();
-            }, { once: true });
-
-            return; 
-        }
-
-        saveConfirmModal.show();
-
-         document.getElementById("confirmSaveBtn").addEventListener("click", function() {
-            form.submit(); // finally submit the form
-        }, { once: true });
-    }); 
-});
-
-
-
-
-
-document.getElementById("mw").addEventListener("change", function () {
-
-    const mwId = this.value;
-    const saveBtn = document.getElementById("saveDraftBtn");
-
-    if (mwId) {
-
-        fetch('/microWatershedArea/' + mwId)
-    .then(response => response.json())
-    
-    .then(data => {
-        console.log(data);
-        document.getElementById("totalMwArea").value = data.area || "";
-
-        const saveBtn = document.getElementById("saveDraftBtn");
-
-        if (data.status === "C") {
-
-            alert("This Micro-Watershed has already been completed. You cannot create another record.");
-            
-         	// Reset Micro-Watershed
-            document.getElementById("mw").value = "";
-
-            // Clear area
-            document.getElementById("totalMwArea").value = "";
-
-            saveBtn.disabled = true;
-
-        } else if (data.status === "D") {
-
-            alert("A draft already exists for this Micro-Watershed. Please edit the existing draft instead of creating a new one.");
-            
-         	// Reset Micro-Watershed
-            document.getElementById("mw").value = "";
-
-            // Clear area
-            document.getElementById("totalMwArea").value = "";
-
-            saveBtn.disabled = true;
-
-        } else {
-
-            saveBtn.disabled = false;
-
-        }
-
-    });
-
-    } else {
-
-        document.getElementById("totalMwArea").value = "";
-        saveBtn.disabled = false;
-
-    }
-
-});
-
-
-
-document.addEventListener("click", function (e) {
-
-    const btn = e.target.closest(".edit-btn");
-
-    console.log("Clicked", btn);
-
-    if (!btn) return;
-
-    
-
-    document.getElementById("editPprId").value = btn.dataset.pprid || "";
-    document.getElementById("editMWId").value = btn.dataset.mwid || "";
-    document.getElementById("editDistrictName").value = btn.dataset.district || "";
-    document.getElementById("editMwName").value = btn.dataset.mwname || "";
-    document.getElementById("editTotalMwArea").value = btn.dataset.totalmwarea || "";
-    
-  
-	document.getElementById("editscheme1No").value = btn.dataset.preNo || "";
-	document.getElementById("editscheme1Area").value = btn.dataset.preArea || "";
-
-	document.getElementById("editscheme2No").value = btn.dataset.dpapNo || "";
-	document.getElementById("editscheme2Area").value = btn.dataset.dpapArea || "";
-
-	document.getElementById("editscheme3No").value = btn.dataset.ddpNo || "";
-	document.getElementById("editscheme3Area").value = btn.dataset.ddpArea || "";
-
-	document.getElementById("editscheme4No").value = btn.dataset.iwdpNo || "";
-	document.getElementById("editscheme4Area").value = btn.dataset.iwdpArea || "";
-
-	document.getElementById("editscheme5No").value = btn.dataset.iwmpNo || "";
-	document.getElementById("editscheme5Area").value = btn.dataset.iwmpArea || "";
-
-	document.getElementById("editscheme6No").value = btn.dataset.wdcNo || "";
-	document.getElementById("editscheme6Area").value = btn.dataset.wdcArea || "";
-   
-    document.getElementById("editscheme7No").value = btn.dataset.otherNo ?? "";
-	document.getElementById("editscheme7Area").value = btn.dataset.otherArea ?? "";
-   
-    bootstrap.Modal.getOrCreateInstance(
-        document.getElementById("editModal")
-    ).show();
-
-});
-
-
-const editForm = document.getElementById("editForm");
-
-editForm.addEventListener("submit", function (e) {
-
-    const requiredFields = editForm.querySelectorAll("[required]");
-
-    for (const field of requiredFields) {
-
-        if (field.value.trim() === "") {
-
-            e.preventDefault();
-
-            const row = field.closest(".row");
-            const label = row.querySelector(".col-md-4");
-
-            document.getElementById("validationMessage").innerText =
-                (label ? label.innerText : "This field") + " is mandatory.";
-
-            bootstrap.Modal.getOrCreateInstance(
-                document.getElementById("validationModal")
-            ).show();
-
-            field.focus();
+        if (!dcode) {
             return;
         }
-    }
-    if(!confirm("Are you sure you want to update this record?")){
-        e.preventDefault();
-    }
-    
-});
 
+        fetch('/districtStats/' + dcode)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP error: " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+
+                console.log("District stats:", data);
+
+                // ==========================================
+                // 1. Update Total Micro-Watershed
+                // ==========================================
+
+                const totalMw = document.getElementById("totalMw");
+
+                if (totalMw) {
+                    totalMw.value = data.totalMw || "";
+                }
+
+
+                // ==========================================
+                // 2. Populate Micro-Watershed dropdown
+                // ==========================================
+
+                const mwSelect = document.getElementById("mw");
+
+                if (mwSelect) {
+
+                    mwSelect.innerHTML =
+                        '<option value="">--Select Micro-Watershed--</option>';
+
+                    if (data.microWatersheds) {
+
+                        data.microWatersheds.forEach(function (mw) {
+
+                            const opt = document.createElement("option");
+
+                            opt.value = mw.mwId;
+                            opt.text = mw.mwName;
+
+                            mwSelect.appendChild(opt);
+
+                        });
+                    }
+                }
+
+
+                // ==========================================
+                // 3. Build Records Grid
+                // ==========================================
+
+                const recordsGrid =
+                    document.getElementById("recordsGrid");
+
+                if (!recordsGrid) {
+                    return;
+                }
+
+                if (!data.records || data.records.length === 0) {
+
+                    recordsGrid.innerHTML =
+                        '<div class="alert alert-warning text-center">' +
+                        'Data not found!' +
+                        '</div>';
+
+                    return;
+                }
+
+
+                let headerrecords = data.records[0];
+
+                let html = `
+
+                    <h4>
+                        <center>
+                            List of Area covered under the watershed programme
+                        </center>
+                    </h4>
+
+                    <table class="table table-bordered table-striped text-center">
+
+                        <thead>
+
+                            <tr>
+
+                                <th rowspan="2" class="table-primary">
+                                    S No.
+                                </th>
+
+                                <th rowspan="2" class="table-primary">
+                                    Micro-Watershed
+                                </th>
+
+                                <th colspan="2" class="table-primary">
+                                    ${headerrecords.pre_scheme ?? ''}
+                                </th>
+
+                                <th colspan="2" class="table-primary">
+                                    ${headerrecords.dpap_scheme ?? ''}
+                                </th>
+
+                                <th colspan="2" class="table-primary">
+                                    ${headerrecords.ddp_scheme ?? ''}
+                                </th>
+
+                                <th colspan="2" class="table-primary">
+                                    ${headerrecords.iwdp_scheme ?? ''}
+                                </th>
+
+                                <th colspan="2" class="table-primary">
+                                    ${headerrecords.iwmp_scheme ?? ''}
+                                </th>
+
+                                <th colspan="2" class="table-primary">
+                                    ${headerrecords.wdc_scheme ?? ''}
+                                </th>
+
+                                <th colspan="2" class="table-primary">
+                                    Others
+                                </th>
+
+                                <th rowspan="2" class="table-primary">
+                                    Action
+                                </th>
+
+                            </tr>
+
+                            <tr>
+
+                                <th class="table-primary">No.</th>
+                                <th class="table-primary">Area</th>
+
+                                <th class="table-primary">No.</th>
+                                <th class="table-primary">Area</th>
+
+                                <th class="table-primary">No.</th>
+                                <th class="table-primary">Area</th>
+
+                                <th class="table-primary">No.</th>
+                                <th class="table-primary">Area</th>
+
+                                <th class="table-primary">No.</th>
+                                <th class="table-primary">Area</th>
+
+                                <th class="table-primary">No.</th>
+                                <th class="table-primary">Area</th>
+
+                                <th class="table-primary">No.</th>
+                                <th class="table-primary">Area</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                `;
+
+
+                // ==========================================
+                // 4. Add Records
+                // ==========================================
+
+                data.records.forEach(function (record, index) {
+
+                    html += `
+
+                        <tr>
+
+                            <td>
+                                ${index + 1}
+                            </td>
+
+                            <td>
+                                ${record.mw_name ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.pre_no ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.pre_area ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.dpap_no ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.dpap_area ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.ddp_no ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.ddp_area ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.iwdp_no ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.iwdp_area ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.iwmp_no ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.iwmp_area ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.wdc_no ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.wdc_area ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.other_no ?? ''}
+                            </td>
+
+                            <td>
+                                ${record.other_area ?? ''}
+                            </td>
+
+                            <td>
+
+                                ${
+                                    record.status === 'D'
+
+                                    ?
+
+                                    `
+
+                                    <!-- EDIT -->
+
+                                    <a href="javascript:void(0)"
+                                       class="btn btn-primary btn-sm edit-btn"
+
+                                       data-pprid="${record.pprId}"
+
+                                       data-district="${record.dist_name ?? ''}"
+
+                                       data-mwid="${record.mw_id ?? ''}"
+
+                                       data-mwname="${record.mw_name ?? ''}"
+
+                                       data-totalmwarea="${record.mw_area ?? ''}"
+
+                                       data-pre-no="${record.pre_no ?? ''}"
+
+                                       data-pre-area="${record.pre_area ?? ''}"
+
+                                       data-dpap-no="${record.dpap_no ?? ''}"
+
+                                       data-dpap-area="${record.dpap_area ?? ''}"
+
+                                       data-ddp-no="${record.ddp_no ?? ''}"
+
+                                       data-ddp-area="${record.ddp_area ?? ''}"
+
+                                       data-iwdp-no="${record.iwdp_no ?? ''}"
+
+                                       data-iwdp-area="${record.iwdp_area ?? ''}"
+
+                                       data-iwmp-no="${record.iwmp_no ?? ''}"
+
+                                       data-iwmp-area="${record.iwmp_area ?? ''}"
+
+                                       data-wdc-no="${record.wdc_no ?? ''}"
+
+                                       data-wdc-area="${record.wdc_area ?? ''}"
+
+                                       data-other-no="${record.other_no ?? ''}"
+
+                                       data-other-area="${record.other_area ?? ''}">
+
+                                        <i class="fas fa-edit"></i>
+
+                                    </a>
+
+
+                                   
+&nbsp; &nbsp;
+                                    <a href="/completeAreaConveredWP?id=${record.pprId}&mwId=${record.mw_id}"
+
+                                       class="btn btn-success btn-sm"
+
+                                       onclick="return confirm('Are you sure you want to complete this record?');">
+
+                                        <i class="fas fa-check"></i>
+
+                                    </a>
+
+
+                                   &nbsp; &nbsp;
+
+                                    <a href="/deleteAreaConveredWP?id=${record.pprId}&mwId=${record.mw_id}"
+
+                                       class="btn btn-danger btn-sm"
+
+                                       onclick="return confirm('Are you sure you want to delete this record?');">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </a>
+
+                                    `
+
+                                    :
+
+                                    `
+
+                                    <span class="badge bg-success">
+                                        Data Completed
+                                    </span>
+
+                                    `
+
+                                }
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                });
+
+
+                html += `
+
+                        </tbody>
+
+                    </table>
+
+                `;
+
+                recordsGrid.innerHTML = html;
+
+            })
+
+            .catch(err => {
+
+                console.error(
+                    "Error fetching district stats:",
+                    err
+                );
+
+            });
+
+    }
+
+
+    // =====================================================
+    // District change - Manual selection
+    // =====================================================
+
+    const district = document.getElementById("district");
+
+    if (district) {
+
+        district.addEventListener("change", function () {
+
+            const dcode = this.value;
+
+            loadDistrictStats(dcode);
+
+        });
+
+
+        // =================================================
+        // District already selected - Next button case
+        // =================================================
+
+        if (district.value) {
+
+            console.log(
+                "Auto loading district:",
+                district.value
+            );
+
+            loadDistrictStats(district.value);
+
+        }
+
+    }
+
+});
 </script>
 </div>
 
