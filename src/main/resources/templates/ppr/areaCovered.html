@@ -11,7 +11,14 @@
 	    color:red;
 	}
 
-	
+	.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 .2rem rgba(220,53,69,.25);
+}
 </style>
 
 
@@ -52,7 +59,7 @@
 										</th:block>
 									    </select> -->
 									    
-									    <select id="district" class="form-select">
+									    <select id="district" name="district" class="form-select" required>
 
     <option value="">--Select District--</option>
 
@@ -202,7 +209,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="saveAreaWP" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-primary">
       <div class="modal-header bg-primary text-white">
@@ -457,10 +464,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 console.log("District stats:", data);
 
-                // ==========================================
-                // 1. Update Total Micro-Watershed
-                // ==========================================
-
+               
                 const totalMw = document.getElementById("totalMw");
 
                 if (totalMw) {
@@ -468,10 +472,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
-                // ==========================================
-                // 2. Populate Micro-Watershed dropdown
-                // ==========================================
-
+               
                 const mwSelect = document.getElementById("mw");
 
                 if (mwSelect) {
@@ -495,10 +496,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
-                // ==========================================
-                // 3. Build Records Grid
-                // ==========================================
-
+              
                 const recordsGrid =
                     document.getElementById("recordsGrid");
 
@@ -605,10 +603,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         <tbody>
                 `;
 
-
-                // ==========================================
-                // 4. Add Records
-                // ==========================================
 
                 data.records.forEach(function (record, index) {
 
@@ -794,6 +788,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
 
                 recordsGrid.innerHTML = html;
+                
+                
 
             })
 
@@ -809,10 +805,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =====================================================
-    // District change - Manual selection
-    // =====================================================
-
     const district = document.getElementById("district");
 
     if (district) {
@@ -826,10 +818,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
-        // =================================================
-        // District already selected - Next button case
-        // =================================================
-
         if (district.value) {
 
             console.log(
@@ -842,6 +830,343 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     }
+
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.addEventListener("click", function (event) {
+
+        const editBtn = event.target.closest(".edit-btn");
+
+        if (!editBtn) {
+            return;
+        }
+
+        console.log("Edit button clicked");
+
+        // ==========================================
+        // Get values from data-* attributes
+        // ==========================================
+
+        const pprId       = editBtn.dataset.pprid;
+        const district    = editBtn.dataset.district;
+        const mwId        = editBtn.dataset.mwid;
+        const mwName      = editBtn.dataset.mwname;
+        const totalMwArea = editBtn.dataset.totalmwarea;
+
+        const preNo       = editBtn.dataset.preNo;
+        const preArea     = editBtn.dataset.preArea;
+
+        const dpapNo      = editBtn.dataset.dpapNo;
+        const dpapArea    = editBtn.dataset.dpapArea;
+
+        const ddpNo       = editBtn.dataset.ddpNo;
+        const ddpArea     = editBtn.dataset.ddpArea;
+
+        const iwdpNo      = editBtn.dataset.iwdpNo;
+        const iwdpArea    = editBtn.dataset.iwdpArea;
+
+        const iwmpNo      = editBtn.dataset.iwmpNo;
+        const iwmpArea    = editBtn.dataset.iwmpArea;
+
+        const wdcNo       = editBtn.dataset.wdcNo;
+        const wdcArea     = editBtn.dataset.wdcArea;
+
+        const otherNo     = editBtn.dataset.otherNo;
+        const otherArea   = editBtn.dataset.otherArea;
+
+
+        document.getElementById("editPprId").value =
+            pprId || "";
+
+        document.getElementById("editMWId").value =
+            mwId || "";
+
+
+        document.getElementById("editDistrictName").value =
+            district || "";
+
+        document.getElementById("editMwName").value =
+            mwName || "";
+
+        document.getElementById("editTotalMwArea").value =
+            totalMwArea || "";
+
+
+        document.getElementById("editscheme1No").value =
+            preNo || "";
+
+        document.getElementById("editscheme1Area").value =
+            preArea || "";
+
+
+        document.getElementById("editscheme2No").value =
+            dpapNo || "";
+
+        document.getElementById("editscheme2Area").value =
+            dpapArea || "";
+
+
+        document.getElementById("editscheme3No").value =
+            ddpNo || "";
+
+        document.getElementById("editscheme3Area").value =
+            ddpArea || "";
+
+
+        document.getElementById("editscheme4No").value =
+            iwdpNo || "";
+
+        document.getElementById("editscheme4Area").value =
+            iwdpArea || "";
+
+
+        document.getElementById("editscheme5No").value =
+            iwmpNo || "";
+
+        document.getElementById("editscheme5Area").value =
+            iwmpArea || "";
+
+
+        document.getElementById("editscheme6No").value =
+            wdcNo || "";
+
+        document.getElementById("editscheme6Area").value =
+            wdcArea || "";
+
+
+        document.getElementById("editscheme7No").value =
+            otherNo || "";
+
+        document.getElementById("editscheme7Area").value =
+            otherArea || "";
+
+
+        const modalElement =
+            document.getElementById("editModal");
+
+        if (!modalElement) {
+
+            console.error("editModal not found");
+
+            return;
+        }
+
+        const editModal =
+            bootstrap.Modal.getOrCreateInstance(modalElement);
+
+        editModal.show();
+
+    });
+
+});
+
+document.getElementById("mw").addEventListener("change", function() {
+    var mwId = this.value;
+    if (mwId) {
+        fetch('/microWatershedArea/' + mwId)
+            .then(response => response.json())
+            .then(data => {
+                // Populate the area field
+                document.getElementById("totalMwArea").value = data.area || "";
+
+                // If you also want to show status in another field
+                if (document.getElementById("mwStatus")) {
+                    document.getElementById("mwStatus").value = data.status || "";
+                }
+            })
+            .catch(err => console.error("Error fetching micro-watershed data:", err));
+    } else {
+        document.getElementById("totalMwArea").value = "";
+        if (document.getElementById("mwStatus")) {
+            document.getElementById("mwStatus").value = "";
+        }
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("institutionForm");
+    const saveModalElement = document.getElementById("saveAreaWP");
+    const confirmSaveBtn = document.getElementById("confirmSaveBtn");
+
+    if (!form) {
+        console.error("institutionForm not found");
+        return;
+    }
+
+    if (!saveModalElement) {
+        console.error("saveAreaWP modal not found");
+        return;
+    }
+
+    if (!confirmSaveBtn) {
+        console.error("confirmSaveBtn not found");
+        return;
+    }
+
+form.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        console.log("Save Draft clicked");
+
+   form.querySelectorAll(".is-invalid").forEach(function (field) {
+            field.classList.remove("is-invalid");
+        });
+
+
+        let firstInvalidField = null;
+        let validationMessage = "";
+
+
+        const district = document.getElementById("district");
+
+        if (!district || !district.value) {
+
+            district.classList.add("is-invalid");
+
+            validationMessage = "Please select a District.";
+
+            firstInvalidField = district;
+        }
+
+
+        if (!firstInvalidField) {
+
+            const mw = document.getElementById("mw");
+
+            if (!mw || !mw.value) {
+
+                mw.classList.add("is-invalid");
+
+                validationMessage =
+                    "Please select a Micro-Watershed.";
+
+                firstInvalidField = mw;
+            }
+        }
+
+
+        if (!firstInvalidField) {
+
+            const requiredFields =
+                form.querySelectorAll(
+                    'input[name^="scheme["][required]'
+                );
+
+            for (const field of requiredFields) {
+
+                if (!field.value.trim()) {
+
+                    field.classList.add("is-invalid");
+
+                    const feedback =
+                        field.parentElement.querySelector(
+                            ".invalid-feedback"
+                        );
+
+                    if (feedback) {
+                        validationMessage =
+                            feedback.innerText.trim();
+                    } else {
+                        validationMessage =
+                            "Please fill all required fields.";
+                    }
+
+                    firstInvalidField = field;
+
+                    break;
+                }
+            }
+        }
+
+
+        if (firstInvalidField) {
+
+            console.log(
+                "Validation failed:",
+                validationMessage
+            );
+
+            document.getElementById(
+                "validationMessage"
+            ).innerText = validationMessage;
+
+
+            const validationModalElement =
+                document.getElementById("validationModal");
+
+
+            if (validationModalElement) {
+
+                const validationModal =
+                    new bootstrap.Modal(
+                        validationModalElement
+                    );
+
+                validationModal.show();
+
+
+                validationModalElement.addEventListener(
+                    "shown.bs.modal",
+                    function () {
+
+                        firstInvalidField.focus();
+
+                    },
+                    { once: true }
+                );
+
+            } else {
+
+                alert(validationMessage);
+
+                firstInvalidField.focus();
+            }
+
+            return;
+        }
+
+
+       
+        console.log("Validation successful");
+
+        const saveModal =
+            new bootstrap.Modal(saveModalElement);
+
+        saveModal.show();
+
+    });
+
+
+    confirmSaveBtn.addEventListener("click", function () {
+
+        console.log("Yes, Save clicked");
+
+
+        confirmSaveBtn.disabled = true;
+
+        confirmSaveBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+
+        // Close confirmation modal
+        const saveModal =
+            bootstrap.Modal.getInstance(saveModalElement);
+
+        if (saveModal) {
+            saveModal.hide();
+        }
+
+
+        // IMPORTANT
+        // Actually submit to /saveAreaWP
+
+        form.submit();
+
+    });
 
 });
 </script>
