@@ -48,7 +48,7 @@ public class PendingUCPPR19Controller {
         }
         List<PprPendingUc> records = ucrepo.findByPpr_District_State_StCode(stcode);
         model.addAttribute("records", records);
-        model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
+        model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
         return "ppr/pendingUCPPR19";
     }

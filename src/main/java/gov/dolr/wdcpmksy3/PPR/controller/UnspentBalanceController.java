@@ -45,7 +45,7 @@ public class UnspentBalanceController {
         }
         List<PprWcdcUnspentBalance> records = unblance.findByPpr_District_State_StCode(stcode);
         model.addAttribute("records", records);
-        model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
+        model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         
         return "ppr/unspentBalancePPR20";
     }

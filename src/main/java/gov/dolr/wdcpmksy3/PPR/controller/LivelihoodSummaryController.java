@@ -59,7 +59,7 @@ public class LivelihoodSummaryController {
         }
         List<PprLivelihood> records = livrepo.findByPpr_District_State_StCode(stcode);
         model.addAttribute("records", records);
-        model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
+        model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("LivelihoodActList", laser.getAllLivelihoodActivity());
         model.addAttribute("LivelihoodInvList", liser.getAllLivelihoodIntervention());
 	

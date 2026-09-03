@@ -93,7 +93,7 @@ public class PPRAgroClimateConditionController {
         }
 
         model.addAttribute("agroClimateList", finalList);
-        model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
+        model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("villageList", villrepo.getVillagesByState(stcode));
         model.addAttribute("soilTypeList", soilser.getAllSoilTypeDetails());
         model.addAttribute("cropTypeList", cropser.getAllCropTypeDetails());
