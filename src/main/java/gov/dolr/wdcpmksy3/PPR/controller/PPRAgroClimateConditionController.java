@@ -65,7 +65,6 @@ public class PPRAgroClimateConditionController {
 	@GetMapping("/agroClimateConditionPPR10")
     public String agroClimateConditionPPR10(HttpSession session, Model model) 
 	{
-		
 		//String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");

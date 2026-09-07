@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
+import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
 
 @Entity
 @Table(name = "wdcpmksy_user_reg", schema = "public")
@@ -98,10 +101,14 @@ public class WdcpmksyUserReg {
     @Column(name = "otp_mobile_expiry")
     private  LocalDateTime otpMobileExpiry;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<WdcpmksyUserMap> userMappings;
     
+    @OneToMany(mappedBy = "sentTo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PprTransaction> transactionsReceived = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sentFrom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PprTransaction> transactionsSent = new ArrayList<>();
     
     // Getters and Setters
     public Integer getRegId() {
@@ -310,6 +317,21 @@ public class WdcpmksyUserReg {
 		this.otpMobileExpiry = otpMobileExpiry;
 	}
 
+	public List<PprTransaction> getTransactionsReceived() {
+		return transactionsReceived;
+	}
+
+	public void setTransactionsReceived(List<PprTransaction> transactionsReceived) {
+		this.transactionsReceived = transactionsReceived;
+	}
+
+	public List<PprTransaction> getTransactionsSent() {
+		return transactionsSent;
+	}
+
+	public void setTransactionsSent(List<PprTransaction> transactionsSent) {
+		this.transactionsSent = transactionsSent;
+	}
 	
    
 }
