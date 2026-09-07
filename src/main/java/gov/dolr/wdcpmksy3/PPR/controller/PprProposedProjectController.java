@@ -92,7 +92,7 @@ public class PprProposedProjectController {
 	                    pprService.getMicroWatershedsByDistrict(dcode));
 	        }
 	    }
-		model.addAttribute("districtList", districtService.getDistrictsByState(stcode));
+		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("criteriaList", criteriaRepo.findAll());
 		model.addAttribute("statename", statename);

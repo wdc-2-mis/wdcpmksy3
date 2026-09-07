@@ -83,7 +83,7 @@ public class PprProjectAtGlanceController {
 	            		microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
 	        }
 	    }
-		model.addAttribute("districtList", districtService.getDistrictsByState(stcode));
+		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("state", statename);
 		

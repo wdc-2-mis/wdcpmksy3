@@ -361,14 +361,14 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 	                    <div class="col-md-3">
-	                        <input type="text" class="form-control" name="tenure">
+	                        <input type="text" class="form-control" name="tenure" oninput="validateInteger(this,2)">
 	                    </div>
 	                </div>
 					
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Phone No <span class="required">*</span></label>
 	                    <div class="col-md-4">
-	                        <input type="text" class="form-control" maxlength="10" name="phone">
+	                        <input type="text" class="form-control" name="phone" oninput="validateInteger(this,10)">
 	                    </div>
 	                </div>
 
@@ -541,14 +541,14 @@
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 							<div class="col-md-3">
-								<input type="text" id="tenure" class="form-control" name="tenure">
+								<input type="text" id="tenure" class="form-control" name="tenure" oninput="validateInteger(this,2)">
 							</div>
 						</div>
 						
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold"> Phone No <span class="required">*</span></label>
 							<div class="col-md-4">
-								<input type="text" id="phoneNo" class="form-control" maxlength="10" name="phone">
+								<input type="text" id="phoneNo" class="form-control" name="phone" oninput="validateInteger(this,10)">
 							</div>
 						</div>
 						
