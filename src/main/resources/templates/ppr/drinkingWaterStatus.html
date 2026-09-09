@@ -580,8 +580,14 @@
 							   	<td th:if="${rec.status.toString().equals('C')}">
 									
 									<span class="badge bg-success">
-											<i class="fas fa-check-circle"></i> Completed
-									</span>	
+										<i class="fas fa-check-circle"></i> Completed
+									</span>
+									&nbsp; &nbsp;
+									<a th:href="@{/pprCropOutcomes}" class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
+									
+										Next <i class="fas fa-arrow-right"></i>
+									
+									</a>
 									
 								</td>
 			                   

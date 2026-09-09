@@ -627,6 +627,17 @@
 							   			class="badge bg-success">
 							   			<i class="fas fa-check-circle"></i> Completed
 							   		</span>	
+									&nbsp; &nbsp; 
+									<a th:href="@{/dtlFloodDroughtArea}" th:if="${row[10].toString().equals('C')}"
+									   class="btn btn-primary btn-sm ms-2 next-btn"
+									   title="Go to Next Form">
+
+									    Next <i class="fas fa-arrow-right"></i>
+
+									</a>
+									
+									
+									
 							   	</td>
 							   	<td th:unless="${stat.first || row[0] != agroClimateList[stat.index-1][0]}"></td>
 			                   

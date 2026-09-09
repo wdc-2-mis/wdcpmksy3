@@ -350,7 +350,10 @@ public class PprAreaCoverService {
 
 	}
 
-
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return wcarearepo.changeStatusByPprId(pprId);
+	}
 
 	
 

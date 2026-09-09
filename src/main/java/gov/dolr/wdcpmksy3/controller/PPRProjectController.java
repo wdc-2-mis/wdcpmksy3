@@ -44,7 +44,7 @@ public class PPRProjectController {
 	
 	
 	@GetMapping("/pprDistrict")
-    public String ppr1(HttpSession session, Model model) 
+    public String ppr1(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -53,7 +53,9 @@ public class PPRProjectController {
 
             return "redirect:/login";
         }
-           
+        if (pprid != null) {
+        	pprService.OpenPPRDist(pprid);
+        }
         model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
         model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
         model.addAttribute("microwatershedList", microService.getMicroServiceIdandName());

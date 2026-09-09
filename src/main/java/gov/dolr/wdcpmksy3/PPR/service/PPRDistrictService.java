@@ -239,4 +239,23 @@ return "Error updating record: " + e.getMessage();
 
 	    return response;
 	}
+	
+	public String OpenPPRDist(Integer id) {
+        try {
+            MPpr ppr = pprRepo.findById(id).orElseThrow();
+
+            ppr.setStatus("D");
+            pprRepo.save(ppr);
+
+            List<PprMicroWatershed> linkedMW = pmwRepo.findByPprPprId(id);
+            for (PprMicroWatershed pmw : linkedMW) {
+                pmw.setStatus("D");
+                pmwRepo.save(pmw);
+            }
+
+            return "Record Completed Successfully!";
+        } catch (Exception e) {
+            return "Error completing record: " + e.getMessage();
+        }
+    }
 }

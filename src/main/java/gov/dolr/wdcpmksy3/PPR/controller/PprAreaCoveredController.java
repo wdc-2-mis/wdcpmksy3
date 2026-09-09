@@ -36,13 +36,16 @@ public class PprAreaCoveredController {
 	private PprAreaCoverService pprAreaService;
 	
 	@GetMapping("/areaCoveredUnderWP")
-    public String areaCoveredUnderWP(HttpSession session, Model model) 
+    public String areaCoveredUnderWP(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		Object userid = session.getAttribute("userid");
         if(userid==null){
 
             return "redirect:/login";
+        }
+        if (pprid != null) {
+        	pprAreaService.changeStatusByPprId(pprid);
         }
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("schemeList", pprAreaService.getAllSchemes().stream().limit(6));
