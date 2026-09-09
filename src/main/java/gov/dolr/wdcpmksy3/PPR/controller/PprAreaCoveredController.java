@@ -109,13 +109,13 @@ public class PprAreaCoveredController {
 	
 	
 	@PostMapping("/saveAreaWP")
-    public String saveAreaWP(@RequestParam Integer district,
+    public String saveAreaWP(@RequestParam Integer district, @RequestParam Integer project,
                                   @RequestParam Integer mw,
                                   @RequestParam Map<String, String> params,
                                   Model model, HttpServletRequest servletRequest, HttpSession session, RedirectAttributes redirectAttributes) {
 	  String userId = (String) session.getAttribute("userid");
 	  try {
-	        pprAreaService.saveRecords(district, mw, params, userId, servletRequest);
+	        pprAreaService.saveRecords(district, project, mw, params, userId, servletRequest);
             redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
 	    } catch (Exception ex) {
 	        redirectAttributes.addFlashAttribute("error", "Failed to save records: " + ex.getMessage());

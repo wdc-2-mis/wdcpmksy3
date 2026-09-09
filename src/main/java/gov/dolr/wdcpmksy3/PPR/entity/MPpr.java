@@ -71,6 +71,12 @@ public class MPpr {
                 .collect(Collectors.joining(","));
     }
     
+    @Column(name = "ppr_name")
+    private String pprName;
+    
+    @Column(name = "ppr_seq_no", nullable = false)
+    private Integer pprSeqNo;
+    
     // --- Getters and Setters ---
     public Integer getPprId() {
         return pprId;
@@ -174,6 +180,22 @@ public class MPpr {
 
 	public void setAgroClimateList(List<PprAgroClimate> agroClimateList) {
 		this.agroClimateList = agroClimateList;
+	}
+
+	public String getPprName() {
+		return pprName;
+	}
+
+	public void setPprName(String pprName) {
+		this.pprName = pprName;
+	}
+
+	public Integer getPprSeqNo() {
+		return pprSeqNo;
+	}
+
+	public void setPprSeqNo(Integer pprSeqNo) {
+		this.pprSeqNo = pprSeqNo;
 	}
     
 	

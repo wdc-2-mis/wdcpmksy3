@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
@@ -27,6 +28,13 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 	@Query("SELECT p FROM MPpr p ORDER BY CASE WHEN p.status = 'C' THEN 1 ELSE 0 END, p.pprId ASC")
 	List<MPpr> findAllOrderByStatusAndId();
 
-	
+	boolean existsByDistrict_DcodeAndStatus(Integer dcode, String status);
+
+	@Query("""
+		    SELECT COALESCE(MAX(p.pprSeqNo), 0)
+		    FROM MPpr p
+		    WHERE p.district.dcode = :dcode
+		""")
+	Integer findMaxSeqNoByDistrict(@Param("dcode") Integer dcode);
 }
 

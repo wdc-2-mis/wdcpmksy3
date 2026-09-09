@@ -79,7 +79,7 @@ public class PprAreaCoverService {
 	    return ip;  
 	}
 	
-	public void saveRecords(Integer district, Integer mw, Map<String, String> params, String userId,
+	public void saveRecords(Integer district, Integer project, Integer mw, Map<String, String> params, String userId,
 			HttpServletRequest servletRequest) {
         List<PprWatershedCoveredArea> entities = new ArrayList<>();
 
@@ -92,8 +92,8 @@ public class PprAreaCoverService {
                 String areaStr = params.get("scheme[" + schemeId + "].area");
 
                 PprWatershedCoveredArea entity = new PprWatershedCoveredArea();
-                MPpr ppr = pprRepo.findByDistrict_Dcode(district);
                 
+                MPpr ppr= pprRepo.getReferenceById(project);
                 
                 MicroWatershed mwEntity = new MicroWatershed();
                 mwEntity.setMwId(mw);
@@ -114,6 +114,30 @@ public class PprAreaCoverService {
             }
         });
 
+        String scheme7NoStr = params.get("scheme7No"); 
+        String scheme7AreaStr = params.get("scheme7Area");
+        
+        if ((scheme7NoStr != null && !scheme7NoStr.trim().isEmpty()) || (scheme7AreaStr != null && !scheme7AreaStr.trim().isEmpty())) {
+        	
+        	PprWatershedCoveredArea entity = new PprWatershedCoveredArea(); 
+        	MPpr ppr = pprRepo.getReferenceById(project);
+        	
+        	MicroWatershed mwEntity = new MicroWatershed(); 
+        	mwEntity.setMwId(mw); 
+        	MScheme scheme = new MScheme();  
+        	scheme.setSchemeId(7); 
+        	entity.setPpr(ppr); 
+        	entity.setMicroWatershed(mwEntity); 
+        	entity.setScheme(scheme); 
+        	entity.setNoMw( scheme7NoStr != null && !scheme7NoStr.trim().isEmpty() ? Integer.valueOf(scheme7NoStr) : null ); 
+        	entity.setAreaMw( scheme7AreaStr != null && !scheme7AreaStr.trim().isEmpty() ? new BigDecimal(scheme7AreaStr) : null ); 
+        	entity.setStatus("D"); 
+        	entity.setCreatedBy(userId); 
+        	entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+        	entity.setCreatedDate( LocalDateTime.now() ); 
+        	entities.add(entity);
+        	
+        }
         wcarearepo.saveAll(entities);
     }
 

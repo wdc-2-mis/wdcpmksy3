@@ -1,6 +1,8 @@
 package gov.dolr.wdcpmksy3.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
@@ -16,6 +19,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.service.FinYearService;
 import gov.dolr.wdcpmksy3.PPR.service.MicroWatershedService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRDistrictService;
+import gov.dolr.wdcpmksy3.entity.MDistrict;
 import gov.dolr.wdcpmksy3.service.DistrictService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -38,6 +42,7 @@ public class PPRProjectController {
 	@Autowired
 	private MPprRepository pprRepo;
 	
+	
 	@GetMapping("/pprDistrict")
     public String ppr1(HttpSession session, Model model) 
 	{
@@ -49,7 +54,7 @@ public class PPRProjectController {
             return "redirect:/login";
         }
            
-        model.addAttribute("distList", districtService.getDistrictsByState(stcode));
+        model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
         model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
         model.addAttribute("microwatershedList", microService.getMicroServiceIdandName());
 		model.addAttribute("statename", statename);
@@ -59,10 +64,31 @@ public class PPRProjectController {
         return "ppr/pprDistrict";
     }
 	
+	@GetMapping("/checkDistrictCompleted")
+	@ResponseBody
+	public Map<String, Object> checkDistrictCompleted(
+	        @RequestParam("dcode") Integer dcode) {
+		boolean completed = pprService.isDistrictCompleted(dcode);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("completed", completed);
+
+	    return response;
+	}
+	
+	@GetMapping("/nextProjectName")
+	@ResponseBody
+	public Map<String, Object> getNextProjectName(
+	        @RequestParam("dcode") Integer dcode,
+	        @RequestParam("fyear") Integer fyear) {
+
+	    return pprService.getNextProjectName(dcode, fyear);
+	}
+	
 	@PostMapping("/savePPRDistrict")
 	public String savePreliminaryPPR(@RequestParam("fyear") Integer finYrCd,
 	                                 @RequestParam("district") Integer dcode,
-	                                 @RequestParam("agency") String projectName,
+	                                 @RequestParam("projectName") String projectName,
 	                                 @RequestParam("micro") List<Integer> mwIds,
 	                                 HttpSession session,
 	                                 HttpServletRequest servletRequest,
@@ -87,7 +113,6 @@ public class PPRProjectController {
 	@PostMapping("/updatePPRDistrict")
 	public String updatePPRDistrict(@RequestParam("pprId") Integer pprId,
 	                                @RequestParam("microIds") List<Integer> microIds,
-	                                @RequestParam("projectName") String projectName,
 	                                HttpSession session,
 	                                HttpServletRequest request,
 	                                RedirectAttributes redirectAttributes) {
@@ -96,7 +121,7 @@ public class PPRProjectController {
 
 	    try {
 	        // Call service update method with projectName
-	        pprService.updatePreliminaryPPR(pprId, microIds, projectName, userId, request);
+	        pprService.updatePreliminaryPPR(pprId, microIds, userId, request);
 
 	        redirectAttributes.addFlashAttribute("success", "Record updated successfully!");
 

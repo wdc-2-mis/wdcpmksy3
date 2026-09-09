@@ -1,6 +1,8 @@
 package gov.dolr.wdcpmksy3.PPR.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,17 +76,30 @@ public class PPRDistrictService {
             MDistrict district = districtRepo.findById(dcode).orElseThrow();
             InstitutionalStructure inst = instRepo.findByStCode(stCode);
 
+            Integer maxSeq = pprRepo.findMaxSeqNoByDistrict(dcode);
+            Integer nextSeq = (maxSeq == null ? 0 : maxSeq) + 1;
+            
             MPpr ppr = new MPpr();
             ppr.setFinYear(finYear);
             ppr.setDistrict(district);
             ppr.setInstitutionalStructure(inst);
             ppr.setProjectName(projectName);
+            ppr.setPprSeqNo(nextSeq);
             ppr.setStatus("D");
             ppr.setCreatedBy(userId);
             ppr.setRequestIp(getClientIpAddr(servletRequest));
 
             ppr = pprRepo.save(ppr);
 
+            String pprName = String.format(
+                    "PPR%02d%03d%d",
+                    stCode,
+                    dcode,
+                    ppr.getPprId()
+            );
+
+             ppr.setPprName(pprName);
+            
             for (Integer mwId : mwIds) {
                 MicroWatershed micro = microRepo.findById(mwId).orElseThrow();
 
@@ -108,21 +123,16 @@ public class PPRDistrictService {
 
 	public String updatePreliminaryPPR(Integer pprId,
             List<Integer> microIds,
-            String projectName,
             String userId,
             HttpServletRequest request) {
 try {
 MPpr ppr = pprRepo.findById(pprId)
    .orElseThrow(() -> new IllegalArgumentException("Invalid PPR ID: " + pprId));
 
-// Update project name
-ppr.setProjectName(projectName);
-pprRepo.save(ppr);
 
-// Remove old associations
+
 pmwRepo.deleteAll(ppr.getMicroWatersheds());
 
-// Add new associations
 for (Integer mwId : microIds) {
 MicroWatershed micro = microRepo.findById(mwId)
                      .orElseThrow(() -> new IllegalArgumentException("Invalid MicroWatershed ID: " + mwId));
@@ -198,5 +208,35 @@ return "Error updating record: " + e.getMessage();
 	public Double getMicroWatershedArea(Integer mwId) {
 		// TODO Auto-generated method stub
 		return microRepo.microWatershedArea(mwId);
+	}
+
+	public boolean isDistrictCompleted(Integer dcode) {
+		 return pprRepo.existsByDistrict_DcodeAndStatus(dcode, "C");
+	}
+
+	public Map<String, Object> getNextProjectName(Integer dcode, Integer fyear) {
+
+	    MDistrict district = districtRepo.findById(dcode)
+	            .orElseThrow(() -> new RuntimeException("District not found"));
+
+	    MFinYear finYear = finYearRepo.findById(fyear)
+	            .orElseThrow(() -> new RuntimeException("Financial Year not found"));
+
+	    Integer maxSeq = pprRepo.findMaxSeqNoByDistrict(dcode);
+
+	    Integer nextSeq = (maxSeq == null ? 0 : maxSeq) + 1;
+
+	    String projectName = district.getDistName()
+	            + "-WDC3-"
+	            + nextSeq
+	            + "/"
+	            + finYear.getFinYrDesc();
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    response.put("seqNo", nextSeq);
+	    response.put("projectName", projectName);
+
+	    return response;
 	}
 }

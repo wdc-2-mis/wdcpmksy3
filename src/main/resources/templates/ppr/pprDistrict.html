@@ -41,10 +41,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* =====================================================
-       CREATE FORM VALIDATION
-       ===================================================== */
-
+   
     const form = document.getElementById("institutionForm");
 
     if (form) {
@@ -88,12 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-
-    /* =====================================================
-       EDIT PPR BUTTON
-       ===================================================== */
-
-    document.addEventListener("click", function (e) {
+  document.addEventListener("click", function (e) {
 
         const btn = e.target.closest(".edit-btn");
 
@@ -103,59 +95,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Edit button clicked:", btn);
 
-
-        /* -----------------------------
-           PPR ID
-           ----------------------------- */
-
-        document.getElementById("pprId").value =
+    document.getElementById("pprId").value =
             btn.dataset.pprid || "";
-
-
-        /* -----------------------------
-           Financial Year
-           ----------------------------- */
-
-        document.getElementById("finYear").value =
+ document.getElementById("finYear").value =
             btn.dataset.finyear || "";
 
-
-        /* -----------------------------
-           District
-           ----------------------------- */
-
-        document.getElementById("districtName").value =
+   document.getElementById("districtName").value =
             btn.dataset.district || "";
 
-
-        /* -----------------------------
-           Project Name
-           ----------------------------- */
-
-        document.getElementById("projectName").value =
+     document.getElementById("pprName").value =
+            btn.dataset.ppr || "";
+        document.getElementById("projName").value =
             btn.dataset.project || "";
 
-
-        /* -----------------------------
-           Micro-Watersheds
-           ----------------------------- */
-
-        const microEdit =
+     const microEdit =
             document.getElementById("microEdit");
 
-
-        // Clear previous selection
-
-        Array.from(microEdit.options).forEach(function (option) {
+    Array.from(microEdit.options).forEach(function (option) {
 
             option.selected = false;
 
         });
 
-
-        // Get comma-separated MW IDs
-
-        const microIds =
+    const microIds =
             btn.dataset.micro || "";
 
 
@@ -184,18 +146,70 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-
-        /* -----------------------------
-           Open Edit Modal
-           ----------------------------- */
-
-        const editModal =
+  const editModal =
             bootstrap.Modal.getOrCreateInstance(
                 document.getElementById("editModal")
             );
 
         editModal.show();
 
+    });
+
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const district = document.getElementById("district");
+    const fyear = document.getElementById("fyear");
+    const projectName = document.getElementById("projectName");
+
+    district.addEventListener("change", function () {
+
+        // Financial year must be selected first
+        if (!fyear.value) {
+
+            alert("Please select Financial Year first.");
+
+            district.value = "";
+            projectName.value = "";
+
+            fyear.focus();
+
+            return;
+        }
+
+        const dcode = district.value;
+        const finYrCd = fyear.value;
+
+        if (!dcode) {
+            projectName.value = "";
+            return;
+        }
+
+        fetch('/nextProjectName?dcode=' + dcode + '&fyear=' + finYrCd)
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Failed to generate project name");
+                }
+
+                return response.json();
+            })
+            .then(data => {
+
+                console.log("Generated project name:", data.projectName);
+
+                projectName.value = data.projectName;
+
+            })
+            .catch(error => {
+
+                console.error("Error:", error);
+
+                projectName.value = "";
+
+            });
     });
 
 });
@@ -256,7 +270,17 @@ document.addEventListener("DOMContentLoaded", function () {
 										<option th:value="${dist.dcode}" th:text="${dist.distName}"> </option>
 										</th:block>
 									    </select>
-                                   <div class="invalid-feedback">Please select a District.</div>
+                                  <div class="invalid-feedback">
+            Please select a District.
+        </div>
+
+       <!-- when district alert message showing
+        <div id="districtCompletedAlert"
+             class="alert alert-warning mt-2"
+             style="display:none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            This district data is already completed.
+        </div> -->
 									</div>
 								</div>
 								<div class="row mb-3">
@@ -264,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
 										<label>Project Name:</label><span class="required">*</span>
 									</div>
 									<div class="col-md-5">
-										<input type="text" name="agency" id="agency"  class="form-control" placeholder="Enter Project Name" required>
+										<input type="text" name="projectName" id="projectName" class="form-control" placeholder="Project Name" readonly required>
                                   <div class="invalid-feedback">Please Enter Project Name.</div>
 									</div>
 								</div>
@@ -286,7 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
 								</div>
 								
 								<div class="text-center mt-4">
-								<button type="submit" name="action"  value="D" class="btn btn-warning">
+								<button type="submit" name="action"  value="D" id="saveDraftBtn" class="btn btn-warning">
 								      <i class="fas fa-save"></i>
 								      Save as Draft
 								</button>
@@ -309,6 +333,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <tr>
                     <th class="table-primary">Financial Year</th>
                     <th class="table-primary">District</th>
+                    <th class="table-primary">PPR Id</th>
                     <th class="table-primary">Project Name</th>
                     <th class="table-primary">Micro-Watershed</th>
                     <th class="table-primary">Actions</th>
@@ -318,6 +343,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <tr th:each="rec : ${records}">
                     <td th:text="${rec.finYear.finYrDesc}"></td>
                     <td th:text="${rec.district.distName}"></td>
+                    <td th:text="${rec.pprName}"></td>
                     <td th:text="${rec.projectName}"></td>
                     <td>
                         <ul>
@@ -337,7 +363,7 @@ document.addEventListener("DOMContentLoaded", function () {
    class="btn btn-primary btn-sm ms-2 next-btn"
    title="Go to Next Form">
 
-    Next <i class="fas fa-arrow-right"></i>
+    Area Covered <i class="fas fa-arrow-right"></i>
 
 </a>
 
@@ -351,6 +377,7 @@ document.addEventListener("DOMContentLoaded", function () {
        data-pprid=${rec.pprId},
        data-finyear=${rec.finYear.finYrDesc},
        data-district=${rec.district.distName},
+       data-ppr=${rec.pprName},
        data-project=${rec.projectName},
        data-micro=${rec.microIdsCsv}">
 
@@ -455,6 +482,24 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
 
                     </div>
+                    
+                    <div class="row mb-3">
+
+                        <label class="col-md-3 fw-bold">
+                            PPR Id
+                        </label>
+
+                        <div class="col-md-9">
+
+                            <input type="text"
+                                   id="pprName"
+                                   name="pprName"
+                                   class="form-control"
+                                   readonly>
+
+                        </div>
+
+                    </div>
 
 
                     <!-- Project -->
@@ -468,9 +513,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="col-md-9">
 
                             <input type="text"
-                                   id="projectName"
-                                   name="projectName"
-                                   class="form-control">
+                                   id="projName"
+                                   name="projName"
+                                   class="form-control"
+                                   readonly>
 
                         </div>
 

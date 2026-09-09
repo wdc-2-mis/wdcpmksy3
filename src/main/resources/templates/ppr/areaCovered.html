@@ -47,52 +47,108 @@
 	        <div class="card-body">
 
 	             <form id="institutionForm" th:action="@{/saveAreaWP}" method="post" enctype="multipart/form-data" novalidate >
-	             <div class="row mb-3">
-									<div class="col-md-3">
-										<label>District Name:</label><span class="required">*</span>
-									</div>
-									<div class="col-md-3">
-										<!-- <select id="district" name="district" class="form-control form-control-sm" required>
-										<option value="">--Select District--</option>
-										<th:block th:each="dist : ${distList}">
-										<option th:value="${dist.dcode}" th:text="${dist.distName}"> </option>
-										</th:block>
-									    </select> -->
-									    
-									    <select id="district" name="district" class="form-select" required>
-
-    <option value="">--Select District--</option>
-
-    <option th:each="dist : ${distList}"
-            th:value="${dist.dcode}"
-            th:text="${dist.distName}"
-            th:selected="${selectedDcode != null and selectedDcode == dist.dcode}">
-    </option>
-
-</select>
-                                   <div class="invalid-feedback">Please select a District.</div>
-									</div>
-									
-					 <div class="col-md-3">
-                     <label>Total Micro-Watershed in the District:</label><span class="required">*</span>
-                    </div>
-                     <div class="col-md-3">
-                         <input type="text" id="totalMw" name="totalMw" class="form-control form-control-sm" readonly />
-                         <div class="invalid-feedback">Please enter total micro-watersheds.</div>
-                     </div>				
-				 </div>
+	             
 				 
-				 <div class="row mb-3">
-    					<div class="col-md-3">
-        					<label>Micro-Watershed:</label><span class="required">*</span>
-    					</div>
-    					<div class="col-md-5">
-        					<select id="mw" name="mw" class="form-control form-control-sm" required>
-            					<option value="">--Select Micro-Watershed--</option>
-            				</select>
-        					<div class="invalid-feedback">Please select a Micro-Watershed.</div>
-    					</div>
-					</div>
+				
+<div class="row mb-3">
+
+    <!-- District -->
+    <div class="col-md-6">
+        <label for="district" class="form-label">
+            District Name:
+            <span class="required">*</span>
+        </label>
+
+        <select id="district"
+                name="district"
+                class="form-select"
+                required>
+
+            <option value="">--Select District--</option>
+
+            <option th:each="dist : ${distList}"
+                    th:value="${dist.dcode}"
+                    th:text="${dist.distName}"
+                    th:selected="${selectedDcode != null and selectedDcode == dist.dcode}">
+            </option>
+
+        </select>
+
+        <div class="invalid-feedback">
+            Please select a District.
+        </div>
+    </div>
+
+
+    <!-- Project -->
+    <div class="col-md-6">
+        <label for="project" class="form-label">
+            Project:
+            <span class="required">*</span>
+        </label>
+
+        <select id="project"
+                name="project"
+                class="form-select"
+                required>
+
+            <option value="">--Select Project--</option>
+
+        </select>
+
+        <div class="invalid-feedback">
+            Please select a Project.
+        </div>
+    </div>
+
+</div>
+
+
+<div class="row mb-3">
+
+    <!-- Total Micro-Watershed -->
+    <div class="col-md-6">
+        <label for="totalMw" class="form-label">
+            Total Micro-Watershed in the District:
+            <span class="required">*</span>
+        </label>
+
+        <input type="text"
+               id="totalMw"
+               name="totalMw"
+               class="form-control form-control-sm"
+               readonly />
+
+        <div class="invalid-feedback">
+            Please enter total micro-watersheds.
+        </div>
+    </div>
+
+
+    <!-- Micro-Watershed -->
+    <div class="col-md-6">
+        <label for="mw" class="form-label">
+            Micro-Watershed:
+            <span class="required">*</span>
+        </label>
+
+        <select id="mw"
+                name="mw"
+                class="form-select"
+                required>
+
+            <option value="">--Select Micro-Watershed--</option>
+
+        </select>
+
+        <div class="invalid-feedback">
+            Please select a Micro-Watershed.
+        </div>
+    </div>
+
+</div>
+
+				 
 								
 				<div class="row mb-3">
                     <div class="col-md-3">
@@ -181,6 +237,21 @@
 								      Save as Draft
 								</button>
 							</div>
+							
+							<div class="text-end mt-2"
+     id="nextBtnContainer"
+     style="display: none;">
+
+    <button type="button"
+            id="nextBtn"
+            class="btn btn-primary">
+
+        Proposed Project
+        <i class="fas fa-arrow-right ms-1"></i>
+
+    </button>
+
+</div>
 	             </form>
 	             
 	        </div>     
@@ -447,6 +518,43 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
+function loadProjects(districtId) { 
+
+	const project = document.getElementById("project"); 
+	if (!project) { 
+		return; 
+		} 
+		
+	 project.innerHTML = 
+	 	'<option value="">--Select Project--</option>'; 
+	 	
+	 	if (!districtId) { 
+	 		return; 
+	 		} 
+	 	fetch('/getProjectsByDistrictPPR10?dcode=' + districtId) 
+	 	
+	 		.then(response => { 
+	 			if (!response.ok) { 
+	 				throw new Error("HTTP error: " + response.status); 
+	 				} 
+	 		return response.json(); }) 
+	 		
+	 		.then(data => { 
+	 			console.log("Projects:", data); 
+	 			data.forEach(function (item) { 
+	 			const option = document.createElement("option"); 
+	 			option.value = item.id; // PPR ID 
+	 			option.textContent = item.name; // Project Name 
+	 			project.appendChild(option); 
+	 			}); 
+	 			}) 
+	 			.catch(error => 
+	 			{ 
+	 			console.error( "Error fetching projects:", error ); 
+	 			}); 
+	 			
+	 			}
+
     function loadDistrictStats(dcode) {
 
         if (!dcode) {
@@ -535,10 +643,19 @@ document.addEventListener("DOMContentLoaded", function () {
                                     S No.
                                 </th>
 
+								<th rowspan="2" class="table-primary">
+                                    District
+                                </th>
+                                
+                                <th rowspan="2" class="table-primary">
+                                    Project
+                                </th>
+                                
                                 <th rowspan="2" class="table-primary">
                                     Micro-Watershed
                                 </th>
-
+                                
+                                
                                 <th colspan="2" class="table-primary">
                                     ${headerrecords.pre_scheme ?? ''}
                                 </th>
@@ -604,7 +721,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
 
 
+                
+                
+                
+                const groups = {}; 
+                data.records.forEach(function (record) { 
+                const groupKey = (record.dist_name ?? '') + '|' + (record.project_name ?? ''); 
+                
+                if (!groups[groupKey]) { groups[groupKey] = 0; } groups[groupKey]++; 
+                
+                });
+                
+                const displayedGroups = {};
+                
                 data.records.forEach(function (record, index) {
+                
+                const districtName = record.dist_name ?? ''; 
+                const projectName = record.pre_no ?? ''; 
+                const groupKey = districtName + '|' + projectName; 
+                let districtProjectColumns = ''; 
+                
+                 if (!displayedGroups[groupKey]) { 
+                 districtProjectColumns = ` 
+                 <td rowspan="${groups[groupKey]}" 
+                 class="align-middle fw-semibold"> 
+                 ${districtName} 
+                 </td> 
+                 
+                 <td rowspan="${groups[groupKey]}" 
+                 class="align-middle fw-semibold"> 
+                 ${projectName} 
+                 </td> `
+                 ; 
+                 displayedGroups[groupKey] = true; 
+                 }
 
                     html += `
 
@@ -614,6 +764,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 ${index + 1}
                             </td>
 
+                            ${districtProjectColumns}
                             <td>
                                 ${record.mw_name ?? ''}
                             </td>
@@ -812,9 +963,18 @@ document.addEventListener("DOMContentLoaded", function () {
         district.addEventListener("change", function () {
 
             const dcode = this.value;
-
+            
+            loadProjects(dcode);
             loadDistrictStats(dcode);
 
+			const nextBtnContainer =
+      		  document.getElementById("nextBtnContainer");
+      		  
+      		  if (dcode) {
+        nextBtnContainer.style.display = "block";
+    } else {
+        nextBtnContainer.style.display = "none";
+    }
         });
 
 
@@ -824,7 +984,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Auto loading district:",
                 district.value
             );
-
+            loadProjects( district.value );
             loadDistrictStats(district.value);
 
         }
@@ -845,10 +1005,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Edit button clicked");
 
-        // ==========================================
-        // Get values from data-* attributes
-        // ==========================================
-
+        
         const pprId       = editBtn.dataset.pprid;
         const district    = editBtn.dataset.district;
         const mwId        = editBtn.dataset.mwid;
@@ -1169,6 +1326,27 @@ form.addEventListener("submit", function (event) {
     });
 
 });
+
+const nextBtn = document.getElementById("nextBtn");
+
+if (nextBtn) {
+
+    nextBtn.addEventListener("click", function () {
+
+        const district = document.getElementById("district");
+
+        if (!district || !district.value) {
+            alert("Please select District first.");
+            district.focus();
+            return;
+        }
+
+        const dcode = district.value;
+
+        window.location.href =
+            "/pprProposedProjectDetails?dcode=" + encodeURIComponent(dcode);
+    });
+}
 </script>
 </div>
 

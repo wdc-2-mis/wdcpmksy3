@@ -24,9 +24,10 @@ public class DistrictService {
     }
 
 	public List<MDistrict> getPPRDistrictsByState(Integer stcode) {
-		// TODO Auto-generated method stub
 		return districtRepo.getPPRDistrictsByState(stcode);
 	}
+
+	
     
     
 }
