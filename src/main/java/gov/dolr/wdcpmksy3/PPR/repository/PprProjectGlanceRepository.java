@@ -10,5 +10,6 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprProjectGlance;
 public interface PprProjectGlanceRepository extends JpaRepository<PprProjectGlance, Integer>{
 	
 	List<PprProjectGlance> getListOfPprProjectGlanceByPpr(MPpr ppr);
+	 List<PprProjectGlance> findByPprPprIdAndStatus(Integer pprId, Character status);
 
 }

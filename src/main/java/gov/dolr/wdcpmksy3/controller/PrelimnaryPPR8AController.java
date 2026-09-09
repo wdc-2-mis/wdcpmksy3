@@ -88,8 +88,13 @@ public class PrelimnaryPPR8AController {
 	@GetMapping("/getBlockByProjectPPR8")
 	@ResponseBody
 	public List<Map<String,Object>> getBlocksByProject(@RequestParam Integer pprId){
-
+		
+		  System.out.println("PPR ID = " + pprId);
 	    List<MBlock> block=blockRepository.getBlocksByProject(pprId);
+	    
+	  
+	    System.out.println("Blocks = " + block.size());
+
 
 	    return block.stream().map(b->{
 

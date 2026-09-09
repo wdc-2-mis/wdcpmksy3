@@ -32,44 +32,44 @@
 
 		document.addEventListener("DOMContentLoaded", function () {
 
-				var editModal = document.getElementById('editModal');
-				editModal.addEventListener('show.bs.modal', function (event) {
-					var button = event.relatedTarget;
+			var editModal = document.getElementById('editModal');
+			editModal.addEventListener('show.bs.modal', function (event) {
+				var button = event.relatedTarget;
 
-					// Get data attributes  
-					var Id = button.getAttribute('data-id');
-					var state = button.getAttribute('data-state');
-					var district = button.getAttribute('data-district');
-					var project = button.getAttribute('data-project');
-					var block = button.getAttribute('data-block');
-					var scheme = button.getAttribute('data-scheme');
-					var projSanctionedNo = button.getAttribute('data-projSanctionedNo');
-					var projSanctionedArea = button.getAttribute('data-projSanctionedArea');
-					var netArea = button.getAttribute('data-netArea');
-					var proposedArea = button.getAttribute('data-proposedArea');
-					var proposedAreaOthers = button.getAttribute('data-proposedAreaOthers');
-					var netBalArea = button.getAttribute('data-netBalArea');
-					
-					// Populate modal fields  pprUnspentBalanceId
-					document.getElementById('pprProposedAreaId').value = Id;
-					document.getElementById('stateName1').value = state;
-					document.getElementById('district1').value = district;
-					document.getElementById('project1').value = project;
-					document.getElementById("block1").value = block;
-					document.getElementById("projSanctionedNo1").value = projSanctionedNo;
-					document.getElementById("projSanctionedArea1").value = projSanctionedArea;
-					document.getElementById("netArea1").value = netArea;
-					document.getElementById("proposedArea1").value = proposedArea;
-					document.getElementById("proposedAreaOthers1").value = proposedAreaOthers;
-					document.getElementById("netBalArea1").value = netBalArea;
-				});
-					
+				// Get data attributes  
+				var Id = button.getAttribute('data-id');
+				var state = button.getAttribute('data-state');
+				var district = button.getAttribute('data-district');
+				var project = button.getAttribute('data-project');
+				var block = button.getAttribute('data-block');
+				var scheme = button.getAttribute('data-scheme');
+				var projSanctionedNo = button.getAttribute('data-projSanctionedNo');
+				var projSanctionedArea = button.getAttribute('data-projSanctionedArea');
+				var netArea = button.getAttribute('data-netArea');
+				var proposedArea = button.getAttribute('data-proposedArea');
+				var proposedAreaOthers = button.getAttribute('data-proposedAreaOthers');
+				var netBalArea = button.getAttribute('data-netBalArea');
+
+				// Populate modal fields  pprUnspentBalanceId
+				document.getElementById('pprProposedAreaId').value = Id;
+				document.getElementById('stateName1').value = state;
+				document.getElementById('district1').value = district;
+				document.getElementById('project1').value = project;
+				document.getElementById("block1").value = block;
+				document.getElementById("projSanctionedNo1").value = projSanctionedNo;
+				document.getElementById("projSanctionedArea1").value = projSanctionedArea;
+				document.getElementById("netArea1").value = netArea;
+				document.getElementById("proposedArea1").value = proposedArea;
+				document.getElementById("proposedAreaOthers1").value = proposedAreaOthers;
+				document.getElementById("netBalArea1").value = netBalArea;
+			});
+
 
 			document.getElementById("district").addEventListener("change", function () {
 
 				let districtId = this.value;
 				let project = document.getElementById("project");
-
+				let block = document.getElementById("block");
 				// Clear existing options
 				project.innerHTML = '<option value="">--Select Project--</option>';
 
@@ -95,39 +95,25 @@
 						console.error("Error:", error);
 					});
 
-			});
+				block.innerHTML = '<option value="">--Select Block--</option>';
 
-			document.getElementById("project").addEventListener("change", function () {
-
-				let projectId = this.value;
-				let village = document.getElementById("block");
-
-				village.innerHTML =
-					'<option value="">--Select Block--</option>';
-
-				if (projectId === "") {
-					return;
-				}
-
-				fetch("/getBlockByProjectPPR8?pprId=" + projectId)
-					.then(res => res.json())
+				fetch('/getBlocksByDistrictPPR13?dcode=' + districtId)
+					.then(response => response.json())
 					.then(data => {
-
 						data.forEach(function (item) {
-
 							let option = document.createElement("option");
-
-							option.value = item.id;
-							option.text = item.name;
-
-							village.appendChild(option);
-
+							option.value = item.id;          // bcode
+							option.textContent = item.name;  // block Name
+							block.appendChild(option);
 						});
-
 					})
-					.catch(err => console.log(err));
+					.catch(error => {
+						console.error("Error:", error);
+					});
+
 
 			});
+
 
 		});
 
@@ -313,21 +299,21 @@
 
 
 		});
-		
+
 		function validateInteger(input, maxLength) {
-		    input.value = input.value.replace(/[^0-9]/g, '');
-		    if (input.value.length > maxLength) {
-		        input.value = input.value.slice(0, maxLength);
-		    }
+			input.value = input.value.replace(/[^0-9]/g, '');
+			if (input.value.length > maxLength) {
+				input.value = input.value.slice(0, maxLength);
+			}
 		}
 
 		function validateDecimal(input) {
-		    input.value = input.value.replace(/[^0-9.]/g, '');
+			input.value = input.value.replace(/[^0-9.]/g, '');
 
-		    const parts = input.value.split('.');
-		    if (parts.length > 2) {
-		        input.value = parts[0] + '.' + parts.slice(1).join('');
-		    }
+			const parts = input.value.split('.');
+			if (parts.length > 2) {
+				input.value = parts[0] + '.' + parts.slice(1).join('');
+			}
 		}
 
 
@@ -344,8 +330,8 @@
 			<div class="card shadow-sm border-0 mt-3">
 
 				<div class="card-header bg-primary text-white">
-				            <h4 class="mb-0">Preliminary Project Report (PPR8)</h4>
-				        </div>
+					<h4 class="mb-0">Preliminary Project Report (PPR8)</h4>
+				</div>
 
 			</div>
 
@@ -375,589 +361,573 @@
 
 			<div class="card-body px-4 py-4">
 
-			    <h5 class="text-center fw-bold mb-4">
-			        Details of Previously identified DPAP/DDP/IWDP areas proposed users
-			    </h5>
+				<h5 class="text-center fw-bold mb-4">
+					Details of Previously identified DPAP/DDP/IWDP areas proposed users
+				</h5>
 
-			    <form id="ppr8Form" th:action="@{/saveDraftPPR8}" method="post" novalidate>
+				<form id="ppr8Form" th:action="@{/saveDraftPPR8}" method="post" novalidate>
 
-			        <!-- Row 1 -->
-			        <div class="row mb-3 align-items-center">
+					<!-- Row 1 -->
+					<div class="row mb-3 align-items-center">
 
-			            <div class="col-md-2">
-			                <label class="form-label fw-semibold">
-			                    State Name <span class="text-danger">*</span>
-			                </label>
-			            </div>
+						<div class="col-md-2">
+							<label class="form-label fw-semibold">
+								State Name <span class="text-danger">*</span>
+							</label>
+						</div>
 
-			            <div class="col-md-4">
-			                <input type="text" class="form-control"
-			                       th:value="${stateName}" readonly>
-			            </div>
+						<div class="col-md-4">
+							<input type="text" class="form-control" th:value="${stateName}" readonly>
+						</div>
 
-			            <div class="col-md-2">
-			                <label class="form-label fw-semibold">
-			                    District Name <span class="text-danger">*</span>
-			                </label>
-			            </div>
+						<div class="col-md-2">
+							<label class="form-label fw-semibold">
+								District Name <span class="text-danger">*</span>
+							</label>
+						</div>
 
-			            <div class="col-md-4">
-			                <select class="form-select" id="district" name="dcode">
-			                    <option value="">--Select District--</option>
-			                    <option th:each="d : ${distList}"
-			                            th:value="${d.dcode}"
-			                            th:text="${d.distName}"></option>
-			                </select>
-			            </div>
+						<div class="col-md-4">
+							<select class="form-select" id="district" name="dcode">
+								<option value="">--Select District--</option>
+								<option th:each="d : ${distList}" th:value="${d.dcode}" th:text="${d.distName}">
+								</option>
+							</select>
+						</div>
 
-			        </div>
+					</div>
 
-			        <!-- Row 2 -->
-			        <div class="row mb-3 align-items-center">
+					<!-- Row 2 -->
+					<div class="row mb-3 align-items-center">
 
-			            <div class="col-md-2">
-			                <label class="form-label fw-semibold">
-			                    Name of Project <span class="text-danger">*</span>
-			                </label>
-			            </div>
+						<div class="col-md-2">
+							<label class="form-label fw-semibold">
+								Name of Project <span class="text-danger">*</span>
+							</label>
+						</div>
 
-			            <div class="col-md-4">
-			                <select class="form-select" id="project" name="pprId">
-			                    <option value="">--Select Project--</option>
-			                </select>
-			            </div>
+						<div class="col-md-4">
+							<select class="form-select" id="project" name="pprId">
+								<option value="">--Select Project--</option>
+							</select>
+						</div>
 
-			            <div class="col-md-2">
-			                <label class="form-label fw-semibold">
-			                    Name of Block <span class="text-danger">*</span>
-			                </label>
-			            </div>
+						<div class="col-md-2">
+							<label class="form-label fw-semibold">
+								Name of Block <span class="text-danger">*</span>
+							</label>
+						</div>
 
-			            <div class="col-md-4">
-			                <select class="form-select" id="block" name="bcode">
-			                    <option value="">--Select Block--</option>
-			                    <option th:each="b : ${blockList}"
-			                            th:value="${b.bcode}"
-			                            th:text="${b.blockName}"></option>
-			                </select>
-			            </div>
+						<div class="col-md-4">
+							<select class="form-select" id="block" name="bcode">
+								<option value="">--Select Block--</option>
+								<option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}">
+								</option>
+							</select>
+						</div>
 
-			        </div>
+					</div>
 
-			        <!-- Row 3 -->
-			        <div class="row mb-3 align-items-center">
+					<!-- Row 3 -->
+					<div class="row mb-3 align-items-center">
 
-			            <div class="col-md-2">
-			                <label class="form-label fw-semibold">
-			                    Type of Scheme <span class="text-danger">*</span>
-			                </label>
-			            </div>
+						<div class="col-md-2">
+							<label class="form-label fw-semibold">
+								Type of Scheme <span class="text-danger">*</span>
+							</label>
+						</div>
 
-			            <div class="col-md-10">
+						<div class="col-md-10">
 
-			                <div class="form-check form-check-inline">
-			                    <input class="form-check-input" type="radio"
-			                           name="scheme" value="DPAP">
-			                    <label class="form-check-label">DPAP</label>
-			                </div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="scheme" value="DPAP">
+								<label class="form-check-label">DPAP</label>
+							</div>
 
-			                <div class="form-check form-check-inline">
-			                    <input class="form-check-input" type="radio"
-			                           name="scheme" value="DDP">
-			                    <label class="form-check-label">DDP</label>
-			                </div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="scheme" value="DDP">
+								<label class="form-check-label">DDP</label>
+							</div>
 
-			                <div class="form-check form-check-inline">
-			                    <input class="form-check-input" type="radio"
-			                           name="scheme" value="IWDP">
-			                    <label class="form-check-label">IWDP</label>
-			                </div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="scheme" value="IWDP">
+								<label class="form-check-label">IWDP</label>
+							</div>
 
-			            </div>
+						</div>
 
-			        </div>
-					
+					</div>
+
 					<!-- No. of Pre WDC 3.0 Projects sanctioned in the Block -->
 					<div class="row mb-3 align-items-center">
 
-					    <div class="col-md-4">
-					        <label class="form-label fw-semibold">
-					            No. of Pre WDC 3.0 Projects sanctioned in the Block
-					            <span class="text-danger">*</span>
-					        </label>
-					    </div>
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">
+								No. of Pre WDC 3.0 Projects sanctioned in the Block
+								<span class="text-danger">*</span>
+							</label>
+						</div>
 
-					    <div class="col-md-4">
-					        <input type="text"
-					               class="form-control form-control-sm"
-					               name="projSanctionedNo"
-					               maxlength="10"
-					               oninput="validateInteger(this,11,5)"
-					               required>
-					    </div>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-sm" name="projSanctionedNo"
+								maxlength="10" oninput="validateInteger(this,11,5)" required>
+						</div>
 
 					</div>
 
 					<!-- Area of Sanctioned Projects (ha) -->
 					<div class="row mb-3 align-items-center">
 
-					    <div class="col-md-4">
-					        <label class="form-label fw-semibold">
-					            Area of Sanctioned Projects (ha)
-					            <span class="text-danger">*</span>
-					        </label>
-					    </div>
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">
+								Area of Sanctioned Projects (ha)
+								<span class="text-danger">*</span>
+							</label>
+						</div>
 
-					    <div class="col-md-4">
-					        <input type="text"
-					               class="form-control form-control-sm"
-					               name="projSanctionedArea"
-					               maxlength="10"
-					               oninput="validateDecimal(this,11,5)"
-					               required>
-					    </div>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-sm" name="projSanctionedArea"
+								maxlength="10" oninput="validateDecimal(this,11,5)" required>
+						</div>
 
 					</div>
 
 					<!-- Net Area to be Covered -->
 					<div class="row mb-3 align-items-center">
 
-					    <div class="col-md-4">
-					        <label class="form-label fw-semibold">
-					            Net Area to be Covered
-					            <span class="text-danger">*</span>
-					        </label>
-					    </div>
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">
+								Net Area to be Covered
+								<span class="text-danger">*</span>
+							</label>
+						</div>
 
-					    <div class="col-md-4">
-					        <input type="text"
-					               class="form-control form-control-sm"
-					               name="netArea"
-					               maxlength="10"
-					               oninput="validateDecimal(this, 11,5)"
-					               required>
-					    </div>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-sm" name="netArea" maxlength="10"
+								oninput="validateDecimal(this, 11,5)" required>
+						</div>
 
 					</div>
 
 					<!-- Area of Proposed Projects (ha) -->
 					<div class="row mb-3 align-items-center">
 
-					    <div class="col-md-4">
-					        <label class="form-label fw-semibold">
-					            Area of Proposed Projects (ha)
-					            <span class="text-danger">*</span>
-					        </label>
-					    </div>
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">
+								Area of Proposed Projects (ha)
+								<span class="text-danger">*</span>
+							</label>
+						</div>
 
-					    <div class="col-md-4">
-					        <input type="text"
-					               class="form-control form-control-sm"
-					               name="proposedArea"
-					               maxlength="10"
-					               oninput="validateDecimal(this, 11,5)"
-					               required>
-					    </div>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-sm" name="proposedArea" maxlength="10"
+								oninput="validateDecimal(this, 11,5)" required>
+						</div>
 
 					</div>
 
 					<!-- Area proposed to be covered by scheme other than DoLR (ha) -->
 					<div class="row mb-3 align-items-center">
 
-					    <div class="col-md-4">
-					        <label class="form-label fw-semibold">
-					            Area proposed to be covered by scheme other than DoLR (ha)
-					            <span class="text-danger">*</span>
-					        </label>
-					    </div>
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">
+								Area proposed to be covered by scheme other than DoLR (ha)
+								<span class="text-danger">*</span>
+							</label>
+						</div>
 
-					    <div class="col-md-4">
-					        <input type="text"
-					               class="form-control form-control-sm"
-					               name="proposedAreaOthers"
-					               maxlength="10"
-					               oninput="validateDecimal(this, 11,5)"
-					               required>
-					    </div>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-sm" name="proposedAreaOthers"
+								maxlength="10" oninput="validateDecimal(this, 11,5)" required>
+						</div>
 
 					</div>
 
 					<!-- Net Balance Area (ha) -->
 					<div class="row mb-3 align-items-center">
 
-					    <div class="col-md-4">
-					        <label class="form-label fw-semibold">
-					            Net Balance Area (ha)
-					        </label>
-					    </div>
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">
+								Net Balance Area (ha)
+							</label>
+						</div>
 
-					    <div class="col-md-4">
-					        <input type="text"
-					               class="form-control form-control-sm"
-					               name="netBalArea"
-					               maxlength="10"
-					               oninput="validateDecimal(this, 11,5)">
-					    </div>
-
-					</div>
-
-			        <input type="hidden" name="action" value="D">
-
-			        <div class="text-center">
-			            <button type="submit" class="btn btn-warning px-4 fw-semibold">
-			                <i class="fa fa-save me-1"></i> Save as Draft
-			            </button>
-			        </div>
-
-			    </form>
-		
-
-					<!-- ===================================================== -->
-					<!--                  DRAFT DETAILS                        -->
-					<!-- ===================================================== -->
-
-					<div class="table-responsive mt-5">
-
-						<h4 class="text-center mb-3">
-
-							<b>Draft Details</b>
-
-						</h4>
-
-						<table class="table table-bordered table-striped table-hover">
-
-							<thead>
-
-								<tr>
-
-									<th class="table-primary">State</th>
-
-									<th class="table-primary">District</th>
-
-									<th class="table-primary">Project</th>
-
-									<th class="table-primary">Block</th>
-
-									<th class="table-primary">Scheme</th>
-
-									<th class="table-primary">
-										No. of Pre WDC Projects
-									</th>
-
-									<th class="table-primary">
-										Sanctioned Area
-									</th>
-
-									<th class="table-primary">
-										Net Area
-									</th>
-
-									<th class="table-primary">
-										Proposed Area
-									</th>
-
-									<th class="table-primary">
-										Other DoLR Area
-									</th>
-
-									<th class="table-primary">
-										Balance Area
-									</th>
-
-									<th class="table-primary" style="min-width:120px;">
-										Action
-									</th>
-
-								</tr>
-
-							</thead>
-							<tbody>
-
-
-								<tr th:each="area : ${draftList}">
-
-									<td th:text="${area.ppr.district.state.stName}"></td>
-
-									<td th:text="${area.ppr.district.distName}"></td>
-
-									<td th:text="${area.ppr.projectName}"></td>
-
-									<td th:text="${area.block.blockName}"></td>
-
-									<td th:text="${area.scheme.schemeName}"></td>
-
-									<td th:text="${area.projSanctionedNo}"></td>
-
-									<td th:text="${area.projSanctionedArea}"></td>
-
-									<td th:text="${area.netArea}"></td>
-
-									<td th:text="${area.proposedArea}"></td>
-
-									<td th:text="${area.proposedAreaOthers}"></td>
-
-									<td th:text="${area.netBalArea}"></td>
-
-									<td th:if="${area.status.toString().equals('D')}">
-										
-										
-										<a th:href="@{/deleteDraftPPR8(id=${area.pprProposedAreaId})}"
-											class="btn btn-danger btn-sm"
-											onclick="return confirm('Are you sure you want to delete this record?');">
-											<i class="fas fa-trash"></i>
-										</a>
-										
-										<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn"
-											th:attr="data-id=${area.pprProposedAreaId}, data-state=${area.ppr.district.state.stName}, data-district=${area.ppr.district.distName}, 
-													data-project=${area.ppr.projectName}, data-block=${area.block.blockName}, data-scheme=${area.scheme.schemeName}, data-projSanctionedNo=${area.projSanctionedNo}, data-projSanctionedArea=${area.projSanctionedArea}, 
-													data-netArea=${area.netArea}, data-proposedArea=${area.proposedArea}, data-proposedAreaOthers=${area.proposedAreaOthers}, data-netBalArea=${area.netBalArea}"
-											data-bs-toggle="modal" data-bs-target="#editModal">
-											<i class="fas fa-edit"></i>
-										</button>
-
-										<a th:href="@{/completeDraftPPR8(id=${area.pprProposedAreaId})}"
-											class="btn btn-success btn-sm"
-											onclick="return confirm('Are you sure you want to complete this record?');">
-											<i class="fas fa-check"></i>
-										</a>
-									</td>
-									<td th:if="${area.status.toString().equals('C')}">
-										<span class="badge bg-success">
-											<i class="fas fa-check-circle"></i> Completed
-										</span>
-									</td>
-
-								</tr>
-
-							</tbody>
-
-						</table>
-
-						<!-- ===================== Edit Modal ====================== -->
-
-						<div class="modal fade" id="editModal">
-							<div class="modal-dialog modal-xl">
-								<div class="modal-content">
-
-									<div class="modal-header bg-primary text-white">
-										<h5>Edit PPR8 Details</h5>
-
-										<button class="btn-close" data-bs-dismiss="modal"></button>
-									</div>
-
-									<div class="modal-body">
-									
-										<form id="editForm" th:action="@{/updateDraftPPR8}" method="post">
-									
-											<!-- Hidden ID -->
-											<input type="hidden" id="pprProposedAreaId" name="pprProposedAreaId">
-									
-											<!-- ========================= ROW 1 ========================= -->
-									
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-2">
-													<label class="form-label fw-semibold">
-														State Name <span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" name="stateName1" id="stateName1" class="form-control" readonly>
-												</div>
-									
-												<div class="col-md-2">
-													<label class="form-label fw-semibold">
-														District Name <span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" name="district1" id="district1" class="form-control" readonly>
-												</div>
-									
-											</div>
-									
-											<!-- Row 2 -->
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-2">
-													<label class="form-label fw-semibold">
-														Name of Project <span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" name="project1" id="project1" class="form-control" readonly>
-												</div>
-									
-												<div class="col-md-2">
-													<label class="form-label fw-semibold">
-														Name of Block <span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" name="block1" id="block1" class="form-control" readonly>
-												</div>
-									
-											</div>
-									
-											<!-- Row 3 -->
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-2">
-													<label class="form-label fw-semibold">
-														Type of Scheme <span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-10">
-									
-													<div class="form-check form-check-inline">
-														<input class="form-check-input" type="radio" name="scheme" value="DPAP">
-														<label class="form-check-label">DPAP</label>
-													</div>
-									
-													<div class="form-check form-check-inline">
-														<input class="form-check-input" type="radio" name="scheme" value="DDP">
-														<label class="form-check-label">DDP</label>
-													</div>
-									
-													<div class="form-check form-check-inline">
-														<input class="form-check-input" type="radio" name="scheme" value="IWDP">
-														<label class="form-check-label">IWDP</label>
-													</div>
-									
-												</div>
-									
-											</div>
-									
-											<!-- No. of Pre WDC 3.0 Projects sanctioned in the Block -->
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-4">
-													<label class="form-label fw-semibold">
-														No. of Pre WDC 3.0 Projects sanctioned in the Block
-														<span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" class="form-control form-control-sm" id="projSanctionedNo1" name="projSanctionedNo1" maxlength="10"
-														oninput="validateInteger(this,11,5)" required>
-												</div>
-									
-											</div>
-									
-											<!-- Area of Sanctioned Projects (ha) -->
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-4">
-													<label class="form-label fw-semibold">
-														Area of Sanctioned Projects (ha)
-														<span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" class="form-control form-control-sm" id="projSanctionedArea1" name="projSanctionedArea1" maxlength="10"
-														oninput="validateDecimal(this,11,5)" required>
-												</div>
-									
-											</div>
-									
-											<!-- Net Area to be Covered -->
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-4">
-													<label class="form-label fw-semibold">
-														Net Area to be Covered
-														<span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" class="form-control form-control-sm" id="netArea1" name="netArea1" maxlength="10"
-														oninput="validateDecimal(this, 11,5)" required>
-												</div>
-									
-											</div>
-									
-											<!-- Area of Proposed Projects (ha) -->
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-4">
-													<label class="form-label fw-semibold">
-														Area of Proposed Projects (ha)
-														<span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" class="form-control form-control-sm" id="proposedArea1" name="proposedArea1" maxlength="10"
-														oninput="validateDecimal(this, 11,5)" required>
-												</div>
-									
-											</div>
-									
-											<!-- Area proposed to be covered by scheme other than DoLR (ha) -->
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-4">
-													<label class="form-label fw-semibold">
-														Area proposed to be covered by scheme other than DoLR (ha)
-														<span class="text-danger">*</span>
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" class="form-control form-control-sm" id="proposedAreaOthers1" name="proposedAreaOthers1" maxlength="10"
-														oninput="validateDecimal(this, 11,5)" required>
-												</div>
-									
-											</div>
-									
-											<!-- Net Balance Area (ha) -->
-											<div class="row mb-3 align-items-center">
-									
-												<div class="col-md-4">
-													<label class="form-label fw-semibold">
-														Net Balance Area (ha)
-													</label>
-												</div>
-									
-												<div class="col-md-4">
-													<input type="text" class="form-control form-control-sm" id="netBalArea1" name="netBalArea1" maxlength="10"
-														oninput="validateDecimal(this, 11,5)">
-												</div>
-									
-											</div>
-
-
-											<div class="text-center mt-4">
-												<button type="submit" name="updateAction" value="D" class="btn btn-warning">
-													<i class="fas fa-save"></i>
-													Update
-												</button>
-											</div>
-
-										</form>
-
-									</div>
-
-								</div>
-							</div>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-sm" name="netBalArea" maxlength="10"
+								oninput="validateDecimal(this, 11,5)">
 						</div>
 
 					</div>
-				
 
-				</div> <!-- container -->
+					<input type="hidden" name="action" value="D">
 
-			</div> <!-- card-body -->
+					<div class="text-center">
+						<button type="submit" class="btn btn-warning px-4 fw-semibold">
+							<i class="fa fa-save me-1"></i> Save as Draft
+						</button>
+					</div>
 
-		</div> <!-- card -->
+				</form>
+
+
+				<!-- ===================================================== -->
+				<!--                  DRAFT DETAILS                        -->
+				<!-- ===================================================== -->
+
+				<div class="table-responsive mt-5">
+
+					<h4 class="text-center mb-3">
+
+						<b>Draft Details</b>
+
+					</h4>
+
+					<table class="table table-bordered table-striped table-hover">
+
+						<thead>
+
+							<tr>
+
+								<th class="table-primary">State</th>
+
+								<th class="table-primary">District</th>
+
+								<th class="table-primary">Project</th>
+
+								<th class="table-primary">Block</th>
+
+								<th class="table-primary">Scheme</th>
+
+								<th class="table-primary">
+									No. of Pre WDC Projects
+								</th>
+
+								<th class="table-primary">
+									Sanctioned Area
+								</th>
+
+								<th class="table-primary">
+									Net Area
+								</th>
+
+								<th class="table-primary">
+									Proposed Area
+								</th>
+
+								<th class="table-primary">
+									Other DoLR Area
+								</th>
+
+								<th class="table-primary">
+									Balance Area
+								</th>
+
+								<th class="table-primary" style="min-width:120px;">
+									Action
+								</th>
+
+							</tr>
+
+						</thead>
+						<tbody>
+
+
+							<tr th:each="area : ${draftList}">
+
+								<td th:text="${area.ppr.district.state.stName}"></td>
+
+								<td th:text="${area.ppr.district.distName}"></td>
+
+								<td th:text="${area.ppr.projectName}"></td>
+
+								<td th:text="${area.block.blockName}"></td>
+
+								<td th:text="${area.scheme.schemeName}"></td>
+
+								<td th:text="${area.projSanctionedNo}"></td>
+
+								<td th:text="${area.projSanctionedArea}"></td>
+
+								<td th:text="${area.netArea}"></td>
+
+								<td th:text="${area.proposedArea}"></td>
+
+								<td th:text="${area.proposedAreaOthers}"></td>
+
+								<td th:text="${area.netBalArea}"></td>
+
+								<td th:if="${area.status.toString().equals('D')}">
+
+
+									<a th:href="@{/deleteDraftPPR8(id=${area.pprProposedAreaId})}"
+										class="btn btn-danger btn-sm"
+										onclick="return confirm('Are you sure you want to delete this record?');">
+										<i class="fas fa-trash"></i>
+									</a>
+
+									<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn"
+										th:attr="data-id=${area.pprProposedAreaId}, data-state=${area.ppr.district.state.stName}, data-district=${area.ppr.district.distName}, 
+													data-project=${area.ppr.projectName}, data-block=${area.block.blockName}, data-scheme=${area.scheme.schemeName}, data-projSanctionedNo=${area.projSanctionedNo}, data-projSanctionedArea=${area.projSanctionedArea}, 
+													data-netArea=${area.netArea}, data-proposedArea=${area.proposedArea}, data-proposedAreaOthers=${area.proposedAreaOthers}, data-netBalArea=${area.netBalArea}"
+										data-bs-toggle="modal" data-bs-target="#editModal">
+										<i class="fas fa-edit"></i>
+									</button>
+
+									<a th:href="@{/completeDraftPPR8(id=${area.pprProposedAreaId})}"
+										class="btn btn-success btn-sm"
+										onclick="return confirm('Are you sure you want to complete this record?');">
+										<i class="fas fa-check"></i>
+									</a>
+								</td>
+								<td th:if="${area.status.toString().equals('C')}">
+									<span class="badge bg-success">
+										<i class="fas fa-check-circle"></i> Completed
+									</span>
+								</td>
+
+							</tr>
+
+						</tbody>
+
+					</table>
+
+					<!-- ===================== Edit Modal ====================== -->
+
+					<div class="modal fade" id="editModal">
+						<div class="modal-dialog modal-xl">
+							<div class="modal-content">
+
+								<div class="modal-header bg-primary text-white">
+									<h5>Edit PPR8 Details</h5>
+
+									<button class="btn-close" data-bs-dismiss="modal"></button>
+								</div>
+
+								<div class="modal-body">
+
+									<form id="editForm" th:action="@{/updateDraftPPR8}" method="post">
+
+										<!-- Hidden ID -->
+										<input type="hidden" id="pprProposedAreaId" name="pprProposedAreaId">
+
+										<!-- ========================= ROW 1 ========================= -->
+
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-2">
+												<label class="form-label fw-semibold">
+													State Name <span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" name="stateName1" id="stateName1"
+													class="form-control" readonly>
+											</div>
+
+											<div class="col-md-2">
+												<label class="form-label fw-semibold">
+													District Name <span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" name="district1" id="district1" class="form-control"
+													readonly>
+											</div>
+
+										</div>
+
+										<!-- Row 2 -->
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-2">
+												<label class="form-label fw-semibold">
+													Name of Project <span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" name="project1" id="project1" class="form-control"
+													readonly>
+											</div>
+
+											<div class="col-md-2">
+												<label class="form-label fw-semibold">
+													Name of Block <span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" name="block1" id="block1" class="form-control"
+													readonly>
+											</div>
+
+										</div>
+
+										<!-- Row 3 -->
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-2">
+												<label class="form-label fw-semibold">
+													Type of Scheme <span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-10">
+
+												<div class="form-check form-check-inline">
+													<input class="form-check-input" type="radio" name="scheme"
+														value="DPAP">
+													<label class="form-check-label">DPAP</label>
+												</div>
+
+												<div class="form-check form-check-inline">
+													<input class="form-check-input" type="radio" name="scheme"
+														value="DDP">
+													<label class="form-check-label">DDP</label>
+												</div>
+
+												<div class="form-check form-check-inline">
+													<input class="form-check-input" type="radio" name="scheme"
+														value="IWDP">
+													<label class="form-check-label">IWDP</label>
+												</div>
+
+											</div>
+
+										</div>
+
+										<!-- No. of Pre WDC 3.0 Projects sanctioned in the Block -->
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-4">
+												<label class="form-label fw-semibold">
+													No. of Pre WDC 3.0 Projects sanctioned in the Block
+													<span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" class="form-control form-control-sm"
+													id="projSanctionedNo1" name="projSanctionedNo1" maxlength="10"
+													oninput="validateInteger(this,11,5)" required>
+											</div>
+
+										</div>
+
+										<!-- Area of Sanctioned Projects (ha) -->
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-4">
+												<label class="form-label fw-semibold">
+													Area of Sanctioned Projects (ha)
+													<span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" class="form-control form-control-sm"
+													id="projSanctionedArea1" name="projSanctionedArea1" maxlength="10"
+													oninput="validateDecimal(this,11,5)" required>
+											</div>
+
+										</div>
+
+										<!-- Net Area to be Covered -->
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-4">
+												<label class="form-label fw-semibold">
+													Net Area to be Covered
+													<span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" class="form-control form-control-sm" id="netArea1"
+													name="netArea1" maxlength="10" oninput="validateDecimal(this, 11,5)"
+													required>
+											</div>
+
+										</div>
+
+										<!-- Area of Proposed Projects (ha) -->
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-4">
+												<label class="form-label fw-semibold">
+													Area of Proposed Projects (ha)
+													<span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" class="form-control form-control-sm"
+													id="proposedArea1" name="proposedArea1" maxlength="10"
+													oninput="validateDecimal(this, 11,5)" required>
+											</div>
+
+										</div>
+
+										<!-- Area proposed to be covered by scheme other than DoLR (ha) -->
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-4">
+												<label class="form-label fw-semibold">
+													Area proposed to be covered by scheme other than DoLR (ha)
+													<span class="text-danger">*</span>
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" class="form-control form-control-sm"
+													id="proposedAreaOthers1" name="proposedAreaOthers1" maxlength="10"
+													oninput="validateDecimal(this, 11,5)" required>
+											</div>
+
+										</div>
+
+										<!-- Net Balance Area (ha) -->
+										<div class="row mb-3 align-items-center">
+
+											<div class="col-md-4">
+												<label class="form-label fw-semibold">
+													Net Balance Area (ha)
+												</label>
+											</div>
+
+											<div class="col-md-4">
+												<input type="text" class="form-control form-control-sm" id="netBalArea1"
+													name="netBalArea1" maxlength="10"
+													oninput="validateDecimal(this, 11,5)">
+											</div>
+
+										</div>
+
+
+										<div class="text-center mt-4">
+											<button type="submit" name="updateAction" value="D" class="btn btn-warning">
+												<i class="fas fa-save"></i>
+												Update
+											</button>
+										</div>
+
+									</form>
+
+								</div>
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+
+			</div> <!-- container -->
+
+		</div> <!-- card-body -->
+
+	</div> <!-- card -->
 
 	</div> <!-- layout fragment -->
 

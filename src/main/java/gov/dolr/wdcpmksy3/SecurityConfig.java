@@ -28,7 +28,7 @@ public class SecurityConfig {
 
                 .requestMatchers(
 
-                  		"/preliminaryPPR15","/testppr15","/saveDraftPPR15","/getVillagesByProject1","/getMicroWatershedsByProject1","/getDraftsPPR15","/getDraftsPPR15", "/updatePPR15","/deletePreliminaryPPR15",
+                  		"/preliminaryPPR15","/testppr15","/saveDraftPPR15","/getVillagesByProject1","/getMicroWatershedsByProject1","/getDraftsPPR15","/getDraftsPPR15", "/updatePPR15","/deletePreliminaryPPR15", "/viewPPR",
                   	    "/completePreliminaryPPR15","/", "/login", "/loginSuccess", "/getEmailandGenerateotp", "/verifyOtp", "/piaPjtNotLocatiaon", "/institutionalStructurePPR1", "/saveInstitutionalStructurePPR1", "/updateInstitutionalStructurePPR1", "/viewPdfPreliminaryPPR4A","/editPreliminaryPPR4A", "/updatePreliminaryPPR4A", "/detailsOfSLNA", "/saveDetailsOfSLNA", 
                         "/deleteDetailsOfSLNA", "/completeDetailsOfSLNA", "/updateDetailsOfSLNA", "/getDetailsOfSLNAById", "/register", "/register/**", "/technicalsupport", "/customLogout", "/download/**","/viewPdfInstitutionalStructure", "/deleteInstitutionalStructurePPR1", "/completeInstitutionalStructurePPR1", "/editInstitutionalStructurePPR1",
                         "/slnaFunctionariesPPR3", "/saveSLNAFunctionariesPPR3", "/deleteSLNAFunctionariesPPR3", "/editSLNAFunctionariesPPR3", "/completeSLNAFunctionariesPPR3","/updateSLNAFunctionariesPPR3", "/preliminaryPPR4A", "/savePreliminaryPPR4A", "/deletePreliminaryPPR4A", "/completePreliminaryPPR4A","/checkDistrictExists", "/areaCoveredUnderWP",

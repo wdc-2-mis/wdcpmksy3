@@ -32,5 +32,7 @@ public interface PprWatershedCoveredAreaRepo extends JpaRepository<PprWatershedC
 	@Transactional
 	@Query("UPDATE PprWatershedCoveredArea w SET w.status = 'D' WHERE w.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);
+	
+	List<PprWatershedCoveredArea> findByPprPprIdAndStatus(Integer pprId, String status);
 
 }

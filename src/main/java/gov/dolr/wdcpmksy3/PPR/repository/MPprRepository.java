@@ -36,5 +36,9 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 		    WHERE p.district.dcode = :dcode
 		""")
 	Integer findMaxSeqNoByDistrict(@Param("dcode") Integer dcode);
+	
+	List<MPpr> findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus( Integer dcode,   Integer pprId,  Integer finYrCd, String status);
+	
+	List<MPpr> findByPprIdAndStatus(Integer pprId, String status);
 }
 

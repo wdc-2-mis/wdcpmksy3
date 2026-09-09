@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MScheme;
+import gov.dolr.wdcpmksy3.PPR.entity.PprWatershedCoveredArea;
 
 public interface PprAreaCoveredRepository extends JpaRepository<MScheme, Integer>{
 
@@ -47,7 +48,6 @@ public interface PprAreaCoveredRepository extends JpaRepository<MScheme, Integer
 List<Object[]> findWatershedDataByDistrict(@Param("dcode") Integer dcode);
 
 
-	
 
 
 	
