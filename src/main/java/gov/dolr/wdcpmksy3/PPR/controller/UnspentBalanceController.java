@@ -34,7 +34,7 @@ public class UnspentBalanceController {
     private UnspentBalanceServices serv;
 	
 	@GetMapping("/unspentBalancePPR20")
-    public String pendingUCPPR19(HttpSession session, Model model) 
+    public String pendingUCPPR19(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
@@ -42,6 +42,9 @@ public class UnspentBalanceController {
         if(userid==null){
 
             return "redirect:/login";
+        }
+        if (pprid != null) {
+        	serv.changeStatusByPprId(pprid);
         }
         List<PprWcdcUnspentBalance> records = unblance.findByPpr_District_State_StCode(stcode);
         model.addAttribute("records", records);

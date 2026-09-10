@@ -48,7 +48,7 @@ public class LivelihoodSummaryController {
     private PprLivelihoodRepository livrepo;
 	
 	@GetMapping("/livelihoodSummaryPPR13")
-    public String livelihoodSummaryPPR13(HttpSession session, Model model) 
+    public String livelihoodSummaryPPR13(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
@@ -56,6 +56,9 @@ public class LivelihoodSummaryController {
         if(userid==null){
 
             return "redirect:/login";
+        }
+        if (pprid != null) {
+        	laser.changeStatusByPprId(pprid);
         }
         List<PprLivelihood> records = livrepo.findByPpr_District_State_StCode(stcode);
         model.addAttribute("records", records);

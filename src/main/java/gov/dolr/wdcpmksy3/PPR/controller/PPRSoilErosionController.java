@@ -34,7 +34,7 @@ public class PPRSoilErosionController {
     private PPRSoilErosionService soilErosionService;
 	
 	@GetMapping("/pprSoilErosion")
-    public String soilErosionForm(HttpSession session, Model model) {
+    public String soilErosionForm(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) {
 		
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		Object userid = session.getAttribute("userid");
@@ -42,7 +42,9 @@ public class PPRSoilErosionController {
 
             return "redirect:/login";
         }
-        
+        if (pprid != null) {
+        	soilErosionService.changeStatusByPprId(pprid);
+        }
         List<MErosion> erosionList = soilErosionService.getErosionList();
         
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));

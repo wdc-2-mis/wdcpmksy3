@@ -42,7 +42,7 @@ public class PPRCropRelatedOutcomeController {
 	private PprCropOutcomeService outcomeService;
 	
 	@GetMapping("/pprCropOutcomes")
-	public String pprCropOutcomes(HttpSession session, Model model) 
+	public String pprCropOutcomes(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		Object userid = session.getAttribute("userid");
@@ -50,7 +50,9 @@ public class PPRCropRelatedOutcomeController {
 
             return "redirect:/login";
         }
-        
+        if (pprid != null) {
+        	outcomeService.changeStatusByPprId(pprid);
+        }
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("mseason", mseasonRepo.findAll());
         model.addAttribute("cropTypeList", cropser.getAllCropTypeDetails());

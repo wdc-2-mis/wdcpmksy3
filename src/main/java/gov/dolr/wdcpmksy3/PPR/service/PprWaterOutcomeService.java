@@ -158,7 +158,10 @@ public class PprWaterOutcomeService {
 	    repository.delete(outcome);
 	}
 
-	
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return repository.changeStatusByPprId(pprId);
+	}
 
 	
 }

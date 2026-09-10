@@ -58,7 +58,8 @@ public class PprProjectAtGlanceController {
 	private VillageRepository villageRepo;
 	 
 	@GetMapping("/pprProjectAtGlance")
-    public String pprProjectAtGlance(@RequestParam(required = false) Integer dcode, HttpSession session, Model model) {
+    public String pprProjectAtGlance(@RequestParam(required = false) Integer dcode, HttpSession session, 
+    		Model model, @RequestParam(required = false) Integer pprid) {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -66,6 +67,9 @@ public class PprProjectAtGlanceController {
 		String userid=(String)session.getAttribute("userid");
 		if(userid==null){
             return "redirect:/login";
+        }
+		if (pprid != null) {
+			pprProjectGlanceServ.changeStatusByPprId(pprid);
         }
 		if(dcode != null){
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);

@@ -246,6 +246,11 @@ public class PprCropOutcomeService {
 		pprCropOutcomeRepo.delete(outcome);
 		
 	}
+	
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return pprCropOutcomeRepo.changeStatusByPprId(pprId);
+	}
 
 	
 }

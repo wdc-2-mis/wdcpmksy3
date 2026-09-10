@@ -52,14 +52,16 @@ public class PPREmploymentGenerationController {
     
 
     @GetMapping("/pprEmploymentGeneration")
-    public String employmentGenerationForm(HttpSession session, Model model) {
+    public String employmentGenerationForm(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) {
 
         Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
         Object userid = session.getAttribute("userid");
         if (userid == null) {
             return "redirect:/login";
         }
-
+        if (pprid != null) {
+        	employmentService.changeStatusByPprId(pprid);
+        }
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         
         List<MEmploymentType> employmentTypes = employmentTypeService.getAllEmploymentTypes();

@@ -127,5 +127,10 @@ public class DrinkingWaterServices {
 		}
 		return state;	
 	}
+	
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return dwrepo.changeStatusByPprId(pprId);
+	}
 
 }

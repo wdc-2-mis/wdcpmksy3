@@ -184,6 +184,9 @@ public class PprDisasterDetailsService {
 	    repository.delete(record);
 	}
 	
-	
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return repository.changeStatusByPprId(pprId);
+	}
 	
 }

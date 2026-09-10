@@ -42,13 +42,16 @@ public class PPRFloodProjectAreaController {
     private PPRSoilErosionService soilErosionService;
 	
 	@GetMapping("/dtlFloodDroughtArea")
-    public String dtlFloodDroughtArea(HttpSession session, Model model) 
+    public String dtlFloodDroughtArea(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		Object userid = session.getAttribute("userid");
         if(userid==null){
 
             return "redirect:/login";
+        }
+        if (pprid != null) {
+        	pprAreaService.changeStatusByPprId(pprid);
         }
         List<DisasterType> disasterTypes = DTrepo.findAll();
         model.addAttribute("disasterTypes", disasterTypes);

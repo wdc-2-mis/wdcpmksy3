@@ -38,7 +38,7 @@ public class PPRWaterOutcomesController {
 	private PprWaterOutcomeService outcomeService;
 	
 	@GetMapping("/pprWaterOutcomes")
-	public String pprWaterOutcomes(HttpSession session, Model model) 
+	public String pprWaterOutcomes(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		Object userid = session.getAttribute("userid");
@@ -46,7 +46,9 @@ public class PPRWaterOutcomesController {
 
             return "redirect:/login";
         }
-        
+        if (pprid != null) {
+        	outcomeService.changeStatusByPprId(pprid);
+        }
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         List<MWaterSource> mWaterSource = waterRepo.findAll();
         model.addAttribute("mWaterSource", mWaterSource);

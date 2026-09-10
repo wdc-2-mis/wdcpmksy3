@@ -53,7 +53,7 @@ public class PPRLandPatternAreaController {
 
 	
 	@GetMapping("/pprLandPatternArea")
-	public String landPatternArea(HttpSession session, Model model) 
+	public String landPatternArea(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		Object userid = session.getAttribute("userid");
@@ -61,7 +61,10 @@ public class PPRLandPatternAreaController {
 
             return "redirect:/login";
         }
-        
+        if (pprid != null) {
+        	landPatternAreaService.changeStatusByPprId(pprid);
+        }
+		
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
 
         return "ppr/pprLandPatternArea";

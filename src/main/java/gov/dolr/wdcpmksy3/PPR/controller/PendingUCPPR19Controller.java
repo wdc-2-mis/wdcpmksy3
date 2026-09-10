@@ -37,7 +37,7 @@ public class PendingUCPPR19Controller {
     private PendingUCPPR19Services services;
 	
 	@GetMapping("/pendingUCPPR19")
-    public String pendingUCPPR19(HttpSession session, Model model) 
+    public String pendingUCPPR19(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
@@ -45,6 +45,9 @@ public class PendingUCPPR19Controller {
         if(userid==null){
 
             return "redirect:/login";
+        }
+        if (pprid != null) {
+        	services.changeStatusByPprId(pprid);
         }
         List<PprPendingUc> records = ucrepo.findByPpr_District_State_StCode(stcode);
         model.addAttribute("records", records);

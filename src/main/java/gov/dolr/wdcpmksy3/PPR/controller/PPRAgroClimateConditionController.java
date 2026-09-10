@@ -63,7 +63,7 @@ public class PPRAgroClimateConditionController {
     private VillageRepository villrepo;
     
 	@GetMapping("/agroClimateConditionPPR10")
-    public String agroClimateConditionPPR10(HttpSession session, Model model) 
+    public String agroClimateConditionPPR10(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		//String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -73,6 +73,9 @@ public class PPRAgroClimateConditionController {
         if(userid==null){
 
             return "redirect:/login";
+        }
+        if (pprid != null) {
+        	agroser.changeStatusByPprId(pprid);
         }
         List<Object[]> finalList = new ArrayList<>();
         int srNo = 1;

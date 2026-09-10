@@ -66,7 +66,7 @@ public class PprProposedProjectController {
 	private CriteriaDetailsRepository criteriaDetailsRepo;
 	
 	@GetMapping("/pprProposedProjectDetails")
-    public String pprProposedProjectDetails(@RequestParam(required = false) Integer dcode, HttpSession session, Model model) {
+    public String pprProposedProjectDetails(@RequestParam(required = false) Integer dcode, HttpSession session, Model model, @RequestParam(required = false) Integer pprid) {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -74,6 +74,9 @@ public class PprProposedProjectController {
 		String userid=(String)session.getAttribute("userid");
 		if(userid==null){
             return "redirect:/login";
+        }
+		if (pprid != null) {
+			proposedProjectService.changeStatusByPprId(pprid);
         }
 		if(dcode != null){
 

@@ -256,6 +256,9 @@ public class PPRSoilErosionService {
         soilErosionRepository.deleteById(id);
         
     }
-    
+    @Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return soilErosionRepository.changeStatusByPprId(pprId);
+	}
 	
 }

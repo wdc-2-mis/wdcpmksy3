@@ -59,14 +59,16 @@ public class PrelimnaryPPR8AController {
 	private MSchemeRepository schemeRepository;
 	
 	@GetMapping("/preliminaryPPR8")
-    public String preliminaryPPR8(HttpSession session, Model model){
+    public String preliminaryPPR8(HttpSession session, Model model, @RequestParam(required = false) Integer pprid){
 
 		String userid = (String) session.getAttribute("userid");
 
 		if (userid == null) {
 		    return "redirect:/login";
 		}
-
+		if (pprid != null) {
+			pprProposedAreaService.changeStatusByPprId(pprid);
+        }
 		String statename = (String) session.getAttribute("statename");
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 

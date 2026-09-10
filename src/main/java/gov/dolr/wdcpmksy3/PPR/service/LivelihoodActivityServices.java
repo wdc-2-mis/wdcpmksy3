@@ -201,6 +201,10 @@ public class LivelihoodActivityServices {
 		return state;	
 		
 	}
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return livrepo.changeStatusByPprId(pprId);
+	}
 
 
 }

@@ -50,14 +50,17 @@ public class PreliminaryPPR15AController {
 	
 	
 	@GetMapping("/preliminaryPPR15")
-	public String preliminaryPPR15(HttpSession session, Model model) {
+	public String preliminaryPPR15(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) {
 
 	    String statename = (String) session.getAttribute("statename");
 
 	    Integer stcode = Integer.parseInt(
 	            session.getAttribute("stcode").toString()
 	    );
-
+	    if (pprid != null) {
+	    	migrationDetailsService.changeStatusByPprId(pprid);
+        }
+		
 	    model.addAttribute("stateName", statename);
 
 	    model.addAttribute(

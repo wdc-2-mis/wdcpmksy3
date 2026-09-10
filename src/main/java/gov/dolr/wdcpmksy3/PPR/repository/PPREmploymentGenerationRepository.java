@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.PPR.entity.PPREmploymentGeneration;
 
@@ -52,5 +54,10 @@ public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmpl
     List<PPREmploymentGeneration> findExistingRecords(@Param("pprId") Integer pprId, @Param("vcode") Integer vcode, @Param("mwId") Integer mwId);
     
     List<PPREmploymentGeneration> findByPprIdPprIdAndStatus(Integer pprId, Character status);
+    
+    @Modifying
+	@Transactional
+	@Query("UPDATE PPREmploymentGeneration e SET e.status = 'D' WHERE e.pprId.pprId = :pprId")
+	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
 }

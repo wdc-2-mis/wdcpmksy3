@@ -216,6 +216,12 @@ public class PprProjectGlanceService {
 	    }
 	}
 	
-	
+	@Transactional
+	public void changeStatusByPprId(Integer pprId) {
+
+		pprProjectGlanceRepo.changeStatusByPprId(pprId);
+
+		pprVillageRepo.changeStatusByPprId(pprId);
+	}
 
 }

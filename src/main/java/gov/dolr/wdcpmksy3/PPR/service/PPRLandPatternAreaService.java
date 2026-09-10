@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.PPR.entity.PPRLandPatternArea;
 import gov.dolr.wdcpmksy3.PPR.entity.PprMicroWatershed;
@@ -59,5 +60,9 @@ public class PPRLandPatternAreaService {
         return landPatternAreaRepository.countByVillage(vcode) > 0;
 
     }
+    @Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return landPatternAreaRepository.changeStatusByPprId(pprId);
+	}
 	
 }

@@ -48,4 +48,9 @@ public class PprProposedAreaService {
 
 		repository.save(ub);
     }
+    
+    @Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return repository.changeStatusByPprId(pprId);
+	}
 }

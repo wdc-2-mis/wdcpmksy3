@@ -3,9 +3,11 @@ package gov.dolr.wdcpmksy3.PPR.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.PPR.entity.PprAgroClimate;
 
@@ -27,7 +29,12 @@ public interface PprAgroClimateRepository extends JpaRepository<PprAgroClimate, 
 			+ "	join ppr_agro_soil s on s.ppr_agro_id = ac.ppr_agro_id where ac.ppr_agro_id=:id  order by d.dist_name, p.project_name ", nativeQuery = true)
 	List<Object[]> getPprAgroClimateListById(@Param("id") int id);
 	
-	  List<PprAgroClimate> findByPprPprIdAndStatus(Integer pprId, Character status);
+	List<PprAgroClimate> findByPprPprIdAndStatus(Integer pprId, Character status);
+	
+	@Modifying
+	@Transactional
+	@Query("UPDATE PprAgroClimate c SET c.status = 'D' WHERE c.ppr.pprId = :pprId")
+	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 
 
 }

@@ -175,5 +175,13 @@ public class PprProposedProjectService {
 
 	    return repository.existsByPprDistrictDcodeAndMicroWatershedMwId(district,microWatershed);
 	}
+	
+	@Transactional
+	public void changeStatusByPprId(Integer pprId) {
+
+		repository.changeStatusByPprId(pprId);
+
+		criteriaDetailsRepo.changeStatusByPprId(pprId);
+	}
 
 }

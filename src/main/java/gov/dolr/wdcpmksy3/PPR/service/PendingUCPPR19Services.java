@@ -116,5 +116,10 @@ public class PendingUCPPR19Services {
 		return state;
 		
 	}
+	
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return ucrepo.changeStatusByPprId(pprId);
+	}
 
 }

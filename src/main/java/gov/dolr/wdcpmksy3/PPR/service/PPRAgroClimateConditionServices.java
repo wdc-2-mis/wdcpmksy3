@@ -118,6 +118,10 @@ public class PPRAgroClimateConditionServices {
 
         agcrepo.save(fun);
     }
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return agcrepo.changeStatusByPprId(pprId);
+	}
 	
 	public boolean editAgroClimateConditionPPR10(Integer agroid, String zone, String graphy, BigDecimal rainfall, BigDecimal area, BigDecimal farea,
 			Integer soilType, BigDecimal soilarea, Integer croptype, BigDecimal croparea, String status, String userid, String ip) {

@@ -99,5 +99,10 @@ public class UnspentBalanceServices {
 		return st;
 		
 	}
+	
+	@Transactional
+	public int changeStatusByPprId(Integer pprId) {
+	    return repo.changeStatusByPprId(pprId);
+	}
 
 }

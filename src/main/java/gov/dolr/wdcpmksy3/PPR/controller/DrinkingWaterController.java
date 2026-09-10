@@ -38,7 +38,7 @@ public class DrinkingWaterController {
     private PprDrinkingWaterRepository dwrepo;
 	
 	@GetMapping("/drinkingWaterStatus")
-    public String drinkingWaterStatus(HttpSession session, Model model) 
+    public String drinkingWaterStatus(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
@@ -46,6 +46,9 @@ public class DrinkingWaterController {
         if(userid==null){
 
             return "redirect:/login";
+        }
+        if (pprid != null) {
+        	serv.changeStatusByPprId(pprid);
         }
         List<MWaterQuality> waterQualityList =wtrqua.findAll();
         model.addAttribute("waterQualityList", waterQualityList);

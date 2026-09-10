@@ -59,7 +59,10 @@ public class PPRMigrationDetailsService {
 	     repository.save(data);
 	 }
 	 
-
+		@Transactional
+		public int changeStatusByPprId(Integer pprId) {
+			return repository.changeStatusByPprId(pprId);
+		}
 	
 	
 
