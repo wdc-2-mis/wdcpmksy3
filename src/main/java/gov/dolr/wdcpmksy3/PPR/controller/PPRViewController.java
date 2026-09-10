@@ -54,9 +54,11 @@ import gov.dolr.wdcpmksy3.PPR.service.PdfService;
 import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.PPR.service.PprProposedProjectService;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.CropOutcomeRepository;
 import gov.dolr.wdcpmksy3.repository.PprDrinkingWaterRepository;
 import gov.dolr.wdcpmksy3.repository.PprProposedAreaRepository;
+import gov.dolr.wdcpmksy3.repository.UserRepository;
 import gov.dolr.wdcpmksy3.service.DistrictService;
 import jakarta.servlet.http.HttpSession;
 
@@ -125,6 +127,9 @@ public class PPRViewController {
 
     @Autowired
     private PdfService pdfService;
+    
+    @Autowired
+    private UserRepository ur;
 
 
     @GetMapping("/viewPPR")
@@ -164,6 +169,9 @@ public class PPRViewController {
         model.addAttribute("selectedProject", project);
         model.addAttribute("selectedFinYrCd", finYrCd);
         model.addAttribute("selectedProjectName", resolveProjectName(data, project));
+        
+        List<WdcpmksyUserReg> users =ur.findDLUsersByStateAndRole(stcode);
+        model.addAttribute("userList", users);
 
         return "viewPPR";
     }

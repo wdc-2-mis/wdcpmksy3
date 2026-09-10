@@ -53,6 +53,21 @@ public interface UserRepository extends JpaRepository<WdcpmksyUserReg, Long> {
     @Query("select max(u.regId) from WdcpmksyUserReg u")
     Integer findMaxRegId();
     
+    
+    @Query("""
+            SELECT DISTINCT u
+            FROM WdcpmksyUserReg u
+            JOIN u.userMappings um
+            JOIN WdcpmksyUserAppRoleMap ur
+                ON ur.regId = u.regId
+            JOIN ur.role r
+            WHERE u.userType = 'DL'
+              AND um.state.stCode = :stcode
+              AND r.roleName = 'DOLR'
+        """)
+        List<WdcpmksyUserReg> findDLUsersByStateAndRole(
+                @Param("stcode") Integer stcode);
+    
 
     
    

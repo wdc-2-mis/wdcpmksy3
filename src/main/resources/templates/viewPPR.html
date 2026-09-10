@@ -1139,6 +1139,40 @@
 					</tbody>
 				</table>
 				</div> <!-- closes th:if="${searched}" -->
+				
+				
+				
+				<form id="viewPPR" th:action="@{/forwardViewPPR}" method="post"
+					th:attr="data-selected-dcode=${selectedDcode},data-selected-project=${selectedProject}">
+					
+					
+					<div class="row mb-3 align-items-center">
+					
+						<div class="col-md-2">
+							<label class="form-label fw-semibold">
+								User-ID <span class="text-danger">*</span>
+							</label>
+						</div>
+						<div class="col-md-4">
+							<select class="form-select" id="userid" name="userid">
+								<option value="">--Select User-ID--</option>
+								<option th:each="d : ${distList}" th:value="${d.dcode}" th:text="${d.distName}">
+								</option>
+							</select>
+						</div>
+						<div class="col-md-4">
+							<button type="submit" class="btn btn-primary">Forward</button>
+						</div>
+					
+					</div>
+					
+					
+				</form>
+				
+				
+				
+				
+				
 			</div>
 		</div>
 	</div>
