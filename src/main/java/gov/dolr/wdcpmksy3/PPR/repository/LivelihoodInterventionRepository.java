@@ -9,5 +9,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.LivelihoodIntervention;
 
 @Repository
 public interface LivelihoodInterventionRepository extends JpaRepository<LivelihoodIntervention, Integer> {
+	
+
 
 }

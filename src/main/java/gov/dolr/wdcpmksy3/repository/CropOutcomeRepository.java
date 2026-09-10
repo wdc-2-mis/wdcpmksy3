@@ -16,5 +16,7 @@ public interface CropOutcomeRepository extends JpaRepository<PprCropOutcome, Int
 
 	@Query(" SELECT p FROM PprCropOutcome p WHERE p.ppr.district.dcode = :dcode ORDER BY p.pprCropOutcomeId")
 	List<PprCropOutcome> findByDistrict(Integer dcode);
+	
+	List<PprCropOutcome> findByPprPprIdAndStatus(Integer pprId, String status);
 
 }

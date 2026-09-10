@@ -50,5 +50,7 @@ public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmpl
         SELECT e FROM PPREmploymentGeneration e WHERE e.pprId.pprId = :pprId AND e.village.vcode = :vcode
         AND e.microWatershed.mwId = :mwId ORDER BY e.employmentType.employmentTypeId""")
     List<PPREmploymentGeneration> findExistingRecords(@Param("pprId") Integer pprId, @Param("vcode") Integer vcode, @Param("mwId") Integer mwId);
+    
+    List<PPREmploymentGeneration> findByPprIdPprIdAndStatus(Integer pprId, Character status);
 	
 }

@@ -9,5 +9,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprLivelihood;
 public interface PprLivelihoodRepository extends JpaRepository<PprLivelihood, Integer> {
 	
 	List<PprLivelihood> findByPpr_District_State_StCode(Integer stCode);
+	
+	List<PprLivelihood> findByPprPprIdAndStatus(Integer pprId, Character status);
 
 }

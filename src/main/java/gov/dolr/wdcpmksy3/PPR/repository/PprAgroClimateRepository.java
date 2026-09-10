@@ -26,5 +26,8 @@ public interface PprAgroClimateRepository extends JpaRepository<PprAgroClimate, 
 			+ "	from m_district d join m_ppr p on p.dcode = d.dcode join ppr_agro_climate ac on ac.ppr_id = p.ppr_id join ppr_agro_crop cr on cr.ppr_agro_id = ac.ppr_agro_id "
 			+ "	join ppr_agro_soil s on s.ppr_agro_id = ac.ppr_agro_id where ac.ppr_agro_id=:id  order by d.dist_name, p.project_name ", nativeQuery = true)
 	List<Object[]> getPprAgroClimateListById(@Param("id") int id);
+	
+	  List<PprAgroClimate> findByPprPprIdAndStatus(Integer pprId, Character status);
+
 
 }

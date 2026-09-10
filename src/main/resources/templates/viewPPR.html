@@ -12,75 +12,75 @@
 
 
 	<script>
-		
-		document.addEventListener("DOMContentLoaded", function () {
-			    document.querySelectorAll(".viewBtn").forEach(function (btn) {
-			        btn.addEventListener("click", function () {
-			            let id = this.getAttribute("data-id");
-			            // Get modal elements
-			            let loading = document.getElementById("criteriaLoading");
-			            let error = document.getElementById("criteriaError");
-			            let noData = document.getElementById("criteriaNoData");
-			            let tableContainer = document.getElementById("criteriaTableContainer");
-			            let tableBody = document.getElementById("criteriaTableBody");
-			            // Reset previous data
-			            tableBody.innerHTML = "";
-			            loading.style.display = "block";
-			            error.style.display = "none";
-			            noData.style.display = "none";
-			            tableContainer.style.display = "none";
-			            fetch("/viewSavedCriteriaDetails?id=" + id)
-			                .then(response => {
-			                    if (!response.ok) {
-			                        throw new Error("Unable to fetch criteria details");
-			                    }
-			                    return response.json();
-			                })
-			                .then(data => {
-			                    console.log("Criteria Details:", data);
-			                    loading.style.display = "none";
-			                    // No records
-			                    if (!data || data.length === 0) {
-			                        noData.style.display = "block";
-			                        return;
-			                    }
-			                    // Create table rows
-			                    data.forEach(function (item, index) {
-			                        let row = document.createElement("tr");
-			                        // S.No.
-			                        let serialCell = document.createElement("td");
-			                        serialCell.textContent = index + 1;
-			                        // Criteria
-			                        let criteriaCell = document.createElement("td");
-			                        if (item.criteriaDesc) {
-			                            criteriaCell.textContent = item.criteriaDesc;
-			                        } else {
-			                            criteriaCell.textContent = "";
-			                        }
-			                        // Scored Marks
-			                        let marksCell = document.createElement("td");
-			                        marksCell.textContent = item.scoredMarks != null ? item.scoredMarks : 0;
-			                        // Add cells to row
-			                        row.appendChild(serialCell);
-			                        row.appendChild(criteriaCell);
-			                        row.appendChild(marksCell);
-			                        // Add row to table
-			                        tableBody.appendChild(row);
-			                    });
-			                    // Show table
-			                    tableContainer.style.display = "block";
-			                })
-			                .catch(errorMessage => {
-			                    console.error("Error:", errorMessage);
-			                    loading.style.display = "none";
-			                    error.textContent =
-			                        "Unable to load criteria details. Please try again.";
-			                    error.style.display = "block";
 
-			                });
-			        });
-			    });
+		document.addEventListener("DOMContentLoaded", function () {
+			document.querySelectorAll(".viewBtn").forEach(function (btn) {
+				btn.addEventListener("click", function () {
+					let id = this.getAttribute("data-id");
+					// Get modal elements
+					let loading = document.getElementById("criteriaLoading");
+					let error = document.getElementById("criteriaError");
+					let noData = document.getElementById("criteriaNoData");
+					let tableContainer = document.getElementById("criteriaTableContainer");
+					let tableBody = document.getElementById("criteriaTableBody");
+					// Reset previous data
+					tableBody.innerHTML = "";
+					loading.style.display = "block";
+					error.style.display = "none";
+					noData.style.display = "none";
+					tableContainer.style.display = "none";
+					fetch("/viewSavedCriteriaDetails?id=" + id)
+						.then(response => {
+							if (!response.ok) {
+								throw new Error("Unable to fetch criteria details");
+							}
+							return response.json();
+						})
+						.then(data => {
+							console.log("Criteria Details:", data);
+							loading.style.display = "none";
+							// No records
+							if (!data || data.length === 0) {
+								noData.style.display = "block";
+								return;
+							}
+							// Create table rows
+							data.forEach(function (item, index) {
+								let row = document.createElement("tr");
+								// S.No.
+								let serialCell = document.createElement("td");
+								serialCell.textContent = index + 1;
+								// Criteria
+								let criteriaCell = document.createElement("td");
+								if (item.criteriaDesc) {
+									criteriaCell.textContent = item.criteriaDesc;
+								} else {
+									criteriaCell.textContent = "";
+								}
+								// Scored Marks
+								let marksCell = document.createElement("td");
+								marksCell.textContent = item.scoredMarks != null ? item.scoredMarks : 0;
+								// Add cells to row
+								row.appendChild(serialCell);
+								row.appendChild(criteriaCell);
+								row.appendChild(marksCell);
+								// Add row to table
+								tableBody.appendChild(row);
+							});
+							// Show table
+							tableContainer.style.display = "block";
+						})
+						.catch(errorMessage => {
+							console.error("Error:", errorMessage);
+							loading.style.display = "none";
+							error.textContent =
+								"Unable to load criteria details. Please try again.";
+							error.style.display = "block";
+
+						});
+				});
 			});
+		});
 
 
 		document.addEventListener("DOMContentLoaded", function () {
@@ -166,8 +166,15 @@
 					<button type="submit" class="btn btn-primary">
 						Get Data
 					</button>
+					
+					<button type="submit" formaction="/downloadPPRPdf" class="btn btn-success" th:if="${searched}">
+					       <i class="fas fa-file-pdf"></i> Download PDF
+					   </button>
 				</div>
 			</form>
+			
+			<div th:if="${searched}">
+
 			<!-- ====================================================== -->
 			<!-- PPR 1 -->
 			<!-- ====================================================== -->
@@ -336,49 +343,50 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="modal fade" id="viewCriteriaModal" tabindex="-1" aria-labelledby="viewcriteriaModalLabel" aria-hidden="true">
-					    <div class="modal-dialog modal-xl modal-dialog-centered">
-					        <div class="modal-content">
-					            <div class="modal-header bg-primary text-white">
-					                <h5 class="modal-title" id="viewcriteriaModalLabel"> Criteria Details </h5>
-					                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-					            </div>
-					            <div class="modal-body">
-					                <!-- Loading -->
-					                <div id="criteriaLoading" class="text-center" style="display:none;">
-					                    <div class="spinner-border text-primary" role="status">
-					                        <span class="visually-hidden"> Loading... </span>
-					                    </div>
-					                    <p class="mt-2"> Loading criteria details... </p>
-					                </div>
-					                <!-- Error -->
-					                <div id="criteriaError" class="alert alert-danger" style="display:none;"></div>
-					                <!-- No Data -->
-					                <div id="criteriaNoData" class="alert alert-warning" style="display:none;">
-					                    No criteria details found for this project.
-					                </div>
-					                <!-- Criteria Table -->
-					                <div id="criteriaTableContainer"
-					                     style="display:none;">
-					                    <table class="table table-bordered table-striped table-hover">
-					                        <thead class="table-primary">
-					                        <tr>
-					                            <th width="5%">S.No.</th>
-					                            <th>Criteria</th>
-					                            <th>Scored Marks</th>		                            
-					                        </tr>
-					                        </thead>
-					                        <tbody id="criteriaTableBody">
-					                        </tbody>
-					                    </table>
-					                </div>
-					            </div>
-					            <div class="modal-footer">
-					                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
-					            </div>
-					        </div>
-					    </div>
+			<div class="modal fade" id="viewCriteriaModal" tabindex="-1" aria-labelledby="viewcriteriaModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog modal-xl modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header bg-primary text-white">
+							<h5 class="modal-title" id="viewcriteriaModalLabel"> Criteria Details </h5>
+							<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+								aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<!-- Loading -->
+							<div id="criteriaLoading" class="text-center" style="display:none;">
+								<div class="spinner-border text-primary" role="status">
+									<span class="visually-hidden"> Loading... </span>
+								</div>
+								<p class="mt-2"> Loading criteria details... </p>
+							</div>
+							<!-- Error -->
+							<div id="criteriaError" class="alert alert-danger" style="display:none;"></div>
+							<!-- No Data -->
+							<div id="criteriaNoData" class="alert alert-warning" style="display:none;">
+								No criteria details found for this project.
+							</div>
+							<!-- Criteria Table -->
+							<div id="criteriaTableContainer" style="display:none;">
+								<table class="table table-bordered table-striped table-hover">
+									<thead class="table-primary">
+										<tr>
+											<th width="5%">S.No.</th>
+											<th>Criteria</th>
+											<th>Scored Marks</th>
+										</tr>
+									</thead>
+									<tbody id="criteriaTableBody">
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
+						</div>
 					</div>
+				</div>
+			</div>
 
 			<!-- ======================= PPR-4 ======================= -->
 			<h4 class="bg-primary text-white p-2 mt-4">
@@ -390,7 +398,7 @@
 
 					<thead class="table-primary">
 						<tr>
-							
+
 							<th>District Name</th>
 							<th>Name of the Project</th>
 							<th>Type of Project</th>
@@ -410,7 +418,7 @@
 					<tbody>
 						<tr th:each="data : ${pprProjectAtGlanceList}">
 
-							
+
 							<td th:text="${data.ppr.district.distName}"></td>
 							<td th:text="${data.ppr.projectName}"></td>
 							<td th:text="${data.projectType.projectType}"></td>
@@ -504,11 +512,10 @@
 
 			<!-- ================= PPR-9 : Land Pattern Area ================= -->
 
-			<div class="bg-primary text-white p-2 mt-4">
-
-				<h4><b>
-						<center>PPR-9 : Land Pattern Area</center>
-					</b></h4>
+			<div>
+				<h4 class="bg-primary text-white p-2 mt-4">
+					PPR-9 : Land Pattern Area
+				</h4>
 			</div>
 
 			<table class="table table-bordered table-striped table-hover">
@@ -531,33 +538,19 @@
 				</thead>
 
 				<tbody>
-
 					<tr th:each="data, stat : ${landPatternAreaList}">
-
 						<td th:text="${stat.count}"></td>
-
-						<td th:text="${data.ppr.district.distName}"></td>
-
-						<td th:text="${data.ppr.projectName}"></td>
-
+						<td th:text="${data.pprId.district.distName}"></td>
+						<td th:text="${data.pprId.projectName}"></td>
 						<td th:text="${data.microWatershed.mwName}"></td>
-
 						<td th:text="${data.village.villageName}"></td>
-
-						<td th:text="${data.geoArea}"></td>
-
+						<td th:text="${data.villageArea}"></td>
 						<td th:text="${data.forestArea}"></td>
-
-						<td th:text="${data.agricultureArea}"></td>
-
+						<td th:text="${data.agricultureLand}"></td>
 						<td th:text="${data.rainfedArea}"></td>
-
-						<td th:text="${data.permanentPastures}"></td>
-
-						<td th:text="${data.cultivableWasteland}"></td>
-
-						<td th:text="${data.nonCultivableWasteland}"></td>
-
+						<td th:text="${data.pastures}"></td>
+						<td th:text="${data.cultivableWastelandArea}"></td>
+						<td th:text="${data.nonCultivableWastelandArea}"></td>
 					</tr>
 
 					<tr th:if="${#lists.isEmpty(landPatternAreaList)}">
@@ -565,7 +558,6 @@
 							No records found.
 						</td>
 					</tr>
-
 				</tbody>
 
 			</table>
@@ -580,7 +572,6 @@
 				<table class="table table-bordered table-striped table-hover">
 					<thead class="table-primary">
 						<tr>
-							<th>State</th>
 							<th>District</th>
 							<th>Project</th>
 							<th>Village</th>
@@ -589,28 +580,33 @@
 							<th>Rainfall (mm)</th>
 							<th>Area (Ha.)</th>
 							<th>Forest Area (Ha.)</th>
-							<th>Major Soil Type</th>
-							<th>Soil Area (Ha.)</th>
-							<th>Major Crop</th>
-							<th>Crop Area (Ha.)</th>
+							<th>Major Soil Type(s)</th>
+							<th>Major Crop(s)</th>
 						</tr>
 					</thead>
 
 					<tbody>
 						<tr th:each="data : ${ppr10List}">
-							<td th:text="${data.ppr.district.state.stName}"></td>
 							<td th:text="${data.ppr.district.distName}"></td>
 							<td th:text="${data.ppr.projectName}"></td>
 							<td th:text="${data.village.villageName}"></td>
-							<td th:text="${data.agroClimaticZone}"></td>
+							<td th:text="${data.zoneName}"></td>
 							<td th:text="${data.topography}"></td>
 							<td th:text="${data.avgRainfall}"></td>
 							<td th:text="${data.area}"></td>
 							<td th:text="${data.forestArea}"></td>
-							<td th:text="${data.soilType.soilTypeName}"></td>
-							<td th:text="${data.soilArea}"></td>
-							<td th:text="${data.crop.cropName}"></td>
-							<td th:text="${data.cropArea}"></td>
+							<td>
+								<span th:each="s, iter : ${data.soilList}">
+									<span th:text="${s.soilType.soilName} + ' (' + ${s.area} + ' ha)'"></span>
+									<span th:if="${!iter.last}">, </span>
+								</span>
+							</td>
+							<td>
+								<span th:each="c, iter : ${data.cropList}">
+									<span th:text="${c.cropType.cropName} + ' (' + ${c.area} + ' ha)'"></span>
+									<span th:if="${!iter.last}">, </span>
+								</span>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -675,7 +671,6 @@
 				<table class="table table-bordered table-striped text-center">
 					<thead>
 						<tr>
-							<th class="table-primary">State</th>
 							<th class="table-primary">District</th>
 							<th class="table-primary">Month</th>
 							<th class="table-primary">Year</th>
@@ -689,21 +684,18 @@
 
 					<tbody>
 						<tr th:each="data : ${soilErosionList}">
-							<td th:text="${data.district.state.stName}"></td>
-							<td th:text="${data.district.distName}"></td>
+							<td th:text="${data.ppr.district.distName}"></td>
 							<td th:text="${data.month.monthName}"></td>
-							<td th:text="${data.finYear.finYrDesc}"></td>
-							<td th:text="${data.erosionType}"></td>
-							<td th:text="${data.erosionCategory}"></td>
+							<td th:text="${data.year.year}"></td>
+							<td th:text="${data.erosionType.erosion.categoryType}"></td>
+							<td th:text="${data.erosionType.erosionType}"></td>
 							<td th:text="${data.affectedArea}"></td>
 							<td th:text="${data.runoff}"></td>
-							<td th:text="${data.averageSoilLoss}"></td>
+							<td th:text="${data.avgSoilLoss}"></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
-
-
 
 			<!-- ================= PPR-13 VIEW ================= -->
 			<h4 class="bg-primary text-white p-2 mt-4">
@@ -734,7 +726,7 @@
 						<tr th:each="data : ${pprLivelihoodSummaryList}">
 							<td th:text="${data.ppr.district.distName}"></td>
 
-							<td th:text="${data.block.blockName}"></td>
+							<td th:text="${data.village.gramPanchayat.block.blockName}"></td>
 
 							<td th:text="${data.ppr.projectName}"></td>
 
@@ -744,28 +736,27 @@
 
 							<!-- Multiple Activities -->
 							<td>
-								<span th:each="act, stat : ${data.activityList}">
-									<span th:text="${act.activity.activityName}"></span>
+								<span th:each="act, stat : ${data.existingLivelihoodActivities}">
+									<span th:text="${act.livelihoodActivity.livelihoodActivityName}"></span>
 									<span th:if="${!stat.last}">, </span>
 								</span>
 							</td>
 
 							<!-- Multiple Interventions -->
 							<td>
-								<span th:each="intv, stat : ${data.interventionList}">
-									<span th:text="${intv.intervention.interventionName}"></span>
+								<span th:each="intv, stat : ${data.projectLivelihoodInterventions}">
+									<span th:text="${intv.livelihoodIntervention.livelihoodInterventionName}"></span>
 									<span th:if="${!stat.last}">, </span>
 								</span>
 							</td>
 
-							<td class="text-center" th:text="${data.currentMigrationStatus}"></td>
+							<td class="text-center" th:text="${data.migratedPeople}"></td>
 
-							<td th:text="${data.mainReasonMigration}"></td>
+							<td th:text="${data.migrationReason}"></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
-
 
 
 
@@ -797,18 +788,19 @@
 
 						<tr th:each="data : ${pprEmploymentList}">
 
-							<td th:text="${data.ppr.district.distName}"></td>
-							<td th:text="${data.ppr.projectName}"></td>
+							<td th:text="${data.pprId.district.distName}"></td>
+							<td th:text="${data.pprId.projectName}"></td>
 							<td th:text="${data.microWatershed.mwName}"></td>
 							<td th:text="${data.village.villageName}"></td>
 
-							<td th:text="${data.employmentType.employmentType}"></td>
+							<td th:text="${data.employmentType.employmentTypeName}"></td>
 
 							<td th:text="${data.sc}"></td>
 							<td th:text="${data.st}"></td>
 							<td th:text="${data.others}"></td>
 							<td th:text="${data.women}"></td>
-							<td th:text="${data.total}"></td>
+							<td th:text="${(data.sc ?: 0) + (data.st ?: 0) + (data.others ?: 0) + (data.women ?: 0)}">
+							</td>
 
 						</tr>
 
@@ -823,8 +815,6 @@
 				</table>
 
 			</div>
-
-
 
 
 			<!-- ================= PPR-15 ================= -->
@@ -853,19 +843,18 @@
 
 				<tbody>
 					<tr th:each="item : ${ppr15List}">
-						<td th:text="${item.ppr.district.distName}"></td>
-						<td th:text="${item.ppr.projectName}"></td>
-						<td th:text="${item.watershed.watershedName}"></td>
-						<td th:text="${item.village.villageName}"></td>
-						<td th:text="${item.peopleMigrating}"></td>
-						<td th:text="${item.daysMigrating}"></td>
-						<td th:text="${item.migrationReason}"></td>
-						<td th:text="${item.expectedReduction}"></td>
+						<td th:text="${item['dist_name']}"></td>
+						<td th:text="${item['project_name']}"></td>
+						<td th:text="${item['mw_name']}"></td>
+						<td th:text="${item['village_name']}"></td>
+						<td th:text="${item['migrating_people_count']}"></td>
+						<td th:text="${item['migration_days_per_year']}"></td>
+						<td th:text="${item['migration_reason']}"></td>
+						<td th:text="${item['expected_reduction_migrating_people']}"></td>
 					</tr>
 				</tbody>
 
 			</table>
-
 
 			<!-- ===================== PPR-16 VIEW TABLE ===================== -->
 			<div>
@@ -901,11 +890,11 @@
 
 							<td th:text="${data.village.villageName}"></td>
 
-							<td th:text="${data.source.sourceName}"></td>
+							<td th:text="${data.waterSource.sourceName}"></td>
 
 							<td th:text="${data.preProjectLevel}"></td>
 
-							<td th:text="${data.expectedPostProjectLevel}"></td>
+							<td th:text="${data.postProjectLevel}"></td>
 
 							<td th:text="${data.remarks}"></td>
 
@@ -922,7 +911,6 @@
 				</table>
 
 			</div>
-
 			<!-- ===================== PPR-17 VIEW TABLE ===================== -->
 
 			<div>
@@ -959,11 +947,11 @@
 								<td th:text="${data.microWatershed.mwName}"></td>
 								<td th:text="${data.village.villageName}"></td>
 
-								<td th:text="${data.preAvailability}"></td>
-								<td th:text="${data.preWaterQuality}"></td>
+								<td th:text="${data.preWaterAvailabilityMonths}"></td>
+								<td th:text="${data.preWaterQuality.waterQualityType}"></td>
 
-								<td th:text="${data.postAvailability}"></td>
-								<td th:text="${data.postWaterQuality}"></td>
+								<td th:text="${data.postWaterAvailabilityMonths}"></td>
+								<td th:text="${data.postWaterQuality.waterQualityType}"></td>
 							</tr>
 						</tbody>
 
@@ -1028,7 +1016,6 @@
 				</table>
 
 			</div>
-
 			<!-- ===================== PPR-19 VIEW TABLE ===================== -->
 			<div>
 
@@ -1073,23 +1060,23 @@
 						<tr th:each="data : ${pendingUCList}">
 
 							<td th:text="${data.ppr.projectName}"></td>
-							<td th:text="${data.financialYear.finYear}"></td>
+							<td th:text="${data.finYear.finYrDesc}"></td>
 							<td th:text="${data.installmentNo}"></td>
 
-							<td th:text="${data.amountReleased}"></td>
-							<td th:text="${data.amountUtilized}"></td>
+							<td th:text="${data.releasedAmount}"></td>
+							<td th:text="${data.utilizedAmount}"></td>
 
-							<td th:text="${#temporals.format(data.ucDueDate,'dd/MM/yyyy')}"></td>
-							<td th:text="${data.ucDueAmount}"></td>
+							<td th:text="${#temporals.format(data.dueDate,'dd/MM/yyyy')}"></td>
+							<td th:text="${data.ucAmount}"></td>
 
 							<td th:text="${#temporals.format(data.ucSubmissionDate,'dd/MM/yyyy')}"></td>
-							<td th:text="${data.ucSubmissionAmount}"></td>
-							<td th:text="${data.reasonNotSubmitting}"></td>
+							<td th:text="${data.ucSubmissionAmt}"></td>
+							<td th:text="${data.reasonNotSubmitted}"></td>
 
 							<td>
-								<span th:text="${#temporals.format(data.pendingFrom,'dd/MM/yyyy')}"></span>
+								<span th:text="${#temporals.format(data.pendingStart,'dd/MM/yyyy')}"></span>
 								&nbsp;To&nbsp;
-								<span th:text="${#temporals.format(data.pendingTo,'dd/MM/yyyy')}"></span>
+								<span th:text="${#temporals.format(data.pendingEnd,'dd/MM/yyyy')}"></span>
 							</td>
 
 							<td th:text="${data.pendingAmount}"></td>
@@ -1108,9 +1095,7 @@
 				</table>
 
 			</div>
-
-
-
+			<!-- ===================== PPR-20 VIEW TABLE ===================== -->
 			<div>
 
 
@@ -1141,38 +1126,25 @@
 							<td th:text="${data.ppr.district.distName}"></td>
 							<td th:text="${data.ppr.projectName}"></td>
 
-							<td th:text="${data.totalCost}"></td>
-							<td th:text="${data.stateFundReleased}"></td>
-							<td th:text="${data.dolrFundReleased}"></td>
+							<td th:text="${data.totCost}"></td>
+							<td th:text="${data.stReleasedFund}"></td>
+							<td th:text="${data.dolrReleasedFund}"></td>
 							<td th:text="${data.interest}"></td>
-							<td th:text="${data.totalFund}"></td>
-							<td th:text="${data.unspentBalance}"></td>
-
-							<td>
-								<div class="d-flex align-items-center gap-2">
-
-									<button type="button" class="btn btn-primary btn-sm editBtn"
-										th:data-id="${data.pprUnspentBalanceId}" data-bs-toggle="modal"
-										data-bs-target="#editModal" th:if="${#strings.trim(data.status) == 'D'}">
-										<i class="fas fa-edit"></i>
-									</button>
-
-								</div>
-							</td>
+							<td th:text="${data.total}"></td>
+							<td th:text="${data.unspendBalance}"></td>
 
 						</tr>
 
 						<tr th:if="${#lists.isEmpty(draftList)}">
-							<td colspan="9" class="text-center text-danger">
+							<td colspan="8" class="text-center text-danger">
 								No records found.
 							</td>
 						</tr>
 
 					</tbody>
 				</table>
-
+				</div> <!-- closes th:if="${searched}" -->
 			</div>
-
 		</div>
 	</div>
 

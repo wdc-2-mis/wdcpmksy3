@@ -47,4 +47,27 @@ public interface PPRMigrationDetailsRepository extends JpaRepository<PPRMigratio
 			         pm.ppr_migration_id
 			""", nativeQuery = true)
 			List<Map<String, Object>> getMigrationDetailsByProject(@Param("pprId") Integer pprId);
+	
+	
+	@Query(value = """
+			SELECT
+			    pm.ppr_migration_id,
+			    d.dist_name,
+			    p.project_name,
+			    mw.mw_name,
+			    v.village_name,
+			    pm.migrating_people_count,
+			    pm.migration_days_per_year,
+			    pm.migration_reason,
+			    pm.expected_reduction_migrating_people,
+			    pm.status
+			FROM ppr_migration_details pm
+			JOIN m_ppr p ON pm.ppr_id = p.ppr_id
+			JOIN m_district d ON p.dcode = d.dcode
+			LEFT JOIN m_micro_watershed mw ON pm.mw_id = mw.mw_id
+			LEFT JOIN m_village v ON pm.vcode = v.vcode
+			WHERE pm.ppr_id = :pprId AND pm.status = :status
+			ORDER BY pm.ppr_migration_id
+			""", nativeQuery = true)
+	List<Map<String, Object>> getMigrationDetailsByProjectAndStatus(@Param("pprId") Integer pprId, @Param("status") String status);
 }

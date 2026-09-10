@@ -49,4 +49,6 @@ public interface PPRLandPatternAreaRepository extends JpaRepository<PPRLandPatte
 		    SELECT COUNT(p) FROM PPRLandPatternArea p WHERE p.village.vcode = :vcode""")
 		long countByVillage(@Param("vcode") Integer vcode);
 	
+	
+	List<PPRLandPatternArea> findByPprIdPprIdAndStatus(Integer pprId, Character status);
 }
