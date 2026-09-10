@@ -17,13 +17,11 @@
 			document.querySelectorAll(".viewBtn").forEach(function (btn) {
 				btn.addEventListener("click", function () {
 					let id = this.getAttribute("data-id");
-					// Get modal elements
 					let loading = document.getElementById("criteriaLoading");
 					let error = document.getElementById("criteriaError");
 					let noData = document.getElementById("criteriaNoData");
 					let tableContainer = document.getElementById("criteriaTableContainer");
 					let tableBody = document.getElementById("criteriaTableBody");
-					// Reset previous data
 					tableBody.innerHTML = "";
 					loading.style.display = "block";
 					error.style.display = "none";
@@ -37,81 +35,77 @@
 							return response.json();
 						})
 						.then(data => {
-							console.log("Criteria Details:", data);
 							loading.style.display = "none";
-							// No records
 							if (!data || data.length === 0) {
 								noData.style.display = "block";
 								return;
 							}
-							// Create table rows
 							data.forEach(function (item, index) {
 								let row = document.createElement("tr");
-								// S.No.
 								let serialCell = document.createElement("td");
 								serialCell.textContent = index + 1;
-								// Criteria
 								let criteriaCell = document.createElement("td");
-								if (item.criteriaDesc) {
-									criteriaCell.textContent = item.criteriaDesc;
-								} else {
-									criteriaCell.textContent = "";
-								}
-								// Scored Marks
+								criteriaCell.textContent = item.criteriaDesc ? item.criteriaDesc : "";
 								let marksCell = document.createElement("td");
 								marksCell.textContent = item.scoredMarks != null ? item.scoredMarks : 0;
-								// Add cells to row
 								row.appendChild(serialCell);
 								row.appendChild(criteriaCell);
 								row.appendChild(marksCell);
-								// Add row to table
 								tableBody.appendChild(row);
 							});
-							// Show table
 							tableContainer.style.display = "block";
 						})
 						.catch(errorMessage => {
 							console.error("Error:", errorMessage);
 							loading.style.display = "none";
-							error.textContent =
-								"Unable to load criteria details. Please try again.";
+							error.textContent = "Unable to load criteria details. Please try again.";
 							error.style.display = "block";
-
 						});
 				});
 			});
 		});
 
+		/*
+		 * loadProjectsForDistrict() is reusable so it can run either from a manual
+		 * District change, or on page load (after a Get Data POST) to re-hydrate the
+		 * Project dropdown and re-select whatever project was previously chosen.
+		 */
+		function loadProjectsForDistrict(districtId, projectIdToSelect) {
+			let project = document.getElementById("project");
+			project.innerHTML = '<option value="">--Select Project--</option>';
+			if (!districtId) {
+				return;
+			}
+			fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
+				.then(response => response.json())
+				.then(data => {
+					data.forEach(function (item) {
+						let option = document.createElement("option");
+						option.value = item.id;          // PPR ID
+						option.textContent = item.name;  // Project Name
+						project.appendChild(option);
+					});
+					if (projectIdToSelect) {
+						project.value = String(projectIdToSelect);
+					}
+				})
+				.catch(error => {
+					console.error("Error:", error);
+				});
+		}
 
 		document.addEventListener("DOMContentLoaded", function () {
 
 			document.getElementById("district").addEventListener("change", function () {
-
-				let districtId = this.value;
-				let project = document.getElementById("project");
-
-				// Clear existing options
-				project.innerHTML = '<option value="">--Select Project--</option>';
-				if (districtId === "") {
-					return;
-				}
-				fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
-					.then(response => response.json())
-					.then(data => {
-						data.forEach(function (item) {
-							let option = document.createElement("option");
-							option.value = item.id;          // PPR ID
-							option.textContent = item.name;  // Project Name
-							project.appendChild(option);
-						});
-
-					})
-					.catch(error => {
-						console.error("Error:", error);
-					});
-
+				loadProjectsForDistrict(this.value, null);
 			});
 
+			let form = document.getElementById("viewPPR");
+			let selectedDcode = form.dataset.selectedDcode;
+			let selectedProject = form.dataset.selectedProject;
+			if (selectedDcode) {
+				loadProjectsForDistrict(selectedDcode, selectedProject);
+			}
 
 		});
 
@@ -130,7 +124,10 @@
 
 		<div class="card-body">
 
-			<form id="viewPPR" th:action="@{/viewPPR}" method="post">
+			<div th:if="${validationError}" class="alert alert-danger" th:text="${validationError}"></div>
+
+			<form id="viewPPR" th:action="@{/viewPPR}" method="post"
+				th:attr="data-selected-dcode=${selectedDcode},data-selected-project=${selectedProject}">
 				<div class="row mb-4">
 
 					<div class="col-md-4">
@@ -138,7 +135,8 @@
 						<select id="district" name="district" class="form-select">
 							<option value="">--Select District--</option>
 							<th:block th:each="dist : ${distList}">
-								<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
+								<option th:value="${dist.dcode}" th:text="${dist.distName}"
+									th:selected="${selectedDcode != null and dist.dcode == selectedDcode}"></option>
 							</th:block>
 						</select>
 					</div>
@@ -147,6 +145,8 @@
 						<label><b>Project</b></label>
 						<select class="form-control" id="project" name="project">
 							<option value="">--Select Project--</option>
+							<option th:if="${selectedProject != null}" th:value="${selectedProject}"
+								th:text="${selectedProjectName}" selected="selected"></option>
 						</select>
 					</div>
 
@@ -155,7 +155,8 @@
 						<select id="fyear" name="fyear" class="form-control form-control-sm" required>
 							<option value="">--Select Year--</option>
 							<th:block th:each="year : ${finYearList}">
-								<option th:value="${year.finYrCd}" th:text="${year.finYrDesc}"> </option>
+								<option th:value="${year.finYrCd}" th:text="${year.finYrDesc}"
+									th:selected="${selectedFinYrCd != null and year.finYrCd == selectedFinYrCd}"> </option>
 							</th:block>
 						</select>
 					</div>
@@ -353,20 +354,16 @@
 								aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
-							<!-- Loading -->
 							<div id="criteriaLoading" class="text-center" style="display:none;">
 								<div class="spinner-border text-primary" role="status">
 									<span class="visually-hidden"> Loading... </span>
 								</div>
 								<p class="mt-2"> Loading criteria details... </p>
 							</div>
-							<!-- Error -->
 							<div id="criteriaError" class="alert alert-danger" style="display:none;"></div>
-							<!-- No Data -->
 							<div id="criteriaNoData" class="alert alert-warning" style="display:none;">
 								No criteria details found for this project.
 							</div>
-							<!-- Criteria Table -->
 							<div id="criteriaTableContainer" style="display:none;">
 								<table class="table table-bordered table-striped table-hover">
 									<thead class="table-primary">
@@ -734,7 +731,6 @@
 
 							<td th:text="${data.village.villageName}"></td>
 
-							<!-- Multiple Activities -->
 							<td>
 								<span th:each="act, stat : ${data.existingLivelihoodActivities}">
 									<span th:text="${act.livelihoodActivity.livelihoodActivityName}"></span>
@@ -742,7 +738,6 @@
 								</span>
 							</td>
 
-							<!-- Multiple Interventions -->
 							<td>
 								<span th:each="intv, stat : ${data.projectLivelihoodInterventions}">
 									<span th:text="${intv.livelihoodIntervention.livelihoodInterventionName}"></span>

@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.dto.CoveredAreaDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.WatershedAreaBean;
@@ -159,20 +160,30 @@ public class PPRViewController {
         model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
         model.addAttribute("searched", true);
 
+        model.addAttribute("selectedDcode", dcode);
+        model.addAttribute("selectedProject", project);
+        model.addAttribute("selectedFinYrCd", finYrCd);
+        model.addAttribute("selectedProjectName", resolveProjectName(data, project));
+
         return "viewPPR";
     }
 
-    /**
-     * Generates the same PPR-1..PPR-20 dataset as /viewPPR and streams it back as a
-     * downloadable PDF. Reuses fetchReportData so there is zero duplicated fetch logic.
-     */
     @PostMapping("/downloadPPRPdf")
-    public ResponseEntity<byte[]> downloadPPRPdf(HttpSession session, @RequestParam("fyear") Integer finYrCd,
-            @RequestParam("district") Integer dcode, @RequestParam("project") Integer project) throws Exception {
+    public ResponseEntity<byte[]> downloadPPRPdf(HttpSession session, Model model,
+            RedirectAttributes redirectAttributes,
+            @RequestParam(value = "fyear", required = false) Integer finYrCd,
+            @RequestParam(value = "district", required = false) Integer dcode,
+            @RequestParam(value = "project", required = false) Integer project) throws Exception {
 
         Object userid = session.getAttribute("userid");
         if (userid == null) {
             return ResponseEntity.status(302).header(HttpHeaders.LOCATION, "/login").build();
+        }
+
+        if (dcode == null || project == null || finYrCd == null) {
+            redirectAttributes.addFlashAttribute("validationError",
+                    "Please select District, Project and Financial Year, then click Get Data before downloading the PDF.");
+            return ResponseEntity.status(302).header(HttpHeaders.LOCATION, "/viewPPR").build();
         }
 
         Map<String, Object> data = fetchReportData(dcode, project, finYrCd);
@@ -182,17 +193,38 @@ public class PPRViewController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "Preliminary_Project_Report.pdf");
+        headers.setContentDispositionFormData("attachment", buildDownloadFileName(data));
         headers.setContentLength(pdfBytes.length);
 
         return new ResponseEntity<>(pdfBytes, headers, org.springframework.http.HttpStatus.OK);
     }
 
-    /**
-     * Central place that fetches PPR-1 through PPR-20 data for a given
-     * district/project/financial year. Used by BOTH the on-screen view and the PDF export,
-     * so the two are always guaranteed to match.
-     */
+    private String buildDownloadFileName(Map<String, Object> data) {
+        String projectName = firstRecordProjectName(data);
+        if (projectName == null || projectName.isBlank()) {
+            return "Preliminary_Project_Report.pdf";
+        }
+        String safeName = projectName.trim().replaceAll("[^a-zA-Z0-9._-]+", "_");
+        return "Preliminary_Project_Report_" + safeName + ".pdf";
+    }
+
+    private String resolveProjectName(Map<String, Object> data, Integer project) {
+        String projectName = firstRecordProjectName(data);
+        return projectName != null ? projectName : ("Project #" + project);
+    }
+
+    @SuppressWarnings("unchecked")
+    private String firstRecordProjectName(Map<String, Object> data) {
+        Object recordsObj = data.get("records");
+        if (recordsObj instanceof List<?> recordsList && !recordsList.isEmpty()) {
+            Object first = recordsList.get(0);
+            if (first instanceof MPpr ppr) {
+                return ppr.getProjectName();
+            }
+        }
+        return null;
+    }
+
     private Map<String, Object> fetchReportData(Integer dcode, Integer project, Integer finYrCd) {
 
         Map<String, Object> data = new LinkedHashMap<>();
