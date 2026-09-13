@@ -1,5 +1,6 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,18 +32,19 @@ public class PprDolrApprovalController {
 		if(userid==null){
             return "redirect:/login";
         }
-		
+		Integer pprId = 0;
 		List<PprTransaction> pprTranList = pprTransactionRepo.findBySentToRegId(regid);
 		if(!pprTranList.isEmpty()) {
+			List<PprRequestDolrApprovalDto> pprRequestDolrApprovalList = new ArrayList<>();
 			for(PprTransaction tran : pprTranList) {
 				PprRequestDolrApprovalDto pprProposedProject = pprProposedProjectRepo.getPprRequestDolrApprovalData(tran.getPpr());
-				model.addAttribute("userid", userid);
-				model.addAttribute("pprId", tran.getPpr().getPprId());
-				model.addAttribute("pprRequestDolrApprovalList", pprProposedProject);
+				pprRequestDolrApprovalList.add(pprProposedProject);
+				pprId = tran.getPpr().getPprId();
 			}
+			model.addAttribute("userid", userid);
+			model.addAttribute("pprId", pprId);
+			model.addAttribute("pprRequestDolrApprovalList", pprRequestDolrApprovalList);
 		}
-		
-		
 		return "ppr/pprRequestDolrApproval";
 	}
 
