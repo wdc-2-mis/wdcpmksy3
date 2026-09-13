@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpSession;
 public class PprDolrApprovalController {
 	
 	@Autowired
-	PprTransactionRepository pprTransactionRepo;
+	private PprTransactionRepository pprTransactionRepo;
 	
 	@Autowired
 	private PprProposedProjectRepository pprProposedProjectRepo;
@@ -28,7 +28,7 @@ public class PprDolrApprovalController {
 	@GetMapping("/pprRequestDolrApproval")
 	public String pprRequestDolrApproval(HttpSession session, Model model) {
 		String userid=(String)session.getAttribute("userid");
-		Integer regid = Integer.parseInt(session.getAttribute("reg_id").toString());
+		Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
 		if(userid==null){
             return "redirect:/login";
         }

@@ -32,7 +32,7 @@ public interface PprProposedProjectRepository extends JpaRepository<PprProposedP
 	int changeStatusByPprId(@Param("pprId") Integer pprId);
 	
 	
-	@Query("select new com.yourpackage.PprRequestDolrApprovalDTO(" 
+	@Query("select new gov.dolr.wdcpmksy3.PPR.dto.PprRequestDolrApprovalDto(" 
 			+ "ppp.ppr.pprId, "
 			+ "ppp.ppr.projectName, "
 			+ "ppp.ppr.district.distName, "
