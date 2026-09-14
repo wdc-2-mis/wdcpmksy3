@@ -10,6 +10,8 @@ public class PprRequestDolrApprovalDto {
 	private String finYear;
 	private BigDecimal treatedArea;
 	private BigDecimal proposedCost;
+	private Character tranStatus;
+	private Integer tranId;
 
 	public PprRequestDolrApprovalDto(Integer pprId, String projectName, String districtName,
 			String finYear, BigDecimal treatedArea, BigDecimal proposedCost) {
@@ -68,8 +70,21 @@ public class PprRequestDolrApprovalDto {
 	public void setProposedCost(BigDecimal proposedCost) {
 		this.proposedCost = proposedCost;
 	}
-	
-	
-	
+
+	public Character getTranStatus() {
+		return tranStatus;
+	}
+
+	public void setTranStatus(Character tranStatus) {
+		this.tranStatus = tranStatus;
+	}
+
+	public Integer getTranId() {
+		return tranId;
+	}
+
+	public void setTranId(Integer tranId) {
+		this.tranId = tranId;
+	}
 
 }

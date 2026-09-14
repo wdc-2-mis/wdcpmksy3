@@ -12,19 +12,80 @@
 			    color:red;
 			}
 		</style>
+		<script th:inline="javascript">
+			document.addEventListener("DOMContentLoaded", function () {
+					const state = document.getElementById("state");
+					state.addEventListener("change", function () {
+						if (this.value) {
+							window.location.href = "/pprRequestDolrApproval?state=" + this.value;
+						} else {
+							window.location.href = "/pprRequestDolrApproval";
+						}
+					});
+				});
+				
+				function openRemarksModal(element, action) {
+						const tranId = element.getAttribute("data-tranid");
+						document.getElementById("remarksTranId").value = tranId;
+						document.getElementById("remarksAction").value = action;
+						document.getElementById("actionRemarks").value = "";
+						document.getElementById("remarksError").innerText = "";
+						if (action === "reject") {
+							document.getElementById("remarksModalLabel").innerText = "Reject PPR Transaction Request";
+						} else {
+							document.getElementById("remarksModalLabel").innerText = "Refer Back PPR Transaction Request";
+						}
+						const modal = new bootstrap.Modal(document.getElementById("remarksModal"));
+						modal.show();
+					}
+					function submitRemarks() {
+						const tranId = document.getElementById("remarksTranId").value;
+						const action = document.getElementById("remarksAction").value;
+						const remarks = document.getElementById("actionRemarks").value.trim();
+						if (remarks === "") {
+							document.getElementById("remarksError").innerText = "Please enter remarks.";
+							document.getElementById("actionRemarks").focus();
+							return;
+						}
+						if (action === "reject") {
+							window.location.href = "/rejPprReqForAprov?id=" + encodeURIComponent(tranId) + "&remarks=" + encodeURIComponent(remarks);
+						} else if (action === "refer") {
+							window.location.href = "/referBackPprReqForAprov?id=" + encodeURIComponent(tranId) + "&remarks=" + encodeURIComponent(remarks);
+						}
+					}	
+		
+		</script>
 </head>
 <body>
 	<div layout:fragment="content">	
+		<div class="card shadow-sm border-0">
 		<div class="card-header bg-primary text-white">
 			<h4 class="mb-0">
 				PPR Request For DOLR Approval
 			</h4>
 		</div>
+		<br/>
 		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${success}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		</br>
+		<br/>
+		<div class="card-body">
+			<form id="projectForm">
+				<div class="row mb-3 align-items-center">
+					<label class="col-md-2 fw-bold">State Name <span class="required">*</span></label>
+					<div class="col-md-3">
+						<select class="form-select" id="state" name="state" required>
+							<option value="0">--Select All--</option>
+							<option th:each="s : ${stateList}" th:value="${s.getStateCode}" th:text="${s.getStateName}"
+								th:selected="${selectedState != null and selectedState == s.getStateCode}"></option>
+						</select>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+		<br/>
 		<div th:if="${pprRequestDolrApprovalList != null}">
 					<h4> <b><center>List of PPR Details For Approval</center></b> </h4>
 					
@@ -42,6 +103,7 @@
 				        </thead>
 				        <tbody>
 				        <tr th:each="data : ${pprRequestDolrApprovalList}">
+							<input type="hidden" id="pprId" name="pprId" th:value="${data.pprId}">
 							<td th:text="${data.projectName}"></td>
 				            <td th:text="${data.districtName}"></td>
 							<td th:text="${data.finYear}"></td>
@@ -49,16 +111,15 @@
 				            <td th:text="${data.proposedCost}"></td>
 							<td>
 								<div class="d-flex align-items-center gap-2">
-									<a th:href="@{/rejPprReqForAprov(id=${pprId})}"
-										class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to Reject this record?');">
+									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}"
+										onclick="openRemarksModal(this, 'reject')" class="btn btn-danger btn-sm">
 										Reject
 									</a>
-									&nbsp;
-									<a th:href="@{/referBackPprReqForAprov(id=${pprId})}"
-										class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to Refer Back this record?');">
+									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}"
+										onclick="openRemarksModal(this, 'refer')" class="btn btn-primary btn-sm">
 										Refer
 									</a>
-									<a th:href="@{/approvePprReqForAprov(id=${pprId})}"
+									<a th:href="@{/approvePprReqForAprov(id=${data.tranId})}"
 										class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to Approve this record?');">
 										Approve
 									</a>
@@ -72,6 +133,29 @@
 				        </tr>
 				        </tbody>
 				    </table>
+				</div>
+				<div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="remarksModalLabel">Enter Remarks</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<input type="hidden" id="remarksTranId">
+								<input type="hidden" id="remarksAction">
+								<div class="mb-3">
+									<label for="actionRemarks" class="form-label fw-bold">Remarks <span class="required">*</span></label>
+									<textarea class="form-control" id="actionRemarks" rows="4" placeholder="Enter remarks"></textarea>
+									<div id="remarksError" class="text-danger mt-1"></div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+								<button type="button" class="btn btn-primary" onclick="submitRemarks()">Submit</button>
+							</div>
+						</div>
+					</div>
 				</div>
 	</div>
 </body>

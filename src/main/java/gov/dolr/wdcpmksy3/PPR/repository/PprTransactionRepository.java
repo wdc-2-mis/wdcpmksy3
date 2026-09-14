@@ -12,7 +12,10 @@ public interface PprTransactionRepository extends JpaRepository<PprTransaction, 
 
     List<PprTransaction> findByPprPprId(Integer pprId);
 
-    List<PprTransaction> findBySentToRegId(Integer regId);
+    @Query("select t from PprTransaction t where t.action = 'F' and t.sentTo.regId =:regId and t.ppr.district.state.stCode= "
+    		+ "case when 0 = :stCode then t.ppr.district.state.stCode else :stCode end and t.senton =(select max(t1.senton) from PprTransaction t1 "
+    		+ "where t.ppr = t1.ppr) order by t.senton desc")
+    List<PprTransaction> findBySentToRegIdandStcode(@Param("regId") Integer regId, @Param("stCode") Integer stCode);
 
     List<PprTransaction> findBySentFromRegId(Integer regId);
     
