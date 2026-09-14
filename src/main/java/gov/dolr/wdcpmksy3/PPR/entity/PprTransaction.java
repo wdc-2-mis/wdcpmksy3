@@ -27,7 +27,7 @@ public class PprTransaction {
     private WdcpmksyUserReg sentFrom;
 
     @Column(name = "action", length = 1)
-    private String action;
+    private Character action;
 
     @Column(name = "remarks", length = 1000)
     private String remarks;
@@ -70,11 +70,11 @@ public class PprTransaction {
         this.sentFrom = sentFrom;
     }
 
-    public String getAction() {
+    public Character getAction() {
         return action;
     }
 
-    public void setAction(String action) {
+    public void setAction(Character action) {
         this.action = action;
     }
 
