@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.dto.CoveredAreaDTO;
@@ -31,6 +32,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprLivelihood;
 import gov.dolr.wdcpmksy3.PPR.entity.PprPendingUc;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProjectGlance;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProposedProject;
+import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWaterOutcome;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWatershedCoveredArea;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
@@ -46,13 +48,16 @@ import gov.dolr.wdcpmksy3.PPR.repository.PprLivelihoodRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprPendingUcRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProposedProjectRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWaterOutcomeRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWatershedCoveredAreaRepo;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWcdcUnspentBalanceRepository;
 import gov.dolr.wdcpmksy3.PPR.service.FinYearService;
+import gov.dolr.wdcpmksy3.PPR.service.PPRDistrictService;
 import gov.dolr.wdcpmksy3.PPR.service.PdfService;
 import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.PPR.service.PprProposedProjectService;
+import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.CropOutcomeRepository;
@@ -60,6 +65,7 @@ import gov.dolr.wdcpmksy3.repository.PprDrinkingWaterRepository;
 import gov.dolr.wdcpmksy3.repository.PprProposedAreaRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 import gov.dolr.wdcpmksy3.service.DistrictService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -130,6 +136,12 @@ public class PPRViewController {
     
     @Autowired
     private UserRepository ur;
+    
+    @Autowired
+	private PPRDistrictService pprService;
+    
+    @Autowired
+    private PprTransactionRepository trans;
 
 
     @GetMapping("/viewPPR")
@@ -328,4 +340,54 @@ public class PPRViewController {
 
         return data;
     }
+    
+    @PostMapping("/forwardViewPPR")
+    public String forwardViewPPR(HttpSession session, Model model, HttpServletRequest request,
+            @RequestParam("pprdcode") Integer pprdcode,
+            @RequestParam("pprid") Integer pprid,
+            @RequestParam("userid") Integer regid,
+            RedirectAttributes redirectAttributes) {
+
+    	Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+		String userid=(String)session.getAttribute("userid");
+		Integer loginregid = Integer.parseInt(session.getAttribute("regid").toString());
+		try {
+			
+			 if(userid==null){
+
+		            return "redirect:/login";
+		     }
+			boolean save=false;
+	    	
+			save=pprService.forwardViewPPR(loginregid, pprdcode, pprid, regid, CommonFunctions.getClientIpAddr(request));
+			
+			if(save)
+				redirectAttributes.addFlashAttribute( "success", "PPR Forward to DoLR successfully.");
+			else
+				redirectAttributes.addFlashAttribute("error", "Unable to Forward PPR");
+			}
+			catch (Exception e) {
+
+				e.printStackTrace();
+		        redirectAttributes.addFlashAttribute("error", "Unable to saved Details of Unspent balance as on date District-wise (PPR20)");
+			}
+
+        return "redirect:/viewPPR";
+    }
+    
+    @GetMapping("/checkTransPPRExists")
+	@ResponseBody
+	public String checkTransPPRExists(@RequestParam Integer pprid) {
+
+    	List<PprTransaction> records = trans.findLatestTransactionsByPprPprId(pprid);
+	    
+	    if (records != null && !records.isEmpty()) {
+	        return "EXISTS";
+	    }
+
+	    return "NOT_EXISTS";
+	}
+    
+    
+    
 }

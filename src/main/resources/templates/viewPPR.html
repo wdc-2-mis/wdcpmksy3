@@ -12,6 +12,29 @@
 
 
 	<script>
+		
+		function checkProjectForwarded() {
+
+					let project = document.getElementById("project").value;
+
+					if (project === "") {
+						return;
+					}
+					fetch('/checkTransPPRExists?pprid=' + project)
+						.then(response => response.text())
+						.then(result => {
+							console.log(result);
+							if (result === "EXISTS") {
+								alert("This PPR Data already Forwarded. Please select different PPR");
+
+								document.getElementById("project").value = "";
+								document.getElementById("project").focus();
+							}
+
+						})
+						.catch(error => console.error(error));
+				}
+
 
 		document.addEventListener("DOMContentLoaded", function () {
 			document.querySelectorAll(".viewBtn").forEach(function (btn) {
@@ -121,6 +144,14 @@
 		<div class="card-header bg-success text-white">
 			<h3 class="mb-0">Preliminary Project Report (View)</h3>
 		</div>
+		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${error}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 
 		<div class="card-body">
 
@@ -143,7 +174,7 @@
 
 					<div class="col-md-4">
 						<label><b>Project</b></label>
-						<select class="form-control" id="project" name="project">
+						<select class="form-control" id="project" name="project" onchange="checkProjectForwarded()">
 							<option value="">--Select Project--</option>
 							<option th:if="${selectedProject != null}" th:value="${selectedProject}"
 								th:text="${selectedProjectName}" selected="selected"></option>
@@ -1142,9 +1173,10 @@
 				
 				
 				
-				<form id="viewPPR" th:action="@{/forwardViewPPR}" method="post"
-					th:attr="data-selected-dcode=${selectedDcode},data-selected-project=${selectedProject}">
+				<form id="viewPPR" th:action="@{/forwardViewPPR}" method="post" >
 					
+					<input type="hidden" name="pprdcode" th:value="${selectedDcode}">
+					<input type="hidden" name="pprid" th:value="${selectedProject}">
 					
 					<div class="row mb-3 align-items-center">
 					
@@ -1156,7 +1188,7 @@
 						<div class="col-md-4">
 							<select class="form-select" id="userid" name="userid">
 								<option value="">--Select User-ID--</option>
-								<option th:each="d : ${distList}" th:value="${d.dcode}" th:text="${d.distName}">
+								<option th:each="u : ${userList}" th:value="${u.regId}" th:text="${u.userId}">
 								</option>
 							</select>
 						</div>

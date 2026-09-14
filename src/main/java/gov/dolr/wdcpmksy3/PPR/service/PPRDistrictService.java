@@ -1,5 +1,7 @@
 package gov.dolr.wdcpmksy3.PPR.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,14 +14,19 @@ import gov.dolr.wdcpmksy3.PPR.entity.MFinYear;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.entity.PprMicroWatershed;
+import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
+import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.PPR.repository.WdcpmksyMFinYearRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprMicroWatershedRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
 import gov.dolr.wdcpmksy3.repository.MDistrictRepository;
+import gov.dolr.wdcpmksy3.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
@@ -31,6 +38,12 @@ public class PPRDistrictService {
     @Autowired private MicroWatershedRepository microRepo;
     @Autowired private InstitutionalStructureRepository instRepo;
     @Autowired private PprMicroWatershedRepository pmwRepo;
+    
+    @Autowired
+    private UserRepository ur;
+    
+    @Autowired
+    private PprTransactionRepository trans;
     
     public static String getClientIpAddr(HttpServletRequest request) {  
 	    String ip = request.getHeader("X-Forwarded-For");  
@@ -258,4 +271,33 @@ return "Error updating record: " + e.getMessage();
             return "Error completing record: " + e.getMessage();
         }
     }
+	
+	public boolean forwardViewPPR(Integer loginregid, Integer pprdcode, Integer pprid, Integer regid, String ip) {
+		
+		boolean st=false;
+		try {
+			
+			MPpr mp= pprRepo.getReferenceById(pprid);
+			WdcpmksyUserReg regfrm=ur.getReferenceById(loginregid.longValue());
+			WdcpmksyUserReg regto=ur.getReferenceById(regid.longValue());
+			PprTransaction ub=new PprTransaction();
+			
+			ub.setPpr(mp);
+			ub.setAction('F');
+			ub.setSentFrom(regfrm);
+			ub.setSentTo(regto);
+			ub.setSenton(LocalDateTime.now());
+			
+			trans.save(ub);
+			
+			st=true;
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			st=false;
+		}
+		return st;
+		
+	}
 }

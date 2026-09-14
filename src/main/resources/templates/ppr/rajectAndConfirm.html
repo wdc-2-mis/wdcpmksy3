@@ -65,8 +65,7 @@
             </h4>
         </div>
 		
-		<div class="table-responsive mt-4"
-		     th:if="${#lists.size(records) > 0}">
+		<div class="table-responsive mt-4" >
 			
 			<table class="table table-bordered table-striped" style="min-width:1200px;">
 
@@ -101,7 +100,7 @@
 							   	</td>
 			               </tr>
 			               <tr th:if="${#lists.isEmpty(records)}">
-			                   <td colspan="5" class="text-center text-muted">
+			                   <td colspan="6" class="text-center text-muted">
 			                       Data Not Found
 			                   </td>
 			               </tr>
