@@ -228,7 +228,7 @@ public class PprDolrApprovalController {
         List<WdcpmksyUserReg> users =ur.findDLUsersByStateAndRole(stcode);
         model.addAttribute("userList", users);
 
-        return "redirect:/pprRequestDolrApproval";
+        return "ppr/pprRequestDolrApproval :: pprDetailsContent";
     }
 	
 	private Map<String, Object> fetchReportData(Integer dcode, Integer project, Integer finYrCd) {

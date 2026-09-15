@@ -105,6 +105,43 @@
 								});
 							});
 						});	
+						
+						// =========================
+						// VIEW PPR DETAILS IN MODAL
+						// =========================
+						document.addEventListener("DOMContentLoaded", function () {
+							const viewModal = document.getElementById("viewModal");
+							const viewModalBody = document.getElementById("viewModalBody");
+							document.querySelectorAll(".viewBtn").forEach(function(button) {
+								button.addEventListener("click", function() {
+									const pprId = this.getAttribute("data-id");
+									viewModalBody.innerHTML = `
+										<div class="text-center p-4">
+											<div class="spinner-border text-primary" role="status">
+												<span class="visually-hidden">Loading...</span>
+											</div>
+											<p class="mt-2">Loading PPR details...</p>
+										</div>`;
+									fetch("/viewPprRequest?id=" + encodeURIComponent(pprId))
+										.then(function(response) {
+											if(!response.ok) {
+												throw new Error("Failed to load PPR details");
+											}
+											return response.text();
+										})
+										.then(function(html) {
+											viewModalBody.innerHTML = html;
+										})
+										.catch(function(error) {
+											console.error(error);
+											viewModalBody.innerHTML = `
+												<div class="alert alert-danger">
+													Unable to load PPR details.
+												</div>`;
+										});
+								});
+							});
+						});
 		
 		</script>
 </head>
@@ -140,9 +177,7 @@
 			<br/>
 			<div th:if="${pprRequestDolrApprovalList != null}">
 					<h4> <b><center>List of PPR Details For Approval</center></b> </h4>
-					
 				    <table class="table table-bordered table-striped table-hover">
-				        
 				        <thead class="table-primary">
 				        <tr>
 							<th>Name of the Project</th>
@@ -155,8 +190,11 @@
 				        </thead>
 				        <tbody>
 				        <tr th:each="data : ${pprRequestDolrApprovalList}">
-							<input type="hidden" id="pprId" name="pprId" th:value="${data.pprId}">
-							<td><a th:href="@{/viewPprRequest(id=${data.pprId})}" th:text="${data.projectName}"></a></td>
+							<td>
+								<button type="button" class="btn btn-primary btn-sm viewBtn" th:data-id="${data.pprId}"
+									data-bs-toggle="modal" data-bs-target="#viewModal" th:text="${data.projectName}">
+								</button>
+							</td>
 				            <td th:text="${data.districtName}"></td>
 							<td th:text="${data.finYear}"></td>
 							<td th:text="${data.treatedArea}"></td>
@@ -209,8 +247,32 @@
 						</div>
 					</div>
 				</div>
+				<!-- ========================= -->
+				<!-- VIEW PPR DETAILS MODAL -->
+				<!-- ========================= -->
+				<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-xl modal-dialog-scrollable">
+						<div class="modal-content">
+							<div class="modal-header bg-primary text-white">
+								<h5 class="modal-title" id="viewModalLabel">PPR Details</h5>
+								<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body" id="viewModalBody">
+								<div class="text-center p-4">
+									<div class="spinner-border text-primary" role="status">
+										<span class="visually-hidden">Loading...</span>
+									</div>
+									<p class="mt-2">Loading PPR details...</p>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
 				
-				<div th:if="${searched}">
+				<div th:fragment="pprDetailsContent" th:if="${searched}">
 							<!-- ===================== PPR-1 ===================== -->
 							<div class="mt-4">
 								<h4 class="bg-primary text-white p-2">
@@ -991,27 +1053,7 @@
 									</tbody>
 								</table>
 								</div> <!-- closes th:if="${searched}" -->
-								<form id="viewPPR" th:action="@{/forwardViewPPR}" method="post" >
-									<input type="hidden" name="pprdcode" th:value="${selectedDcode}">
-									<input type="hidden" name="pprid" th:value="${selectedProject}">
-									<div class="row mb-3 align-items-center">
-										<div class="col-md-2">
-											<label class="form-label fw-semibold">
-												User-ID <span class="text-danger">*</span>
-											</label>
-										</div>
-										<div class="col-md-4">
-											<select class="form-select" id="userid" name="userid">
-												<option value="">--Select User-ID--</option>
-												<option th:each="u : ${userList}" th:value="${u.regId}" th:text="${u.userId}">
-												</option>
-											</select>
-										</div>
-										<div class="col-md-4">
-											<button type="submit" class="btn btn-primary">Forward</button>
-										</div>
-									</div>
-								</form>
+								
 							</div>
 				
 				
