@@ -25,7 +25,7 @@ public interface PprTransactionRepository extends JpaRepository<PprTransaction, 
     		+ "from PprTransaction t2  where t2.ppr.pprId = t.ppr.pprId) order by t.senton desc")
     List<PprTransaction> findLatestTransactionsByState(@Param("stCode") Integer stCode);
     
-    @Query("select t from PprTransaction t where t.ppr.pprId=:pprId and t.action='F' and t.senton=(select max(t2.senton) "
+    @Query("select t from PprTransaction t where t.ppr.pprId=:pprId and (t.action='F' or t.action='A' or t.action='R') and t.senton=(select max(t2.senton) "
     		+ "from PprTransaction t2  where t2.ppr.pprId = t.ppr.pprId) order by t.senton desc")
     List<PprTransaction> findLatestTransactionsByPprPprId(@Param("pprId") Integer pprId);
 }
