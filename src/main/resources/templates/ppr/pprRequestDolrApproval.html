@@ -55,56 +55,68 @@
 					}
 					
 					document.addEventListener("DOMContentLoaded", function () {
-							document.querySelectorAll(".viewBtn").forEach(function (btn) {
-								btn.addEventListener("click", function () {
-									let id = this.getAttribute("data-id");
-									let loading = document.getElementById("criteriaLoading");
-									let error = document.getElementById("criteriaError");
-									let noData = document.getElementById("criteriaNoData");
-									let tableContainer = document.getElementById("criteriaTableContainer");
-									let tableBody = document.getElementById("criteriaTableBody");
-									tableBody.innerHTML = "";
-									loading.style.display = "block";
-									error.style.display = "none";
-									noData.style.display = "none";
-									tableContainer.style.display = "none";
-									fetch("/viewSavedCriteriaDetails?id=" + id)
-										.then(response => {
-											if (!response.ok) {
-												throw new Error("Unable to fetch criteria details");
-											}
-											return response.json();
-										})
-										.then(data => {
-											loading.style.display = "none";
-											if (!data || data.length === 0) {
-												noData.style.display = "block";
-												return;
-											}
-											data.forEach(function (item, index) {
-												let row = document.createElement("tr");
-												let serialCell = document.createElement("td");
-												serialCell.textContent = index + 1;
-												let criteriaCell = document.createElement("td");
-												criteriaCell.textContent = item.criteriaDesc ? item.criteriaDesc : "";
-												let marksCell = document.createElement("td");
-												marksCell.textContent = item.scoredMarks != null ? item.scoredMarks : 0;
-												row.appendChild(serialCell);
-												row.appendChild(criteriaCell);
-												row.appendChild(marksCell);
-												tableBody.appendChild(row);
-											});
-											tableContainer.style.display = "block";
-										})
-										.catch(errorMessage => {
-											console.error("Error:", errorMessage);
-											loading.style.display = "none";
-											error.textContent = "Unable to load criteria details. Please try again.";
-											error.style.display = "block";
+						console.log("Criteria JS loaded");
+						document.addEventListener("click", function (event) {
+							let btn = event.target.closest(".viewCriteriaBtn");
+							if (!btn) {
+								return;
+							}
+							console.log("View Criteria button clicked");
+							let id = btn.getAttribute("data-id");
+							console.log("ID:", id);
+							let loading = document.getElementById("criteriaLoading");
+							let error = document.getElementById("criteriaError");
+							let noData = document.getElementById("criteriaNoData");
+							let tableContainer = document.getElementById("criteriaTableContainer");
+							let tableBody = document.getElementById("criteriaTableBody");
+							let criteriaModalElement = document.getElementById("viewCriteriaModal");
+							tableBody.innerHTML = "";
+							loading.style.display = "block";
+							error.style.display = "none";
+							noData.style.display = "none";
+							tableContainer.style.display = "none";
+							fetch("/viewSavedCriteriaDetails?id=" + id)
+								.then(response => {
+									console.log("Response status:", response.status);
+									if (!response.ok) {
+										throw new Error("Unable to fetch criteria details");
+									}
+									return response.json();
+								})
+								.then(data => {
+									console.log("Criteria data:", data);
+									loading.style.display = "none";
+									if (!data || data.length === 0) {
+										noData.style.display = "block";
+									} else {
+										data.forEach(function (item, index) {
+											let row = document.createElement("tr");
+											let serialCell = document.createElement("td");
+											serialCell.textContent = index + 1;
+											let criteriaCell = document.createElement("td");
+											criteriaCell.textContent = item.criteriaDesc ? item.criteriaDesc : "";
+											let marksCell = document.createElement("td");
+											marksCell.textContent = item.scoredMarks != null ? item.scoredMarks : 0;
+											row.appendChild(serialCell);
+											row.appendChild(criteriaCell);
+											row.appendChild(marksCell);
+											tableBody.appendChild(row);
 										});
+										tableContainer.style.display = "block";
+									}
+									let criteriaModal = new bootstrap.Modal(criteriaModalElement);
+									criteriaModal.show();
+								})
+								.catch(errorMessage => {
+									console.error("Error:", errorMessage);
+									loading.style.display = "none";
+									error.textContent = "Unable to load criteria details. Please try again.";
+									error.style.display = "block";
+									let criteriaModal = new bootstrap.Modal(criteriaModalElement);
+									criteriaModal.show();
 								});
-							});
-						});	
+						});
+					});
 						
 						// =========================
 						// VIEW PPR DETAILS IN MODAL
@@ -273,6 +285,14 @@
 				</div>
 				
 				<div th:fragment="pprDetailsContent" th:if="${searched}">
+					<form id="viewPPR" th:action="@{/downloadPPRPdf}" method="post">
+						<input type="hidden" id="fyear" name="fyear" th:value="${selectedFinYrCd}" />
+						<input type="hidden" id="project" name="project" th:value="${selectedProject}" />
+						<input type="hidden" id="district" name="district" th:value="${selectedDcode}" />
+						<button type="submit" class="btn btn-success">
+							<i class="fas fa-file-pdf"></i> Download PDF
+						</button>
+					</form>
 							<!-- ===================== PPR-1 ===================== -->
 							<div class="mt-4">
 								<h4 class="bg-primary text-white p-2">
@@ -399,10 +419,8 @@
 											<td th:text="${data.projectType.projectType}"></td>
 											<td th:text="${data.proposedCost}"></td>
 											<td class="text-center">
-												<div class="col-md-4">
-													<button type="button" class="btn btn-primary btn-sm viewBtn"
-														th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
-														data-bs-target="#viewCriteriaModal">
+												<div class="col-md-6">
+													<button type="button" class="btn btn-primary btn-sm viewCriteriaBtn" th:data-id="${data.pprProposedProjectId}">
 														Link <i class="fas fa-list"></i>
 													</button>
 												</div>
