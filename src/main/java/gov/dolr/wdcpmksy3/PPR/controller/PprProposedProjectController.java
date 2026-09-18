@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +68,8 @@ public class PprProposedProjectController {
 	private CriteriaDetailsRepository criteriaDetailsRepo;
 	
 	@GetMapping("/pprProposedProjectDetails")
-    public String pprProposedProjectDetails(@RequestParam(required = false) Integer dcode, HttpSession session, Model model, @RequestParam(required = false) Integer pprid) {
+    public String pprProposedProjectDetails(@RequestParam(required = false) Integer dcode, 
+    		HttpSession session, Model model, @RequestParam(required = false) Integer pprid, @RequestParam(required = false) Integer project) {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -79,20 +82,17 @@ public class PprProposedProjectController {
 			proposedProjectService.changeStatusByPprId(pprid);
         }
 		if(dcode != null){
-
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
-
 	        if(!pprList.isEmpty()){
-
-	            MPpr ppr = pprList.get(0);
-	            model.addAttribute("pprId", ppr.getPprId());
-	            model.addAttribute("selectedDistrict", dcode);
-	            model.addAttribute("detailsOfListOfProposedProject",
-	                    proposedProjectService.getPprProposedProjectList(ppr));
-
-	            model.addAttribute("project", ppr.getProjectName());
-	            model.addAttribute("microWatershedList",
-	                    pprService.getMicroWatershedsByDistrict(dcode));
+	        	model.addAttribute("selectedDistrict", dcode);
+	        	model.addAttribute("pprList", pprList);
+	            model.addAttribute("microWatershedList", pprService.getMicroWatershedsByDistrict(dcode));
+	            if(project != null) {
+	            	MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
+	            	System.out.println("check pprid "+ppr.getProjectName());
+	 	            model.addAttribute("pprId", project);
+	 	            model.addAttribute("detailsOfListOfProposedProject", proposedProjectService.getPprProposedProjectList(ppr));
+	            }
 	        }
 	    }
 		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));
