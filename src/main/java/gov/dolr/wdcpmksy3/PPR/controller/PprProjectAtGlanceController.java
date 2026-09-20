@@ -59,7 +59,7 @@ public class PprProjectAtGlanceController {
 	 
 	@GetMapping("/pprProjectAtGlance")
     public String pprProjectAtGlance(@RequestParam(required = false) Integer dcode, HttpSession session, 
-    		Model model, @RequestParam(required = false) Integer pprid) {
+    		Model model, @RequestParam(required = false) Integer pprid, @RequestParam(required = false) Integer project) {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -74,17 +74,16 @@ public class PprProjectAtGlanceController {
 		if(dcode != null){
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
 	        if(!pprList.isEmpty()){
-
-	            MPpr ppr = pprList.get(0);
-	            model.addAttribute("pprId", ppr.getPprId());
-	            model.addAttribute("selectedDistrict", dcode);
-	            model.addAttribute("pprProjectAtGlanceList",
-	            		pprProjectGlanceServ.getPprProjectGlanceList(ppr));
-
-	            model.addAttribute("project", ppr.getProjectName());
-	            model.addAttribute("blockList", mBlockRepo.findByDistrict_DcodeOrderByBlockNameAsc(dcode));
-	            model.addAttribute("microWatershedList",
-	            		microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
+	        	model.addAttribute("selectedDistrict", dcode);
+	        	model.addAttribute("blockList", mBlockRepo.findByDistrict_DcodeOrderByBlockNameAsc(dcode));
+	        	model.addAttribute("pprList", pprList);
+	        	if(project != null) {
+	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
+	        		model.addAttribute("pprId", project);
+	        		model.addAttribute("pprProjectAtGlanceList", pprProjectGlanceServ.getPprProjectGlanceList(ppr));
+		            model.addAttribute("project", ppr.getProjectName());
+		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
+	        	}
 	        }
 	    }
 		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));

@@ -24,14 +24,22 @@
 	</style>
 <script th:inline="javascript">
 	document.addEventListener("DOMContentLoaded", function () {
-		    const district = document.getElementById("district");
-		    district.addEventListener("change", function () {
+			const district = document.getElementById("district");
+			const project = document.getElementById("project");
+			district.addEventListener("change", function () {
 				if (this.value) {
-				           window.location.href = "/pprProjectAtGlance?dcode=" + this.value;
-				       } else {
-				           window.location.href = "/pprProjectAtGlance";
-				       }
-		    });
+					window.location.href = "/pprProjectAtGlance?dcode=" + this.value;
+				} else {
+					window.location.href = "/pprProjectAtGlance";
+				}
+			});
+			project.addEventListener("change", function () {
+				if (this.value) {
+					window.location.href = "/pprProjectAtGlance?dcode=" + district.value + "&&project=" + this.value;
+				} else {
+					window.location.href = "/pprProjectAtGlance";
+				}
+			});
 		});
 		
 	document.addEventListener("DOMContentLoaded", function () {
@@ -456,7 +464,11 @@
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold">Name of the Project</label>
 						<div class="col-md-5">
-							<input type="text" class="form-control" id="project" name="project" th:value="${project}" readonly>
+							<select class="form-select" id="project" name="project">
+								<option value="">--Select--</option>
+								<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
+									th:selected="${pprId != null and pprId == p.pprId}"> </option>
+							</select>
 						</div>
 					</div>
 

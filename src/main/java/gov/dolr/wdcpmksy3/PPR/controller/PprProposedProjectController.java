@@ -89,7 +89,6 @@ public class PprProposedProjectController {
 	            model.addAttribute("microWatershedList", pprService.getMicroWatershedsByDistrict(dcode));
 	            if(project != null) {
 	            	MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
-	            	System.out.println("check pprid "+ppr.getProjectName());
 	 	            model.addAttribute("pprId", project);
 	 	            model.addAttribute("detailsOfListOfProposedProject", proposedProjectService.getPprProposedProjectList(ppr));
 	            }
