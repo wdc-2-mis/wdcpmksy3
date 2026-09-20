@@ -1,0 +1,78 @@
+!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>State Wise PPR Status</title>
+	<style>
+		.required {
+			color: red;
+		}
+	</style>
+</head>
+
+<body>
+	
+	<div layout:fragment="content">	
+			<div class="card shadow-sm border-0">
+				<div class="card-header bg-primary text-white">
+					<h4 class="mb-0">
+						State Wise PPR Status
+					</h4>
+				</div>
+				<br />
+				<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+					<span th:text="${success}"></span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+				</div>
+				<br />
+				<div class="card-body">
+					<form id="projectForm">
+						<div class="row mb-3 align-items-center">
+							<label class="col-md-2 fw-bold">State Name <span class="required">*</span></label>
+							<div class="col-md-3">
+								<select class="form-select" id="state" name="state" required>
+									<option value="0">--Select All--</option>
+									<option th:each="s : ${stateList}" th:value="${s.getStateCode}" th:text="${s.getStateName}"
+										th:selected="${selectedState != null and selectedState == s.getStateCode}"></option>
+								</select>
+							</div>
+						</div>
+					</form>
+				</div>
+				<br/>
+				<div th:if="${stWisePprTransactionList != null}">
+					<h4> <b>
+							<center>List of State Wise PPR Status</center>
+						</b> </h4>
+					<table class="table table-bordered table-striped table-hover">
+						<thead class="table-primary">
+							<tr>
+								<th>S.No.</th>
+								<th>District Name</th>
+								<th>PPR Name</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="data, stat : ${stWisePprTransactionList}">
+								<td th:text="${stat.count}"></td>
+								<td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.action}"></td>
+							</tr>
+							<tr th:if="${#lists.isEmpty(stWisePprTransactionList)}">
+								<td colspan="4" class="text-center text-danger">
+									No records found.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+	</div>
+</body>
+
+</html>
