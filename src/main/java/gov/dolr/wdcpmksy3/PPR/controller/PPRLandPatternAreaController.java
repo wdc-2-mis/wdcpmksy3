@@ -64,8 +64,10 @@ public class PPRLandPatternAreaController {
         if (pprid != null) {
         	landPatternAreaService.changeStatusByPprId(pprid);
         }
-		
+        String statename = session.getAttribute("statename").toString();
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
+        model.addAttribute("statename", statename);
+       
 
         return "ppr/pprLandPatternArea";
 	}

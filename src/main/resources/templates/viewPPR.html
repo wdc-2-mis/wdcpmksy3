@@ -162,7 +162,7 @@
 				<div class="row mb-4">
 
 					<div class="col-md-4">
-						<label><b>District</b></label>
+						<label><b>District</b></label><span class="required">*</span>
 						<select id="district" name="district" class="form-select">
 							<option value="">--Select District--</option>
 							<th:block th:each="dist : ${distList}">
@@ -173,7 +173,7 @@
 					</div>
 
 					<div class="col-md-4">
-						<label><b>Project</b></label>
+						<label><b>Project</b></label><span class="required">*</span>
 						<select class="form-control" id="project" name="project" onchange="checkProjectForwarded()">
 							<option value="">--Select Project--</option>
 							<option th:if="${selectedProject != null}" th:value="${selectedProject}"
@@ -182,7 +182,7 @@
 					</div>
 
 					<div class="col-md-4">
-						<label><b>Financial Year</b></label>
+						<label><b>Financial Year</b></label><span class="required">*</span>
 						<select id="fyear" name="fyear" class="form-control form-control-sm" required>
 							<option value="">--Select Year--</option>
 							<th:block th:each="year : ${finYearList}">
