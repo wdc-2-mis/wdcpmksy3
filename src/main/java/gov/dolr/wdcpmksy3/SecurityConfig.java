@@ -6,10 +6,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import gov.dolr.wdcpmksy3.SmartAuthenticationEntryPoint;
+
 
 
 @Configuration
 public class SecurityConfig {
+	
+	// an INSTANCE of the entry point, injected by Spring — not the class itself
+    private final SmartAuthenticationEntryPoint smartAuthenticationEntryPoint;
+ 
+    public SecurityConfig(SmartAuthenticationEntryPoint smartAuthenticationEntryPoint) {
+        this.smartAuthenticationEntryPoint = smartAuthenticationEntryPoint;
+    }
+
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -28,7 +38,7 @@ public class SecurityConfig {
 
                 .requestMatchers(
 
-                  		"/preliminaryPPR15","/testppr15","/saveDraftPPR15","/getVillagesByProject1","/getMicroWatershedsByProject1","/getDraftsPPR15","/getDraftsPPR15", "/updatePPR15","/deletePreliminaryPPR15", "/viewPPR", "/checkTransPPRExists", "/forwardViewPPR",
+                		"/error","/test500","/test404","/preliminaryPPR15","/testppr15","/saveDraftPPR15","/getVillagesByProject1","/getMicroWatershedsByProject1","/getDraftsPPR15","/getDraftsPPR15", "/updatePPR15","/deletePreliminaryPPR15", "/viewPPR", "/checkTransPPRExists", "/forwardViewPPR",
                   	    "/completePreliminaryPPR15","/", "/login", "/loginSuccess", "/getEmailandGenerateotp", "/verifyOtp", "/piaPjtNotLocatiaon", "/institutionalStructurePPR1", "/saveInstitutionalStructurePPR1", "/updateInstitutionalStructurePPR1", "/viewPdfPreliminaryPPR4A","/editPreliminaryPPR4A", "/updatePreliminaryPPR4A", "/detailsOfSLNA", "/saveDetailsOfSLNA", "/downloadPPRPdf",
                         "/deleteDetailsOfSLNA", "/completeDetailsOfSLNA", "/updateDetailsOfSLNA", "/getDetailsOfSLNAById", "/register", "/register/**", "/technicalsupport", "/customLogout", "/download/**","/viewPdfInstitutionalStructure", "/deleteInstitutionalStructurePPR1", "/completeInstitutionalStructurePPR1", "/editInstitutionalStructurePPR1",
                         "/slnaFunctionariesPPR3", "/saveSLNAFunctionariesPPR3", "/deleteSLNAFunctionariesPPR3", "/editSLNAFunctionariesPPR3", "/completeSLNAFunctionariesPPR3","/updateSLNAFunctionariesPPR3", "/preliminaryPPR4A", "/savePreliminaryPPR4A", "/deletePreliminaryPPR4A", "/completePreliminaryPPR4A","/checkDistrictExists", "/areaCoveredUnderWP",
@@ -62,6 +72,12 @@ public class SecurityConfig {
 
                     .permitAll()
 
+            )
+
+            .exceptionHandling(ex -> ex
+           		 
+                    .authenticationEntryPoint(smartAuthenticationEntryPoint)
+ 
             )
 
             .logout(logout -> logout

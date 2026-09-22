@@ -2,6 +2,7 @@ package gov.dolr.wdcpmksy3.controller;
 
 
 import java.io.File;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -199,6 +200,7 @@ public class PreliminaryPPR4AController {
             model.addAttribute("success", "Record deleted successfully.");
 
             model.addAttribute("ppr4List", pprWcdcDetailsService.getPPR4List(stcode));	
+            model.addAttribute("distList", districtService.getDistrictsByState(stcode)); 
     		model.addAttribute("statename", statename);
     		model.addAttribute("stcode", stcode);
 
@@ -249,6 +251,7 @@ public class PreliminaryPPR4AController {
 		        }
 		        model.addAttribute("ppr4List",
 		                pprWcdcDetailsService.getPPR4List(stcode));
+		        model.addAttribute("distList", districtService.getDistrictsByState(stcode));
 	    		model.addAttribute("statename", statename);
 	    		model.addAttribute("stcode", stcode);
 		    } 
