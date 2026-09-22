@@ -110,6 +110,9 @@ public class WdcpmksyUserReg {
     @OneToMany(mappedBy = "sentFrom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PprTransaction> transactionsSent = new ArrayList<>();
     
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<WdcpmksyUserProjectMap> projectMappings = new ArrayList<>();
+    
     // Getters and Setters
     public Integer getRegId() {
         return regId;
@@ -331,6 +334,12 @@ public class WdcpmksyUserReg {
 
 	public void setTransactionsSent(List<PprTransaction> transactionsSent) {
 		this.transactionsSent = transactionsSent;
+	}
+	public List<WdcpmksyUserProjectMap> getProjectMappings() {
+		return projectMappings;
+	}
+	public void setProjectMappings(List<WdcpmksyUserProjectMap> projectMappings) {
+		this.projectMappings = projectMappings;
 	}
 	
    

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -104,11 +105,14 @@ public class RegistrationService {
 
         try {
 
-            // Email already registered
-			/*
-			 * if (userRepository.existsByEmail(dto.getUserEmailId())) { return
-			 * "EMAIL_ALREADY_EXISTS"; }
-			 */
+        	 if (userRepository.existsByEmailIgnoreCase(dto.getUserEmailId().trim())) {
+                 return "EMAIL_ALREADY_EXISTS";
+             }
+
+             // Check mobile before sending OTP
+             if (userRepository.existsByMobileNo(dto.getUserMobileNo().trim())) {
+                 return "MOBILE_ALREADY_EXISTS";
+             }
 
             SendOtpRequest request = new SendOtpRequest();
 
@@ -322,8 +326,12 @@ public class RegistrationService {
 
             // Step 4 : Save user
             
-            if (userRepository.existsByEmail(email)) {
-                return "ALREADY_REGISTERED";
+            if (userRepository.existsByEmailIgnoreCase(dto.getUserEmailId())) {
+                return "EMAIL_ALREADY_EXISTS";
+            }
+
+            if (userRepository.existsByMobileNo(dto.getUserMobileNo())) {
+                return "MOBILE_ALREADY_EXISTS";
             }
 
             saveUser(dto, request);
@@ -354,7 +362,7 @@ public class RegistrationService {
 
         user.setCreationDate(new Timestamp(System.currentTimeMillis()));
 
-        user.setStatus("PENDING");
+        user.setStatus("New");
 
         user.setUserType(dto.getUserType());
 
@@ -427,5 +435,16 @@ public class RegistrationService {
             Integer max = userMapRepository.findMaxMapId();
 
             return (max == null) ? 1 : max + 1;
+        }
+
+        public boolean isEmailAlreadyRegistered(String email) {
+
+            return userRepository.existsByEmailIgnoreCase(email.trim());
+        }
+
+
+        public boolean isMobileAlreadyRegistered(String mobile) {
+
+            return userRepository.existsByMobileNo(mobile.trim());
         }
     }

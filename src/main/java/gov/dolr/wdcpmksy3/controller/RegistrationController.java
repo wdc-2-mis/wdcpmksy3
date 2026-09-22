@@ -90,6 +90,23 @@ public class RegistrationController {
 	                    dto.getOtp(), request));
 	}
 
+	@GetMapping("/register/checkEmail")
+	@ResponseBody
+	public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
 
+	    return ResponseEntity.ok(
+	            registrationService.isEmailAlreadyRegistered(email)
+	    );
+	}
+
+
+	@GetMapping("/register/checkMobile")
+	@ResponseBody
+	public ResponseEntity<Boolean> checkMobile(@RequestParam String mobile) {
+
+	    return ResponseEntity.ok(
+	            registrationService.isMobileAlreadyRegistered(mobile)
+	    );
+	}
 	
 }

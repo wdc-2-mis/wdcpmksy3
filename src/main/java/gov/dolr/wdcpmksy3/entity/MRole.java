@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity 
-@Table(name = "wdcpmksy_app_role_map") 
-public class WdcpmksyAppRoleMap {
+@Table(name = "m_role") 
+public class MRole {
 
 	@Id @Column(name = "role_id") 
 	private Integer roleId;

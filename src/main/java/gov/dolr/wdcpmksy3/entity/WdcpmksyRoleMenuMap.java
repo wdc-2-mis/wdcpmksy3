@@ -23,7 +23,7 @@ public class WdcpmksyRoleMenuMap
 	
 	@ManyToOne(fetch = FetchType.LAZY) 
 	@JoinColumn(name = "role_id", nullable = false) 
-	private WdcpmksyAppRoleMap role; 
+	private MRole role; 
 	
 	@ManyToOne(fetch = FetchType.LAZY) 
 	@JoinColumn(name = "submenu_id", nullable = false) 
@@ -63,11 +63,11 @@ public class WdcpmksyRoleMenuMap
 	{ 
 		this.requestIp = requestIp; 
 	} 
-	public WdcpmksyAppRoleMap getRole() 
+	public MRole getRole() 
 	{ 
 		return role; 
 	}
-	public void setRole(WdcpmksyAppRoleMap role) 
+	public void setRole(MRole role) 
 	{ 
 		this.role = role; 
 	} 

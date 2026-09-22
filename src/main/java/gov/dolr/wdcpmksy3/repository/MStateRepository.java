@@ -11,4 +11,6 @@ import gov.dolr.wdcpmksy3.entity.MState;
 public interface MStateRepository extends JpaRepository<MState, Integer> {
 
     List<MState> findAllByWdcpmksyOrderByStNameAsc(int i);
+
+	List<MState> findAllByOrderByStNameAsc();
 }

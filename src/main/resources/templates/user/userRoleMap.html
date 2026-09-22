@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>User Role & Project Mapping</title>
+
+<style>
+
+    .mapping-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        background: #fff;
+    }
+
+    .mapping-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 16px 20px;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 14px;
+        color: #495057;
+    }
+
+    .form-select,
+    .form-control {
+        min-height: 42px;
+        border-radius: 7px;
+    }
+
+    .required::after {
+        content: " *";
+        color: red;
+    }
+
+    .field-section {
+        display: none;
+    }
+
+    .user-info-card {
+        display: none;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .user-info-item {
+        margin-bottom: 8px;
+    }
+
+    .user-info-label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .project-section,
+    .role-section {
+        display: none;
+    }
+
+    .btn-save {
+        min-width: 120px;
+    }
+
+    .table th {
+        font-size: 14px;
+    }
+
+    .table td {
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    .no-data {
+        text-align: center;
+        color: #6c757d;
+        padding: 15px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 15px;
+    }
+
+    .session-state-note {
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <h4 class="mb-1">
+                User Role & Project Mapping
+            </h4>
+
+            <small class="text-muted">
+                Assign application role and project access to users
+            </small>
+        </div>
+
+    </div>
+
+
+    <!-- Main Card -->
+    <div class="card mapping-card">
+
+        <div class="card-header">
+            User Mapping
+        </div>
+
+        <div class="card-body">
+
+   
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label for="userType" class="form-label required">
+                        User Type
+                    </label>
+
+                    <select id="userType"
+                            class="form-select">
+
+                        <option value="">
+                            -- Select User Type --
+                        </option>
+
+                        <option th:each="entry : ${userTypeList}"
+                                th:value="${entry.key}"
+                                th:text="${entry.value}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="col-md-4 field-section" id="stateSection">
+
+                    <label for="state" class="form-label required">
+                        State
+                    </label>
+
+                    <select id="state"
+                            class="form-select">
+
+                        <option value="">
+                            -- Select State --
+                        </option>
+
+                        <option th:each="state : ${states}"
+                                th:value="${state.stCode}"
+                                th:text="${state.stName}">
+                        </option>
+
+                    </select>
+
+                    <div id="sessionStateNote"
+                         class="session-state-note"
+                         style="display:none;">
+                        
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4 field-section" id="districtSection">
+
+                    <label for="district" class="form-label required">
+                        District
+                    </label>
+
+                    <select id="district"
+                            class="form-select">
+
+                        <option value="">
+                            -- Select District --
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="col-md-6 field-section" id="userSection">
+
+                    <label for="user" class="form-label required">
+                        Users
+                    </label>
+
+                    <select id="user"
+                            class="form-select">
+
+                        <option value="">
+                            -- Select User --
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="col-md-6 project-section" id="projectSection">
+
+                    <label for="project" class="form-label required">
+                        Project
+                    </label>
+
+                    <select id="project"
+                            class="form-select"
+                            multiple
+                            size="5">
+
+                    </select>
+
+                    <small class="text-muted">
+                        Hold Ctrl and select multiple projects.
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div id="userInfoCard"
+                 class="user-info-card">
+
+                <div class="section-title">
+                    User Information
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-4 user-info-item">
+                        <span class="user-info-label">
+                            User ID:
+                        </span>
+                        <span id="infoUserId"></span>
+                    </div>
+
+                    <div class="col-md-4 user-info-item">
+                        <span class="user-info-label">
+                            User Name:
+                        </span>
+                        <span id="infoUserName"></span>
+                    </div>
+
+                    <div class="col-md-4 user-info-item">
+                        <span class="user-info-label">
+                            Email:
+                        </span>
+                        <span id="infoEmail"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="row mt-3">
+
+                <div class="col-md-6 role-section"
+                     id="roleSection">
+
+                    <label for="role"
+                           class="form-label required">
+
+                        Roles
+
+                    </label>
+
+                    <select id="role"
+                            class="form-select">
+
+                        <option value="">
+                            -- Select Role --
+                        </option>
+
+                        <option th:each="role : ${roles}"
+                                th:value="${role.roleId}"
+                                th:text="${role.roleName}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div id="existingProjectSection"
+                 class="mt-4"
+                 style="display:none;">
+
+                <div class="section-title">
+                    Existing Project Assignment
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+
+                        <thead class="table-light">
+
+                        <tr>
+
+                            <th style="width:70px;">
+                                S.No.
+                            </th>
+
+                            <th>
+                                Project Code
+                            </th>
+
+                            <th>
+                                Project Name
+                            </th>
+
+                            <th style="width:100px;">
+                                Action
+                            </th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="existingProjectBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+
+           <div class="mt-4">
+    <button type="button"
+            id="saveMappingBtn"
+            class="btn btn-primary btn-save"
+            style="display:none;">
+        Save
+    </button>
+</div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+
+const loggedInUserType =
+    /*[[${loggedInUserType}]]*/ '';
+
+const sessionStateCode =
+    /*[[${sessionStateCode}]]*/ null;
+
+
+
+const userTypeSelect =
+    document.getElementById("userType");
+
+const stateSection =
+    document.getElementById("stateSection");
+
+const districtSection =
+    document.getElementById("districtSection");
+
+const userSection =
+    document.getElementById("userSection");
+
+const projectSection =
+    document.getElementById("projectSection");
+
+const roleSection =
+    document.getElementById("roleSection");
+
+const stateSelect =
+    document.getElementById("state");
+
+const districtSelect =
+    document.getElementById("district");
+
+const userSelect =
+    document.getElementById("user");
+
+const projectSelect =
+    document.getElementById("project");
+
+const roleSelect =
+    document.getElementById("role");
+
+const userInfoCard =
+    document.getElementById("userInfoCard");
+
+const existingProjectSection =
+    document.getElementById("existingProjectSection");
+
+const existingProjectBody =
+    document.getElementById("existingProjectBody");
+
+const saveMappingBtn =
+    document.getElementById("saveMappingBtn");
+
+const sessionStateNote =
+    document.getElementById("sessionStateNote");
+
+
+userTypeSelect.addEventListener("change", function () {
+
+    resetDependentFields();
+
+    const userType = this.value;
+
+    if (!userType) {
+        return;
+    }
+
+    // =========================
+    // SLNA LOGIN
+    // =========================
+    if (loggedInUserType === "SL") {
+
+        if (userType === "PI") {
+
+            // Show State
+            showState();
+
+            // State comes from session
+            setSessionState();
+
+            // Show remaining fields
+            showDistrict();
+            showUser();
+            showProject();
+            showRole();
+        }
+
+        return;
+    }
+
+    // =========================
+    // SUPERUSER LOGIN
+    // =========================
+    if (loggedInUserType === "ADMIN") {
+
+        if (userType === "PI") {
+
+            showState();
+            enableState();
+
+            showDistrict();
+            showUser();
+            showProject();
+            showRole();
+
+        } else if (userType === "DL") {
+
+            showUser();
+            showRole();
+
+            loadUsers(null, null, "DL");
+
+        } else if (userType === "SL") {
+
+            showState();
+            enableState();
+
+            showUser();
+            showRole();
+
+        } else if (userType === "DI") {
+
+            showState();
+            enableState();
+
+            showDistrict();
+            showUser();
+            showRole();
+
+        } else if (userType === "NGO") {
+
+            showState();
+            enableState();
+
+            showDistrict();
+            showUser();
+            showRole();
+
+        } else if (userType === "ALL") {
+
+            showState();
+            enableState();
+
+            showDistrict();
+            showUser();
+            showProject();
+            showRole();
+        }
+
+        return;
+    }
+});
+
+
+stateSelect.addEventListener("change", function () {
+
+    const stCode = this.value;
+
+    clearDistricts();
+    clearUsers();
+    clearProjects();
+    clearUserInfo();
+
+    if (!stCode) {
+        return;
+    }
+
+    const userType =
+        userTypeSelect.value;
+
+    if (userType === "DL") {
+        return;
+    }
+
+
+    if (userType === "SL") {
+
+        loadUsers(stCode, null, "SL");
+
+        return;
+    }
+
+
+
+    loadDistricts(stCode);
+
+});
+
+
+districtSelect.addEventListener("change", function () {
+
+    const dcode = this.value;
+
+    clearUsers();
+    clearProjects();
+    clearUserInfo();
+
+    if (saveMappingBtn) {
+    saveMappingBtn.style.display = "none";
+}
+
+    if (!dcode) {
+        return;
+    }
+
+    const stCode =
+        stateSelect.value;
+
+    const userType =
+        userTypeSelect.value;
+
+
+   
+
+    if (userType === "PI") {
+
+        /*
+         * Load PIA users
+         */
+        loadUsers(
+            stCode,
+            dcode,
+            "PI"
+        );
+
+        /*
+         * Load district projects
+         */
+        loadProjects(dcode);
+
+        return;
+    }
+
+
+    
+
+    if (userType === "DI") {
+
+        loadUsers(
+            stCode,
+            dcode,
+            "DI"
+        );
+
+        return;
+    }
+
+
+    
+
+    if (userType === "NGO") {
+
+        loadUsers(
+            stCode,
+            dcode,
+            "NGO"
+        );
+
+        return;
+    }
+
+
+    
+
+    if (userType === "ALL") {
+
+        loadUsers(
+            stCode,
+            dcode,
+            "ALL"
+        );
+
+        loadProjects(dcode);
+
+    }
+
+});
+
+
+
+userSelect.addEventListener("change", function () {
+
+    const regId = this.value;
+
+    if (!regId) {
+        hideSaveButton();
+        return;
+    }
+
+    // User selection does not call any API.
+    // Save button is simply enabled.
+    showSaveButton();
+});
+
+
+function showState() {
+    const section = document.getElementById("stateSection");
+
+    if (section) {
+        section.style.display = "block";
+    }
+}
+
+function hideState() {
+    const section = document.getElementById("stateSection");
+
+    if (section) {
+        section.style.display = "none";
+    }
+}
+
+function showDistrict() {
+    const section = document.getElementById("districtSection");
+
+    if (section) {
+        section.style.display = "block";
+    }
+}
+
+function hideDistrict() {
+    const section = document.getElementById("districtSection");
+
+    if (section) {
+        section.style.display = "none";
+    }
+}
+
+function showUser() {
+    const section = document.getElementById("userSection");
+
+    if (section) {
+        section.style.display = "block";
+    }
+}
+
+function hideUser() {
+    const section = document.getElementById("userSection");
+
+    if (section) {
+        section.style.display = "none";
+    }
+}
+
+function showProject() {
+    const section = document.getElementById("projectSection");
+
+    if (section) {
+        section.style.display = "block";
+    }
+}
+
+function hideProject() {
+    const section = document.getElementById("projectSection");
+
+    if (section) {
+        section.style.display = "none";
+    }
+}
+
+function showRole() {
+    const section = document.getElementById("roleSection");
+
+    if (section) {
+        section.style.display = "block";
+    }
+}
+
+function hideRole() {
+    const section = document.getElementById("roleSection");
+
+    if (section) {
+        section.style.display = "none";
+    }
+}
+
+
+function enableState() {
+
+    stateSelect.disabled = false;
+
+    sessionStateNote.style.display = "none";
+}
+
+
+function setSessionState() {
+
+    stateSelect.value = sessionStateCode || "";
+
+    stateSelect.disabled = true;
+
+    sessionStateNote.style.display = "block";
+
+    if (sessionStateCode) {
+        loadDistricts(sessionStateCode);
+    }
+}
+
+
+
+function resetDependentFields() {
+
+    const stateSection = document.getElementById("stateSection");
+    const districtSection = document.getElementById("districtSection");
+    const userSection = document.getElementById("userSection");
+    const projectSection = document.getElementById("projectSection");
+    const roleSection = document.getElementById("roleSection");
+
+    const state = document.getElementById("state");
+    const district = document.getElementById("district");
+    const user = document.getElementById("user");
+    const project = document.getElementById("project");
+    const role = document.getElementById("role");
+
+    const saveMappingBtn =
+        document.getElementById("saveMappingBtn");
+
+
+
+    if (stateSection) {
+        stateSection.style.display = "none";
+    }
+
+    if (districtSection) {
+        districtSection.style.display = "none";
+    }
+
+    if (userSection) {
+        userSection.style.display = "none";
+    }
+
+    if (projectSection) {
+        projectSection.style.display = "none";
+    }
+
+    if (roleSection) {
+        roleSection.style.display = "none";
+    }
+
+
+    if (state) {
+        state.disabled = false;
+        state.value = "";
+    }
+
+
+    if (district) {
+
+        district.innerHTML =
+            '<option value="">-- Select District --</option>';
+
+        district.value = "";
+    }
+
+
+    if (user) {
+
+        user.innerHTML =
+            '<option value="">-- Select User --</option>';
+
+        user.value = "";
+    }
+
+
+    if (project) {
+
+        project.innerHTML =
+            '<option value="">-- Select Project --</option>';
+
+        project.value = "";
+    }
+
+
+    if (role) {
+        role.value = "";
+    }
+
+
+    if (saveMappingBtn) {
+        saveMappingBtn.style.display = "none";
+    }
+
+
+    if (typeof clearUserInformation === "function") {
+        clearUserInformation();
+    }
+
+  const tableBody =
+        document.querySelector(
+            "#existingProjectsTable tbody"
+        );
+
+    if (tableBody) {
+        tableBody.innerHTML = "";
+    }
+}
+
+
+function clearDistricts() {
+
+    districtSelect.innerHTML =
+        '<option value="">-- Select District --</option>';
+}
+
+
+function clearUsers() {
+
+    userSelect.innerHTML =
+        '<option value="">-- Select User --</option>';
+}
+
+
+function clearProjects() {
+
+    projectSelect.innerHTML = "";
+
+    existingProjectSection.style.display = "none";
+
+    existingProjectBody.innerHTML = "";
+}
+
+
+function clearUserInfo() {
+
+    userInfoCard.style.display = "none";
+
+    document.getElementById("infoUserId").textContent = "";
+    document.getElementById("infoUserName").textContent = "";
+    document.getElementById("infoEmail").textContent = "";
+}
+
+
+function loadDistricts(stCode) {
+
+    fetch(
+        `/userRoleMap/districts?stCode=${encodeURIComponent(stCode)}`
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("District request failed");
+        }
+
+        return response.json();
+    })
+
+    .then(data => {
+
+        clearDistricts();
+
+        data.forEach(district => {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                district.dcode;
+
+            option.textContent =
+                district.distName;
+
+            districtSelect.appendChild(option);
+
+        });
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Unable to load districts.");
+    });
+
+}
+
+
+function loadUsers(stCode, dcode, userType) {
+
+    let url =
+        `/userRoleMap/users?userType=${encodeURIComponent(userType)}`;
+
+
+    if (stCode !== null && stCode !== undefined) {
+
+        url +=
+            `&stCode=${encodeURIComponent(stCode)}`;
+    }
+
+
+    if (dcode !== null && dcode !== undefined) {
+
+        url +=
+            `&dcode=${encodeURIComponent(dcode)}`;
+    }
+
+
+    console.log(
+        "Loading users:",
+        url
+    );
+
+
+    fetch(url)
+
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "User request failed: "
+                    + response.status
+                );
+            }
+
+            return response.json();
+        })
+
+        .then(data => {
+
+            console.log(
+                "Users received:",
+                data
+            );
+
+            clearUsers();
+
+            if (!data || data.length === 0) {
+
+                const option =
+                    document.createElement("option");
+
+                option.disabled = true;
+
+                option.textContent =
+                    "No users available";
+
+                userSelect.appendChild(option);
+
+                return;
+            }
+
+
+            data.forEach(user => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    user.regId;
+
+                option.textContent =
+                    (user.userId);
+
+                userSelect.appendChild(option);
+
+            });
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "User loading error:",
+                error
+            );
+
+            alert(
+                "Unable to load users."
+            );
+
+        });
+
+}
+
+
+function loadUserDetails(regId) {
+
+    fetch(
+        `/userRoleMap/user/${encodeURIComponent(regId)}`
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("User details request failed");
+        }
+
+        return response.json();
+    })
+
+    .then(user => {
+
+        document.getElementById("infoUserId")
+            .textContent =
+            user.userId || "";
+
+        document.getElementById("infoUserName")
+            .textContent =
+            user.userName || "";
+
+        document.getElementById("infoEmail")
+            .textContent =
+            user.email || "";
+
+        userInfoCard.style.display =
+            "block";
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Unable to load user details.");
+    });
+
+}
+
+
+
+function loadExistingRole(regId) {
+
+    fetch(
+        `/userRoleMap/user/${encodeURIComponent(regId)}/role`
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("Role request failed");
+        }
+
+        return response.json();
+    })
+
+    .then(data => {
+
+        if (data && data.role) {
+
+            roleSelect.value =
+                data.role.roleId;
+
+        } else {
+
+            roleSelect.value = "";
+        }
+
+        
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        roleSelect.value = "";
+
+        
+    });
+
+}
+
+
+function loadProjects(dcode) {
+
+    if (!dcode) {
+        return;
+    }
+
+    fetch(
+        `/userRoleMap/projects?dcode=${encodeURIComponent(dcode)}`
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error(
+                "Project request failed"
+            );
+        }
+
+        return response.json();
+    })
+
+    .then(data => {
+
+        projectSelect.innerHTML = "";
+
+        if (!data || data.length === 0) {
+
+            projectSection.style.display =
+                "block";
+
+            const option =
+                document.createElement("option");
+
+            option.disabled = true;
+
+            option.textContent =
+                "No projects available";
+
+            projectSelect.appendChild(option);
+
+            return;
+        }
+
+
+        data.forEach(project => {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                project.projId;
+
+            option.textContent =
+                (project.projName);
+
+            projectSelect.appendChild(option);
+
+        });
+
+
+        projectSection.style.display =
+            "block";
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Project loading error:",
+            error
+        );
+
+        alert(
+            "Unable to load projects."
+        );
+
+    });
+
+}
+
+
+
+function loadExistingProjects(regId) {
+
+    fetch(
+        `/userRoleMap/user/${encodeURIComponent(regId)}/projects`
+    )
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error(
+                "Existing project request failed"
+            );
+        }
+
+        return response.json();
+    })
+    .then(data => {
+
+        existingProjectBody.innerHTML = "";
+
+        if (!data || data.length === 0) {
+
+            existingProjectSection.style.display =
+                "none";
+
+            return;
+        }
+
+        data.forEach((mapping, index) => {
+
+            const project =
+                mapping.project;
+
+            const tr =
+                document.createElement("tr");
+
+            tr.innerHTML = `
+                <td>
+                    ${index + 1}
+                </td>
+
+                <td>
+                    ${project.projectCd || ""}
+                </td>
+
+                <td>
+                    ${project.projName || ""}
+                </td>
+
+                <td>
+                    <button type="button"
+                            class="btn btn-sm btn-danger"
+                            onclick="deleteProject(${project.projId})">
+                        Delete
+                    </button>
+                </td>
+            `;
+
+            existingProjectBody.appendChild(tr);
+        });
+
+        existingProjectSection.style.display =
+            "block";
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        existingProjectSection.style.display =
+            "none";
+    });
+}
+
+
+
+
+
+
+
+
+
+
+function deleteProject(projId) {
+
+    const regId =
+        userSelect.value;
+
+    if (!regId || !projId) {
+        return;
+    }
+
+
+    if (!confirm(
+        "Are you sure you want to remove this project?"
+    )) {
+        return;
+    }
+
+
+    const formData =
+        new URLSearchParams();
+
+    formData.append(
+        "regId",
+        regId
+    );
+
+    formData.append(
+        "projId",
+        projId
+    );
+
+
+    fetch(
+        "/userRoleMap/deleteProject",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                    "application/x-www-form-urlencoded"
+            },
+            body:
+                formData.toString()
+        }
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("Delete project failed");
+        }
+
+        return response.json();
+    })
+
+    .then(data => {
+
+        alert(
+            data.message ||
+            "Project removed successfully."
+        );
+
+        
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Unable to delete project.");
+    });
+
+}
+
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+filterRolesByLoginUser();
+        if (
+            loggedInUserType &&
+            loggedInUserType.toUpperCase() === "SL"
+        ) {
+
+            /*
+             * Only PIA is available.
+             */
+
+            userTypeSelect.value = "PI";
+
+            /*
+             * Automatically trigger the same
+             * logic as selecting PIA.
+             */
+
+            userTypeSelect.dispatchEvent(
+                new Event("change")
+            );
+        }
+
+    }
+);
+
+function saveMapping() {
+
+    const regId =
+        document.getElementById("user").value;
+
+    const projId =
+        document.getElementById("project").value;
+
+    const roleId =
+        document.getElementById("role").value;
+
+
+    if (!regId) {
+
+        alert("Please select a user.");
+        return;
+    }
+
+
+    if (!projId && !roleId) {
+
+        alert(
+            "Please select a project or role."
+        );
+
+        return;
+    }
+
+    const confirmed = confirm(
+        "Do you want to assign this role to this user?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+    
+    
+    const params =
+        new URLSearchParams();
+
+    params.append(
+        "regId",
+        regId
+    );
+
+
+    if (projId) {
+
+        params.append(
+            "projId",
+            projId
+        );
+    }
+
+
+    if (roleId) {
+
+        params.append(
+            "roleId",
+            roleId
+        );
+    }
+
+
+    fetch("/userRoleMap/save", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type":
+                "application/x-www-form-urlencoded"
+        },
+
+        body:
+            params.toString()
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (data.success) {
+
+    alert(
+        "Role assigned successfully."
+    );
+
+    hideSaveButton();
+    window.location.href = "/userRoleMap";
+
+} else {
+
+    alert(
+        data.message ||
+        "Unable to assign role."
+    );
+}
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Save error:",
+            error
+        );
+
+        alert(
+            "Unable to assign role."
+        );
+    });
+}
+
+function showSaveButton() {
+
+    if (saveMappingBtn) {
+        saveMappingBtn.style.display =
+            "inline-block";
+    }
+}
+
+
+function hideSaveButton() {
+
+    if (saveMappingBtn) {
+        saveMappingBtn.style.display =
+            "none";
+    }
+}
+
+saveMappingBtn.addEventListener(
+    "click",
+    saveMapping
+);
+
+function onUserSelected() {
+    const regId = document.getElementById("user").value;
+
+    if (regId) {
+        showSaveButton();
+    } else {
+        hideSaveButton();
+    }
+}
+
+
+
+function filterRolesByLoginUser() {
+
+    const roleSelect = document.getElementById("role");
+
+    if (!roleSelect) {
+        return;
+    }
+
+    const loggedType =
+        (loggedInUserType || "").trim().toUpperCase();
+
+    // Keep all original role options
+    const allOptions = Array.from(
+        roleSelect.querySelectorAll("option")
+    );
+
+    // SUPERUSER / ADMIN
+    // Show ALL roles
+    if (loggedType === "ADMIN") {
+
+        allOptions.forEach(option => {
+            option.style.display = "";
+        });
+
+        return;
+    }
+
+    // SLNA
+    // Show ONLY PIA role
+    if (loggedType === "SL") {
+
+        allOptions.forEach(option => {
+
+            if (option.value === "") {
+                option.style.display = "";
+                return;
+            }
+
+            const roleName =
+                option.textContent.trim().toUpperCase();
+
+            if (roleName === "PIA") {
+                option.style.display = "";
+            } else {
+                option.style.display = "none";
+            }
+        });
+
+        // Clear current selection
+        roleSelect.value = "";
+
+        return;
+    }
+}
+
+
+</script>
+
+</div>
+
+</body>
+
+</html>

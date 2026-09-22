@@ -255,48 +255,173 @@ function validateEmail() {
 
     let email = document.getElementById("emailField").value.trim();
 
-    let emailError = document.getElementById("emailError");
+    let emailError =
+        document.getElementById("emailError");
 
     emailError.innerHTML = "";
 
     if (email === "") {
-        emailError.innerHTML = "Email is required.";
+
+        emailError.innerHTML =
+            "Email is required.";
+
         return false;
     }
 
-    const pattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    const pattern =
+        /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
     if (!pattern.test(email)) {
-        emailError.innerHTML = "Please enter a valid email address.";
+
+        emailError.innerHTML =
+            "Please enter a valid email address.";
+
         return false;
     }
 
     return true;
 }
 
+async function checkEmailAlreadyRegistered() {
+
+    const emailField = document.getElementById("emailField");
+    const emailError = document.getElementById("emailError");
+
+    const email = emailField.value.trim();
+
+    if (email === "") {
+        return false;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/register/checkEmail?email=" +
+            encodeURIComponent(email)
+        );
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+        const exists = await response.json();
+
+        if (exists) {
+
+            emailError.innerHTML =
+                "Email is already registered.";
+
+            emailField.classList.add("is-invalid");
+
+            return false;
+
+        } else {
+
+            emailError.innerHTML = "";
+
+            emailField.classList.remove("is-invalid");
+
+            return true;
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        emailError.innerHTML =
+            "Unable to verify email. Please try again.";
+
+        return false;
+    }
+}
+
 function validateMobile() {
 
-    let mobile = document.getElementById("mobileField").value.trim();
+    let mobile =
+        document.getElementById("mobileField").value.trim();
 
-    let mobileError = document.getElementById("mobileError");
+    let mobileError =
+        document.getElementById("mobileError");
 
     mobileError.innerHTML = "";
 
-    // Allow only digits
     mobile = mobile.replace(/\D/g, "");
+
     document.getElementById("mobileField").value = mobile;
 
     if (mobile === "") {
-        mobileError.innerHTML = "Mobile number is required.";
+
+        mobileError.innerHTML =
+            "Mobile number is required.";
+
         return false;
     }
 
     if (!/^[6-9]\d{9}$/.test(mobile)) {
-        mobileError.innerHTML = "Please enter a valid 10-digit mobile number.";
+
+        mobileError.innerHTML =
+            "Please enter a valid 10-digit mobile number.";
+
         return false;
     }
 
     return true;
+}
+
+async function checkMobileAlreadyRegistered() {
+
+    const mobileField =
+        document.getElementById("mobileField");
+
+    const mobileError =
+        document.getElementById("mobileError");
+
+    const mobile = mobileField.value.trim();
+
+    if (mobile === "") {
+        return false;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/register/checkMobile?mobile=" +
+            encodeURIComponent(mobile)
+        );
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+        const exists = await response.json();
+
+        if (exists) {
+
+            mobileError.innerHTML =
+                "Mobile number is already registered.";
+
+            mobileField.classList.add("is-invalid");
+
+            return false;
+
+        } else {
+
+            mobileError.innerHTML = "";
+
+            mobileField.classList.remove("is-invalid");
+
+            return true;
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        mobileError.innerHTML =
+            "Unable to verify mobile number. Please try again.";
+
+        return false;
+    }
 }
 
 function validateAddress() {
@@ -320,12 +445,26 @@ function validateAddress() {
     return true;
 }
 
-function sendOtp() {
+async function sendOtp() {
 
     if (!validateForm()) {
         return;
     }
 
+	const emailValid =
+	    await checkEmailAlreadyRegistered();
+
+	if (!emailValid) {
+	    return;
+	}
+
+	const mobileValid =
+	    await checkMobileAlreadyRegistered();
+
+	if (!mobileValid) {
+	    return;
+	}
+	
 	const btn = document.getElementById("registerBtn");
 
 	btn.disabled = true;

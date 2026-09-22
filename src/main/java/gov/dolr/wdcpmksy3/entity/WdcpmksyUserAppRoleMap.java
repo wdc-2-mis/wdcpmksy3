@@ -26,7 +26,7 @@ public class WdcpmksyUserAppRoleMap {
 	
 	@ManyToOne(fetch = FetchType.LAZY) 
 	@JoinColumn(name = "role_id", nullable = false) 
-	private WdcpmksyAppRoleMap role; 
+	private MRole role; 
 	
 	// Getters and Setters 
 	public Integer getUserAppId() 
@@ -69,11 +69,11 @@ public class WdcpmksyUserAppRoleMap {
 	{ 
 		this.requestIp = requestIp; 
 	} 
-	public WdcpmksyAppRoleMap getRole() 
+	public MRole getRole() 
 	{ 
 		return role; 
 	} 
-	public void setRole(WdcpmksyAppRoleMap role) 
+	public void setRole(MRole role) 
 	{ 
 		this.role = role; 
 	} 

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PIA User Activation</title>
+    
+<style type="text/css">
+/* Activation Success Modal */
+
+.activation-success-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: #198754;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto;
+
+    font-size: 30px;
+
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.25);
+}
+
+.credential-box {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 5px 15px;
+}
+
+.credential-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 5px;
+
+    border-bottom: 1px solid #e9ecef;
+}
+
+.credential-row:last-child {
+    border-bottom: none;
+}
+
+.credential-row span {
+    color: #495057;
+    font-weight: 500;
+}
+
+.credential-row strong {
+    color: #212529;
+    letter-spacing: 0.5px;
+}
+
+#activationPassword {
+    font-family: monospace;
+    background: #fff3cd;
+    padding: 4px 8px;
+    border-radius: 5px;
+}
+
+#activationSuccessModal .modal-content {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+#activationSuccessModal .modal-header {
+    border-bottom: none;
+}
+
+#activationSuccessModal .modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchButton = document.getElementById("search");
+
+    searchButton.addEventListener("click", function () {
+
+        const userId = document.getElementById("userId").value.trim();
+        const userName = document.getElementById("userName").value.trim();
+        const userType = document.getElementById("userType").value;
+        const status = document.getElementById("status").value;
+        const error = document.getElementById("error");
+
+       
+        error.classList.add("d-none");
+        error.innerHTML = "";
+
+       
+        if (userType !== "" && status === "") {
+
+            error.innerHTML =
+                "Please select Status when User Type is selected.";
+
+            error.classList.remove("d-none");
+
+            document.getElementById("status").focus();
+
+            return;
+        }
+
+        
+        if (
+            userId === "" &&
+            userName === "" &&
+            userType === "" &&
+            status === ""
+        ) {
+
+            error.innerHTML =
+                "Please provide at least one search criteria.";
+
+            error.classList.remove("d-none");
+
+            document.getElementById("userId").focus();
+
+            return;
+        }
+
+       
+        const form = document.getElementById("usersearch");
+
+        form.action = "/slnausersrch";
+        form.method = "post";
+
+        form.submit();
+    });
+
+
+ document.querySelectorAll(".activate-btn").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const regId = this.getAttribute("data-reg-id");
+            const userName = this.getAttribute("data-user-name");
+
+            const confirmed = confirm(
+                "Are you sure you want to activate the account of "
+                + userName
+                + "?"
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            activatePiaUser(regId);
+        });
+
+    });
+    
+    document.getElementById("activationOkButton")
+        .addEventListener("click", function () {
+
+            window.location.href = "/userRoleMap";
+
+        });
+
+});
+
+function activatePiaUser(regId) {
+
+    fetch("/activatePiaUser", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            regId: regId
+        })
+    })
+
+    .then(function (response) {
+
+        console.log("HTTP Status:", response.status);
+        console.log("Content-Type:", response.headers.get("content-type"));
+
+        if (!response.ok) {
+            throw new Error("HTTP Error: " + response.status);
+        }
+
+        return response.text();
+    })
+
+    .then(function (text) {
+
+        console.log("Server Response:", text);
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+
+            console.error("Invalid JSON response:", text);
+
+            throw new Error(
+                "Server did not return valid JSON."
+            );
+        }
+
+        console.log("Parsed Response:", data);
+
+        if (data.status !== "SUCCESS") {
+
+            alert(
+                data.message ||
+                "Unable to activate user."
+            );
+
+            return;
+        }
+
+        // Get popup elements
+        const userNameElement =
+            document.getElementById("activationUserName");
+
+        const userIdElement =
+            document.getElementById("activationUserId");
+
+        const passwordElement =
+            document.getElementById("activationPassword");
+
+        const modalElement =
+            document.getElementById("activationSuccessModal");
+
+        console.log(
+            "activationUserName:",
+            userNameElement
+        );
+
+        console.log(
+            "activationUserId:",
+            userIdElement
+        );
+
+        console.log(
+            "activationPassword:",
+            passwordElement
+        );
+
+        console.log(
+            "activationSuccessModal:",
+            modalElement
+        );
+
+        // Check popup elements
+        if (!userNameElement) {
+            throw new Error(
+                "HTML element #activationUserName not found."
+            );
+        }
+
+        if (!userIdElement) {
+            throw new Error(
+                "HTML element #activationUserId not found."
+            );
+        }
+
+        if (!passwordElement) {
+            throw new Error(
+                "HTML element #activationPassword not found."
+            );
+        }
+
+        if (!modalElement) {
+            throw new Error(
+                "HTML element #activationSuccessModal not found."
+            );
+        }
+
+        // Fill popup
+        userNameElement.textContent =
+            data.userName || "User";
+
+        userIdElement.textContent =
+            data.userId || "";
+
+        passwordElement.textContent =
+            data.password || "";
+
+        // Open Bootstrap modal
+        const modal =
+            new bootstrap.Modal(modalElement);
+
+        modal.show();
+
+    })
+
+    .catch(function (error) {
+
+        console.error(
+            "Activation Error:",
+            error
+        );
+
+        alert(
+            "Activation completed, but response processing failed.\n\n"
+            + error.message
+        );
+    });
+}
+
+
+</script>
+
+
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="card shadow-sm border-0">
+
+        <!-- Page Header -->
+        <div class="card-header bg-primary text-white">
+
+            <h4 class="mb-0">
+                User Activation / Inactivation / Deletion
+            </h4>
+
+        </div>
+
+
+        <div class="card-body">
+    <!-- Error Message -->
+            <div id="error"
+                 class="alert alert-danger d-none"
+                 role="alert">
+            </div>
+
+
+            <!-- Search Form -->
+            <form id="usersearch"
+                  autocomplete="off">
+
+                <div class="row g-3">
+
+
+                    <!-- User ID -->
+                    <div class="col-md-6">
+
+                        <label for="userId" class="form-label fw-semibold">
+                            User Id
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="userId"
+                               name="userId"
+                               maxlength="100">
+
+                    </div>
+
+
+                    <!-- Name -->
+                    <div class="col-md-6">
+
+                        <label for="userName" class="form-label fw-semibold">
+                            Name
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="userName"
+                               name="userName"
+                               maxlength="100">
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label for="userType" class="form-label fw-semibold">
+                            User Type
+                        </label>
+
+                        <select id="userType"
+                                name="userType"
+                                class="form-select">
+
+                            <option value="">
+                                -- Select --
+                            </option>
+
+                            <option th:each="entry : ${userTypeList}"
+                                    th:value="${entry.key}"
+                                    th:text="${entry.value}">
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Status -->
+                    <div class="col-md-6">
+
+                        <label for="status" class="form-label fw-semibold">
+                            Status
+                        </label>
+
+                        <select id="status"
+                                name="status"
+                                class="form-select">
+
+                            <option value="">
+                                -- Select --
+                            </option>
+
+                            <option th:each="entry : ${userStatusList}"
+                                    th:value="${entry.key}"
+                                    th:text="${entry.value}">
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Search Button -->
+                    <div class="col-12 text-end mt-4">
+
+                        <button type="button"
+                                id="search"
+                                class="btn btn-info text-white px-4">
+
+                            <i class="fas fa-search me-1"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+
+            <!-- Search Result will come here later -->
+
+            <div id="searchResult" class="mt-4">
+
+               <div th:if="${userList != null}" class="mt-4">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-primary text-white">
+
+            <h5 class="mb-0">
+                User Search Result
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered">
+
+                    <thead class="table-light">
+
+                    <tr>
+
+                        <th class="table-primary">Registration Id</th>
+                        <th class="table-primary">State Code</th>
+                        <th class="table-primary">State</th>
+                        <th class="table-primary">User Type</th>
+                        <th class="table-primary">User Id</th>
+                        <th class="table-primary">User Name</th>
+                        <th class="table-primary">Designation</th>
+                        <th class="table-primary">Department</th>
+                        <th class="table-primary">Email</th>
+                        <th class="table-primary">Phone</th>
+                        <th class="table-primary" style="width:200px">Action</th>
+                        
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    <tr th:each="user : ${userList}">
+
+                        <td>
+                            <span th:text="'WDC-PMKSY-000' + ${user.regId}">
+                            </span>
+                        </td>
+
+                        <td th:text="${user.userMappings[0].state.stCode}"></td>
+
+                        <td th:text="${user.userMappings[0].state.stName}"></td>
+                        
+
+                        <td>
+                            <span th:if="${user.userType == 'PI'}">
+                                PIA
+                            </span>
+
+                            <span th:if="${user.userType == 'SL'}">
+                                SLNA
+                            </span>
+
+                            <span th:if="${user.userType == 'DI'}">
+                                WCDC
+                            </span>
+
+                            <span th:if="${user.userType == 'DL'}">
+                                DoLR
+                            </span>
+                        </td>
+
+                        <td th:text="${user.userId}">
+                        </td>
+
+                        <td th:text="${user.userName}">
+                        </td>
+
+                        <td th:text="${user.designation}">
+                        </td>
+
+                        <td th:text="${user.department}">
+                        </td>
+
+                        <td th:text="${user.email}">
+                        </td>
+
+                        <td th:text="${user.mobileNo}">
+                        </td>
+
+                        <td>
+
+                            <button type="button"
+                                    class="btn btn-warning btn-sm"
+                                    th:if="${user.status == 'Active' or user.status == 'ACTIVE'}">
+
+                                InActivate
+
+                            </button>
+
+                            <button type="button" class="btn btn-success btn-sm activate-btn" th:unless="${user.status == 'Active' or user.status == 'ACTIVE'}" th:attr="data-reg-id=${user.regId}, data-user-name=${user.userName}"> 
+                            <i class="fas fa-check-circle me-1"></i> Activate </button>
+
+                        
+
+                            <button type="button"
+                                    class="btn btn-danger btn-sm"
+                                    th:if="${user.status == 'New' or user.status == 'NEW'}">
+
+                                Delete
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr th:if="${#lists.isEmpty(userList)}">
+
+                        <td colspan="12"
+                            class="text-center text-danger fw-semibold">
+
+                            No Data Found!
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<div class="modal fade" id="activationSuccessModal"
+     tabindex="-1"
+     aria-labelledby="activationSuccessModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="activationSuccessModalLabel">
+                    <i class="fas fa-check-circle me-2"></i>
+                    User Activated Successfully
+                </h5>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="text-center mb-3">
+                    <div class="activation-success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+
+                    <h5 class="mt-3 text-success">
+                        Account Activated Successfully
+                    </h5>
+                </div>
+
+                <p class="text-center mb-4">
+                    <strong id="activationUserName"></strong>
+                    account has been activated successfully.
+                </p>
+
+                <div class="credential-box">
+
+                    <div class="credential-row">
+                        <span>
+                            <i class="fas fa-user me-2"></i>
+                            User ID
+                        </span>
+
+                        <strong id="activationUserId"></strong>
+                    </div>
+
+                    <div class="credential-row">
+                        <span>
+                            <i class="fas fa-key me-2"></i>
+                            Password
+                        </span>
+
+                        <strong id="activationPassword"></strong>
+                    </div>
+
+                </div>
+
+                <div class="alert alert-warning mt-3 mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+
+                    <strong>Important:</strong>
+                    Your account will be available for login only after
+                    a project has been assigned to this User ID.
+                </div>
+
+                <p class="text-muted text-center small mt-3 mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Kindly note down these credentials for future use.
+                </p>
+
+            </div>
+
+            <div class="modal-footer justify-content-center">
+
+                <button type="button"
+                        class="btn btn-success px-5"
+                        id="activationOkButton"
+                        data-bs-dismiss="modal">
+
+                    <i class="fas fa-check me-2"></i>
+                    OK
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+</body>
+
+</html>
+

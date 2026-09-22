@@ -52,7 +52,7 @@ public interface UserMapRepository extends JpaRepository<WdcpmksyUserMap, Intege
             "(select dist_name from m_district d " +
             " where d.st_code=m.st_code and d.dcode=m.dcode) as districtName, " +
             "pm.proj_id as projectCode, " +
-            "(select proj_name from wdcpmksy_m_project p " +
+            "(select proj_name from m_project p " +
             " where p.dcode=m.dcode and p.proj_id=pm.proj_id) as projectName " +
             "from wdcpmksy_user_map m " +
             "left join wdcpmksy_user_project_map pm on m.reg_id=pm.reg_id " +

@@ -186,13 +186,13 @@ ${lists.value}
 <div class="row">
 
 <div class="col-md-6 mb-3"> <label>Email *</label>
-    <input type="email" id="emailField" class="form-control form-control-sm" name="userEmailId" onblur="validateEmail()">
+    <input type="email" id="emailField" class="form-control form-control-sm" name="userEmailId" onblur="validateEmail(); checkEmailAlreadyRegistered()" >
     <small class="text-danger error-text" id="emailError"></small>
     
 </div>
 
 <div class="col-md-6 mb-3"><label>Mobile *</label>
-<input type="text" id="mobileField" class="form-control form-control-sm" name="userMobileNo" maxlength="10" oninput="validateMobile()">
+<input type="text" id="mobileField" class="form-control form-control-sm" name="userMobileNo" maxlength="10" oninput="validateMobile()"  onblur="validateMobile(); checkMobileAlreadyRegistered()"> 
 
     <small class="text-danger error-text" id="mobileError"></small>
 </div>
