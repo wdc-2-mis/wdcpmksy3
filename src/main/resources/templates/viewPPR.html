@@ -8,7 +8,11 @@
 	<title>Preliminary Project Report (View)</title>
 
 	<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
-
+	<style>
+	.required {
+	    color: red;
+	}
+	</style>
 
 
 	<script>
@@ -119,19 +123,47 @@
 
 		document.addEventListener("DOMContentLoaded", function () {
 
-			document.getElementById("district").addEventListener("change", function () {
-				loadProjectsForDistrict(this.value, null);
-			});
+		    document.getElementById("district").addEventListener("change", function () {
+		        loadProjectsForDistrict(this.value, null);
+		    });
 
-			let form = document.getElementById("viewPPR");
-			let selectedDcode = form.dataset.selectedDcode;
-			let selectedProject = form.dataset.selectedProject;
-			if (selectedDcode) {
-				loadProjectsForDistrict(selectedDcode, selectedProject);
-			}
+		    let form = document.getElementById("viewPPR");
+		    let selectedDcode = form.dataset.selectedDcode;
+		    let selectedProject = form.dataset.selectedProject;
+		    if (selectedDcode) {
+		        loadProjectsForDistrict(selectedDcode, selectedProject);
+		    }
+
+		    form.addEventListener("submit", function (e) {
+
+		        const district = document.getElementById("district");
+		        const project = document.getElementById("project");
+		        const fyear = document.getElementById("fyear");
+
+		        if (district.value.trim() === "") {
+		            alert("Please select District.");
+		            district.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (project.value.trim() === "") {
+		            alert("Please select Project.");
+		            project.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		        if (fyear.value.trim() === "") {
+		            alert("Please select Financial Year.");
+		            fyear.focus();
+		            e.preventDefault();
+		            return false;
+		        }
+
+		    });
 
 		});
-
 	</script>
 
 </head>
@@ -218,36 +250,36 @@
 					PPR-1 : Preliminary Project Report
 				</h4>
 
-				<div th:if="${#lists.isEmpty(records)}" class="alert alert-warning">
-					<center>Data not found!</center>
-				</div>
+				<table class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th class="table-primary">Financial Year</th>
+							<th class="table-primary">District</th>
+							<th class="table-primary">Project Name</th>
+							<th class="table-primary">Micro-Watershed</th>
+						</tr>
+					</thead>
 
-				<div th:if="${!#lists.isEmpty(records)}">
-					<table class="table table-bordered table-striped">
-						<thead>
-							<tr>
-								<th class="table-primary">Financial Year</th>
-								<th class="table-primary">District</th>
-								<th class="table-primary">Project Name</th>
-								<th class="table-primary">Micro-Watershed</th>
-							</tr>
-						</thead>
+					<tbody>
+						<tr th:each="rec : ${records}">
+							<td th:text="${rec.finYear.finYrDesc}"></td>
+							<td th:text="${rec.district.distName}"></td>
+							<td th:text="${rec.projectName}"></td>
+							<td>
+								<ul class="mb-0 ps-3">
+									<li th:each="mw : ${rec.microWatersheds}" th:text="${mw.microWatershed.mwName}">
+									</li>
+								</ul>
+							</td>
+						</tr>
 
-						<tbody>
-							<tr th:each="rec : ${records}">
-								<td th:text="${rec.finYear.finYrDesc}"></td>
-								<td th:text="${rec.district.distName}"></td>
-								<td th:text="${rec.projectName}"></td>
-								<td>
-									<ul class="mb-0 ps-3">
-										<li th:each="mw : ${rec.microWatersheds}" th:text="${mw.microWatershed.mwName}">
-										</li>
-									</ul>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+						<tr th:if="${#lists.isEmpty(records)}">
+							<td colspan="4" class="text-center text-danger">
+								No records found.
+							</td>
+						</tr>
+					</tbody>
+				</table>
 
 			</div>
 
@@ -320,6 +352,12 @@
 								<td th:text="${row.otherNo}"></td>
 								<td th:text="${row.otherArea}"></td>
 							</tr>
+
+							<tr th:if="${#lists.isEmpty(watershedList)}">
+								<td colspan="16" class="text-center text-danger">
+									No records found.
+								</td>
+							</tr>
 						</tbody>
 
 					</table>
@@ -333,48 +371,49 @@
 				PPR-3 : Prioritized List of Proposed Projects
 			</h4>
 
-			<div th:if="${#lists.isEmpty(detailsOfListOfProposedProject)}" class="alert alert-warning text-center">
-				No records found.
-			</div>
+			<table class="table table-bordered table-striped table-hover">
+				<thead class="table-primary">
+					<tr>
+						<th>District</th>
+						<th>Project Name</th>
+						<th>Name of Micro-watershed</th>
+						<th>Micro-watershed Code</th>
+						<th>Proposed Area (Ha.)</th>
+						<th>Type of Project</th>
+						<th>Proposed Cost</th>
+						<th>Weightage under Criteria</th>
+					</tr>
+				</thead>
 
-			<div th:if="${!#lists.isEmpty(detailsOfListOfProposedProject)}">
-				<table class="table table-bordered table-striped table-hover">
-					<thead class="table-primary">
-						<tr>
-							<th>District</th>
-							<th>Project Name</th>
-							<th>Name of Micro-watershed</th>
-							<th>Micro-watershed Code</th>
-							<th>Proposed Area (Ha.)</th>
-							<th>Type of Project</th>
-							<th>Proposed Cost</th>
-							<th>Weightage under Criteria</th>
-						</tr>
-					</thead>
+				<tbody>
+					<tr th:each="data : ${detailsOfListOfProposedProject}">
+						<td th:text="${data.ppr.district.distName}"></td>
+						<td th:text="${data.ppr.projectName}"></td>
+						<td th:text="${data.microWatershed.mwName}"></td>
+						<td th:text="${data.microWatershed.mwCode}"></td>
+						<td th:text="${data.treatedArea}"></td>
+						<td th:text="${data.projectType.projectType}"></td>
+						<td th:text="${data.proposedCost}"></td>
 
-					<tbody>
-						<tr th:each="data : ${detailsOfListOfProposedProject}">
-							<td th:text="${data.ppr.district.distName}"></td>
-							<td th:text="${data.ppr.projectName}"></td>
-							<td th:text="${data.microWatershed.mwName}"></td>
-							<td th:text="${data.microWatershed.mwCode}"></td>
-							<td th:text="${data.treatedArea}"></td>
-							<td th:text="${data.projectType.projectType}"></td>
-							<td th:text="${data.proposedCost}"></td>
+						<td class="text-center">
+							<div class="col-md-4">
+								<button type="button" class="btn btn-primary btn-sm viewBtn"
+									th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
+									data-bs-target="#viewCriteriaModal">
+									Link <i class="fas fa-list"></i>
+								</button>
+							</div>
+						</td>
+					</tr>
 
-							<td class="text-center">
-								<div class="col-md-4">
-									<button type="button" class="btn btn-primary btn-sm viewBtn"
-										th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
-										data-bs-target="#viewCriteriaModal">
-										Link <i class="fas fa-list"></i>
-									</button>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+					<tr th:if="${#lists.isEmpty(detailsOfListOfProposedProject)}">
+						<td colspan="8" class="text-center text-danger">
+							No records found.
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
 			<div class="modal fade" id="viewCriteriaModal" tabindex="-1" aria-labelledby="viewcriteriaModalLabel"
 				aria-hidden="true">
 				<div class="modal-dialog modal-xl modal-dialog-centered">
@@ -595,7 +634,7 @@
 				PPR-10 : Details of Agro-Climatic Condition
 			</h4>
 
-			<div th:if="${!#lists.isEmpty(ppr10List)}" class="table-responsive mb-4">
+			<div class="table-responsive mb-4">
 
 				<table class="table table-bordered table-striped table-hover">
 					<thead class="table-primary">
@@ -636,12 +675,14 @@
 								</span>
 							</td>
 						</tr>
+
+						<tr th:if="${#lists.isEmpty(ppr10List)}">
+							<td colspan="10" class="text-center text-danger">
+								No records found.
+							</td>
+						</tr>
 					</tbody>
 				</table>
-			</div>
-
-			<div th:if="${#lists.isEmpty(ppr10List)}" class="alert alert-warning text-center">
-				No records found.
 			</div>
 
 
@@ -650,7 +691,7 @@
 				PPR-11 : Details of Flood and Drought in Project Area
 			</h4>
 
-			<div th:if="${!#lists.isEmpty(ppr11List)}" class="table-responsive mb-4">
+			<div class="table-responsive mb-4">
 
 				<table class="table table-bordered table-striped">
 					<thead class="table-primary">
@@ -675,12 +716,14 @@
 							<td th:text="${rec.periodicity == 'Q' ? 'Quarterly' : 'Annual'}"></td>
 							<td th:text="${rec.affected ? 'Yes' : 'No'}"></td>
 						</tr>
+
+						<tr th:if="${#lists.isEmpty(ppr11List)}">
+							<td colspan="7" class="text-center text-danger">
+								No records found.
+							</td>
+						</tr>
 					</tbody>
 				</table>
-			</div>
-
-			<div th:if="${#lists.isEmpty(ppr11List)}" class="alert alert-warning text-center">
-				No records found.
 			</div>
 
 
@@ -691,11 +734,7 @@
 				PPR-12 : Soil Erosion Details
 			</h4>
 
-			<div th:if="${#lists.isEmpty(soilErosionList)}" class="alert alert-warning">
-				<center>No Data Available</center>
-			</div>
-
-			<div th:if="${!#lists.isEmpty(soilErosionList)}" class="table-responsive">
+			<div class="table-responsive">
 				<table class="table table-bordered table-striped text-center">
 					<thead>
 						<tr>
@@ -721,6 +760,12 @@
 							<td th:text="${data.runoff}"></td>
 							<td th:text="${data.avgSoilLoss}"></td>
 						</tr>
+
+						<tr th:if="${#lists.isEmpty(soilErosionList)}">
+							<td colspan="8" class="text-center text-danger">
+								No records found.
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
@@ -730,11 +775,7 @@
 				PPR-13 : Livelihood Summary
 			</h4>
 
-			<div th:if="${#lists.isEmpty(pprLivelihoodSummaryList)}" class="alert alert-warning">
-				<center>No Data Found</center>
-			</div>
-
-			<div th:if="${!#lists.isEmpty(pprLivelihoodSummaryList)}" class="table-responsive">
+			<div class="table-responsive">
 				<table class="table table-bordered table-striped table-hover">
 					<thead class="table-primary text-center">
 						<tr>
@@ -779,6 +820,12 @@
 							<td class="text-center" th:text="${data.migratedPeople}"></td>
 
 							<td th:text="${data.migrationReason}"></td>
+						</tr>
+
+						<tr th:if="${#lists.isEmpty(pprLivelihoodSummaryList)}">
+							<td colspan="9" class="text-center text-danger">
+								No records found.
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -848,11 +895,7 @@
 				PPR-15 : Migration Details
 			</h4>
 
-			<div th:if="${#lists.isEmpty(ppr15List)}" class="alert alert-warning">
-				No Migration Details found.
-			</div>
-
-			<table class="table table-bordered table-striped" th:if="${!#lists.isEmpty(ppr15List)}">
+			<table class="table table-bordered table-striped">
 
 				<thead class="table-primary">
 					<tr>
@@ -877,6 +920,12 @@
 						<td th:text="${item['migration_days_per_year']}"></td>
 						<td th:text="${item['migration_reason']}"></td>
 						<td th:text="${item['expected_reduction_migrating_people']}"></td>
+					</tr>
+
+					<tr th:if="${#lists.isEmpty(ppr15List)}">
+						<td colspan="8" class="text-center text-danger">
+							No records found.
+						</td>
 					</tr>
 				</tbody>
 
@@ -945,11 +994,7 @@
 					PPR-17 : Drinking Water Status
 				</h4>
 
-				<div th:if="${#lists.isEmpty(pprDrinkingWaterList)}" class="alert alert-warning text-center">
-					Data not found!
-				</div>
-
-				<div th:if="${!#lists.isEmpty(pprDrinkingWaterList)}" class="table-responsive">
+				<div class="table-responsive">
 
 					<table class="table table-bordered table-striped table-hover">
 
@@ -978,6 +1023,12 @@
 
 								<td th:text="${data.postWaterAvailabilityMonths}"></td>
 								<td th:text="${data.postWaterQuality.waterQualityType}"></td>
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(pprDrinkingWaterList)}">
+								<td colspan="8" class="text-center text-danger">
+									No records found.
+								</td>
 							</tr>
 						</tbody>
 
@@ -1173,7 +1224,7 @@
 				
 				
 				
-				<form id="viewPPR" th:action="@{/forwardViewPPR}" method="post" >
+				<form id="forwardPPRForm" th:action="@{/forwardViewPPR}" method="post" >
 					
 					<input type="hidden" name="pprdcode" th:value="${selectedDcode}">
 					<input type="hidden" name="pprid" th:value="${selectedProject}">
