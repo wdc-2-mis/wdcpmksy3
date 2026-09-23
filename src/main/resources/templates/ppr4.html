@@ -44,6 +44,14 @@
 
 			const mouDate = document.getElementsByName("MoU")[0];
 			mouDate.setAttribute("min", "2026-01-01");
+			
+			// Restrict future dates - max is today
+			    const today = new Date();
+			    const yyyy = today.getFullYear();
+			    const mm = String(today.getMonth() + 1).padStart(2, "0");
+			    const dd = String(today.getDate()).padStart(2, "0");
+			    mouDate.setAttribute("max", `${yyyy}-${mm}-${dd}`);
+
 
 		});
 

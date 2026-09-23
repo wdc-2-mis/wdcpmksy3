@@ -22,7 +22,7 @@ public interface PPRWcdcDetailsRepository extends JpaRepository<PPRWcdcDetails, 
 	        "w.status " +
 	        "FROM ppr_wcdc_details w " +
 	        "JOIN m_district d ON d.dcode = w.dcode " +
-	        "WHERE d.st_code = :stcode order by w.status ASC" ,
+	        "WHERE d.st_code = :stcode order by w.status DESC" ,
 	        nativeQuery = true)
 	    List<Object[]> getPPR4List(@Param("stcode") Integer stcode);
 	    
