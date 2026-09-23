@@ -9,35 +9,80 @@
 
 	<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
 	<style>
-	.required {
-	    color: red;
-	}
+		.required {
+			color: red;
+		}
+
+
+
+		@keyframes blinkButton {
+			0% {
+				opacity: 1;
+			}
+
+			50% {
+				opacity: 0.4;
+			}
+
+			100% {
+				opacity: 1;
+			}
+		}
+
+		.btn-blink {
+			animation: blinkButton 1.2s infinite;
+		}
+
+
+
+		@keyframes blinkArrow {
+			0% {
+				opacity: 1;
+				transform: translateX(0);
+			}
+
+			50% {
+				opacity: 0.3;
+				transform: translateX(5px);
+			}
+
+			100% {
+				opacity: 1;
+				transform: translateX(0);
+			}
+		}
+
+		.arrow-blink {
+			animation: blinkArrow 1s infinite;
+			color: #0d6efd;
+			font-size: 18px;
+		}
 	</style>
 
 
 	<script>
-		
+
 		function checkProjectForwarded() {
 
-					let project = document.getElementById("project").value;
+			let project = document.getElementById("project").value;
 
-					if (project === "") {
-						return;
+			if (project === "") {
+				return;
+			}
+			fetch('/checkTransPPRExists?pprid=' + project)
+				.then(response => response.text())
+				.then(result => {
+					console.log(result);
+					if (result === "EXISTS") {
+						alert("This PPR Data already Forwarded. Please select different PPR");
+
+						document.getElementById("project").value = "";
+						document.getElementById("project").focus();
 					}
-					fetch('/checkTransPPRExists?pprid=' + project)
-						.then(response => response.text())
-						.then(result => {
-							console.log(result);
-							if (result === "EXISTS") {
-								alert("This PPR Data already Forwarded. Please select different PPR");
 
-								document.getElementById("project").value = "";
-								document.getElementById("project").focus();
-							}
-
-						})
-						.catch(error => console.error(error));
-				}
+				})
+				.catch(error => console.error(error));
+		}
 
 
 		document.addEventListener("DOMContentLoaded", function () {
@@ -123,45 +168,45 @@
 
 		document.addEventListener("DOMContentLoaded", function () {
 
-		    document.getElementById("district").addEventListener("change", function () {
-		        loadProjectsForDistrict(this.value, null);
-		    });
+			document.getElementById("district").addEventListener("change", function () {
+				loadProjectsForDistrict(this.value, null);
+			});
 
-		    let form = document.getElementById("viewPPR");
-		    let selectedDcode = form.dataset.selectedDcode;
-		    let selectedProject = form.dataset.selectedProject;
-		    if (selectedDcode) {
-		        loadProjectsForDistrict(selectedDcode, selectedProject);
-		    }
+			let form = document.getElementById("viewPPR");
+			let selectedDcode = form.dataset.selectedDcode;
+			let selectedProject = form.dataset.selectedProject;
+			if (selectedDcode) {
+				loadProjectsForDistrict(selectedDcode, selectedProject);
+			}
 
-		    form.addEventListener("submit", function (e) {
+			form.addEventListener("submit", function (e) {
 
-		        const district = document.getElementById("district");
-		        const project = document.getElementById("project");
-		        const fyear = document.getElementById("fyear");
+				const district = document.getElementById("district");
+				const project = document.getElementById("project");
+				const fyear = document.getElementById("fyear");
 
-		        if (district.value.trim() === "") {
-		            alert("Please select District.");
-		            district.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (district.value.trim() === "") {
+					alert("Please select District.");
+					district.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (project.value.trim() === "") {
-		            alert("Please select Project.");
-		            project.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (project.value.trim() === "") {
+					alert("Please select Project.");
+					project.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		        if (fyear.value.trim() === "") {
-		            alert("Please select Financial Year.");
-		            fyear.focus();
-		            e.preventDefault();
-		            return false;
-		        }
+				if (fyear.value.trim() === "") {
+					alert("Please select Financial Year.");
+					fyear.focus();
+					e.preventDefault();
+					return false;
+				}
 
-		    });
+			});
 
 		});
 	</script>
@@ -219,7 +264,8 @@
 							<option value="">--Select Year--</option>
 							<th:block th:each="year : ${finYearList}">
 								<option th:value="${year.finYrCd}" th:text="${year.finYrDesc}"
-									th:selected="${selectedFinYrCd != null and year.finYrCd == selectedFinYrCd}"> </option>
+									th:selected="${selectedFinYrCd != null and year.finYrCd == selectedFinYrCd}">
+								</option>
 							</th:block>
 						</select>
 					</div>
@@ -230,132 +276,327 @@
 					<button type="submit" class="btn btn-primary">
 						Get Data
 					</button>
-					
+
 					<button type="submit" formaction="/downloadPPRPdf" class="btn btn-success" th:if="${searched}">
-					       <i class="fas fa-file-pdf"></i> Download PDF
-					   </button>
+						<i class="fas fa-file-pdf"></i> Download PDF
+					</button>
 				</div>
 			</form>
-			
+
 			<div th:if="${searched}">
 
-			<!-- ====================================================== -->
-			<!-- PPR 1 -->
-			<!-- ====================================================== -->
+				<!-- ====================================================== -->
+				<!-- PPR 1 -->
+				<!-- ====================================================== -->
 
-			<!-- ===================== PPR-1 ===================== -->
-			<div class="mt-4">
+				<!-- ===================== PPR-1 ===================== -->
+				<div class="mt-4">
 
-				<h4 class="bg-primary text-white p-2">
-					PPR-1 : Preliminary Project Report
+					<h4 class="bg-primary text-white p-2">
+						PPR-1 : Preliminary Project Report
+					</h4>
+
+					<table class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="table-primary">Financial Year</th>
+								<th class="table-primary">District</th>
+								<th class="table-primary">Project Name</th>
+								<th class="table-primary">Micro-Watershed</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr th:each="rec : ${records}">
+								<td th:text="${rec.finYear.finYrDesc}"></td>
+								<td th:text="${rec.district.distName}"></td>
+								<td th:text="${rec.projectName}"></td>
+								<td>
+									<ul class="mb-0 ps-3">
+										<li th:each="mw : ${rec.microWatersheds}" th:text="${mw.microWatershed.mwName}">
+										</li>
+									</ul>
+								</td>
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(records)}">
+								<td colspan="4">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<!-- TODO: confirm URL -->
+										<a th:href="@{/pprDistrict}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+
+
+				<!-- ===================== PPR-2 ===================== -->
+				<div class="mt-4">
+
+					<h4 class="bg-primary text-white p-2">
+						PPR-2 : Area Covered under Watershed Programme
+					</h4>
+
+					<div>
+
+						<table class="table table-bordered table-striped">
+
+							<thead>
+								<tr>
+									<th class="table-primary" rowspan="2">S No.</th>
+									<th class="table-primary" rowspan="2">Micro-Watershed</th>
+
+									<th class="table-primary" colspan="2">Pre-WDC2.0</th>
+									<th class="table-primary" colspan="2">DPAP</th>
+									<th class="table-primary" colspan="2">DDP</th>
+									<th class="table-primary" colspan="2">IWDP</th>
+									<th class="table-primary" colspan="2">IWMP</th>
+									<th class="table-primary" colspan="2">WDC-PMKSY 2.0</th>
+									<th class="table-primary" colspan="2">Others</th>
+								</tr>
+								<tr>
+									<th class="table-primary">No.</th>
+									<th class="table-primary">Area</th>
+									<th class="table-primary">No.</th>
+									<th class="table-primary">Area</th>
+									<th class="table-primary">No.</th>
+									<th class="table-primary">Area</th>
+									<th class="table-primary">No.</th>
+									<th class="table-primary">Area</th>
+									<th class="table-primary">No.</th>
+									<th class="table-primary">Area</th>
+									<th class="table-primary">No.</th>
+									<th class="table-primary">Area</th>
+									<th class="table-primary">No.</th>
+									<th class="table-primary">Area</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr th:each="row, stat : ${watershedList}">
+									<td th:text="${stat.count}"></td>
+									<td th:text="${row.mwName}"></td>
+
+									<td th:text="${row.preNo}"></td>
+									<td th:text="${row.preArea}"></td>
+
+									<td th:text="${row.dpapNo}"></td>
+									<td th:text="${row.dpapArea}"></td>
+
+									<td th:text="${row.ddpNo}"></td>
+									<td th:text="${row.ddpArea}"></td>
+
+									<td th:text="${row.iwdpNo}"></td>
+									<td th:text="${row.iwdpArea}"></td>
+
+									<td th:text="${row.iwmpNo}"></td>
+									<td th:text="${row.iwmpArea}"></td>
+
+									<td th:text="${row.pmksyNo}"></td>
+									<td th:text="${row.pmksyArea}"></td>
+
+									<td th:text="${row.otherNo}"></td>
+									<td th:text="${row.otherArea}"></td>
+								</tr>
+
+								<tr th:if="${#lists.isEmpty(watershedList)}">
+									<td colspan="16">
+										<div class="d-flex justify-content-center align-items-center gap-3">
+											<span class="text-danger">No records found.</span>
+											<i class="fas fa-arrow-right arrow-blink"></i>
+											<!-- TODO: confirm URL -->
+											<a th:href="@{/areaCoveredUnderWP}"
+												class="btn btn-primary btn-sm btn-blink">
+												<i class="fas fa-plus"></i> Add Details
+											</a>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+
+						</table>
+
+					</div>
+
+				</div>
+
+				<!-- ================= PPR-3 ================= -->
+				<h4 class="bg-primary text-white p-2 mt-4">
+					PPR-3 : Prioritized List of Proposed Projects
 				</h4>
 
-				<table class="table table-bordered table-striped">
-					<thead>
+				<table class="table table-bordered table-striped table-hover">
+					<thead class="table-primary">
 						<tr>
-							<th class="table-primary">Financial Year</th>
-							<th class="table-primary">District</th>
-							<th class="table-primary">Project Name</th>
-							<th class="table-primary">Micro-Watershed</th>
+							<th>District</th>
+							<th>Project Name</th>
+							<th>Name of Micro-watershed</th>
+							<th>Micro-watershed Code</th>
+							<th>Proposed Area (Ha.)</th>
+							<th>Type of Project</th>
+							<th>Proposed Cost</th>
+							<th>Weightage under Criteria</th>
 						</tr>
 					</thead>
 
 					<tbody>
-						<tr th:each="rec : ${records}">
-							<td th:text="${rec.finYear.finYrDesc}"></td>
-							<td th:text="${rec.district.distName}"></td>
-							<td th:text="${rec.projectName}"></td>
-							<td>
-								<ul class="mb-0 ps-3">
-									<li th:each="mw : ${rec.microWatersheds}" th:text="${mw.microWatershed.mwName}">
-									</li>
-								</ul>
+						<tr th:each="data : ${detailsOfListOfProposedProject}">
+							<td th:text="${data.ppr.district.distName}"></td>
+							<td th:text="${data.ppr.projectName}"></td>
+							<td th:text="${data.microWatershed.mwName}"></td>
+							<td th:text="${data.microWatershed.mwCode}"></td>
+							<td th:text="${data.treatedArea}"></td>
+							<td th:text="${data.projectType.projectType}"></td>
+							<td th:text="${data.proposedCost}"></td>
+
+							<td class="text-center">
+								<div class="col-md-4">
+									<button type="button" class="btn btn-primary btn-sm viewBtn"
+										th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
+										data-bs-target="#viewCriteriaModal">
+										Link <i class="fas fa-list"></i>
+									</button>
+								</div>
 							</td>
 						</tr>
 
-						<tr th:if="${#lists.isEmpty(records)}">
-							<td colspan="4" class="text-center text-danger">
-								No records found.
+						<tr th:if="${#lists.isEmpty(detailsOfListOfProposedProject)}">
+							<td colspan="8">
+								<div class="d-flex justify-content-center align-items-center gap-3">
+									<span class="text-danger">No records found.</span>
+									<i class="fas fa-arrow-right arrow-blink"></i>
+									<!-- TODO: confirm URL -->
+									<a th:href="@{/pprProposedProjectDetails}" class="btn btn-primary btn-sm btn-blink">
+										<i class="fas fa-plus"></i> Add Details
+									</a>
+								</div>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 
-			</div>
+				<div class="modal fade" id="viewCriteriaModal" tabindex="-1" aria-labelledby="viewcriteriaModalLabel"
+					aria-hidden="true">
+					<div class="modal-dialog modal-xl modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header bg-primary text-white">
+								<h5 class="modal-title" id="viewcriteriaModalLabel"> Criteria Details </h5>
+								<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<div id="criteriaLoading" class="text-center" style="display:none;">
+									<div class="spinner-border text-primary" role="status">
+										<span class="visually-hidden"> Loading... </span>
+									</div>
+									<p class="mt-2"> Loading criteria details... </p>
+								</div>
+								<div id="criteriaError" class="alert alert-danger" style="display:none;"></div>
+								<div id="criteriaNoData" class="alert alert-warning" style="display:none;">
+									No criteria details found for this project.
+								</div>
+								<div id="criteriaTableContainer" style="display:none;">
+									<table class="table table-bordered table-striped table-hover">
+										<thead class="table-primary">
+											<tr>
+												<th width="5%">S.No.</th>
+												<th>Criteria</th>
+												<th>Scored Marks</th>
+											</tr>
+										</thead>
+										<tbody id="criteriaTableBody">
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
+							</div>
+						</div>
+					</div>
+				</div>
 
-
-			<!-- ===================== PPR-2 ===================== -->
-			<div class="mt-4">
-
-				<h4 class="bg-primary text-white p-2">
-					PPR-2 : Area Covered under Watershed Programme
+				<!-- ======================= PPR-4 ======================= -->
+				<h4 class="bg-primary text-white p-2 mt-4">
+					PPR-4 : Project at a Glance
 				</h4>
 
-				<div>
+				<div th:if="${pprProjectAtGlanceList != null}">
+					<table class="table table-bordered table-striped table-hover">
 
-					<table class="table table-bordered table-striped">
-
-						<thead>
+						<thead class="table-primary">
 							<tr>
-								<th class="table-primary" rowspan="2">S No.</th>
-								<th class="table-primary" rowspan="2">Micro-Watershed</th>
 
-								<th class="table-primary" colspan="2">Pre-WDC2.0</th>
-								<th class="table-primary" colspan="2">DPAP</th>
-								<th class="table-primary" colspan="2">DDP</th>
-								<th class="table-primary" colspan="2">IWDP</th>
-								<th class="table-primary" colspan="2">IWMP</th>
-								<th class="table-primary" colspan="2">WDC-PMKSY 2.0</th>
-								<th class="table-primary" colspan="2">Others</th>
-							</tr>
-							<tr>
-								<th class="table-primary">No.</th>
-								<th class="table-primary">Area</th>
-								<th class="table-primary">No.</th>
-								<th class="table-primary">Area</th>
-								<th class="table-primary">No.</th>
-								<th class="table-primary">Area</th>
-								<th class="table-primary">No.</th>
-								<th class="table-primary">Area</th>
-								<th class="table-primary">No.</th>
-								<th class="table-primary">Area</th>
-								<th class="table-primary">No.</th>
-								<th class="table-primary">Area</th>
-								<th class="table-primary">No.</th>
-								<th class="table-primary">Area</th>
+								<th>District Name</th>
+								<th>Name of the Project</th>
+								<th>Type of Project</th>
+								<th>Name of Block</th>
+								<th>Name of Gram Panchayat</th>
+								<th>Villages</th>
+								<th>Name of Micro-Watershed (Code)</th>
+								<th>Reason for Selection of Watershed</th>
+								<th>Area of Project (ha)</th>
+								<th>Area Proposed to be treated (ha)</th>
+								<th>Project Cost (Rs in Lakh)</th>
+								<th>Name of PIA</th>
+								<th>Address of PIA</th>
 							</tr>
 						</thead>
 
 						<tbody>
-							<tr th:each="row, stat : ${watershedList}">
-								<td th:text="${stat.count}"></td>
-								<td th:text="${row.mwName}"></td>
+							<tr th:each="data : ${pprProjectAtGlanceList}">
 
-								<td th:text="${row.preNo}"></td>
-								<td th:text="${row.preArea}"></td>
 
-								<td th:text="${row.dpapNo}"></td>
-								<td th:text="${row.dpapArea}"></td>
+								<td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.projectType.projectType}"></td>
 
-								<td th:text="${row.ddpNo}"></td>
-								<td th:text="${row.ddpArea}"></td>
+								<td>
+									<span th:if="${data.villages != null and !data.villages.isEmpty()}"
+										th:text="${data.villages[0].village.gramPanchayat.block.blockName}">
+									</span>
+								</td>
 
-								<td th:text="${row.iwdpNo}"></td>
-								<td th:text="${row.iwdpArea}"></td>
+								<td>
+									<span th:if="${data.villages != null and !data.villages.isEmpty()}"
+										th:text="${data.villages[0].village.gramPanchayat.gramPanchayatName}">
+									</span>
+								</td>
 
-								<td th:text="${row.iwmpNo}"></td>
-								<td th:text="${row.iwmpArea}"></td>
+								<td>
+									<span th:each="pv,iter : ${data.villages}">
+										<span th:text="${pv.village.villageName}"></span>
+										<span th:if="${!iter.last}">, </span>
+									</span>
+								</td>
 
-								<td th:text="${row.pmksyNo}"></td>
-								<td th:text="${row.pmksyArea}"></td>
+								<td th:text="${data.microWatershed.mwCode}"></td>
+								<td th:text="${data.selectionReason}"></td>
+								<td th:text="${data.projectArea}"></td>
+								<td th:text="${data.proposedArea}"></td>
+								<td th:text="${data.projectCost}"></td>
+								<td th:text="${data.pia.piaName}"></td>
+								<td th:text="${data.pia.address}"></td>
 
-								<td th:text="${row.otherNo}"></td>
-								<td th:text="${row.otherArea}"></td>
 							</tr>
 
-							<tr th:if="${#lists.isEmpty(watershedList)}">
-								<td colspan="16" class="text-center text-danger">
-									No records found.
+							<tr th:if="${#lists.isEmpty(pprProjectAtGlanceList)}">
+								<td colspan="14">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<!-- TODO: confirm URL -->
+										<a th:href="@{/pprProjectAtGlance}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
 								</td>
 							</tr>
 						</tbody>
@@ -364,637 +605,467 @@
 
 				</div>
 
-			</div>
-
-			<!-- ================= PPR-3 ================= -->
-			<h4 class="bg-primary text-white p-2 mt-4">
-				PPR-3 : Prioritized List of Proposed Projects
-			</h4>
-
-			<table class="table table-bordered table-striped table-hover">
-				<thead class="table-primary">
-					<tr>
-						<th>District</th>
-						<th>Project Name</th>
-						<th>Name of Micro-watershed</th>
-						<th>Micro-watershed Code</th>
-						<th>Proposed Area (Ha.)</th>
-						<th>Type of Project</th>
-						<th>Proposed Cost</th>
-						<th>Weightage under Criteria</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<tr th:each="data : ${detailsOfListOfProposedProject}">
-						<td th:text="${data.ppr.district.distName}"></td>
-						<td th:text="${data.ppr.projectName}"></td>
-						<td th:text="${data.microWatershed.mwName}"></td>
-						<td th:text="${data.microWatershed.mwCode}"></td>
-						<td th:text="${data.treatedArea}"></td>
-						<td th:text="${data.projectType.projectType}"></td>
-						<td th:text="${data.proposedCost}"></td>
-
-						<td class="text-center">
-							<div class="col-md-4">
-								<button type="button" class="btn btn-primary btn-sm viewBtn"
-									th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
-									data-bs-target="#viewCriteriaModal">
-									Link <i class="fas fa-list"></i>
-								</button>
-							</div>
-						</td>
-					</tr>
-
-					<tr th:if="${#lists.isEmpty(detailsOfListOfProposedProject)}">
-						<td colspan="8" class="text-center text-danger">
-							No records found.
-						</td>
-					</tr>
-				</tbody>
-			</table>
-
-			<div class="modal fade" id="viewCriteriaModal" tabindex="-1" aria-labelledby="viewcriteriaModalLabel"
-				aria-hidden="true">
-				<div class="modal-dialog modal-xl modal-dialog-centered">
-					<div class="modal-content">
-						<div class="modal-header bg-primary text-white">
-							<h5 class="modal-title" id="viewcriteriaModalLabel"> Criteria Details </h5>
-							<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-								aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<div id="criteriaLoading" class="text-center" style="display:none;">
-								<div class="spinner-border text-primary" role="status">
-									<span class="visually-hidden"> Loading... </span>
-								</div>
-								<p class="mt-2"> Loading criteria details... </p>
-							</div>
-							<div id="criteriaError" class="alert alert-danger" style="display:none;"></div>
-							<div id="criteriaNoData" class="alert alert-warning" style="display:none;">
-								No criteria details found for this project.
-							</div>
-							<div id="criteriaTableContainer" style="display:none;">
-								<table class="table table-bordered table-striped table-hover">
-									<thead class="table-primary">
-										<tr>
-											<th width="5%">S.No.</th>
-											<th>Criteria</th>
-											<th>Scored Marks</th>
-										</tr>
-									</thead>
-									<tbody id="criteriaTableBody">
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close </button>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- ======================= PPR-4 ======================= -->
-			<h4 class="bg-primary text-white p-2 mt-4">
-				PPR-4 : Project at a Glance
-			</h4>
-
-			<div th:if="${pprProjectAtGlanceList != null}">
-				<table class="table table-bordered table-striped table-hover">
-
-					<thead class="table-primary">
-						<tr>
-
-							<th>District Name</th>
-							<th>Name of the Project</th>
-							<th>Type of Project</th>
-							<th>Name of Block</th>
-							<th>Name of Gram Panchayat</th>
-							<th>Villages</th>
-							<th>Name of Micro-Watershed (Code)</th>
-							<th>Reason for Selection of Watershed</th>
-							<th>Area of Project (ha)</th>
-							<th>Area Proposed to be treated (ha)</th>
-							<th>Project Cost (Rs in Lakh)</th>
-							<th>Name of PIA</th>
-							<th>Address of PIA</th>
-						</tr>
-					</thead>
-
-					<tbody>
-						<tr th:each="data : ${pprProjectAtGlanceList}">
-
-
-							<td th:text="${data.ppr.district.distName}"></td>
-							<td th:text="${data.ppr.projectName}"></td>
-							<td th:text="${data.projectType.projectType}"></td>
-
-							<td>
-								<span th:if="${data.villages != null and !data.villages.isEmpty()}"
-									th:text="${data.villages[0].village.gramPanchayat.block.blockName}">
-								</span>
-							</td>
-
-							<td>
-								<span th:if="${data.villages != null and !data.villages.isEmpty()}"
-									th:text="${data.villages[0].village.gramPanchayat.gramPanchayatName}">
-								</span>
-							</td>
-
-							<td>
-								<span th:each="pv,iter : ${data.villages}">
-									<span th:text="${pv.village.villageName}"></span>
-									<span th:if="${!iter.last}">, </span>
-								</span>
-							</td>
-
-							<td th:text="${data.microWatershed.mwCode}"></td>
-							<td th:text="${data.selectionReason}"></td>
-							<td th:text="${data.projectArea}"></td>
-							<td th:text="${data.proposedArea}"></td>
-							<td th:text="${data.projectCost}"></td>
-							<td th:text="${data.pia.piaName}"></td>
-							<td th:text="${data.pia.address}"></td>
-
-						</tr>
-
-						<tr th:if="${#lists.isEmpty(pprProjectAtGlanceList)}">
-							<td colspan="14" class="text-center text-danger">
-								No records found.
-							</td>
-						</tr>
-					</tbody>
-
-				</table>
-
-			</div>
-
-			<!-- ================= PPR-8 : Area Proposed ================= -->
-			<h4 class="bg-primary text-white p-2 mt-4">
-				PPR-8 : Area Proposed
-			</h4>
-
-			<table class="table table-bordered table-striped table-hover">
-				<thead class="table-primary">
-					<tr>
-						<th>State</th>
-						<th>District</th>
-						<th>Project</th>
-						<th>Block</th>
-						<th>Scheme</th>
-						<th>No. of Pre WDC Projects</th>
-						<th>Sanctioned Area</th>
-						<th>Net Area</th>
-						<th>Proposed Area</th>
-						<th>Other DoLR Area</th>
-						<th>Balance Area</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<tr th:each="area : ${ppr8List}">
-						<td th:text="${area.ppr.district.state.stName}"></td>
-						<td th:text="${area.ppr.district.distName}"></td>
-						<td th:text="${area.ppr.projectName}"></td>
-						<td th:text="${area.block.blockName}"></td>
-						<td th:text="${area.scheme.schemeName}"></td>
-						<td th:text="${area.projSanctionedNo}"></td>
-						<td th:text="${area.projSanctionedArea}"></td>
-						<td th:text="${area.netArea}"></td>
-						<td th:text="${area.proposedArea}"></td>
-						<td th:text="${area.proposedAreaOthers}"></td>
-						<td th:text="${area.netBalArea}"></td>
-					</tr>
-
-					<tr th:if="${#lists.isEmpty(ppr8List)}">
-						<td colspan="11" class="text-center text-danger">
-							No records found.
-						</td>
-					</tr>
-				</tbody>
-			</table>
-
-
-
-			<!-- ================= PPR-9 : Land Pattern Area ================= -->
-
-			<div>
+				<!-- ================= PPR-8 : Area Proposed ================= -->
 				<h4 class="bg-primary text-white p-2 mt-4">
-					PPR-9 : Land Pattern Area
+					PPR-8 : Area Proposed
 				</h4>
-			</div>
-
-			<table class="table table-bordered table-striped table-hover">
-
-				<thead class="table-primary">
-					<tr>
-						<th>S.No.</th>
-						<th>District</th>
-						<th>Project Name</th>
-						<th>Micro-Watershed</th>
-						<th>Village</th>
-						<th>Geographical Area (Ha.)</th>
-						<th>Forest Area</th>
-						<th>Land Under Agriculture</th>
-						<th>Rainfed Area</th>
-						<th>Permanent Pastures</th>
-						<th>Cultivable Wasteland</th>
-						<th>Non-Cultivable Wasteland</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<tr th:each="data, stat : ${landPatternAreaList}">
-						<td th:text="${stat.count}"></td>
-						<td th:text="${data.pprId.district.distName}"></td>
-						<td th:text="${data.pprId.projectName}"></td>
-						<td th:text="${data.microWatershed.mwName}"></td>
-						<td th:text="${data.village.villageName}"></td>
-						<td th:text="${data.villageArea}"></td>
-						<td th:text="${data.forestArea}"></td>
-						<td th:text="${data.agricultureLand}"></td>
-						<td th:text="${data.rainfedArea}"></td>
-						<td th:text="${data.pastures}"></td>
-						<td th:text="${data.cultivableWastelandArea}"></td>
-						<td th:text="${data.nonCultivableWastelandArea}"></td>
-					</tr>
-
-					<tr th:if="${#lists.isEmpty(landPatternAreaList)}">
-						<td colspan="12" class="text-center text-danger">
-							No records found.
-						</td>
-					</tr>
-				</tbody>
-
-			</table>
-
-			<!-- ================= PPR-10 VIEW TABLE ================= -->
-			<h4 class="bg-primary text-white p-2">
-				PPR-10 : Details of Agro-Climatic Condition
-			</h4>
-
-			<div class="table-responsive mb-4">
 
 				<table class="table table-bordered table-striped table-hover">
 					<thead class="table-primary">
 						<tr>
+							<th>State</th>
 							<th>District</th>
 							<th>Project</th>
-							<th>Village</th>
-							<th>Agro-Climatic Zone</th>
-							<th>Topography</th>
-							<th>Rainfall (mm)</th>
-							<th>Area (Ha.)</th>
-							<th>Forest Area (Ha.)</th>
-							<th>Major Soil Type(s)</th>
-							<th>Major Crop(s)</th>
-						</tr>
-					</thead>
-
-					<tbody>
-						<tr th:each="data : ${ppr10List}">
-							<td th:text="${data.ppr.district.distName}"></td>
-							<td th:text="${data.ppr.projectName}"></td>
-							<td th:text="${data.village.villageName}"></td>
-							<td th:text="${data.zoneName}"></td>
-							<td th:text="${data.topography}"></td>
-							<td th:text="${data.avgRainfall}"></td>
-							<td th:text="${data.area}"></td>
-							<td th:text="${data.forestArea}"></td>
-							<td>
-								<span th:each="s, iter : ${data.soilList}">
-									<span th:text="${s.soilType.soilName} + ' (' + ${s.area} + ' ha)'"></span>
-									<span th:if="${!iter.last}">, </span>
-								</span>
-							</td>
-							<td>
-								<span th:each="c, iter : ${data.cropList}">
-									<span th:text="${c.cropType.cropName} + ' (' + ${c.area} + ' ha)'"></span>
-									<span th:if="${!iter.last}">, </span>
-								</span>
-							</td>
-						</tr>
-
-						<tr th:if="${#lists.isEmpty(ppr10List)}">
-							<td colspan="10" class="text-center text-danger">
-								No records found.
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-
-			<!-- ================= PPR-11 ================= -->
-			<h4 class="bg-primary text-white p-2">
-				PPR-11 : Details of Flood and Drought in Project Area
-			</h4>
-
-			<div class="table-responsive mb-4">
-
-				<table class="table table-bordered table-striped">
-					<thead class="table-primary">
-						<tr>
-							<th>S No.</th>
-							<th>Village</th>
-							<th>Year</th>
-							<th>Month</th>
-							<th>Particular</th>
-							<th>Periodicity</th>
-							<th>Affected</th>
-						</tr>
-					</thead>
-
-					<tbody>
-						<tr th:each="rec, iterStat : ${ppr11List}">
-							<td th:text="${iterStat.index + 1}"></td>
-							<td th:text="${rec.vcode.villageName}"></td>
-							<td th:text="${rec.year.year}"></td>
-							<td th:text="${rec.month.monthName}"></td>
-							<td th:text="${rec.dtype.disasterName}"></td>
-							<td th:text="${rec.periodicity == 'Q' ? 'Quarterly' : 'Annual'}"></td>
-							<td th:text="${rec.affected ? 'Yes' : 'No'}"></td>
-						</tr>
-
-						<tr th:if="${#lists.isEmpty(ppr11List)}">
-							<td colspan="7" class="text-center text-danger">
-								No records found.
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-
-
-			<!-- ===================== PPR-12 ===================== -->
-
-			<h4 class="bg-primary text-white p-2 mt-4">
-				PPR-12 : Soil Erosion Details
-			</h4>
-
-			<div class="table-responsive">
-				<table class="table table-bordered table-striped text-center">
-					<thead>
-						<tr>
-							<th class="table-primary">District</th>
-							<th class="table-primary">Month</th>
-							<th class="table-primary">Year</th>
-							<th class="table-primary">Type of Erosion</th>
-							<th class="table-primary">Erosion Type</th>
-							<th class="table-primary">Affected Area (ha)</th>
-							<th class="table-primary">Runoff (mm/year)</th>
-							<th class="table-primary">Average Soil Loss (tonnes/year)</th>
-						</tr>
-					</thead>
-
-					<tbody>
-						<tr th:each="data : ${soilErosionList}">
-							<td th:text="${data.ppr.district.distName}"></td>
-							<td th:text="${data.month.monthName}"></td>
-							<td th:text="${data.year.year}"></td>
-							<td th:text="${data.erosionType.erosion.categoryType}"></td>
-							<td th:text="${data.erosionType.erosionType}"></td>
-							<td th:text="${data.affectedArea}"></td>
-							<td th:text="${data.runoff}"></td>
-							<td th:text="${data.avgSoilLoss}"></td>
-						</tr>
-
-						<tr th:if="${#lists.isEmpty(soilErosionList)}">
-							<td colspan="8" class="text-center text-danger">
-								No records found.
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-			<!-- ================= PPR-13 VIEW ================= -->
-			<h4 class="bg-primary text-white p-2 mt-4">
-				PPR-13 : Livelihood Summary
-			</h4>
-
-			<div class="table-responsive">
-				<table class="table table-bordered table-striped table-hover">
-					<thead class="table-primary text-center">
-						<tr>
-							<th>District</th>
 							<th>Block</th>
-							<th>Project</th>
-							<th>Micro-Watershed</th>
-							<th>Village</th>
-							<th>Livelihood Activities</th>
-							<th>Livelihood Interventions</th>
-							<th>Current Migration Status (No. of People)</th>
-							<th>Main Reason of Migration</th>
+							<th>Scheme</th>
+							<th>No. of Pre WDC Projects</th>
+							<th>Sanctioned Area</th>
+							<th>Net Area</th>
+							<th>Proposed Area</th>
+							<th>Other DoLR Area</th>
+							<th>Balance Area</th>
 						</tr>
 					</thead>
 
 					<tbody>
-						<tr th:each="data : ${pprLivelihoodSummaryList}">
-							<td th:text="${data.ppr.district.distName}"></td>
-
-							<td th:text="${data.village.gramPanchayat.block.blockName}"></td>
-
-							<td th:text="${data.ppr.projectName}"></td>
-
-							<td th:text="${data.microWatershed.mwName}"></td>
-
-							<td th:text="${data.village.villageName}"></td>
-
-							<td>
-								<span th:each="act, stat : ${data.existingLivelihoodActivities}">
-									<span th:text="${act.livelihoodActivity.livelihoodActivityName}"></span>
-									<span th:if="${!stat.last}">, </span>
-								</span>
-							</td>
-
-							<td>
-								<span th:each="intv, stat : ${data.projectLivelihoodInterventions}">
-									<span th:text="${intv.livelihoodIntervention.livelihoodInterventionName}"></span>
-									<span th:if="${!stat.last}">, </span>
-								</span>
-							</td>
-
-							<td class="text-center" th:text="${data.migratedPeople}"></td>
-
-							<td th:text="${data.migrationReason}"></td>
+						<tr th:each="area : ${ppr8List}">
+							<td th:text="${area.ppr.district.state.stName}"></td>
+							<td th:text="${area.ppr.district.distName}"></td>
+							<td th:text="${area.ppr.projectName}"></td>
+							<td th:text="${area.block.blockName}"></td>
+							<td th:text="${area.scheme.schemeName}"></td>
+							<td th:text="${area.projSanctionedNo}"></td>
+							<td th:text="${area.projSanctionedArea}"></td>
+							<td th:text="${area.netArea}"></td>
+							<td th:text="${area.proposedArea}"></td>
+							<td th:text="${area.proposedAreaOthers}"></td>
+							<td th:text="${area.netBalArea}"></td>
 						</tr>
 
-						<tr th:if="${#lists.isEmpty(pprLivelihoodSummaryList)}">
-							<td colspan="9" class="text-center text-danger">
-								No records found.
+						<tr th:if="${#lists.isEmpty(ppr8List)}">
+							<td colspan="11">
+								<div class="d-flex justify-content-center align-items-center gap-3">
+									<span class="text-danger">No records found.</span>
+									<i class="fas fa-arrow-right arrow-blink"></i>
+									<!-- TODO: confirm URL -->
+									<a th:href="@{/preliminaryPPR8}" class="btn btn-primary btn-sm btn-blink">
+										<i class="fas fa-plus"></i> Add Details
+									</a>
+								</div>
 							</td>
 						</tr>
 					</tbody>
 				</table>
-			</div>
 
 
 
-			<!-- ================= PPR-14 : Employment Generation (View) ================= -->
-			<div>
+				<!-- ================= PPR-9 : Land Pattern Area ================= -->
 
-				<h4 class="bg-primary text-white p-2 mt-4">
-					PPR-14 : Employment Generation Details
-				</h4>
+				<div>
+					<h4 class="bg-primary text-white p-2 mt-4">
+						PPR-9 : Land Pattern Area
+					</h4>
+				</div>
 
-				<table class="table table-bordered table-striped table-hover text-center">
+				<table class="table table-bordered table-striped table-hover">
 
 					<thead class="table-primary">
 						<tr>
+							<th>S.No.</th>
 							<th>District</th>
 							<th>Project Name</th>
-							<th>Micro Watershed</th>
+							<th>Micro-Watershed</th>
 							<th>Village</th>
-							<th>Employment Type</th>
-							<th>SC</th>
-							<th>ST</th>
-							<th>Others</th>
-							<th>Women</th>
-							<th>Total</th>
+							<th>Geographical Area (Ha.)</th>
+							<th>Forest Area</th>
+							<th>Land Under Agriculture</th>
+							<th>Rainfed Area</th>
+							<th>Permanent Pastures</th>
+							<th>Cultivable Wasteland</th>
+							<th>Non-Cultivable Wasteland</th>
 						</tr>
 					</thead>
 
 					<tbody>
-
-						<tr th:each="data : ${pprEmploymentList}">
-
+						<tr th:each="data, stat : ${landPatternAreaList}">
+							<td th:text="${stat.count}"></td>
 							<td th:text="${data.pprId.district.distName}"></td>
 							<td th:text="${data.pprId.projectName}"></td>
 							<td th:text="${data.microWatershed.mwName}"></td>
 							<td th:text="${data.village.villageName}"></td>
-
-							<td th:text="${data.employmentType.employmentTypeName}"></td>
-
-							<td th:text="${data.sc}"></td>
-							<td th:text="${data.st}"></td>
-							<td th:text="${data.others}"></td>
-							<td th:text="${data.women}"></td>
-							<td th:text="${(data.sc ?: 0) + (data.st ?: 0) + (data.others ?: 0) + (data.women ?: 0)}">
-							</td>
-
+							<td th:text="${data.villageArea}"></td>
+							<td th:text="${data.forestArea}"></td>
+							<td th:text="${data.agricultureLand}"></td>
+							<td th:text="${data.rainfedArea}"></td>
+							<td th:text="${data.pastures}"></td>
+							<td th:text="${data.cultivableWastelandArea}"></td>
+							<td th:text="${data.nonCultivableWastelandArea}"></td>
 						</tr>
 
-						<tr th:if="${#lists.isEmpty(pprEmploymentList)}">
-							<td colspan="10" class="text-center text-danger">
-								No records found.
+						<tr th:if="${#lists.isEmpty(landPatternAreaList)}">
+							<td colspan="12">
+								<div class="d-flex justify-content-center align-items-center gap-3">
+									<span class="text-danger">No records found.</span>
+									<i class="fas fa-arrow-right arrow-blink"></i>
+									<a th:href="@{/pprLandPatternArea}" class="btn btn-primary btn-sm btn-blink">
+										<i class="fas fa-plus"></i> Add Details
+									</a>
+								</div>
 							</td>
 						</tr>
-
 					</tbody>
 
 				</table>
 
-			</div>
-
-
-			<!-- ================= PPR-15 ================= -->
-			<h4 class="bg-primary text-white p-2 mt-4">
-				PPR-15 : Migration Details
-			</h4>
-
-			<table class="table table-bordered table-striped">
-
-				<thead class="table-primary">
-					<tr>
-						<th>District Name</th>
-						<th>Project Name</th>
-						<th>Watershed Name</th>
-						<th>Village Name</th>
-						<th>No. of People Migrating</th>
-						<th>No. of Days Migrating</th>
-						<th>Major Reason(s) for Migration</th>
-						<th>Expected Reduction</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<tr th:each="item : ${ppr15List}">
-						<td th:text="${item['dist_name']}"></td>
-						<td th:text="${item['project_name']}"></td>
-						<td th:text="${item['mw_name']}"></td>
-						<td th:text="${item['village_name']}"></td>
-						<td th:text="${item['migrating_people_count']}"></td>
-						<td th:text="${item['migration_days_per_year']}"></td>
-						<td th:text="${item['migration_reason']}"></td>
-						<td th:text="${item['expected_reduction_migrating_people']}"></td>
-					</tr>
-
-					<tr th:if="${#lists.isEmpty(ppr15List)}">
-						<td colspan="8" class="text-center text-danger">
-							No records found.
-						</td>
-					</tr>
-				</tbody>
-
-			</table>
-
-			<!-- ===================== PPR-16 VIEW TABLE ===================== -->
-			<div>
-
-				<h4 class="bg-primary text-white p-2 mt-4">
-					PPR-16 : Average Ground Water Table Depth in Project Area
+				<!-- ================= PPR-10 VIEW TABLE ================= -->
+				<h4 class="bg-primary text-white p-2">
+					PPR-10 : Details of Agro-Climatic Condition
 				</h4>
 
-				<table class="table table-bordered table-striped table-hover">
+				<div class="table-responsive mb-4">
+
+					<table class="table table-bordered table-striped table-hover">
+						<thead class="table-primary">
+							<tr>
+								<th>District</th>
+								<th>Project</th>
+								<th>Village</th>
+								<th>Agro-Climatic Zone</th>
+								<th>Topography</th>
+								<th>Rainfall (mm)</th>
+								<th>Area (Ha.)</th>
+								<th>Forest Area (Ha.)</th>
+								<th>Major Soil Type(s)</th>
+								<th>Major Crop(s)</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr th:each="data : ${ppr10List}">
+								<td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.village.villageName}"></td>
+								<td th:text="${data.zoneName}"></td>
+								<td th:text="${data.topography}"></td>
+								<td th:text="${data.avgRainfall}"></td>
+								<td th:text="${data.area}"></td>
+								<td th:text="${data.forestArea}"></td>
+								<td>
+									<span th:each="s, iter : ${data.soilList}">
+										<span th:text="${s.soilType.soilName} + ' (' + ${s.area} + ' ha)'"></span>
+										<span th:if="${!iter.last}">, </span>
+									</span>
+								</td>
+								<td>
+									<span th:each="c, iter : ${data.cropList}">
+										<span th:text="${c.cropType.cropName} + ' (' + ${c.area} + ' ha)'"></span>
+										<span th:if="${!iter.last}">, </span>
+									</span>
+								</td>
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(ppr10List)}">
+								<td colspan="10">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/agroClimateConditionPPR10}"
+											class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+
+				<!-- ================= PPR-11 ================= -->
+				<h4 class="bg-primary text-white p-2">
+					PPR-11 : Details of Flood and Drought in Project Area
+				</h4>
+
+				<div class="table-responsive mb-4">
+
+					<table class="table table-bordered table-striped">
+						<thead class="table-primary">
+							<tr>
+								<th>S No.</th>
+								<th>Village</th>
+								<th>Year</th>
+								<th>Month</th>
+								<th>Particular</th>
+								<th>Periodicity</th>
+								<th>Affected</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr th:each="rec, iterStat : ${ppr11List}">
+								<td th:text="${iterStat.index + 1}"></td>
+								<td th:text="${rec.vcode.villageName}"></td>
+								<td th:text="${rec.year.year}"></td>
+								<td th:text="${rec.month.monthName}"></td>
+								<td th:text="${rec.dtype.disasterName}"></td>
+								<td th:text="${rec.periodicity == 'Q' ? 'Quarterly' : 'Annual'}"></td>
+								<td th:text="${rec.affected ? 'Yes' : 'No'}"></td>
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(ppr11List)}">
+								<td colspan="7">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/dtlFloodDroughtArea}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+
+
+				<!-- ===================== PPR-12 ===================== -->
+
+				<h4 class="bg-primary text-white p-2 mt-4">
+					PPR-12 : Soil Erosion Details
+				</h4>
+
+				<div class="table-responsive">
+					<table class="table table-bordered table-striped text-center">
+						<thead>
+							<tr>
+								<th class="table-primary">District</th>
+								<th class="table-primary">Month</th>
+								<th class="table-primary">Year</th>
+								<th class="table-primary">Type of Erosion</th>
+								<th class="table-primary">Erosion Type</th>
+								<th class="table-primary">Affected Area (ha)</th>
+								<th class="table-primary">Runoff (mm/year)</th>
+								<th class="table-primary">Average Soil Loss (tonnes/year)</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr th:each="data : ${soilErosionList}">
+								<td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.month.monthName}"></td>
+								<td th:text="${data.year.year}"></td>
+								<td th:text="${data.erosionType.erosion.categoryType}"></td>
+								<td th:text="${data.erosionType.erosionType}"></td>
+								<td th:text="${data.affectedArea}"></td>
+								<td th:text="${data.runoff}"></td>
+								<td th:text="${data.avgSoilLoss}"></td>
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(soilErosionList)}">
+								<td colspan="8">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/pprSoilErosion}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<!-- ================= PPR-13 VIEW ================= -->
+				<h4 class="bg-primary text-white p-2 mt-4">
+					PPR-13 : Livelihood Summary
+				</h4>
+
+				<div class="table-responsive">
+					<table class="table table-bordered table-striped table-hover">
+						<thead class="table-primary text-center">
+							<tr>
+								<th>District</th>
+								<th>Block</th>
+								<th>Project</th>
+								<th>Micro-Watershed</th>
+								<th>Village</th>
+								<th>Livelihood Activities</th>
+								<th>Livelihood Interventions</th>
+								<th>Current Migration Status (No. of People)</th>
+								<th>Main Reason of Migration</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr th:each="data : ${pprLivelihoodSummaryList}">
+								<td th:text="${data.ppr.district.distName}"></td>
+
+								<td th:text="${data.village.gramPanchayat.block.blockName}"></td>
+
+								<td th:text="${data.ppr.projectName}"></td>
+
+								<td th:text="${data.microWatershed.mwName}"></td>
+
+								<td th:text="${data.village.villageName}"></td>
+
+								<td>
+									<span th:each="act, stat : ${data.existingLivelihoodActivities}">
+										<span th:text="${act.livelihoodActivity.livelihoodActivityName}"></span>
+										<span th:if="${!stat.last}">, </span>
+									</span>
+								</td>
+
+								<td>
+									<span th:each="intv, stat : ${data.projectLivelihoodInterventions}">
+										<span
+											th:text="${intv.livelihoodIntervention.livelihoodInterventionName}"></span>
+										<span th:if="${!stat.last}">, </span>
+									</span>
+								</td>
+
+								<td class="text-center" th:text="${data.migratedPeople}"></td>
+
+								<td th:text="${data.migrationReason}"></td>
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(pprLivelihoodSummaryList)}">
+								<td colspan="9">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/livelihoodSummaryPPR13}"
+											class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+
+
+				<!-- ================= PPR-14 : Employment Generation (View) ================= -->
+				<div>
+
+					<h4 class="bg-primary text-white p-2 mt-4">
+						PPR-14 : Employment Generation Details
+					</h4>
+
+					<table class="table table-bordered table-striped table-hover text-center">
+
+						<thead class="table-primary">
+							<tr>
+								<th>District</th>
+								<th>Project Name</th>
+								<th>Micro Watershed</th>
+								<th>Village</th>
+								<th>Employment Type</th>
+								<th>SC</th>
+								<th>ST</th>
+								<th>Others</th>
+								<th>Women</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+
+						<tbody>
+
+							<tr th:each="data : ${pprEmploymentList}">
+
+								<td th:text="${data.pprId.district.distName}"></td>
+								<td th:text="${data.pprId.projectName}"></td>
+								<td th:text="${data.microWatershed.mwName}"></td>
+								<td th:text="${data.village.villageName}"></td>
+
+								<td th:text="${data.employmentType.employmentTypeName}"></td>
+
+								<td th:text="${data.sc}"></td>
+								<td th:text="${data.st}"></td>
+								<td th:text="${data.others}"></td>
+								<td th:text="${data.women}"></td>
+								<td
+									th:text="${(data.sc ?: 0) + (data.st ?: 0) + (data.others ?: 0) + (data.women ?: 0)}">
+								</td>
+
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(pprEmploymentList)}">
+								<td colspan="10">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/pprEmploymentGeneration}"
+											class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
+
+						</tbody>
+
+					</table>
+
+				</div>
+
+
+				<!-- ================= PPR-15 ================= -->
+				<h4 class="bg-primary text-white p-2 mt-4">
+					PPR-15 : Migration Details
+				</h4>
+
+				<table class="table table-bordered table-striped">
 
 					<thead class="table-primary">
 						<tr>
-							<th>District</th>
-							<th>Project</th>
-							<th>Micro Watershed</th>
-							<th>Village</th>
-							<th>Source</th>
-							<th>Pre-Project Level</th>
-							<th>Expected Post Project Level</th>
-							<th>Remarks</th>
+							<th>District Name</th>
+							<th>Project Name</th>
+							<th>Watershed Name</th>
+							<th>Village Name</th>
+							<th>No. of People Migrating</th>
+							<th>No. of Days Migrating</th>
+							<th>Major Reason(s) for Migration</th>
+							<th>Expected Reduction</th>
 						</tr>
 					</thead>
 
 					<tbody>
-
-						<tr th:each="data : ${pprWaterOutcomesList}">
-
-							<td th:text="${data.ppr.district.distName}"></td>
-
-							<td th:text="${data.ppr.projectName}"></td>
-
-							<td th:text="${data.microWatershed.mwName}"></td>
-
-							<td th:text="${data.village.villageName}"></td>
-
-							<td th:text="${data.waterSource.sourceName}"></td>
-
-							<td th:text="${data.preProjectLevel}"></td>
-
-							<td th:text="${data.postProjectLevel}"></td>
-
-							<td th:text="${data.remarks}"></td>
-
+						<tr th:each="item : ${ppr15List}">
+							<td th:text="${item['dist_name']}"></td>
+							<td th:text="${item['project_name']}"></td>
+							<td th:text="${item['mw_name']}"></td>
+							<td th:text="${item['village_name']}"></td>
+							<td th:text="${item['migrating_people_count']}"></td>
+							<td th:text="${item['migration_days_per_year']}"></td>
+							<td th:text="${item['migration_reason']}"></td>
+							<td th:text="${item['expected_reduction_migrating_people']}"></td>
 						</tr>
 
-						<tr th:if="${#lists.isEmpty(pprWaterOutcomesList)}">
-							<td colspan="8" class="text-center text-danger">
-								No records found.
+						<tr th:if="${#lists.isEmpty(ppr15List)}">
+							<td colspan="8">
+								<div class="d-flex justify-content-center align-items-center gap-3">
+									<span class="text-danger">No records found.</span>
+									<i class="fas fa-arrow-right arrow-blink"></i>
+									<a th:href="@{/preliminaryPPR15}" class="btn btn-primary btn-sm btn-blink">
+										<i class="fas fa-plus"></i> Add Details
+									</a>
+								</div>
 							</td>
 						</tr>
-
 					</tbody>
 
 				</table>
 
-			</div>
-			<!-- ===================== PPR-17 VIEW TABLE ===================== -->
+				<!-- ===================== PPR-16 VIEW TABLE ===================== -->
+				<div>
 
-			<div>
-
-				<h4 class="bg-primary text-white p-2 mt-4">
-					PPR-17 : Drinking Water Status
-				</h4>
-
-				<div class="table-responsive">
+					<h4 class="bg-primary text-white p-2 mt-4">
+						PPR-16 : Average Ground Water Table Depth in Project Area
+					</h4>
 
 					<table class="table table-bordered table-striped table-hover">
 
@@ -1002,260 +1073,354 @@
 							<tr>
 								<th>District</th>
 								<th>Project</th>
-								<th>Watershed</th>
+								<th>Micro Watershed</th>
 								<th>Village</th>
-								<th>Pre-Project Availability (Months)</th>
-								<th>Pre-Project Water Quality</th>
-								<th>Post-Project Availability (Months)</th>
-								<th>Post-Project Water Quality</th>
+								<th>Source</th>
+								<th>Pre-Project Level</th>
+								<th>Expected Post Project Level</th>
+								<th>Remarks</th>
 							</tr>
 						</thead>
 
 						<tbody>
-							<tr th:each="data : ${pprDrinkingWaterList}">
+
+							<tr th:each="data : ${pprWaterOutcomesList}">
+
 								<td th:text="${data.ppr.district.distName}"></td>
+
 								<td th:text="${data.ppr.projectName}"></td>
+
 								<td th:text="${data.microWatershed.mwName}"></td>
+
 								<td th:text="${data.village.villageName}"></td>
 
-								<td th:text="${data.preWaterAvailabilityMonths}"></td>
-								<td th:text="${data.preWaterQuality.waterQualityType}"></td>
+								<td th:text="${data.waterSource.sourceName}"></td>
 
-								<td th:text="${data.postWaterAvailabilityMonths}"></td>
-								<td th:text="${data.postWaterQuality.waterQualityType}"></td>
+								<td th:text="${data.preProjectLevel}"></td>
+
+								<td th:text="${data.postProjectLevel}"></td>
+
+								<td th:text="${data.remarks}"></td>
+
 							</tr>
 
-							<tr th:if="${#lists.isEmpty(pprDrinkingWaterList)}">
-								<td colspan="8" class="text-center text-danger">
-									No records found.
+							<tr th:if="${#lists.isEmpty(pprWaterOutcomesList)}">
+								<td colspan="8">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/pprWaterOutcomes}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
 								</td>
 							</tr>
+
 						</tbody>
 
 					</table>
+
 				</div>
-			</div>
+				<!-- ===================== PPR-17 VIEW TABLE ===================== -->
 
-			<!-- ===================== PPR-18 VIEW TABLE ===================== -->
-			<div>
+				<div>
 
+					<h4 class="bg-primary text-white p-2 mt-4">
+						PPR-17 : Drinking Water Status
+					</h4>
 
-				<h4 class="bg-primary text-white p-2 mt-4">
-					PPR-18 : Major Crops Grown and Their Productivity in the Project
-				</h4>
+					<div class="table-responsive">
 
+						<table class="table table-bordered table-striped table-hover">
 
-				<table class="table table-bordered table-striped table-hover">
+							<thead class="table-primary">
+								<tr>
+									<th>District</th>
+									<th>Project</th>
+									<th>Watershed</th>
+									<th>Village</th>
+									<th>Pre-Project Availability (Months)</th>
+									<th>Pre-Project Water Quality</th>
+									<th>Post-Project Availability (Months)</th>
+									<th>Post-Project Water Quality</th>
+								</tr>
+							</thead>
 
-					<thead>
-						<tr>
-							<th rowspan="2" class="table-primary text-center">S.No</th>
-							<th rowspan="2" class="table-primary text-center">Season</th>
-							<th rowspan="2" class="table-primary text-center">Name of Crop</th>
+							<tbody>
+								<tr th:each="data : ${pprDrinkingWaterList}">
+									<td th:text="${data.ppr.district.distName}"></td>
+									<td th:text="${data.ppr.projectName}"></td>
+									<td th:text="${data.microWatershed.mwName}"></td>
+									<td th:text="${data.village.villageName}"></td>
 
-							<th colspan="2" class="table-primary text-center">
-								Current Status
-							</th>
+									<td th:text="${data.preWaterAvailabilityMonths}"></td>
+									<td th:text="${data.preWaterQuality.waterQualityType}"></td>
 
-							<th colspan="2" class="table-primary text-center">
-								Expected Post Project Status
-							</th>
-						</tr>
+									<td th:text="${data.postWaterAvailabilityMonths}"></td>
+									<td th:text="${data.postWaterQuality.waterQualityType}"></td>
+								</tr>
 
-						<tr>
-							<th class="table-primary text-center">Area (ha.)</th>
-							<th class="table-primary text-center">Productivity (kg/ha.)</th>
-							<th class="table-primary text-center">Area (ha.)</th>
-							<th class="table-primary text-center">Productivity (kg/ha.)</th>
-						</tr>
-					</thead>
+								<tr th:if="${#lists.isEmpty(pprDrinkingWaterList)}">
+									<td colspan="8">
+										<div class="d-flex justify-content-center align-items-center gap-3">
+											<span class="text-danger">No records found.</span>
+											<i class="fas fa-arrow-right arrow-blink"></i>
+											<a th:href="@{/drinkingWaterStatus}"
+												class="btn btn-primary btn-sm btn-blink">
+												<i class="fas fa-plus"></i> Add Details
+											</a>
+										</div>
+									</td>
+								</tr>
+							</tbody>
 
-					<tbody>
+						</table>
+					</div>
+				</div>
 
-						<tr th:each="rec, iterStat : ${cropOutcomes}">
-							<td th:text="${iterStat.index + 1}"></td>
-							<td th:text="${rec.season.seasonName}"></td>
-							<td th:text="${rec.cropType.cropName}"></td>
-							<td th:text="${rec.currentArea}"></td>
-							<td th:text="${rec.currentProd}"></td>
-							<td th:text="${rec.expectedArea}"></td>
-							<td th:text="${rec.expectedProd}"></td>
-						</tr>
-
-						<tr th:if="${#lists.isEmpty(cropOutcomes)}">
-							<td colspan="7" class="text-center text-danger">
-								No records found.
-							</td>
-						</tr>
-
-					</tbody>
-
-				</table>
-
-			</div>
-			<!-- ===================== PPR-19 VIEW TABLE ===================== -->
-			<div>
-
-				<h4 class="bg-primary text-white p-2 mt-4">
-					PPR-19 : List of Details of Pending UC's
-				</h4>
-
-				<table class="table table-bordered table-striped table-hover">
-
-					<thead class="table-primary text-center align-middle">
-
-						<tr>
-							<th rowspan="2">Project Name</th>
-							<th rowspan="2">Financial Year</th>
-							<th rowspan="2">Installment No.</th>
-							<th rowspan="2">Amount Released (Rs. in Lakh)</th>
-							<th rowspan="2">Amount Utilized (Rs. in Lakh)</th>
-
-							<th colspan="2">Submission of UC</th>
-							<th colspan="3">Date of Submission of UC</th>
-							<th colspan="2">Pending UC's</th>
+				<!-- ===================== PPR-18 VIEW TABLE ===================== -->
+				<div>
 
 
-						</tr>
-
-						<tr>
-							<th>Due Date</th>
-							<th>Amount</th>
-
-							<th>Date</th>
-							<th>Amount</th>
-							<th>Reason</th>
-
-							<th>Period</th>
-							<th>Amount</th>
-						</tr>
-
-					</thead>
-
-					<tbody>
-
-						<tr th:each="data : ${pendingUCList}">
-
-							<td th:text="${data.ppr.projectName}"></td>
-							<td th:text="${data.finYear.finYrDesc}"></td>
-							<td th:text="${data.installmentNo}"></td>
-
-							<td th:text="${data.releasedAmount}"></td>
-							<td th:text="${data.utilizedAmount}"></td>
-
-							<td th:text="${#temporals.format(data.dueDate,'dd/MM/yyyy')}"></td>
-							<td th:text="${data.ucAmount}"></td>
-
-							<td th:text="${#temporals.format(data.ucSubmissionDate,'dd/MM/yyyy')}"></td>
-							<td th:text="${data.ucSubmissionAmt}"></td>
-							<td th:text="${data.reasonNotSubmitted}"></td>
-
-							<td>
-								<span th:text="${#temporals.format(data.pendingStart,'dd/MM/yyyy')}"></span>
-								&nbsp;To&nbsp;
-								<span th:text="${#temporals.format(data.pendingEnd,'dd/MM/yyyy')}"></span>
-							</td>
-
-							<td th:text="${data.pendingAmount}"></td>
+					<h4 class="bg-primary text-white p-2 mt-4">
+						PPR-18 : Major Crops Grown and Their Productivity in the Project
+					</h4>
 
 
-						</tr>
+					<table class="table table-bordered table-striped table-hover">
 
-						<tr th:if="${#lists.isEmpty(pendingUCList)}">
-							<td colspan="13" class="text-center text-danger">
-								No records found.
-							</td>
-						</tr>
+						<thead>
+							<tr>
+								<th rowspan="2" class="table-primary text-center">S.No</th>
+								<th rowspan="2" class="table-primary text-center">Season</th>
+								<th rowspan="2" class="table-primary text-center">Name of Crop</th>
 
-					</tbody>
+								<th colspan="2" class="table-primary text-center">
+									Current Status
+								</th>
 
-				</table>
+								<th colspan="2" class="table-primary text-center">
+									Expected Post Project Status
+								</th>
+							</tr>
 
-			</div>
-			<!-- ===================== PPR-20 VIEW TABLE ===================== -->
-			<div>
+							<tr>
+								<th class="table-primary text-center">Area (ha.)</th>
+								<th class="table-primary text-center">Productivity (kg/ha.)</th>
+								<th class="table-primary text-center">Area (ha.)</th>
+								<th class="table-primary text-center">Productivity (kg/ha.)</th>
+							</tr>
+						</thead>
+
+						<tbody>
+
+							<tr th:each="rec, iterStat : ${cropOutcomes}">
+								<td th:text="${iterStat.index + 1}"></td>
+								<td th:text="${rec.season.seasonName}"></td>
+								<td th:text="${rec.cropType.cropName}"></td>
+								<td th:text="${rec.currentArea}"></td>
+								<td th:text="${rec.currentProd}"></td>
+								<td th:text="${rec.expectedArea}"></td>
+								<td th:text="${rec.expectedProd}"></td>
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(cropOutcomes)}">
+								<td colspan="7">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/pprCropOutcomes}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
+
+						</tbody>
+
+					</table>
+
+				</div>
+				<!-- ===================== PPR-19 VIEW TABLE ===================== -->
+				<div>
+
+					<h4 class="bg-primary text-white p-2 mt-4">
+						PPR-19 : List of Details of Pending UC's
+					</h4>
+
+					<table class="table table-bordered table-striped table-hover">
+
+						<thead class="table-primary text-center align-middle">
+
+							<tr>
+								<th rowspan="2">Project Name</th>
+								<th rowspan="2">Financial Year</th>
+								<th rowspan="2">Installment No.</th>
+								<th rowspan="2">Amount Released (Rs. in Lakh)</th>
+								<th rowspan="2">Amount Utilized (Rs. in Lakh)</th>
+
+								<th colspan="2">Submission of UC</th>
+								<th colspan="3">Date of Submission of UC</th>
+								<th colspan="2">Pending UC's</th>
 
 
-				<h4 class="bg-primary text-white p-2 mt-4">
-					PPR-20 : Draft Details
-				</h4>
+							</tr>
+
+							<tr>
+								<th>Due Date</th>
+								<th>Amount</th>
+
+								<th>Date</th>
+								<th>Amount</th>
+								<th>Reason</th>
+
+								<th>Period</th>
+								<th>Amount</th>
+							</tr>
+
+						</thead>
+
+						<tbody>
+
+							<tr th:each="data : ${pendingUCList}">
+
+								<td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.finYear.finYrDesc}"></td>
+								<td th:text="${data.installmentNo}"></td>
+
+								<td th:text="${data.releasedAmount}"></td>
+								<td th:text="${data.utilizedAmount}"></td>
+
+								<td th:text="${#temporals.format(data.dueDate,'dd/MM/yyyy')}"></td>
+								<td th:text="${data.ucAmount}"></td>
+
+								<td th:text="${#temporals.format(data.ucSubmissionDate,'dd/MM/yyyy')}"></td>
+								<td th:text="${data.ucSubmissionAmt}"></td>
+								<td th:text="${data.reasonNotSubmitted}"></td>
+
+								<td>
+									<span th:text="${#temporals.format(data.pendingStart,'dd/MM/yyyy')}"></span>
+									&nbsp;To&nbsp;
+									<span th:text="${#temporals.format(data.pendingEnd,'dd/MM/yyyy')}"></span>
+								</td>
+
+								<td th:text="${data.pendingAmount}"></td>
 
 
-				<table class="table table-bordered table-striped table-hover">
+							</tr>
 
-					<thead>
-						<tr>
-							<th class="table-primary">District</th>
-							<th class="table-primary">Project</th>
-							<th class="table-primary">Total Cost (Rs. in Lakh)</th>
-							<th class="table-primary">State Fund Released</th>
-							<th class="table-primary">DoLR Fund Released</th>
-							<th class="table-primary">Interest</th>
-							<th class="table-primary">Total (Rs. in Lakh)</th>
-							<th class="table-primary">Unspent Balance</th>
-						</tr>
-					</thead>
+							<tr th:if="${#lists.isEmpty(pendingUCList)}">
+								<td colspan="13">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/pendingUCPPR19}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
 
-					<tbody>
+						</tbody>
 
-						<tr th:each="data : ${draftList}">
+					</table>
 
-							<td th:text="${data.ppr.district.distName}"></td>
-							<td th:text="${data.ppr.projectName}"></td>
+				</div>
+				<!-- ===================== PPR-20 VIEW TABLE ===================== -->
+				<div>
 
-							<td th:text="${data.totCost}"></td>
-							<td th:text="${data.stReleasedFund}"></td>
-							<td th:text="${data.dolrReleasedFund}"></td>
-							<td th:text="${data.interest}"></td>
-							<td th:text="${data.total}"></td>
-							<td th:text="${data.unspendBalance}"></td>
 
-						</tr>
+					<h4 class="bg-primary text-white p-2 mt-4">
+						PPR-20 : Draft Details
+					</h4>
 
-						<tr th:if="${#lists.isEmpty(draftList)}">
-							<td colspan="8" class="text-center text-danger">
-								No records found.
-							</td>
-						</tr>
 
-					</tbody>
-				</table>
+					<table class="table table-bordered table-striped table-hover">
+
+						<thead>
+							<tr>
+								<th class="table-primary">District</th>
+								<th class="table-primary">Project</th>
+								<th class="table-primary">Total Cost (Rs. in Lakh)</th>
+								<th class="table-primary">State Fund Released</th>
+								<th class="table-primary">DoLR Fund Released</th>
+								<th class="table-primary">Interest</th>
+								<th class="table-primary">Total (Rs. in Lakh)</th>
+								<th class="table-primary">Unspent Balance</th>
+							</tr>
+						</thead>
+
+						<tbody>
+
+							<tr th:each="data : ${draftList}">
+
+								<td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
+
+								<td th:text="${data.totCost}"></td>
+								<td th:text="${data.stReleasedFund}"></td>
+								<td th:text="${data.dolrReleasedFund}"></td>
+								<td th:text="${data.interest}"></td>
+								<td th:text="${data.total}"></td>
+								<td th:text="${data.unspendBalance}"></td>
+
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(draftList)}">
+								<td colspan="8">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										<a th:href="@{/unspentBalancePPR20}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+									</div>
+								</td>
+							</tr>
+
+						</tbody>
+					</table>
 				</div> <!-- closes th:if="${searched}" -->
-				
-				
-				
-				<form id="forwardPPRForm" th:action="@{/forwardViewPPR}" method="post" >
-					
+
+
+
+				<form id="forwardPPRForm" th:action="@{/forwardViewPPR}" method="post">
+
 					<input type="hidden" name="pprdcode" th:value="${selectedDcode}">
 					<input type="hidden" name="pprid" th:value="${selectedProject}">
-					
+
+					<div th:if="${!allSectionsFilled}" class="alert alert-warning text-center">
+						<i class="fas fa-exclamation-triangle"></i>
+						Please complete all PPR sections (PPR-1 to PPR-20) before forwarding this project.
+					</div>
+
 					<div class="row mb-3 align-items-center">
-					
+
 						<div class="col-md-2">
 							<label class="form-label fw-semibold">
 								User-ID <span class="text-danger">*</span>
 							</label>
 						</div>
 						<div class="col-md-4">
-							<select class="form-select" id="userid" name="userid">
+							<select class="form-select" id="userid" name="userid" th:disabled="${!allSectionsFilled}">
 								<option value="">--Select User-ID--</option>
 								<option th:each="u : ${userList}" th:value="${u.regId}" th:text="${u.userId}">
 								</option>
 							</select>
 						</div>
 						<div class="col-md-4">
-							<button type="submit" class="btn btn-primary">Forward</button>
+							<button type="submit" class="btn btn-primary" th:disabled="${!allSectionsFilled}">
+								Forward
+							</button>
 						</div>
-					
+
 					</div>
-					
-					
+
+
 				</form>
-				
-				
-				
-				
-				
+
+
+
 			</div>
 		</div>
 	</div>

@@ -402,59 +402,61 @@
 					<form id="ppr15Form" th:action="@{/saveDraftPPR15}" method="post" novalidate>
 
 						<div class="row mb-4">
-						    <div class="col-md-2">
-						        <label class="form-label fw-semibold">State Name:</label><span class="required">*</span>
-						    </div>
-						    <div class="col-md-4">
-						        <input type="text" class="form-control form-control-sm"
-						               th:value="${statename}" readonly>
-						    </div>
+							<div class="col-md-2">
+								<label class="form-label fw-semibold">State Name:</label><span class="required">*</span>
+							</div>
+							<div class="col-md-4">
+								<input type="text" class="form-control form-control-sm" th:value="${statename}"
+									readonly>
+							</div>
 
-						    <div class="col-md-2">
-						        <label class="form-label fw-semibold">District Name:</label><span class="required">*</span>
-						    </div>
-						    <div class="col-md-4">
-						        <select id="district" name="district"
-						            class="form-control form-control-sm" required>
-						            <option value="">--Select District--</option>
-						            <th:block th:each="dist : ${distList}">
-						                <option th:value="${dist.dcode}" th:text="${dist.distName}">
-						                </option>
-						            </th:block>
-						        </select>
-						    </div>
+							<div class="col-md-2">
+								<label class="form-label fw-semibold">District Name:</label><span
+									class="required">*</span>
+							</div>
+							<div class="col-md-4">
+								<select id="district" name="district" class="form-control form-control-sm" required>
+									<option value="">--Select District--</option>
+									<th:block th:each="dist : ${distList}">
+										<option th:value="${dist.dcode}" th:text="${dist.distName}">
+										</option>
+									</th:block>
+								</select>
+							</div>
 						</div>
 
 						<div class="row mb-4">
-						    <div class="col-md-2">
-						        <label class="form-label fw-semibold">Project Name:</label><span class="required">*</span>
-						    </div>
-						    <div class="col-md-4">
-						        <select id="project" name="project" class="form-control form-control-sm" required>
-						            <option value="">--Select Project--</option>
-						        </select>
-						    </div>
+							<div class="col-md-2">
+								<label class="form-label fw-semibold">Project Name:</label><span
+									class="required">*</span>
+							</div>
+							<div class="col-md-4">
+								<select id="project" name="project" class="form-control form-control-sm" required>
+									<option value="">--Select Project--</option>
+								</select>
+							</div>
 
-						    <div class="col-md-2">
-						        <label class="form-label fw-semibold">Micro Watershed Name:</label><span class="required">*</span>
-						    </div>
-						    <div class="col-md-4">
-						        <select id="watershed" name="watershed"
-						            class="form-control form-control-sm" required>
-						            <option value="">--Select Micro Watershed--</option>
-						        </select>
-						    </div>
+							<div class="col-md-2">
+								<label class="form-label fw-semibold">Micro Watershed Name:</label><span
+									class="required">*</span>
+							</div>
+							<div class="col-md-4">
+								<select id="watershed" name="watershed" class="form-control form-control-sm" required>
+									<option value="">--Select Micro Watershed--</option>
+								</select>
+							</div>
 						</div>
 
 						<div class="row mb-4">
-						    <div class="col-md-2">
-						        <label class="form-label fw-semibold">Village Name:</label><span class="required">*</span>
-						    </div>
-						    <div class="col-md-4">
-						        <select id="village" name="village" class="form-control form-control-sm" required>
-						            <option value="">--Select Village--</option>
-						        </select>
-						    </div>
+							<div class="col-md-2">
+								<label class="form-label fw-semibold">Village Name:</label><span
+									class="required">*</span>
+							</div>
+							<div class="col-md-4">
+								<select id="village" name="village" class="form-control form-control-sm" required>
+									<option value="">--Select Village--</option>
+								</select>
+							</div>
 						</div>
 
 						<!-- Row 3 -->
@@ -527,12 +529,20 @@
 
 						<input type="hidden" name="action" value="D">
 
-						<div class="text-center mt-4">
-							<button type="submit" class="btn btn-warning px-4 fw-semibold">
-								<i class="fa fa-save me-1"></i> Save as Draft
-							</button>
-						</div>
+						<div class="mt-4" style="position: relative;">
 
+						    <div class="text-center">
+						        <button type="submit" class="btn btn-warning px-4 fw-semibold">
+						            <i class="fa fa-save me-1"></i> Save as Draft
+						        </button>
+						    </div>
+
+						    <a th:href="@{/pprWaterOutcomes}" class="btn btn-outline-secondary"
+						        style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
+						        Skip <i class="fas fa-arrow-right"></i>
+						    </a>
+
+						</div>
 					</form>
 
 					<!-- ================= DRAFT DETAILS ================= -->

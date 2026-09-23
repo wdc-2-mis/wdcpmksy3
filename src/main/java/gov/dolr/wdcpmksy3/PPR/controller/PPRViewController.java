@@ -181,12 +181,48 @@ public class PPRViewController {
         model.addAttribute("selectedProject", project);
         model.addAttribute("selectedFinYrCd", finYrCd);
         model.addAttribute("selectedProjectName", resolveProjectName(data, project));
-        
-        List<WdcpmksyUserReg> users =ur.findDLUsersByStateAndRole(stcode);
+
+        boolean allSectionsFilled = isAllSectionsFilled(data);
+        model.addAttribute("allSectionsFilled", allSectionsFilled);
+
+        List<WdcpmksyUserReg> users = ur.findDLUsersByStateAndRole(stcode);
         model.addAttribute("userList", users);
 
         return "viewPPR";
     }
+
+    private boolean isAllSectionsFilled(Map<String, Object> data) {
+
+        String[] keysToCheck = {
+            "records",
+            "watershedList",
+            "detailsOfListOfProposedProject",
+            "pprProjectAtGlanceList",
+            "ppr8List",
+            "landPatternAreaList",
+            "ppr10List",
+            "ppr11List",
+            "soilErosionList",
+            "pprLivelihoodSummaryList",
+            "pprEmploymentList",
+            "ppr15List",
+            "pprWaterOutcomesList",
+            "pprDrinkingWaterList",
+            "cropOutcomes",
+            "pendingUCList",
+            "draftList"
+        };
+
+        for (String key : keysToCheck) {
+            Object value = data.get(key);
+            if (!(value instanceof List<?> list) || list.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
 
     @PostMapping("/downloadPPRPdf")
     public ResponseEntity<byte[]> downloadPPRPdf(HttpSession session, Model model,
