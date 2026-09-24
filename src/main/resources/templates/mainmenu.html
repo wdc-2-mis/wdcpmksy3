@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+	  <head> <meta charset="UTF-8">
+
+	  <title>Add / Modify Menu</title>
+
+	  <style>
+	      .table-wrapper {
+	          margin: 20px;
+	      }
+
+	      .table-title {
+	          margin-bottom: 20px;
+	      }
+
+	      .alert {
+	          padding: 5px 10px;
+	          margin-left: 5px;
+	      }
+
+	      .alert-danger {
+	          color: #842029;
+	          background-color: #f8d7da;
+	          border: 1px solid #f5c2c7;
+	      }
+
+	      .alert-info {
+	          color: #055160;
+	          background-color: #cff4fc;
+	          border: 1px solid #b6effb;
+	      }
+
+	      .square_btn {
+	          padding: 8px 25px;
+	          border: none;
+	          cursor: pointer;
+	      }
+
+	      .role-item {
+	          display: block;
+	          margin-bottom: 5px;
+	      }
+	  </style>
+
+	  <script> 
+	  	
+	  	  		function getValue(obj) 
+	  			{ 
+	  				var parameter = obj.value; 
+	  				window.location.href ='/fetchMenu' + '?role=' + encodeURIComponent(parameter); 
+	  			}
+				
+	  </script>
+	
+	  </head>
+
+<body>
+
+<div layout:fragment="content"> 
+	<div class="card shadow-sm border-0"> 
+		<!-- Header --> 
+		<div class="card-header bg-primary text-white">
+			<h4 class="mb-0">
+				View List of Menu to be Modify or Delete
+			</h4>
+		</div>
+		<!--<div class="table-title"> 
+			<div class="row"> 
+				<div class="col-sm-9"> <h5>List of Menu to be Modify or Delete </h5> </div> 
+			</div> 
+		</div> -->
+		<!-- Add Menu --> 		
+		<div class="d-flex justify-content-end my-3">
+		    <a th:href="@{/newMenu}" class="btn btn-primary">
+		        Add Menu
+		    </a>
+		</div>
+		<!-- Role Selection --> 
+		<table class="table table-striped table-highlight"> 
+			<tr> 
+				<td>Role</td> 
+				<td > 
+					<select id="role" name="role" class="form-select" style="width: 300px;" onchange="getValue(this);"> 
+						<option value="0">---All---</option> 
+						<option th:each="roleItem : ${listRole}" th:value="${roleItem.roleId}" 
+								th:text="${roleItem.roleName}" th:selected="${roleItem.roleId.toString() == role}"> 
+						</option> 
+					</select> 
+				</td> 
+			</tr> 
+		</table> 
+		<!-- Message --> 
+		<table class="table table-bordered table-striped" style="min-width:1500px;"> 
+			<!--<tr> 
+				<td colspan="11"> 
+					<div th:if="${msg == 'success'}" class="alert alert-success"> Record is successfully Deleted </div> 
+					<div th:if="${msg == 'fail'}" class="alert alert-danger"> Record can not be Deleted as it is referenced by other submenus </div> 
+				</td> 
+			</tr> 
+			<tr> 
+				<td colspan="11">
+					<br>
+				</td> 
+			</tr> -->
+			<!-- Table Header --> 
+			<thead class="table-primary text-center align-middle">
+			<tr> 
+				<th>Role</th> 
+				<th>Parent ID</th> 
+				<th>Parent Sequence</th> 
+				<th>Parent</th> 
+				<th>Menu Id</th> 
+				<th>Menu Name</th> 
+				<th>Target</th> 
+				<th>Sequence</th> 
+				<th>Parent IsActive</th> 
+				<th>Child IsActive</th> 
+				<th style="width: 200px;">Action</th> 
+			</tr> 
+			</thead>
+			<!-- Parent Menu --> 
+			<th:block th:each="list : ${listMenu}"> 
+				<tr> 
+					<!-- Role --> 
+					<td th:text="${#strings.substringBefore(list.key, ',')}"> </td> 
+					<!-- Parent ID --> 
+					<td th:text="${#strings.substringBefore( #strings.substringAfter( #strings.substringAfter(list.key, ','), ':::' ), '$' )}"> </td> 
+					<!-- Parent Sequence --> 
+					<td th:text="${#strings.substringBefore( #strings.substringAfter( #strings.substringAfter( #strings.substringAfter(list.key, ','), ':::' ), '$' ), '@' )}"> </td> 
+					<!-- Parent Name --> 
+					<td th:text="${#strings.substringBefore( #strings.substringAfter(list.key, ','), ':::' )}"> </td> 
+					<!-- Empty Parent Menu fields --> 
+					<td></td> <td></td> <td></td> <td></td> 
+					<!-- Parent Active --> 
+					<td th:text="${#strings.substringAfter( #strings.substringAfter( #strings.substringAfter( #strings.substringAfter(list.key, ','), ':::' ), '$' ), '@' )}"> </td> 
+					<!-- Child Active --> 
+					<td></td> 
+					<!-- Parent Actions --> 
+					<td> 
+						<a th:href="@{/editMenu(pmenuId=${#strings.substringBefore(#strings.substringAfter(#strings.substringAfter(list.key, ','),
+						            ':::' ),'$')})}"class="btn btn-sm btn-primary">
+						    Modify
+						</a>
+						<!--<a href="#" class="delete btn btn-sm btn-danger" th:data-id="${#strings.substringBefore( #strings.substringAfter( #strings.substringAfter(list.key, ','), ':::' ), '$' )}"> Delete </a>--> 
+					</td> 
+				</tr> 
+				<!-- Child Menus --> 
+				<th:block th:each="menulist : ${list.value}"> 
+					<tr th:if="${menulist.menuid != null and menulist.menuid > 0}"> 
+						<td></td> <td></td> <td></td> <td></td> 
+						<!-- Menu ID --> 
+						<td th:text="${menulist.menuid}"></td> 
+						<!-- Menu Name --> 
+						<td th:text="${menulist.menuname}"></td> 
+						<!-- Target --> 
+						<td th:text="${menulist.target}"></td> 
+						<!-- Sequence --> 
+						<td th:text="${menulist.sequence}"></td> 
+						<!-- Parent Active --> 
+						<td></td> 
+						<!-- Child Active --> 
+						<td th:text="${menulist.cactive}"></td> 
+						<!-- Child Actions --> 
+						<td> 
+							<a th:href="@{/editMenu(menuId=${menulist.menuid})}" class="btn btn-sm btn-primary"> Modify </a> 
+						
+							<button type="button"
+							        class="delete btn btn-sm btn-danger"
+							        th:data-id="${menulist.menuid}">
+							    Delete
+							</button>
+						</td> 
+					</tr> 
+				</th:block> 
+			</th:block> 
+		</table> 
+	</div> 
+	
+	<script>
+	      document.addEventListener('click', function(e) {
+
+	          const deleteBtn = e.target.closest('.delete');
+
+	          if (!deleteBtn) {
+	              return;
+	          }
+
+	          e.preventDefault();
+
+	          const menuId = deleteBtn.getAttribute('data-id');
+
+	          console.log("Menu ID =", menuId);
+
+	          if (!menuId) {
+	              alert("Menu ID is missing.");
+	              return;
+	          }
+
+	          if (!confirm("Do you want to delete menu ?")) {
+	              return;
+	          }
+
+	          fetch('/deleteMenu', {
+	              method: 'POST',
+	              headers: {
+	                  'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+	              },
+	              body: 'menuId=' + encodeURIComponent(menuId)
+	          })
+	          .then(function(response) {
+
+	              console.log("HTTP Status =", response.status);
+
+	              return response.text();
+	          })
+	          .then(function(data) {
+
+	              console.log("Server response =", data);
+
+	              if (data.trim() === 'success') {
+
+	                  alert('Record is successfully Deleted');
+
+	                  window.location.href = '/mainmenu';
+
+	              } else {
+
+	                  alert(
+	                      'Record can not be Deleted as it is referenced by other submenus'
+	                  );
+	              }
+
+	          })
+	          .catch(function(error) {
+
+	              console.error("Delete error =", error);
+
+	              alert('Error while deleting menu.');
+
+	          });
+
+	      });
+	  </script>
+	
+	
+</div> 
+
+
+
+
+</body>
+</html>

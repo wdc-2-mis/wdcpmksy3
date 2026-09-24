@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     notificationDate.setAttribute("min", "2026-01-01");
     mouDate.setAttribute("min", "2026-01-01");
+	
+	const today = new Date().toISOString().split("T")[0]; 
+	notificationDate.setAttribute("max", today); 
+	mouDate.setAttribute("max", today);
 
 });
 
@@ -117,6 +121,22 @@ document.addEventListener("DOMContentLoaded", function () {
         const mouDate = document.getElementsByName("mouDate")[0];
         const notificationFile = document.getElementsByName("notificationFile")[0];
         const mouFile = document.getElementsByName("mouFile")[0];
+		
+		// Validate Notification Date - Future date not allowed 
+		const today = new Date().toISOString().split("T")[0]; 
+		if (notificationDate.value > today) { 
+			alert("Notification Date cannot be a future date."); 
+			notificationDate.focus(); 
+			e.preventDefault(); 
+			return false; 
+		} 
+		// Validate MoU Date - Future date not allowed 
+		if (mouDate.value > today) { 
+			alert("MoU Date cannot be a future date."); 
+			mouDate.focus(); 
+			e.preventDefault(); 
+			return false; 
+		}
 
         // Type of SLNA
         if (slnaType.value.trim() === "") {
@@ -435,25 +455,25 @@ document.addEventListener("DOMContentLoaded", function () {
 											
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> State Name </b><span class="required">*</span>
+														<b> State Name </b>
 													</label>
 													<input type="text" class="form-control" name="stateName1" id="stateName1" readonly>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> Type of SLNA </b><span class="required">*</span>
+														<b> Type of SLNA </b>
 													</label>
 													<input type="text" class="form-control" name="slnaType1" id="slnaType1" placeholder="Enter Type of SLNA" required>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> Date of Notification </b><span class="required">*</span>
+														<b> Date of Notification </b>
 													</label>
 													<input type="date" class="form-control" name="notificationDate1" id="notificationDate1" min="2026-01-01" required>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> Upload Notification </b> <span class="required">*</span>
+														<b> Upload Notification </b> 
 													</label>
 													<input type="file" id="notificationFile1" name="notificationFile1" class="form-control"
 														accept=".pdf,application/pdf" required>
@@ -461,13 +481,13 @@ document.addEventListener("DOMContentLoaded", function () {
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> Date of MoU with DoLR </b> <span class="required">*</span>
+														<b> Date of MoU with DoLR </b> 
 													</label>
 													<input type="date" class="form-control" name="mouDate1" id="mouDate1" min="2026-01-01"  required>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> Upload MoU </b> <span class="required">*</span>
+														<b> Upload MoU </b> 
 													</label>
 													<input type="file" id="mouFile1" name="mouFile1" class="form-control" accept=".pdf,application/pdf" required>
 													<small class="form-text text-muted">Only PDF file is allowed.</small>

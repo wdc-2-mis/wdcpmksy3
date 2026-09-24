@@ -8,8 +8,7 @@ import org.springframework.stereotype.Repository;
 import gov.dolr.wdcpmksy3.entity.MRole;
 
 @Repository
-public interface MRoleRepository
-        extends JpaRepository<MRole, Integer> {
+public interface MRoleRepository   extends JpaRepository<MRole, Integer> {
 
     List<MRole> findAllByOrderByRoleNameAsc();
 

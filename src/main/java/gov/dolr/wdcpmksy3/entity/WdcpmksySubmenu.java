@@ -44,7 +44,7 @@ public class WdcpmksySubmenu {
     
     
     @OneToMany(mappedBy = "submenu", cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY)
+            fetch = FetchType.LAZY, orphanRemoval = true)
     private List<WdcpmksyRoleMenuMap> roleMenuMappings;
 
     // Getters and Setters
@@ -137,7 +137,27 @@ public class WdcpmksySubmenu {
 		this.roleMenuMappings = roleMenuMappings;
 	}
 
-   
+	@Transient
+	private int[] mapRoleId;
+
+	@Transient
+	private Integer isParent;
+
+	public int[] getMapRoleId() {
+		return mapRoleId;
+	}
+
+	public void setMapRoleId(int[] mapRoleId) {
+		this.mapRoleId = mapRoleId;
+	}
+
+	public Integer getIsParent() {
+		return isParent;
+	}
+
+	public void setIsParent(Integer isParent) {
+		this.isParent = isParent;
+	}
     
     
     

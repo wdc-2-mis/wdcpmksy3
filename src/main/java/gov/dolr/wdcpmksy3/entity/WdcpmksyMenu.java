@@ -37,7 +37,7 @@ public class WdcpmksyMenu {
 
     @OneToMany(mappedBy = "menu",
                cascade = CascadeType.ALL,
-               fetch = FetchType.LAZY)
+               fetch = FetchType.LAZY, orphanRemoval = true)
     private List<WdcpmksySubmenu> submenus;
 
     // Getters and Setters
