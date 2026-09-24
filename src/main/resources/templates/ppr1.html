@@ -31,6 +31,58 @@ document.addEventListener("DOMContentLoaded", function () {
 	const today = new Date().toISOString().split("T")[0]; 
 	notificationDate.setAttribute("max", today); 
 	mouDate.setAttribute("max", today);
+	
+	const notificationDate1 = document.getElementsByName("notificationDate1")[0];
+	const mouDate1 = document.getElementsByName("mouDate1")[0];
+
+	notificationDate1.setAttribute("min", "2026-01-01");
+	mouDate1.setAttribute("min", "2026-01-01");
+
+	notificationDate1.setAttribute("max", today);
+	mouDate1.setAttribute("max", today);
+	
+	const form = document.getElementById("institutionForm");
+
+	   if (form) {
+
+	       const inputs =
+	           form.querySelectorAll("input[required], select[required]");
+
+	       inputs.forEach(function (input) {
+
+	           input.addEventListener("blur", function () {
+
+	               if (!input.value) {
+
+	                   input.classList.add("is-invalid");
+	                   input.classList.remove("is-valid");
+
+	               } else {
+
+	                   input.classList.remove("is-invalid");
+	                   input.classList.add("is-valid");
+
+	               }
+
+	           });
+
+	       });
+
+
+	       form.addEventListener("submit", function (event) {
+
+	           if (!form.checkValidity()) {
+
+	               event.preventDefault();
+	               event.stopPropagation();
+
+	           }
+
+	           form.classList.add("was-validated");
+
+	       });
+
+	   }
 
 });
 
@@ -64,20 +116,36 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("institutionForm");
 	const notificationFile = document.getElementById("notificationFile");
 	const mouFile = document.getElementById("mouFile");
+	
+	const notificationFile1 = document.getElementById("notificationFile1");
+	const mouFile1 = document.getElementById("mouFile1");
 
 	    function validatePDF(input) {
-	        if (input.files.length === 0) return true;
+			
+			if (input.files.length === 0) {
+			        return true;
+			   }
 
-	        const file = input.files[0];
-	        const fileName = file.name.toLowerCase();
+			    const file = input.files[0];
+			    const fileName = file.name.toLowerCase();
 
-	        if (file.type !== "application/pdf" && !fileName.endsWith(".pdf")) {
-	            alert("Only PDF files are allowed.");
-	            input.value = "";
-	            return false;
-	        }
+			    // Check PDF type
+			    if (file.type !== "application/pdf" && !fileName.endsWith(".pdf")) {
+			        alert("Only PDF files are allowed.");
+			        input.value = "";
+			        return false;
+			    }
 
-	        return true;
+			    // Check file size - maximum 5 MB
+			    const maxSize = 5 * 1024 * 1024; // 5 MB
+
+			    if (file.size > maxSize) {
+			        alert("PDF file size must not be more than 5 MB.");
+			        input.value = "";
+			        return false;
+			    }
+
+			    return true;
 	    }
 
 	    function validateSameFile(changedInput, otherInput) {
@@ -109,12 +177,23 @@ document.addEventListener("DOMContentLoaded", function () {
 	        }
 	    });
 	
+		notificationFile1.addEventListener("change", function () {
+			if (validatePDF(this)) {
+				validateSameFile(this, mouFile1);
+			}
+		});
+
+		mouFile1.addEventListener("change", function () {
+			if (validatePDF(this)) {
+				validateSameFile(this, notificationFile1);
+			}
+		});
 	
 	
 	
 	
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit1", function (e) {
 
         const slnaType = document.getElementsByName("slnaType")[0];
         const notificationDate = document.getElementsByName("notificationDate")[0];
@@ -275,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 						<input type="text" class="form-control"name="slnaType"
 						         placeholder="Enter Type of SLNA" required>
-
+								 <div class="invalid-feedback">Please enter type of SLNA</div>
                     </div>
 
                     <!-- Date -->
@@ -285,10 +364,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         <label class="form-label">
                           <b>  Date of Notification </b><span class="required">*</span>
                         </label>
-
-						<input type="date" class="form-control" name="notificationDate"
-						            min="2026-01-01"  required>
-
+						<input type="date" class="form-control" name="notificationDate"  min="2026-01-01"  required>
+							<div class="invalid-feedback">Please select date of notification</div>
                     </div>
 
                     <!-- Upload -->
@@ -305,7 +382,9 @@ document.addEventListener("DOMContentLoaded", function () {
 						       class="form-control"
 						       accept=".pdf,application/pdf"
 						       required>
+							   <div class="invalid-feedback">Please select a notification PDF within 5 MB. </div>
                   <small class="form-text text-muted">Only PDF file is allowed.</small>
+				  <div id="notificationFileError" class="text-danger mt-1"></div>
                     </div>
                     
                     <div class="col-md-6">
@@ -316,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 						<input type="date" class="form-control" name="mouDate"
 						          min="2026-01-01"  required>
-
+								  <div class="invalid-feedback">Please select date of MoU with DoLR</div>
                     </div>
                     <div class="col-md-6">
 
@@ -330,7 +409,8 @@ document.addEventListener("DOMContentLoaded", function () {
 						       class="form-control"
 						       accept=".pdf,application/pdf"
 						       required>
-											   
+						<div class="invalid-feedback">Please select a MoU PDF within 5 MB. </div>	
+						<div id="mouFileError" class="text-danger mt-1"></div>		   
 						<small class="form-text text-muted">Only PDF file is allowed.</small>
                     </div>
 

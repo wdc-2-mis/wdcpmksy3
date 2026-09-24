@@ -29,7 +29,7 @@ import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.MemberDetails;
 import gov.dolr.wdcpmksy3.entity.Qualification;
 import gov.dolr.wdcpmksy3.service.DesignationService;
-import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
+import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
 import gov.dolr.wdcpmksy3.service.MemberDetailsService;
 import gov.dolr.wdcpmksy3.service.QualificationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ import jakarta.servlet.http.HttpSession;
 public class PprDetailsOfSlnaController {
 	
 	@Autowired
-    private InstitutionalStructureServiceImpl isserv;
+    private InstitutionalStructureService isserv;
 	
 	@Autowired
 	PprSlnaDetailsService pprSlnaDetailsService;

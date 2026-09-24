@@ -45,7 +45,7 @@ import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryWorkExperienceRepository;
 import gov.dolr.wdcpmksy3.service.DesignationService;
 import gov.dolr.wdcpmksy3.service.DistrictService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
-import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
+import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
 import gov.dolr.wdcpmksy3.service.PPRWcdcDetailsServiceImpl;
 import gov.dolr.wdcpmksy3.service.QualificationService;
 import gov.dolr.wdcpmksy3.service.SlnaFunctionaryServiceImpl;
@@ -60,9 +60,6 @@ public class PPR1Controller {
 
     @Autowired
     private InstitutionalStructureService service;
-    
-    @Autowired
-    private InstitutionalStructureServiceImpl isserv;
     
     @Autowired
     InstitutionalStructureRepository repository;
@@ -106,7 +103,7 @@ public class PPR1Controller {
 
             return "redirect:/login";
         }
-        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+        model.addAttribute("ppr1List", service.getPPR1List(stcode));
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
         return "ppr1";
@@ -137,29 +134,13 @@ public class PPR1Controller {
 	        exists = repository.existsByStCode(stcode);
 	        
 	        if (!exists) {
+	        	
+	        	service.saveInstitutionalStructure(stcode, stateName, slnaType, notificationDate, notificationFile, mouDate, mouFile, userid, getClientIpAddr(request));
 	
-	        String notificationFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ notificationFile.getOriginalFilename();
-	
-	        String mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ mouFile.getOriginalFilename();
-	
-	        notificationFile.transferTo(new File(uploadPath + notificationFileName));
-	
-	        mouFile.transferTo(new File(uploadPath + mouFileName));
-	
-	        InstitutionalStructure obj = new InstitutionalStructure();
-	
-	        obj.setStCode(stcode);
-	        obj.setSlnaType(slnaType);
-	        obj.setNotificationDate(notificationDate);
-	        obj.setNotificationFile(uploadPath+notificationFileName);
-	        obj.setMouDate(mouDate);
-	        obj.setMouFile(uploadPath+mouFileName);
-	        obj.setStatus(action.charAt(0));
-	        obj.setCreatedBy(userid);
-	        obj.setCreatedDate(LocalDateTime.now());
-	        obj.setRequestIp(getClientIpAddr(request));
+	       // String notificationFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ notificationFile.getOriginalFilename();
 	        
-	        service.save(obj);
+	      //  String mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ mouFile.getOriginalFilename();
+	       
 	        
 	        redirectAttributes.addFlashAttribute("success","Record Saved Successfully.");
 	        }
@@ -167,10 +148,8 @@ public class PPR1Controller {
 	        	
 	        	redirectAttributes.addFlashAttribute("error","Record already Exists, Only one entry allow.");
 	        }
-	
 	        
-	        
-	        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+	        model.addAttribute("ppr1List", service.getPPR1List(stcode));
 	
 	        return "redirect:/institutionalStructurePPR1";
 		}
@@ -200,7 +179,7 @@ public class PPR1Controller {
     public ResponseEntity<Resource> viewPdf2(@RequestParam Long id,
             @RequestParam String type) throws IOException {
 
-    		InstitutionalStructure data = isserv.getById(id);
+    		InstitutionalStructure data = service.getById(id);
     		if (data == null) {
     			return ResponseEntity.notFound().build();
     		}
@@ -232,7 +211,7 @@ public class PPR1Controller {
     public ResponseEntity<Resource> viewPdf(@RequestParam Long id,
                         @RequestParam String type) throws IOException {
 
-        InstitutionalStructure data = isserv.getById(id);
+        InstitutionalStructure data = service.getById(id);
         if (data == null) {
             return ResponseEntity.notFound().build();
         }
@@ -290,7 +269,7 @@ public class PPR1Controller {
 	
 	            return "redirect:/login";
 	        }
-            InstitutionalStructure data = isserv.getById(id);
+            InstitutionalStructure data = service.getById(id);
             if (data == null) {
                 redirectAttributes.addFlashAttribute("error", "Record not found.");
                 return "redirect:/institutionalStructurePPR1";
@@ -298,10 +277,10 @@ public class PPR1Controller {
             
             deleteFile(data.getNotificationFile());
             deleteFile(data.getMouFile());
-            isserv.delete(id);
+            service.delete(id);
 
             redirectAttributes.addFlashAttribute("success", "Record deleted successfully.");
-            model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+            model.addAttribute("ppr1List", service.getPPR1List(stcode));
     		model.addAttribute("statename", statename);
     		model.addAttribute("stcode", stcode);
 
@@ -343,14 +322,14 @@ public class PPR1Controller {
 
 		            return "redirect:/login";
 		        }
-		        boolean updated = isserv.completeRecordPPR1(id);
+		        boolean updated = service.completeRecordPPR1(id);
 		        if (updated) {
 		            redirectAttributes.addFlashAttribute("success", "Record completed successfully.");
 		        } 
 		        else {
 		            redirectAttributes.addFlashAttribute("success", "Record not found.");
 		        }
-		        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+		        model.addAttribute("ppr1List", service.getPPR1List(stcode));
 	    		model.addAttribute("statename", statename);
 	    		model.addAttribute("stcode", stcode);
 		    } 
@@ -365,7 +344,7 @@ public class PPR1Controller {
     @GetMapping("/editInstitutionalStructurePPR1")
     public String editPPR1(@RequestParam Long id, Model model, HttpSession session) {
 
-    	InstitutionalStructure data = isserv.getById(id);
+    	InstitutionalStructure data = service.getById(id);
         model.addAttribute("editData", data);
         String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -375,7 +354,7 @@ public class PPR1Controller {
 
 		    return "redirect:/login";
 		}
-		model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+		model.addAttribute("ppr1List", service.getPPR1List(stcode));
  		model.addAttribute("statename", statename);
  		model.addAttribute("stcode", stcode);
  	//	model.addAttribute("stcode", data.getPpr_inst_str_id());
@@ -407,17 +386,19 @@ public class PPR1Controller {
 	            dir.mkdirs();
 	        }
 	        
-	        InstitutionalStructure data = isserv.getById(pprid);	
+	        InstitutionalStructure data = service.getById(pprid);	
 			
 	        if (notificationFile1 != null && !notificationFile1.isEmpty()) {
 	        	deleteFile(data.getNotificationFile());
-	        	notificationFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ notificationFile1.getOriginalFilename();
+	        //	notificationFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ notificationFile1.getOriginalFilename();
+	        	notificationFileName = pprid+ "_"+ notificationFile1.getOriginalFilename();
 	        	notificationFile1.transferTo(new File(uploadPath + notificationFileName));
 	 	        data.setNotificationFile(uploadPath+notificationFileName);
 	        }
 	        if (mouFile1 != null && !mouFile1.isEmpty()) {
 	        	deleteFile(data.getMouFile());
-	        	mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ mouFile1.getOriginalFilename();
+	        	//mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6) + "_"+ mouFile1.getOriginalFilename();
+	        	mouFileName= pprid+"_"+ mouFile1.getOriginalFilename();
 	        	data.setMouFile(uploadPath+mouFileName);
 	        	mouFile1.transferTo(new File(uploadPath + mouFileName));
 	        }
@@ -433,11 +414,11 @@ public class PPR1Controller {
 	        data.setUpdatedDate(LocalDate.now());
 	        data.setRequestIp(getClientIpAddr(request));
 	        
-	        service.save(data);
+	        service.updateInstitutionalStructure(data);
 	
 	        redirectAttributes.addFlashAttribute("success","Record update Successfully.");
 	        
-	        model.addAttribute("ppr1List", isserv.getPPR1List(stcode));
+	        model.addAttribute("ppr1List", service.getPPR1List(stcode));
 	
 	        return "redirect:/institutionalStructurePPR1";
 		}
@@ -493,7 +474,7 @@ public class PPR1Controller {
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
 		
-		List<Object[]> list = isserv.getPPR1List(stcode);
+		List<Object[]> list = service.getPPR1List(stcode);
 		for (Object[] row : list) {
 
 		    Integer id = (Integer) row[0];
@@ -566,7 +547,7 @@ public class PPR1Controller {
 		            return "redirect:/login";
 		     }
 			Integer pprInstStrId =0;
-	    	List<Object[]> list = isserv.getPPR1List(stcode);
+	    	List<Object[]> list = service.getPPR1List(stcode);
 			for (Object[] row : list) {
 	
 			    pprInstStrId = (Integer) row[0];

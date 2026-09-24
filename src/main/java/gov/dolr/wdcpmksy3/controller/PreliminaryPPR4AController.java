@@ -30,7 +30,7 @@ import gov.dolr.wdcpmksy3.entity.PPRWcdcDetails;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
 import gov.dolr.wdcpmksy3.repository.PPRWcdcDetailsRepository;
 import gov.dolr.wdcpmksy3.service.DistrictService;
-import gov.dolr.wdcpmksy3.service.InstitutionalStructureServiceImpl;
+import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
 import gov.dolr.wdcpmksy3.service.PPRWcdcDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -58,7 +58,7 @@ public class PreliminaryPPR4AController {
     private DistrictService districtService;
 	
 	@Autowired
-    private InstitutionalStructureServiceImpl isserv;
+    private InstitutionalStructureService isserv;
 	
 	@Autowired
 	private InstitutionalStructureRepository institutionalRepo;
