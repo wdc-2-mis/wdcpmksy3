@@ -233,10 +233,28 @@ document.addEventListener("DOMContentLoaded", function () {
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		   </div>
 		
-		   <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-		    <span th:text="${error}"></span>
-		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		   </div>
+		   <div th:if="${error}"
+     class="alert alert-warning alert-dismissible fade show"
+     role="alert">
+
+    <i class="fas fa-exclamation-triangle me-2"></i>
+
+    <strong>Action Required:</strong>
+    <span th:text="${error}"></span>
+
+    <a th:href="@{/wcdcFunctionariesPPR4B}"
+       class="btn btn-sm btn-primary ms-3">
+        Go to Institutional Structure
+    </a>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+    </button>
+
+</div>
+		   
+		   
 	        <div th:if="${saveMessage}" class="alert alert-success" th:text="${saveMessage}"></div>
 	        
 	        
@@ -310,10 +328,15 @@ document.addEventListener("DOMContentLoaded", function () {
 								</div>
 								
 								<div class="text-center mt-4">
-								<button type="submit" name="action"  value="D" id="saveDraftBtn" class="btn btn-warning">
-								      <i class="fas fa-save"></i>
-								      Save as Draft
-								</button>
+								<button type="submit"
+        									name="action"
+        									value="D"
+        								id="saveDraftBtn"
+        								class="btn btn-warning"
+        					th:disabled="${!institutionalStructureCompleted}">
+    <i class="fas fa-save"></i>
+    Save as Draft
+</button>
 							
 							</div>
 

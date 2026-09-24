@@ -44,27 +44,54 @@ public class PPRProjectController {
 	
 	
 	@GetMapping("/pprDistrict")
-    public String ppr1(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
-	{
-		String statename=session.getAttribute("statename").toString();
-		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-		Object userid = session.getAttribute("userid");
-        if(userid==null){
+	public String ppr1(HttpSession session,
+	                    Model model,
+	                    @RequestParam(required = false) Integer pprid) {
 
-            return "redirect:/login";
-        }
-        if (pprid != null) {
-        	pprService.OpenPPRDist(pprid);
-        }
-        model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
-        model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
-        model.addAttribute("microwatershedList", microService.getMicroServiceIdandName());
-		model.addAttribute("statename", statename);
-		model.addAttribute("stcode", stcode);
-		List<MPpr> records = pprRepo.findAllOrderByStatusAndId();
+	    Object userid = session.getAttribute("userid");
+
+	    if (userid == null) {
+	        return "redirect:/login";
+	    }
+
+	    String statename = session.getAttribute("statename").toString();
+	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+
+	    if (pprid != null) {
+	        pprService.OpenPPRDist(pprid);
+	    }
+
+	    // Check whether Institutional Structure is completed
+	    boolean institutionalStructureCompleted =
+	            pprService.isInstitutionalStructureCompleted(stcode);
+
+	    model.addAttribute("institutionalStructureCompleted",
+	                       institutionalStructureCompleted);
+
+	    if (!institutionalStructureCompleted) {
+	        model.addAttribute(
+	            "error",
+	            "Please complete the Institutional Structure before entering Preliminary Project Report (PPR1) details."
+	        );
+	    }
+
+	    model.addAttribute("distList",
+	            districtService.findCompletedDistrictsByState(stcode));
+
+	    model.addAttribute("finYearList",
+	            finService.getFinYearCdAndDesc());
+
+	    model.addAttribute("microwatershedList",
+	            microService.getMicroServiceIdandName());
+
+	    model.addAttribute("statename", statename);
+	    model.addAttribute("stcode", stcode);
+
+	    List<MPpr> records = pprRepo.findAllOrderByStatusAndId();
 	    model.addAttribute("records", records);
-        return "ppr/pprDistrict";
-    }
+
+	    return "ppr/pprDistrict";
+	}
 	
 	@GetMapping("/checkDistrictCompleted")
 	@ResponseBody

@@ -109,6 +109,7 @@ public class LoginController {
     	String email=login.getEmailid();
     	Integer regid =0;
     	String usertype =null;
+    	String rolename = null;
     	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
     	int i =1;
 
@@ -135,6 +136,7 @@ public class LoginController {
             	    String department = (String) row[3];
             	    String mobile = (String) row[6];
             	    String statename = (String) row[13];
+            	    rolename = (String) row[11];
             	    usertype = (String) row[1];
             	    String username = (String) row[0];
             	    String user_id = (String) row[8];
@@ -286,6 +288,7 @@ public class LoginController {
              	    String department = (String) row[3];
              	    String mobile = (String) row[6];
              	    String statename = (String) row[13];
+             	    rolename = (String) row[11];
              	    usertype = (String) row[1];
              	    String username = (String) row[0];
              	    String user_id = (String) row[8];
@@ -391,7 +394,7 @@ public class LoginController {
      			model.addAttribute("userList", otpService.getUserVerify(userid));
      			
      			
-     			if(usertype.equals("SL"))
+     			if(usertype.equals("SL") && rolename.equals("SLNA"))
      			{
      				return "redirect:/progressdashboard";
      			}

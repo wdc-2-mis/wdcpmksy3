@@ -1,18 +1,23 @@
 package gov.dolr.wdcpmksy3.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import gov.dolr.wdcpmksy3.dto.ProfileBean;
 import gov.dolr.wdcpmksy3.entity.MState;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
+import gov.dolr.wdcpmksy3.repository.UserRepository;
 import gov.dolr.wdcpmksy3.service.MenuService;
 import gov.dolr.wdcpmksy3.service.OtpService;
 import gov.dolr.wdcpmksy3.service.ProfileService;
@@ -35,6 +40,9 @@ public class ProfileController {
 	
 	@Autowired
     private ProfileService profileService;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@GetMapping("/profile")
     public String profile(HttpSession session, Model model) {
@@ -145,6 +153,68 @@ model.addAttribute("sessionTimeout", session.getMaxInactiveInterval());
         }
 
         model.addAttribute("username", username);
+
+        return "changePassword";
+    }
+    
+    @PostMapping("/changePassword")
+    public String updatePassword(
+            @RequestParam("newPassword") String newPassword,
+            @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session,
+            Model model) {
+
+        String userId = (String) session.getAttribute("userid");
+        String username = (String) session.getAttribute("username");
+
+        if (userId == null || username == null) {
+            return "redirect:/login";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("username", username);
+            model.addAttribute("error", "New password and confirm password do not match.");
+            return "changePassword";
+        }
+
+         if (newPassword.length() < 6
+                || !newPassword.matches(".*[A-Z].*")
+                || !newPassword.matches(".*[a-z].*")
+                || !newPassword.matches(".*[^A-Za-z0-9].*")) {
+
+            model.addAttribute("username", username);
+            model.addAttribute("error",
+                    "Password must contain at least 6 characters, one uppercase letter, one lowercase letter and one special character.");
+
+            return "changePassword";
+        }
+
+        try {
+
+            WdcpmksyUserReg user = userRepository.findByUserId(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+            String encryptedPassword = encoder.encode(newPassword);
+
+            user.setEncryptedPass(encryptedPassword);
+            user.setPaswdModify(new java.sql.Date(System.currentTimeMillis()));
+            user.setLastUpdatedDate(new java.sql.Date(System.currentTimeMillis()));
+            user.setLastUpdatedBy(userId);
+
+            userRepository.save(user);
+
+            model.addAttribute("username", username);
+            model.addAttribute("success", "Password changed successfully.");
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            model.addAttribute("username", username);
+            model.addAttribute("error", "Unable to change password. Please try again.");
+        }
 
         return "changePassword";
     }

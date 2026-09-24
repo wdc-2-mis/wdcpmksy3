@@ -26,6 +26,7 @@ import gov.dolr.wdcpmksy3.entity.MDistrict;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
 import gov.dolr.wdcpmksy3.repository.MDistrictRepository;
+import gov.dolr.wdcpmksy3.repository.PprWcdcFunctionaryRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -38,6 +39,7 @@ public class PPRDistrictService {
     @Autowired private MicroWatershedRepository microRepo;
     @Autowired private InstitutionalStructureRepository instRepo;
     @Autowired private PprMicroWatershedRepository pmwRepo;
+    @Autowired private PprWcdcFunctionaryRepository pprWcdcFunctionaryRepository;
     
     @Autowired
     private UserRepository ur;
@@ -299,5 +301,14 @@ return "Error updating record: " + e.getMessage();
 		}
 		return st;
 		
+	}
+
+	public boolean isInstitutionalStructureCompleted(Integer stcode) {
+
+	    long count =
+	            pprWcdcFunctionaryRepository
+	                .countCompletedInstitutionalStructure(stcode);
+
+	    return count > 0;
 	}
 }

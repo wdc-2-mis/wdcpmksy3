@@ -17,4 +17,20 @@ public interface PprWcdcFunctionaryRepository extends JpaRepository<PprWcdcFunct
 			+ "join ppr_wcdc_functionary f on e.ppr_wcdc_fun_id=f.ppr_wcdc_fun_id join ppr_wcdc_details w  on f.ppr_wcdc_id=w.ppr_wcdc_id JOIN m_district d ON d.dcode = w.dcode "
 			+ "join m_designation de on f.designation_id=de.designation_id join m_qualification q on f.qualification_id=q.qualification_id where d.st_code=:stcode order by d.dist_name", nativeQuery = true)
 	List<Object[]> getWcdcFunctionariesList(@Param("stcode") int stcode);
+
+	@Query(value = """
+		    SELECT COUNT(*)
+		    FROM ppr_wcdc_functionary
+		    WHERE ppr_wcdc_id IN (
+		        SELECT ppr_wcdc_id
+		        FROM ppr_wcdc_details
+		        WHERE dcode IN (
+		            SELECT dcode
+		            FROM m_district
+		            WHERE st_code = :stcode
+		        )
+		    )
+		    AND status = 'C'
+		    """, nativeQuery = true)
+		long countCompletedInstitutionalStructure(@Param("stcode") Integer stcode);
 }
