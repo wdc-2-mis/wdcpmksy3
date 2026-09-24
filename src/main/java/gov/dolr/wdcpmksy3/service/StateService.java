@@ -17,6 +17,10 @@ public class StateService {
     public List<MState> getAllStates(int i) {
         return stateRepo.findAllByWdcpmksyOrderByStNameAsc(i);
     }
+    
+    public List<MState> findAllByRegId(Integer regId){
+    	return stateRepo.findAllByRegId(regId);
+    }
 
 	
 }

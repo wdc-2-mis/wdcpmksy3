@@ -32,11 +32,15 @@
 					<form id="projectForm">
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-2 fw-bold">State Name <span class="required">*</span></label>
-							<div class="col-md-3">
+							<div class="col-md-5" th:if="${stateOrList}">
+								<input type="text" class="form-control" id="state" name="state" th:value="${statename}" readonly>
+							</div>
+							<div class="col-md-3" th:unless="${stateOrList}">
 								<select class="form-select" id="state" name="state" required>
 									<option value="0">--Select All--</option>
-									<option th:each="s : ${stateList}" th:value="${s.getStateCode}" th:text="${s.getStateName}"
-										th:selected="${selectedState != null and selectedState == s.getStateCode}"></option>
+									<option th:each="s : ${stateList}" th:value="${s.stCode}" th:text="${s.stName}"
+										th:selected="${selectedState != null and selectedState == s.stCode}">
+									</option>
 								</select>
 							</div>
 						</div>
@@ -53,15 +57,19 @@
 								<th>S.No.</th>
 								<th>District Name</th>
 								<th>PPR Name</th>
+								<th>Proposed Area</th>
+								<th>Proposed Cost</th>
 								<th>Status</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr th:each="data, stat : ${stWisePprTransactionList}">
 								<td th:text="${stat.count}"></td>
-								<td th:text="${data.ppr.district.distName}"></td>
-								<td th:text="${data.ppr.projectName}"></td>
-								<td th:text="${data.action}"></td>
+								<td th:text="${data.districtName}"></td>
+								<td th:text="${data.projectName}"></td>
+								<td th:text="${data.treatedArea}"></td>
+								<td th:text="${data.proposedCost}"></td>
+								<td th:text="${data.tranStatus}"></td>
 							</tr>
 							<tr th:if="${#lists.isEmpty(stWisePprTransactionList)}">
 								<td colspan="4" class="text-center text-danger">
