@@ -13,6 +13,8 @@ public interface WdcpmksyUserProjectMapRepository
 
     List<WdcpmksyUserProjectMap> findByUser_RegId(Integer regId);
 
+    boolean existsByUser_RegId(Integer regId);
+    
     boolean existsByUser_RegIdAndProject_ProjId(
             Integer regId,
             Integer projId
@@ -22,4 +24,6 @@ public interface WdcpmksyUserProjectMapRepository
             Integer regId,
             Integer projId
     );
+    
+    
 }

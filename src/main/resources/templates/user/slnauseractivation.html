@@ -320,6 +320,150 @@ function activatePiaUser(regId) {
 }
 
 
+function deleteUser(button) {
+
+    const regId = button.getAttribute("data-reg-id");
+
+    if (!regId) {
+        alert("Invalid user.");
+        return;
+    }
+
+    const confirmed = confirm(
+        "Are you sure you want to delete this user?\n\n" +
+        "This action cannot be undone."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    fetch("/deleteUser?regId=" + encodeURIComponent(regId), {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.status === "SUCCESS") {
+
+            alert(data.message);
+
+            /*
+             * Reload table/page.
+             */
+            location.reload();
+
+        } else {
+
+            alert(data.message || "Unable to delete user.");
+        }
+    })
+    .catch(error => {
+
+        console.error("Delete error:", error);
+
+        alert("Unable to delete user. Please try again.");
+    });
+}
+
+function deactivateUser(button) {
+
+    const regId = button.getAttribute("data-reg-id");
+
+    if (!regId) {
+        alert("Invalid user.");
+        return;
+    }
+
+    const confirmed = confirm(
+        "Are you sure you want to inactivate this user?\n\n" +
+        "The user will not be able to log in until the account is reactivated."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    fetch("/deactivateUser?regId=" + encodeURIComponent(regId), {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.status === "SUCCESS") {
+
+            alert(data.message);
+
+            location.reload();
+
+        } else {
+
+            alert(data.message || "Unable to inactivate user.");
+        }
+    })
+    .catch(error => {
+
+        console.error("Inactive error:", error);
+
+        alert(
+            "Unable to inactivate user. Please try again."
+        );
+    });
+}
+
+function activateExistingUser(button) {
+
+    const regId = button.getAttribute("data-reg-id");
+
+    if (!regId) {
+        alert("Invalid user.");
+        return;
+    }
+
+    const confirmed = confirm(
+        "Do you want to activate this user?\n\n" +
+        "The existing User ID and Password will remain unchanged."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    fetch("/activateExistingUser?regId=" + encodeURIComponent(regId), {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.status === "SUCCESS") {
+
+            alert(data.message);
+
+            location.reload();
+
+        } else {
+
+            alert(data.message || "Unable to activate user.");
+        }
+    })
+    .catch(error => {
+
+        console.error("Activate error:", error);
+
+        alert(
+            "Unable to activate user. Please try again."
+        );
+    });
+}
 </script>
 
 
@@ -553,25 +697,40 @@ function activatePiaUser(regId) {
                         <td>
 
                             <button type="button"
-                                    class="btn btn-warning btn-sm"
-                                    th:if="${user.status == 'Active' or user.status == 'ACTIVE'}">
+        							class="btn btn-warning btn-sm"
+        							th:if="${user.status != null and user.status.equalsIgnoreCase('Active')}"
+        							th:attr="data-reg-id=${user.regId}"
+        							onclick="deactivateUser(this)">
+        							<i class="fa-solid fa-user-slash"></i>
+   								Inactive
+							</button>
 
-                                InActivate
+                           
 
-                            </button>
-
-                            <button type="button" class="btn btn-success btn-sm activate-btn" th:unless="${user.status == 'Active' or user.status == 'ACTIVE'}" th:attr="data-reg-id=${user.regId}, data-user-name=${user.userName}"> 
-                            <i class="fas fa-check-circle me-1"></i> Activate </button>
-
+<button type="button" 
+        class="btn btn-success btn-sm activate-btn" 
+        th:if="${user.status != null and user.status.equalsIgnoreCase('New')}" 
+        th:attr="data-reg-id=${user.regId}, data-user-name=${user.userName}"> 
+    <i class="fas fa-check-circle me-1"></i> Activate 
+</button>
                         
 
+<button type="button"
+            class="btn btn-success btn-sm"
+            th:if="${user.status != null and user.status.equalsIgnoreCase('Inactive')}"
+            th:attr="data-reg-id=${user.regId}"
+            onclick="activateExistingUser(this)">
+        <i class="fa-solid fa-user-check"></i>
+        Re-Activate
+    </button>
+
                             <button type="button"
-                                    class="btn btn-danger btn-sm"
-                                    th:if="${user.status == 'New' or user.status == 'NEW'}">
-
-                                Delete
-
-                            </button>
+        							class="btn btn-danger btn-sm"
+        							th:if="${user.userId == null or #strings.isEmpty(user.userId.trim())}"
+        							th:attr="data-reg-id=${user.regId}"
+        							onclick="deleteUser(this)">
+    							Delete
+							</button>
 
                         </td>
 

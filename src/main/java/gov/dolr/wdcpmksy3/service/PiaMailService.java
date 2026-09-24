@@ -190,4 +190,138 @@ public class PiaMailService {
 
         return false;
     }
+    
+    public boolean sendInactiveMail(
+            String email,
+            String userName,
+            String userId) {
+
+        try {
+
+            String message =
+                    "Dear " + userName + ",\n\n"
+                    + "This is to inform you that your "
+                    + "WDC-PMKSY 3.0 user account has been "
+                    + "temporarily inactivated by the administration.\n\n"
+                    + "User ID : " + userId + "\n\n"
+                    + "You will not be able to log in while your "
+                    + "account remains inactive.\n\n"
+                    + "If you require further information, "
+                    + "please contact your concerned administrator.\n\n"
+                    + "Regards,\n"
+                    + "WDC-PMKSY 3.0\n"
+                    + "Department of Land Resources\n"
+                    + "Ministry of Rural Development\n"
+                    + "Government of India";
+
+            SendCredentialMailRequest request =
+                    new SendCredentialMailRequest();
+
+            request.setEmail(email);
+            request.setFromEmail("support-wdcpmksy@nic.in");
+            request.setFromName("WDC-PMKSY 3.0");
+
+            request.setSubject(
+                    "WDC-PMKSY 3.0 – User Account Inactivated"
+            );
+
+            request.setMessage(message);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<SendCredentialMailRequest> entity =
+                    new HttpEntity<>(request, headers);
+
+            ResponseEntity<Map> response =
+                    restTemplate.postForEntity(
+                            MAIL_URL,
+                            entity,
+                            Map.class
+                    );
+
+            if (response.getBody() != null) {
+
+                Object status =
+                        response.getBody().get("status");
+
+                return "SENT".equalsIgnoreCase(
+                        String.valueOf(status)
+                );
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    
+    public boolean sendReactivatedMail(
+            String email,
+            String userName,
+            String userId) {
+
+        try {
+
+            String message =
+                    "Dear " + userName + ",\n\n"
+                    + "This is to inform you that your "
+                    + "WDC-PMKSY 3.0 user account has been "
+                    + "reactivated by the administration.\n\n"
+                    + "User ID : " + userId + "\n\n"
+                    + "You may now log in using your existing "
+                    + "User ID and Password.\n\n"
+                    + "No change has been made to your existing "
+                    + "login credentials.\n\n"
+                    + "Regards,\n"
+                    + "WDC-PMKSY 3.0\n"
+                    + "Department of Land Resources\n"
+                    + "Ministry of Rural Development\n"
+                    + "Government of India";
+
+            SendCredentialMailRequest request =
+                    new SendCredentialMailRequest();
+
+            request.setEmail(email);
+            request.setFromEmail("support-wdcpmksy@nic.in");
+            request.setFromName("WDC-PMKSY 3.0");
+
+            request.setSubject(
+                    "WDC-PMKSY 3.0 – User Account Reactivated"
+            );
+
+            request.setMessage(message);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<SendCredentialMailRequest> entity =
+                    new HttpEntity<>(request, headers);
+
+            ResponseEntity<Map> response =
+                    restTemplate.postForEntity(
+                            MAIL_URL,
+                            entity,
+                            Map.class
+                    );
+
+            if (response.getBody() != null) {
+
+                Object status =
+                        response.getBody().get("status");
+
+                return "SENT".equalsIgnoreCase(
+                        String.valueOf(status)
+                );
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

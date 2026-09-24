@@ -254,7 +254,7 @@ public class UserRoleProjectMapController {
                         regId,
                         roleId,
                         updatedBy,
-                        requestIp
+                        requestIp, request
                 );
 
         return ResponseEntity.ok(
@@ -285,7 +285,7 @@ public class UserRoleProjectMapController {
                         regId,
                         projectIds,
                         updatedBy,
-                        requestIp
+                        requestIp, request
                 );
 
         return ResponseEntity.ok(

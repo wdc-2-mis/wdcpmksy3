@@ -1,5 +1,6 @@
 package gov.dolr.wdcpmksy3.controller;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import gov.dolr.wdcpmksy3.dto.ActivatePiaUserResponse;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 import gov.dolr.wdcpmksy3.service.PIAUserActivationService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -84,6 +86,166 @@ public class PiaUserActivationController {
 	}
 
 	
+	@PostMapping("/deleteUser")
+	@ResponseBody
+	public Map<String, Object> deleteUser(
+	        @RequestParam Integer regId,
+	        HttpSession session) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+
+	        Object loggedUser = session.getAttribute("userid");
+
+	        if (loggedUser == null) {
+
+	            response.put("status", "ERROR");
+	            response.put("message",
+	                    "Session expired. Please login again.");
+
+	            return response;
+	        }
+
+	        piaUserActivationService.deleteNewUser(regId);
+
+	        response.put("status", "SUCCESS");
+	        response.put("message",
+	                "User deleted successfully.");
+
+	    } catch (IllegalArgumentException e) {
+
+	        response.put("status", "ERROR");
+	        response.put("message", e.getMessage());
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        response.put("status", "ERROR");
+	        response.put("message",
+	                "Unable to delete user.");
+	    }
+
+	    return response;
+	}
+	
+	@PostMapping("/deactivateUser")
+	@ResponseBody
+	public Map<String, Object> deactivateUser(
+	        @RequestParam Integer regId,
+	        HttpSession session,
+	        HttpServletRequest request) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+
+	        Object useridObj = session.getAttribute("userid");
+
+	        if (useridObj == null) {
+
+	            response.put("status", "ERROR");
+	            response.put("message",
+	                    "Session expired. Please login again.");
+
+	            return response;
+	        }
+
+	        String updatedBy = useridObj.toString();
+
+	        piaUserActivationService.deactivateUser(
+	                regId,
+	                updatedBy
+	        );
+
+	        response.put("status", "SUCCESS");
+	        response.put("message",
+	                "User has been inactivated successfully.");
+
+	    } catch (IllegalArgumentException e) {
+
+	        response.put("status", "ERROR");
+	        response.put("message", e.getMessage());
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        response.put("status", "ERROR");
+	        response.put("message",
+	                "Unable to inactivate user.");
+	    }
+
+	    return response;
+	}
+	
+	@PostMapping("/activateExistingUser")
+	@ResponseBody
+	public Map<String, Object> activateExistingUser(
+	        @RequestParam Integer regId,
+	        HttpSession session) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+
+	        Object useridObj = session.getAttribute("userid");
+
+	        if (useridObj == null) {
+
+	            response.put("status", "ERROR");
+	            response.put("message",
+	                    "Session expired. Please login again.");
+
+	            return response;
+	        }
+
+	        String updatedBy = useridObj.toString();
+
+	        boolean mailSent =
+	        		piaUserActivationService.reactivateUser(
+	                        regId,
+	                        updatedBy
+	                );
+
+	        response.put("status", "SUCCESS");
+
+	        if (mailSent) {
+
+	            response.put(
+	                    "message",
+	                    "User activated successfully. "
+	                    + "Notification email has been sent."
+	            );
+
+	        } else {
+
+	            response.put(
+	                    "message",
+	                    "User activated successfully, "
+	                    + "but notification email could not be sent."
+	            );
+	        }
+
+	    } catch (IllegalArgumentException e) {
+
+	        response.put("status", "ERROR");
+	        response.put("message", e.getMessage());
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        response.put("status", "ERROR");
+	        response.put(
+	                "message",
+	                "Unable to activate user."
+	        );
+	    }
+
+	    return response;
+	}
 	
 	@RequestMapping(value = "/slnausersrch", method = {RequestMethod.GET, RequestMethod.POST})
 	public String searchUsers(

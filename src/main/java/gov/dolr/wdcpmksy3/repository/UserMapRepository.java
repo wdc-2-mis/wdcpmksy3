@@ -66,7 +66,7 @@ public interface UserMapRepository extends JpaRepository<WdcpmksyUserMap, Intege
     Integer findMaxMapId();
 
 
-	
+    void deleteByUser_RegId(Integer regId);
 
 
  

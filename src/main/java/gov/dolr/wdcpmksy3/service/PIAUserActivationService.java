@@ -1,6 +1,9 @@
 package gov.dolr.wdcpmksy3.service;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import gov.dolr.wdcpmksy3.dto.ActivatePiaUserResponse;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserMap;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
+import gov.dolr.wdcpmksy3.repository.UserMapRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
+import gov.dolr.wdcpmksy3.repository.WdcpmksyUserAppRoleMapRepository;
+import gov.dolr.wdcpmksy3.repository.WdcpmksyUserProjectMapRepository;
 
 @Service
 public class PIAUserActivationService {
@@ -35,8 +41,16 @@ public class PIAUserActivationService {
 		    this.piaMailService = piaMailService;
 		}
    
-	
 	 
+	 @Autowired
+	 private UserMapRepository userMapRepository;
+
+	 @Autowired
+	 private WdcpmksyUserAppRoleMapRepository userAppRoleMapRepository;
+	 
+
+	 @Autowired
+	 private WdcpmksyUserProjectMapRepository userProjectMapRepository;
 	 
 	public List<WdcpmksyUserReg> searchPiaUsers(String userId, String userName, String userType, String status, Integer stCode) {
 		
@@ -71,22 +85,14 @@ public class PIAUserActivationService {
 
 	    try {
 
-	        // -------------------------------------------------
-	        // 1. Find user
-	        // -------------------------------------------------
-
+	       
 	        WdcpmksyUserReg user =
 	                userRegRepository.findById(regId.longValue())
 	                        .orElseThrow(() ->
 	                                new RuntimeException("User not found.")
 	                        );
 
-
-	        // -------------------------------------------------
-	        // 2. Check current status
-	        // -------------------------------------------------
-
-	        if ("Active".equalsIgnoreCase(user.getStatus())) {
+           if ("Active".equalsIgnoreCase(user.getStatus())) {
 
 	            return new ActivatePiaUserResponse(
 	                    "ERROR",
@@ -97,10 +103,6 @@ public class PIAUserActivationService {
 	            );
 	        }
 
-
-	        // -------------------------------------------------
-	        // 3. Get user's mapping
-	        // -------------------------------------------------
 
 	        if (user.getUserMappings() == null
 	                || user.getUserMappings().isEmpty()) {
@@ -117,10 +119,6 @@ public class PIAUserActivationService {
 	        WdcpmksyUserMap userMap =
 	                user.getUserMappings().get(0);
 
-
-	        // -------------------------------------------------
-	        // 4. Get State Code
-	        // -------------------------------------------------
 
 	        Integer stCode = null;
 
@@ -142,10 +140,6 @@ public class PIAUserActivationService {
 	        }
 
 
-	        // -------------------------------------------------
-	        // 5. Get User Type
-	        // -------------------------------------------------
-
 	        String userType = user.getUserType();
 
 	        if (userType == null
@@ -163,13 +157,6 @@ public class PIAUserActivationService {
 	        userType =
 	                userType.trim().toUpperCase();
 
-
-	        // -------------------------------------------------
-	        // 6. Get District Code
-	        //
-	        // PI and DI require district.
-	        // SL and DL do NOT require district.
-	        // -------------------------------------------------
 
 	        Integer dcode = null;
 
@@ -203,18 +190,11 @@ public class PIAUserActivationService {
 	        }
 
 
-	        // -------------------------------------------------
-	        // 7. Generate User ID
-	        // -------------------------------------------------
-
 	        String newUserId;
 
 	        switch (userType) {
 
 	            case "PI":
-
-	                // PI + 2 digit state + 3 digit district
-	                // + 3 random alphabets
 
 	                newUserId =
 	                        generateUserId(
@@ -229,9 +209,6 @@ public class PIAUserActivationService {
 
 	            case "SL":
 
-	                // SL + 2 digit state + 00
-	                // + 2 random alphabets
-
 	                newUserId =
 	                        generateUserId(
 	                                "SL",
@@ -245,9 +222,6 @@ public class PIAUserActivationService {
 
 	            case "DL":
 
-	                // DL + 2 digit state + 00
-	                // + 3 random alphabets
-
 	                newUserId =
 	                        generateUserId(
 	                                "DL",
@@ -260,11 +234,7 @@ public class PIAUserActivationService {
 
 
 	            case "DI":
-
-	                // DI + 2 digit state + 3 digit district
-	                // + 2 random alphabets
-
-	                newUserId =
+         newUserId =
 	                        generateUserId(
 	                                "DI",
 	                                stCode,
@@ -286,26 +256,12 @@ public class PIAUserActivationService {
 	                );
 	        }
 
-
-	        // -------------------------------------------------
-	        // 8. Generate Password
-	        // -------------------------------------------------
-
-	        String rawPassword =
+    String rawPassword =
 	                generatePassword();
 
-
-	        // -------------------------------------------------
-	        // 9. Encrypt Password
-	        // -------------------------------------------------
-
-	        String encryptedPassword =
+     String encryptedPassword =
 	                encoder.encode(rawPassword);
 
-
-	        // -------------------------------------------------
-	        // 10. Update User
-	        // -------------------------------------------------
 
 	        user.setUserId(newUserId);
 	        user.setEncryptedPass(encryptedPassword);
@@ -313,10 +269,6 @@ public class PIAUserActivationService {
 
 	        userRegRepository.save(user);
 
-
-	        // -------------------------------------------------
-	        // 11. Send Credentials by Email
-	        // -------------------------------------------------
 
 	        boolean emailSent =
 	                piaMailService.sendCredentialMail(
@@ -326,10 +278,6 @@ public class PIAUserActivationService {
 	                        rawPassword
 	                );
 
-
-	        // -------------------------------------------------
-	        // 12. Prepare Response
-	        // -------------------------------------------------
 
 	        ActivatePiaUserResponse response =
 	                new ActivatePiaUserResponse(
@@ -382,15 +330,10 @@ public class PIAUserActivationService {
 	        Integer dcode,
 	        int randomLength) {
 
-	    // State code must always be 2 digits
 	    String stateCode =
 	            String.format("%02d", stCode);
 
-
-	    // District code
-	    // For SL and DL, dcode will be 0
-	    // and therefore becomes "000".
-	    String districtCode;
+   String districtCode;
 
 	    if ("SL".equalsIgnoreCase(prefix)
 	            || "DL".equalsIgnoreCase(prefix)) {
@@ -525,6 +468,123 @@ public class PIAUserActivationService {
         }
 
         return new String(chars);
+    }
+
+
+
+
+    @Transactional
+    public void deleteNewUser(Integer regId) {
+
+        WdcpmksyUserReg user = userRegRepository.findById(regId.longValue())
+                .orElseThrow(() ->
+                        new IllegalArgumentException("User not found."));
+
+        if (user.getUserId() != null
+                && !user.getUserId().trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "User cannot be deleted because User ID has already been generated."
+            );
+        }
+
+        if (userAppRoleMapRepository.existsByRegId(regId)) {
+
+            throw new IllegalArgumentException(
+                    "User cannot be deleted because a role is already assigned."
+            );
+        }
+
+        if (userProjectMapRepository.existsByUser_RegId(regId)) {
+
+            throw new IllegalArgumentException(
+                    "User cannot be deleted because a project is already assigned."
+            );
+        }
+
+        userMapRepository.deleteByUser_RegId(regId);
+
+       
+        userRegRepository.delete(user);
+    }
+
+    @Transactional
+    public boolean deactivateUser(
+            Integer regId,
+            String updatedBy) {
+
+        WdcpmksyUserReg user = userRegRepository.findById(regId.longValue())
+                .orElseThrow(() ->
+                        new IllegalArgumentException("User not found."));
+
+        if (!"Active".equalsIgnoreCase(user.getStatus())) {
+
+            throw new IllegalArgumentException(
+                    "Only active users can be inactivated."
+            );
+        }
+
+        user.setStatus("Inactive");
+        user.setLastUpdatedBy(updatedBy);
+        user.setLastUpdatedDate(new java.sql.Date(System.currentTimeMillis()));
+
+        userRegRepository.save(user);
+
+        boolean mailSent = piaMailService.sendInactiveMail(
+                user.getEmail(),
+                user.getUserName(),
+                user.getUserId()
+        );
+
+        return mailSent;
+    }
+
+    @Transactional
+    public boolean reactivateUser(
+            Integer regId,
+            String updatedBy) {
+
+        WdcpmksyUserReg user = userRegRepository.findById(regId.longValue())
+                .orElseThrow(() ->
+                        new IllegalArgumentException("User not found."));
+
+        if (!"Inactive".equalsIgnoreCase(user.getStatus())) {
+
+            throw new IllegalArgumentException(
+                    "Only inactive users can be activated."
+            );
+        }
+
+        if (user.getUserId() == null
+                || user.getUserId().trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "User ID is missing for this inactive account."
+            );
+        }
+
+        if (user.getEncryptedPass() == null
+                || user.getEncryptedPass().trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Password is missing for this inactive account."
+            );
+        }
+
+       
+        user.setStatus("Active");
+        user.setLastUpdatedBy(updatedBy);
+        user.setLastUpdatedDate(new java.sql.Date(System.currentTimeMillis()));
+
+        userRegRepository.save(user);
+
+        boolean mailSent = piaMailService.sendReactivatedMail(
+                user.getEmail(),
+                user.getUserName(),
+                user.getUserId()
+        );
+
+        return mailSent;
     }
 
 }
