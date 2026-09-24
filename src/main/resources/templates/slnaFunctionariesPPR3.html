@@ -291,6 +291,27 @@ document.addEventListener("click", function (e) {
 		    <span th:text="${error}"></span>
 		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
+		
+		<div th:if="${error1}"
+		     class="alert alert-warning alert-dismissible fade show"
+		     role="alert">
+
+		    <i class="fas fa-exclamation-triangle me-2"></i>
+
+		    <strong>Action Required:</strong>
+		    <span th:text="${error1}"></span>
+
+		    <a th:href="@{/detailsOfSLNA}"
+		       class="btn btn-sm btn-primary ms-3">
+		        Go to Details of SLNA
+		    </a>
+
+		    <button type="button"
+		            class="btn-close"
+		            data-bs-dismiss="alert">
+		    </button>
+
+		</div>
 
         <div class="card-body">
 
@@ -512,7 +533,7 @@ document.addEventListener("click", function (e) {
 						</table>
 
 						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning">
+							<button type="submit" name="action"  value="D" class="btn btn-warning" th:disabled="${!existssl}">
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>

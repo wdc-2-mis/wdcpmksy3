@@ -42,6 +42,45 @@ document.addEventListener("DOMContentLoaded", function () {
 	mouDate1.setAttribute("max", today);
 	
 	const form = document.getElementById("institutionForm");
+	const formedit = document.getElementById("editForm");
+	
+	if (formedit) {
+
+	    const slnaType1 = document.getElementById("slnaType1");
+
+	    if (slnaType1) {
+
+	        slnaType1.addEventListener("blur", function () {
+
+	            if (!slnaType1.value.trim()) {
+	                slnaType1.classList.add("is-invalid");
+	                slnaType1.classList.remove("is-valid");
+	            } else {
+	                slnaType1.classList.remove("is-invalid");
+	                slnaType1.classList.add("is-valid");
+	            }
+
+	        });
+
+	        formedit.addEventListener("submit", function (event) {
+
+	            if (!slnaType1.value.trim()) {
+
+	                event.preventDefault();
+
+	                slnaType1.classList.add("is-invalid");
+	                slnaType1.classList.remove("is-valid");
+
+	                slnaType1.focus();
+	            } else {
+
+	                slnaType1.classList.remove("is-invalid");
+	                slnaType1.classList.add("is-valid");
+	            }
+
+	        });
+	    }
+	}
 
 	   if (form) {
 
@@ -364,7 +403,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <label class="form-label">
                           <b>  Date of Notification </b><span class="required">*</span>
                         </label>
-						<input type="date" class="form-control" name="notificationDate"  min="2026-01-01"  required>
+						<input type="date" class="form-control" name="notificationDate"  min="2026-01-01"  required onkeydown="return false;">
 							<div class="invalid-feedback">Please select date of notification</div>
                     </div>
 
@@ -394,7 +433,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </label>
 
 						<input type="date" class="form-control" name="mouDate"
-						          min="2026-01-01"  required>
+						          min="2026-01-01"  onkeydown="return false;" required>
 								  <div class="invalid-feedback">Please select date of MoU with DoLR</div>
                     </div>
                     <div class="col-md-6">
@@ -544,12 +583,13 @@ document.addEventListener("DOMContentLoaded", function () {
 														<b> Type of SLNA </b>
 													</label>
 													<input type="text" class="form-control" name="slnaType1" id="slnaType1" placeholder="Enter Type of SLNA" required>
+													<div class="invalid-feedback">Please enter type of SLNA</div>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
 														<b> Date of Notification </b>
 													</label>
-													<input type="date" class="form-control" name="notificationDate1" id="notificationDate1" min="2026-01-01" required>
+													<input type="date" class="form-control" name="notificationDate1" id="notificationDate1" min="2026-01-01" onkeydown="return false;" required>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
@@ -563,7 +603,7 @@ document.addEventListener("DOMContentLoaded", function () {
 													<label class="form-label">
 														<b> Date of MoU with DoLR </b> 
 													</label>
-													<input type="date" class="form-control" name="mouDate1" id="mouDate1" min="2026-01-01"  required>
+													<input type="date" class="form-control" name="mouDate1" id="mouDate1" min="2026-01-01"  onkeydown="return false;" required>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">

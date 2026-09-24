@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.repository.PprSlnaDetailsRepository;
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionary;
 import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionaryWorkExperience;
@@ -90,6 +91,9 @@ public class PPR1Controller {
     
     @Autowired
     private PprWcdcFunctionaryWorkExperienceRepository wdcexprep;
+    
+    @Autowired
+    private PprSlnaDetailsRepository slnadt;
 	
 	@GetMapping("/institutionalStructurePPR1")
     public String ppr1(HttpSession session, Model model) 
@@ -507,13 +511,20 @@ public class PPR1Controller {
             finalList.add(newRow);
             previousId = currentId;
         }
-
+        boolean exists=false;
+        exists=slnadt.existsByInstitutionalStructure_StCodeAndStatus(stcode, 'C');
         model.addAttribute("functionariesList", finalList);
       //  model.addAttribute("functionariesList", slnaFunctionaryService.getFunctionariesList(stcode));
         model.addAttribute("designationList", dserv.getAllDesignationDetails());
         model.addAttribute("qualificationList", qserv.getAllQualification());
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
+		model.addAttribute("existssl", exists);
+		if (!exists) {
+	        model.addAttribute( "error1", "Please complete the Details of SLNA before entering Functionaries of SLNA details.");
+	    }
+		
+		
         return "slnaFunctionariesPPR3";
     } 
     

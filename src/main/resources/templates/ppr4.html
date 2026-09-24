@@ -73,6 +73,13 @@
 					input.value = "";
 					return false;
 				}
+				const maxSize = 5 * 1024 * 1024; // 5 MB
+
+				if (file.size > maxSize) {
+					alert("PDF file size must not be more than 5 MB.");
+					input.value = "";
+					return false;
+				}
 
 				return true;
 			}
@@ -184,6 +191,26 @@
 				<span th:text="${error}"></span>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
+			<div th:if="${error1}"
+					     class="alert alert-warning alert-dismissible fade show"
+					     role="alert">
+
+					    <i class="fas fa-exclamation-triangle me-2"></i>
+
+					    <strong>Action Required:</strong>
+					    <span th:text="${error1}"></span>
+
+					    <a th:href="@{/institutionalStructurePPR1}"
+					       class="btn btn-sm btn-primary ms-3">
+					        Go to Institutional Structure
+					    </a>
+
+					    <button type="button"
+					            class="btn-close"
+					            data-bs-dismiss="alert">
+					    </button>
+
+					</div>
 
 			<div class="card-body">
 
@@ -232,7 +259,7 @@
 							<label>Date of Signing of MoU with SLNA</label><span class="required">*</span>
 						</div>
 						<div class="col-md-5">
-							<input type="date" name="MoU" id="MoU" class="form-control" required>
+							<input type="date" name="MoU" id="MoU" class="form-control" onkeydown="return false;" required>
 
 						</div>
 					</div>
@@ -255,7 +282,7 @@
 
 
 					<div class="text-center mt-4">
-						<button type="submit" name="action" value="D" class="btn btn-warning">
+						<button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!existssl}">
 							<i class="fas fa-save"></i>
 							Save as Draft
 						</button>

@@ -92,11 +92,16 @@ public class PreliminaryPPR4AController {
 		    Integer id = (Integer) row[0];
 		    System.out.println("Idkdy : " + id);
 		}
-        
+        boolean exists=false;
+        exists=institutionalRepo.existsByStCodeAndStatus(stcode, 'C');
+        if (!exists) {
+        	model.addAttribute( "error1", "Please complete the Institutional Structure before entering Functionaries of Watershed Cell");
+        }
         model.addAttribute("ppr4List", pprWcdcDetailsService.getPPR4List(stcode));
         model.addAttribute("distList", districtService.getDistrictsByState(stcode));
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
+		model.addAttribute("existssl", exists);
         return "ppr4";
     }
 	

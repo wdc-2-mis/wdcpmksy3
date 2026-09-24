@@ -14,5 +14,7 @@ public interface PprSlnaDetailsRepository extends JpaRepository<PprSlnaDetails, 
 	
 	// Find all details for a given InstitutionalStructure
     List<PprSlnaDetails> findByInstitutionalStructure(InstitutionalStructure institutionalStructure);
+    
+    boolean existsByInstitutionalStructure_StCodeAndStatus(Integer stCode, Character status);
 
 }

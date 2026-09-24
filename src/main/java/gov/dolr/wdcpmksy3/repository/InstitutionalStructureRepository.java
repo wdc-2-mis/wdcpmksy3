@@ -28,6 +28,8 @@ public interface InstitutionalStructureRepository extends JpaRepository<Institut
 
 
 		InstitutionalStructure findByStCode(Integer stCode);
+		
+		boolean existsByStCodeAndStatus(Integer stCode, Character status);
 	    
 	    
 
