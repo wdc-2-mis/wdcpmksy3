@@ -33,71 +33,380 @@
 		document.addEventListener("DOMContentLoaded", function () {
 
 			var editModal = document.getElementById('editModal');
-			editModal.addEventListener('show.bs.modal', function (event) {
-				var button = event.relatedTarget;
 
-				// Get data attributes  
-				var Id = button.getAttribute('data-id');
-				var state = button.getAttribute('data-state');
-				var district = button.getAttribute('data-district');
-				var project = button.getAttribute('data-project');
-				var block = button.getAttribute('data-block');
-				var scheme = button.getAttribute('data-scheme');
-				var projSanctionedNo = button.getAttribute('data-projSanctionedNo');
-				var projSanctionedArea = button.getAttribute('data-projSanctionedArea');
-				var netArea = button.getAttribute('data-netArea');
-				var proposedArea = button.getAttribute('data-proposedArea');
-				var proposedAreaOthers = button.getAttribute('data-proposedAreaOthers');
-				var netBalArea = button.getAttribute('data-netBalArea');
+editModal.addEventListener('show.bs.modal', function (event) {
 
-				// Populate modal fields  pprUnspentBalanceId
-				document.getElementById('pprProposedAreaId').value = Id;
-				document.getElementById('stateName1').value = state;
-				document.getElementById('district1').value = district;
-				document.getElementById('project1').value = project;
-				document.getElementById("block1").value = block;
-				document.getElementById("projSanctionedNo1").value = projSanctionedNo;
-				document.getElementById("projSanctionedArea1").value = projSanctionedArea;
-				document.getElementById("netArea1").value = netArea;
-				document.getElementById("proposedArea1").value = proposedArea;
-				document.getElementById("proposedAreaOthers1").value = proposedAreaOthers;
-				document.getElementById("netBalArea1").value = netBalArea;
-			});
+    var button = event.relatedTarget;
+
+    var Id = button.getAttribute('data-id');
+    var state = button.getAttribute('data-state');
+    var district = button.getAttribute('data-district');
+    var project = button.getAttribute('data-project');
+    var block = button.getAttribute('data-block');
+    var scheme = button.getAttribute('data-scheme');
+
+    var projSanctionedNo =
+        button.getAttribute('data-projSanctionedNo');
+
+    var projSanctionedArea =
+        button.getAttribute('data-projSanctionedArea');
+
+    var netArea =
+        button.getAttribute('data-netArea');
+
+    var proposedArea =
+        button.getAttribute('data-proposedArea');
+
+    var proposedAreaOthers =
+        button.getAttribute('data-proposedAreaOthers');
+
+    var netBalArea =
+        button.getAttribute('data-netBalArea');
 
 
+    // Populate modal fields
+
+    document.getElementById('pprProposedAreaId').value = Id;
+
+    document.getElementById('stateName1').value = state;
+
+    document.getElementById('district1').value = district;
+
+    document.getElementById('project1').value = project;
+
+    document.getElementById('block1').value = block;
+
+    document.getElementById('projSanctionedNo1').value =
+        projSanctionedNo;
+
+    document.getElementById('projSanctionedArea1').value =
+        projSanctionedArea;
+
+    document.getElementById('netArea1').value =
+        netArea;
+
+    document.getElementById('proposedArea1').value =
+        proposedArea;
+
+    document.getElementById('proposedAreaOthers1').value =
+        proposedAreaOthers;
+
+    document.getElementById('netBalArea1').value =
+        netBalArea;
+
+
+    // ==========================================
+    // SELECT TYPE OF SCHEME IN EDIT MODAL
+    // ==========================================
+
+    console.log("Scheme from table:", scheme);
+
+    var schemeRadios =
+        editModal.querySelectorAll('input[name="scheme1"]');
+
+    schemeRadios.forEach(function (radio) {
+
+        radio.checked = false;
+
+        if (radio.value.trim() === scheme.trim()) {
+            radio.checked = true;
+        }
+
+    });
+
+});
+
+
+		});
+
+
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("ppr8Form");
+
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener("submit", function (e) {
+
+        let isValid = true;
+
+        // ==========================================
+        // District
+        // ==========================================
+
+        const district = document.getElementById("district");
+
+        if (district.value === "") {
+
+            district.classList.add("is-invalid");
+            district.classList.remove("is-valid");
+
+            isValid = false;
+
+        } else {
+
+            district.classList.remove("is-invalid");
+            district.classList.add("is-valid");
+        }
+
+
+        // ==========================================
+        // Project
+        // ==========================================
+
+        const project = document.getElementById("project");
+
+        if (project.value === "") {
+
+            project.classList.add("is-invalid");
+            project.classList.remove("is-valid");
+
+            isValid = false;
+
+        } else {
+
+            project.classList.remove("is-invalid");
+            project.classList.add("is-valid");
+        }
+
+
+        // ==========================================
+        // Block
+        // ==========================================
+
+        const block = document.getElementById("block");
+
+        if (block.value === "") {
+
+            block.classList.add("is-invalid");
+            block.classList.remove("is-valid");
+
+            isValid = false;
+
+        } else {
+
+            block.classList.remove("is-invalid");
+            block.classList.add("is-valid");
+        }
+
+
+        // ==========================================
+        // Scheme
+        // ==========================================
+
+        const scheme =
+            document.querySelector('input[name="scheme"]:checked');
+
+        const schemeError =
+            document.getElementById("schemeError");
+
+        if (!scheme) {
+
+            schemeError.style.display = "block";
+
+            isValid = false;
+
+        } else {
+
+            schemeError.style.display = "none";
+        }
+
+
+        // ==========================================
+        // Helper function for text fields
+        // ==========================================
+
+        function validateTextField(element) {
+
+            if (element.value.trim() === "") {
+
+                element.classList.add("is-invalid");
+                element.classList.remove("is-valid");
+
+                isValid = false;
+
+            } else {
+
+                element.classList.remove("is-invalid");
+                element.classList.add("is-valid");
+            }
+        }
+
+
+        // ==========================================
+        // Numeric / Area fields
+        // ==========================================
+
+        validateTextField(
+            document.getElementById("projSanctionedNo")
+        );
+
+        validateTextField(
+            document.getElementById("projSanctionedArea")
+        );
+
+        validateTextField(
+            document.getElementById("netArea")
+        );
+
+        validateTextField(
+            document.getElementById("proposedArea")
+        );
+
+        validateTextField(
+            document.getElementById("proposedAreaOthers")
+        );
+
+        validateTextField(
+            document.getElementById("netBalArea")
+        );
+
+
+        // ==========================================
+        // Stop form submission if invalid
+        // ==========================================
+
+        if (!isValid) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Scroll to first invalid field
+            const firstInvalid =
+                form.querySelector(".is-invalid");
+
+            if (firstInvalid) {
+
+                firstInvalid.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+                firstInvalid.focus();
+            }
+
+            return false;
+        }
+
+    });
+
+
+    // ==========================================
+    // Remove error immediately after user fixes it
+    // ==========================================
+
+    const fields = form.querySelectorAll(
+        "input, select"
+    );
+
+    fields.forEach(function (field) {
+
+        field.addEventListener("change", function () {
+
+            if (field.value.trim() !== "") {
+
+                field.classList.remove("is-invalid");
+                field.classList.add("is-valid");
+
+            }
+
+        });
+
+        field.addEventListener("input", function () {
+
+            if (field.value.trim() !== "") {
+
+                field.classList.remove("is-invalid");
+                field.classList.add("is-valid");
+
+            }
+
+        });
+
+    });
+
+
+    // ==========================================
+    // Scheme radio change
+    // ==========================================
+
+    document
+        .querySelectorAll('input[name="scheme"]')
+        .forEach(function (radio) {
+
+            radio.addEventListener("change", function () {
+
+                document.getElementById(
+                    "schemeError"
+                ).style.display = "none";
+
+            });
+
+        });
+
+});
+
+
+
+		/* ==========================================================
+		   Load Block according to District
+		========================================================== */
+		document.addEventListener("DOMContentLoaded", function () {
 			document.getElementById("district").addEventListener("change", function () {
 
-				let districtId = this.value;
-				let project = document.getElementById("project");
-				let block = document.getElementById("block");
-				// Clear existing options
-				project.innerHTML = '<option value="">--Select Project--</option>';
+    let dcode = this.value;
 
-				if (districtId === "") {
-					return;
-				}
+    let project = document.getElementById("project");
 
-				fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
-					.then(response => response.json())
-					.then(data => {
+    project.innerHTML =
+        "<option value=''>--Select Project--</option>";
 
-						data.forEach(function (item) {
+    if (dcode === "") {
+        return;
+    }
 
-							let option = document.createElement("option");
-							option.value = item.id;          // PPR ID
-							option.textContent = item.name;  // Project Name
+    fetch("/getProjectsByDistrictPPR10?dcode=" + encodeURIComponent(dcode))
 
-							project.appendChild(option);
-						});
+        .then(response => {
 
-					})
-					.catch(error => {
-						console.error("Error:", error);
-					});
+            console.log("STATUS:", response.status);
+            console.log("URL:", response.url);
 
-				block.innerHTML = '<option value="">--Select Block--</option>';
+            if (!response.ok) {
+                throw new Error("HTTP error: " + response.status);
+            }
 
-				fetch('/getBlocksByDistrictPPR13?dcode=' + districtId)
+            return response.json();
+        })
+
+        .then(data => {
+
+            console.log("Projects received:", data);
+
+            data.forEach(function (item) {
+
+                let option = document.createElement("option");
+
+                option.value = item.id;
+                option.textContent = item.name;
+
+                project.appendChild(option);
+            });
+
+        })
+
+        .catch(function (error) {
+
+            console.error("Error loading projects:", error);
+
+        });
+        
+        block.innerHTML = '<option value="">--Select Block--</option>';
+
+				fetch('/getBlocksByDistrictPPR13?dcode=' + encodeURIComponent(dcode))
 					.then(response => response.json())
 					.then(data => {
 						data.forEach(function (item) {
@@ -111,159 +420,7 @@
 						console.error("Error:", error);
 					});
 
-
-			});
-
-
-		});
-
-
-
-		document.addEventListener("DOMContentLoaded", function () {
-
-			const form = document.getElementById("ppr8Form");
-
-			form.addEventListener("submit", function (e) {
-
-				const district = document.getElementById("district");
-				const project = document.getElementById("project");
-				const block = document.getElementById("block");
-
-				const scheme = document.querySelector('input[name="scheme"]:checked');
-
-				const projSanctionedNo = document.getElementsByName("projSanctionedNo")[0];
-				const sanctionArea = document.getElementsByName("projSanctionedArea")[0];
-				const netArea = document.getElementsByName("netArea")[0];
-				const proposedArea = document.getElementsByName("proposedArea")[0];
-				const otherArea = document.getElementsByName("proposedAreaOthers")[0];
-				const balanceArea = document.getElementsByName("netBalArea")[0];
-
-				if (district.value === "") {
-					alert("Please select District.");
-					district.focus();
-					e.preventDefault();
-					return false;
-				}
-
-				if (project.value === "") {
-					alert("Please select Project.");
-					project.focus();
-					e.preventDefault();
-					return false;
-				}
-
-				if (block.value === "") {
-					alert("Please select Block.");
-					block.focus();
-					e.preventDefault();
-					return false;
-				}
-
-				if (!scheme) {
-					alert("Please select Scheme.");
-					e.preventDefault();
-					return false;
-				}
-
-				if (projSanctionedNo.value.trim() === "") {
-					alert("Please enter No. of Pre WDC Projects.");
-					projSanctionedNo.focus();
-					e.preventDefault();
-					return false;
-				}
-
-				if (sanctionArea.value.trim() === "") {
-					alert("Please enter Sanctioned Area.");
-					sanctionArea.focus();
-					e.preventDefault();
-					return false;
-				}
-
-				if (netArea.value.trim() === "") {
-					alert("Please enter Net Area.");
-					netArea.focus();
-					e.preventDefault();
-					return false;
-				}
-
-				if (proposedArea.value.trim() === "") {
-					alert("Please enter Proposed Area.");
-					proposedArea.focus();
-					e.preventDefault();
-					return false;
-				}
-
-				if (otherArea.value.trim() === "") {
-					alert("Please enter Other DoLR Area.");
-					otherArea.focus();
-					e.preventDefault();
-					return false;
-				}
-
-				if (balanceArea.value.trim() === "") {
-					alert("Please enter Net Balance Area.");
-					balanceArea.focus();
-					e.preventDefault();
-					return false;
-				}
-
-			});
-
-
-		});
-
-
-
-		/* ==========================================================
-		   Load Block according to District
-		========================================================== */
-		document.addEventListener("DOMContentLoaded", function () {
-			document.getElementById("district").addEventListener("change", function () {
-
-				let dcode = this.value;
-
-				if (dcode == "") {
-
-					document.getElementById("block").innerHTML =
-						"<option value=''>--Select Block--</option>";
-
-					return;
-
-				}
-
-				fetch("/getBlocksByDistrict?dcode=" + dcode)
-
-					.then(response => response.json())
-
-					.then(data => {
-
-						let block = document.getElementById("block");
-
-						block.innerHTML =
-							"<option value=''>--Select Block--</option>";
-
-						data.forEach(function (item) {
-
-							let option =
-								document.createElement("option");
-
-							option.value = item.bcode;
-
-							option.text = item.blockName;
-
-							block.appendChild(option);
-
-						});
-
-					})
-
-					.catch(function (error) {
-
-						console.log(error);
-
-					});
-
-			});
+});
 
 
 			/* ==========================================================
@@ -272,29 +429,40 @@
 
 			function calculateBalanceArea() {
 
-				let sanctionArea = parseFloat(document.getElementById("sanctionArea").value) || 0;
+    let sanctionArea =
+        parseFloat(document.getElementById("projSanctionedArea").value) || 0;
 
-				let netArea = parseFloat(document.getElementById("netArea").value) || 0;
+    let netArea =
+        parseFloat(document.getElementById("netArea").value) || 0;
 
-				let proposedArea = parseFloat(document.getElementById("proposedArea").value) || 0;
+    let proposedArea =
+        parseFloat(document.getElementById("proposedArea").value) || 0;
 
-				let otherArea = parseFloat(document.getElementById("otherArea").value) || 0;
+    let otherArea =
+        parseFloat(document.getElementById("proposedAreaOthers").value) || 0;
 
-				let balance = sanctionArea - (netArea + proposedArea + otherArea);
+    let balance =
+        sanctionArea - (netArea + proposedArea + otherArea);
 
+    if (balance < 0) {
+        balance = 0;
+    }
 
-				if (balance < 0) {
-					balance = 0;
-				}
+    document.querySelector('[name="netBalArea"]').value =
+        balance.toFixed(2);
+}
 
-				document.getElementById("balanceArea").value = balance.toFixed(2);
-			}
+			document.getElementById("projSanctionedArea")
+    .addEventListener("keyup", calculateBalanceArea);
 
-			document.getElementById("netArea").addEventListener("keyup", calculateBalanceArea);
+document.getElementById("netArea")
+    .addEventListener("keyup", calculateBalanceArea);
 
-			document.getElementById("proposedArea").addEventListener("keyup", calculateBalanceArea);
+document.getElementById("proposedArea")
+    .addEventListener("keyup", calculateBalanceArea);
 
-			document.getElementById("otherArea").addEventListener("keyup", calculateBalanceArea);
+document.getElementById("proposedAreaOthers")
+    .addEventListener("keyup", calculateBalanceArea);
 
 
 
@@ -315,6 +483,7 @@
 				input.value = parts[0] + '.' + parts.slice(1).join('');
 			}
 		}
+
 
 
 	</script>
@@ -384,16 +553,18 @@
 							<label class="form-label fw-semibold">
 								District Name <span class="text-danger">*</span>
 							</label>
+							
 						</div>
 
 						<div class="col-md-4">
-							<select class="form-select" id="district" name="dcode">
+							<select class="form-control form-control-sm" id="district" name="dcode" required>
 								<option value="">--Select District--</option>
 								<option th:each="d : ${distList}" th:value="${d.dcode}" th:text="${d.distName}">
 								</option>
 							</select>
+							 <div class="invalid-feedback">Please select a District.</div>
 						</div>
-
+                  
 					</div>
 
 					<!-- Row 2 -->
@@ -406,9 +577,10 @@
 						</div>
 
 						<div class="col-md-4">
-							<select class="form-select" id="project" name="pprId">
+							<select class="form-select" id="project" name="pprId" required>
 								<option value="">--Select Project--</option>
 							</select>
+							<div class="invalid-feedback"> Please select a Project.</div>
 						</div>
 
 						<div class="col-md-2">
@@ -418,11 +590,14 @@
 						</div>
 
 						<div class="col-md-4">
-							<select class="form-select" id="block" name="bcode">
+							<select class="form-select" id="block" name="bcode" required>
 								<option value="">--Select Block--</option>
 								<option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}">
 								</option>
 							</select>
+							<div class="invalid-feedback">
+        Please select a Block.
+    </div>
 						</div>
 
 					</div>
@@ -430,32 +605,59 @@
 					<!-- Row 3 -->
 					<div class="row mb-3 align-items-center">
 
-						<div class="col-md-2">
-							<label class="form-label fw-semibold">
-								Type of Scheme <span class="text-danger">*</span>
-							</label>
-						</div>
+    <div class="col-md-2">
+        <label class="form-label fw-semibold">
+            Type of Scheme
+            <span class="text-danger">*</span>
+        </label>
+    </div>
 
-						<div class="col-md-10">
+    <div class="col-md-10">
 
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="scheme" value="DPAP">
-								<label class="form-check-label">DPAP</label>
-							</div>
+        <div id="schemeGroup">
 
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="scheme" value="DDP">
-								<label class="form-check-label">DDP</label>
-							</div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input"
+                       type="radio"
+                       name="scheme"
+                       value="DPAP"
+                       required>
+                <label class="form-check-label">
+                    DPAP
+                </label>
+            </div>
 
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="scheme" value="IWDP">
-								<label class="form-check-label">IWDP</label>
-							</div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input"
+                       type="radio"
+                       name="scheme"
+                       value="DDP">
+                <label class="form-check-label">
+                    DDP
+                </label>
+            </div>
 
-						</div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input"
+                       type="radio"
+                       name="scheme"
+                       value="IWDP">
+                <label class="form-check-label">
+                    IWDP
+                </label>
+            </div>
 
-					</div>
+        </div>
+
+        <div id="schemeError"
+             class="text-danger small mt-1"
+             style="display:none;">
+            Please select Scheme.
+        </div>
+
+    </div>
+
+</div>
 
 					<!-- No. of Pre WDC 3.0 Projects sanctioned in the Block -->
 					<div class="row mb-3 align-items-center">
@@ -468,8 +670,11 @@
 						</div>
 
 						<div class="col-md-4">
-							<input type="text" class="form-control form-control-sm" name="projSanctionedNo"
+							<input type="text" class="form-control form-control-sm" name="projSanctionedNo" id = "projSanctionedNo"
 								maxlength="10" oninput="validateInteger(this,11,5)" required>
+								<div class="invalid-feedback">
+        Please enter No. of Pre WDC Projects.
+    </div>
 						</div>
 
 					</div>
@@ -485,8 +690,11 @@
 						</div>
 
 						<div class="col-md-4">
-							<input type="text" class="form-control form-control-sm" name="projSanctionedArea"
+							<input type="text" class="form-control form-control-sm" name="projSanctionedArea" id = "projSanctionedArea"
 								maxlength="10" oninput="validateDecimal(this,11,5)" required>
+								<div class="invalid-feedback">
+        Please enter Sanctioned Area.
+    </div>
 						</div>
 
 					</div>
@@ -502,8 +710,11 @@
 						</div>
 
 						<div class="col-md-4">
-							<input type="text" class="form-control form-control-sm" name="netArea" maxlength="10"
+							<input type="text" class="form-control form-control-sm" name="netArea" id = "netArea" maxlength="10"
 								oninput="validateDecimal(this, 11,5)" required>
+								<div class="invalid-feedback">
+        Please enter Net Area.
+    </div>
 						</div>
 
 					</div>
@@ -519,8 +730,11 @@
 						</div>
 
 						<div class="col-md-4">
-							<input type="text" class="form-control form-control-sm" name="proposedArea" maxlength="10"
+							<input type="text" class="form-control form-control-sm" id="proposedArea" name="proposedArea" maxlength="10"
 								oninput="validateDecimal(this, 11,5)" required>
+								<div class="invalid-feedback">
+        Please enter Proposed Area.
+    </div>
 						</div>
 
 					</div>
@@ -536,8 +750,11 @@
 						</div>
 
 						<div class="col-md-4">
-							<input type="text" class="form-control form-control-sm" name="proposedAreaOthers"
+							<input type="text" class="form-control form-control-sm" name="proposedAreaOthers" id="proposedAreaOthers"
 								maxlength="10" oninput="validateDecimal(this, 11,5)" required>
+								<div class="invalid-feedback">
+        Please enter Area proposed to be covered by scheme.
+    </div>
 						</div>
 
 					</div>
@@ -552,19 +769,23 @@
 						</div>
 
 						<div class="col-md-4">
-							<input type="text" class="form-control form-control-sm" name="netBalArea" maxlength="10"
-								oninput="validateDecimal(this, 11,5)">
+							<input type="text" class="form-control form-control-sm" name="netBalArea" id="netBalArea" maxlength="10"
+								oninput="validateDecimal(this, 11,5)" required>
+								<div class="invalid-feedback">
+        Please enter Net Balance Area (ha).
+    </div>
 						</div>
 
 					</div>
 
-					<input type="hidden" name="action" value="D">
+					<!-- <input type="hidden"  name="action" value="D"> -->
 
 					<div class="text-center">
-						<button type="submit" class="btn btn-warning px-4 fw-semibold">
-							<i class="fa fa-save me-1"></i> Save as Draft
+						<button type="submit" value="D" name="action" class="btn btn-warning">
+							<i class="fa fa-save"></i> Save as Draft
 						</button>
 					</div>
+
 
 				</form>
 
@@ -577,7 +798,7 @@
 
 					<h4 class="text-center mb-3">
 
-						<b>Draft Details</b>
+						<b>List of Previously identified DPAP/DDP/IWDP areas proposed users</b>
 
 					</h4>
 
@@ -672,7 +893,8 @@
 										<i class="fas fa-edit"></i>
 									</button>
 
-									<a th:href="@{/completeDraftPPR8(id=${area.pprProposedAreaId})}"
+									
+						<a th:href="@{/completeDraftPPR8(id=${area.pprProposedAreaId})}"
 										class="btn btn-success btn-sm"
 										onclick="return confirm('Are you sure you want to complete this record?');">
 										<i class="fas fa-check"></i>
@@ -776,19 +998,19 @@
 											<div class="col-md-10">
 
 												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="scheme"
+													<input class="form-check-input" type="radio" name="scheme1"
 														value="DPAP">
 													<label class="form-check-label">DPAP</label>
 												</div>
 
 												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="scheme"
+													<input class="form-check-input" type="radio" name="scheme1"
 														value="DDP">
 													<label class="form-check-label">DDP</label>
 												</div>
 
 												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="scheme"
+													<input class="form-check-input" type="radio" name="scheme1"
 														value="IWDP">
 													<label class="form-check-label">IWDP</label>
 												</div>

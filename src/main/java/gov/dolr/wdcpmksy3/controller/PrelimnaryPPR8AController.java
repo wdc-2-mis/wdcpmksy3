@@ -130,7 +130,7 @@ public class PrelimnaryPPR8AController {
 	    
 
 	    if (userid != null) {
-
+	    	
 	        // Fetch Project
 	        MPpr ppr = mpprRepository.getReferenceById(pprId);
 
@@ -273,6 +273,7 @@ public class PrelimnaryPPR8AController {
 	@PostMapping("/updateDraftPPR8")
 	public String updateDraftPPR8(HttpSession session, Model model,
 	                            @RequestParam Integer pprProposedAreaId,
+	                            @RequestParam String scheme1,
 	                            @RequestParam Integer projSanctionedNo1,
 	                            @RequestParam BigDecimal projSanctionedArea1,
 	                            @RequestParam BigDecimal netArea1,
@@ -289,6 +290,10 @@ public class PrelimnaryPPR8AController {
 	    if (userid != null) {
 
 	        PprProposedArea obj = pprprep.findById(pprProposedAreaId.longValue()).get();
+	        
+	        MScheme scheme = schemeRepository.findBySchemeName(scheme1);
+	                   
+	        obj.setScheme(scheme);
 
 	        obj.setProjSanctionedNo(projSanctionedNo1);
 	        obj.setProjSanctionedArea(projSanctionedArea1);
