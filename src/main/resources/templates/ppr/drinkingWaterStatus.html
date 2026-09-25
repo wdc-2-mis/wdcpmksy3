@@ -530,12 +530,13 @@
 			           <thead class="table-primary">
 			               <tr>
 			                   <!--<th>S.No.</th>-->
+							   <th rowspan="2">Action</th>
 			                   <th rowspan="2">Project Name</th>
 							   <th rowspan="2">Village Name</th>
 			                   <th rowspan="2">Name of Watershed</th>
 			                   <th colspan="2">Pre-Project Drinking Water Details</th>
 			                   <th colspan="2">Post-Project Drinking Water Details</th>
-							   <th rowspan="2">Action</th>
+							   
 			               </tr>
 							<tr>
 								<th> Availability of Water <br> (No. of month in a year)  </th>
@@ -547,6 +548,43 @@
 			           <tbody>
 
 			               <tr th:each="rec : ${records}">
+							
+							<td th:if="${rec.status.toString().equals('D')}">
+								&nbsp; &nbsp;
+								<a title="Delete" th:href="@{/deleteDrinkingWaterStatus(id=${rec.pprWaterId})}" class="btn btn-danger btn-sm"
+									onclick="return confirm('Are you sure you want to delete this record?');">
+									<i class="fas fa-trash"></i>
+								</a>
+								&nbsp; &nbsp;
+							
+								<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn"
+									th:attr="data-id=${rec.pprWaterId}, data-district=${rec.ppr.district.distName}, data-premon=${rec.preWaterAvailabilityMonths},
+																										data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, data-watershedid=${rec.microWatershed.mwId}, data-villid=${rec.village.vcode}, data-postmon=${rec.postWaterAvailabilityMonths},
+																										data-preid=${rec.preWaterQuality.waterQualityId}, data-postid=${rec.postWaterQuality.waterQualityId}" data-bs-toggle="modal" data-bs-target="#editModal">
+									<i class="fas fa-edit"></i>
+								</button>
+							
+								&nbsp; &nbsp;
+								<a title="Complete" th:href="@{/completeDrinkingWaterStatus(id=${rec.pprWaterId})}" class="btn btn-success btn-sm"
+									onclick="return confirm('Are you sure you want to complete this record?');">
+									<i class="fas fa-check"></i>
+								</a>
+							
+							</td>
+							<td th:if="${rec.status.toString().equals('C')}">
+							
+								<span class="badge bg-success">
+									<i class="fas fa-check-circle"></i> Completed
+								</span>
+								&nbsp; &nbsp;
+								<a th:href="@{/pprCropOutcomes}" class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
+							
+									Next <i class="fas fa-arrow-right"></i>
+							
+								</a>
+							
+							</td>
+							
 								<td th:text="${rec.ppr.projectName}"></td>
 								<td th:text="${rec.village.villageName}"></td>
 								<td th:text="${rec.microWatershed.mwName}"></td>
@@ -555,41 +593,7 @@
 								<td th:text="${rec.postWaterAvailabilityMonths}"></td>
 								<td th:text="${rec.postWaterQuality.waterQualityType}"></td>
 								
-							   <td th:if="${rec.status.toString().equals('D')}">
-							   		&nbsp; &nbsp; 
-							   		<a title="Delete" th:href="@{/deleteDrinkingWaterStatus(id=${rec.pprWaterId})}"
-							   			class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-							   			<i class="fas fa-trash"></i>
-							   		</a>
-							   		&nbsp; &nbsp; 
-												
-									<button type="button" title="Edit"  class="btn btn-primary btn-sm editBtn" 	th:attr="data-id=${rec.pprWaterId}, data-district=${rec.ppr.district.distName}, data-premon=${rec.preWaterAvailabilityMonths},
-												data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, data-watershedid=${rec.microWatershed.mwId}, data-villid=${rec.village.vcode}, data-postmon=${rec.postWaterAvailabilityMonths},
-												data-preid=${rec.preWaterQuality.waterQualityId}, data-postid=${rec.postWaterQuality.waterQualityId}"  
-												 data-bs-toggle="modal"   data-bs-target="#editModal" >
-									    <i class="fas fa-edit"></i>
-									</button>
-									
-							   		&nbsp; &nbsp; 
-							   		<a  title="Complete" th:href="@{/completeDrinkingWaterStatus(id=${rec.pprWaterId})}"
-							   			class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-							   			<i class="fas fa-check"></i>
-							   		</a>
-							   		
-							   	</td>
-							   	<td th:if="${rec.status.toString().equals('C')}">
-									
-									<span class="badge bg-success">
-										<i class="fas fa-check-circle"></i> Completed
-									</span>
-									&nbsp; &nbsp;
-									<a th:href="@{/pprCropOutcomes}" class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
-									
-										Next <i class="fas fa-arrow-right"></i>
-									
-									</a>
-									
-								</td>
+							   
 			                   
 			               </tr>
 			               <tr th:if="${#lists.isEmpty(records)}">

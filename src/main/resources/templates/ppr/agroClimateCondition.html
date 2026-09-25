@@ -560,6 +560,7 @@
 			           <thead class="table-primary">
 			               <tr>
 			                   <th rowspan="2">S.No.</th>
+							   <th rowspan="2"> Action </th>
 			                   <th rowspan="2">Project Name</th>
 							   <th rowspan="2">Area <br>(in ha.)</th>
 			                   <th rowspan="2">Name of Agro Climatic <br>
@@ -571,7 +572,7 @@
 			                   <th rowspan="2"> Forest Area </th>
 			                   <th colspan="2"> Major soil types </th>
 			                   <th colspan="2"> Major Crops </th>
-							   <th rowspan="2"> Action </th>
+							   
 			               </tr>
 			               <tr>
 			                   <th> Soil Type </th>
@@ -584,6 +585,43 @@
 
 			               <tr th:each="row, stat : ${agroClimateList}">
 			                   <td th:text="${row[17]}"> </td>
+							   
+							<td th:if="${stat.first || row[0] != agroClimateList[stat.index-1][0]}">
+								&nbsp; &nbsp;
+								<a th:if="${row[10].toString().equals('D')}" title="Delete"
+									th:href="@{/deleteAgroClimateConditionPPR10(id=${row[0]})}" class="btn btn-danger btn-sm"
+									onclick="return confirm('Are you sure you want to delete this record?');">
+									<i class="fas fa-trash"></i>
+								</a>
+								&nbsp; &nbsp;
+							
+								<!--	<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${row[0]}" data-bs-toggle="modal" data-bs-target="#editModal">
+														   											<i class="fas fa-edit"></i>
+														   									</button>-->
+								<button type="button" th:if="${row[10].toString().equals('D')}" title="Edit" class="btn btn-primary btn-sm editBtn"
+									th:data-id="${row[0]}" data-bs-toggle="modal" data-bs-target="#editModal">
+									<i class="fas fa-edit"></i>
+								</button>
+								&nbsp; &nbsp;
+								<a th:if="${row[10].toString().equals('D')}" title="Complete"
+									th:href="@{/completeAgroClimateConditionPPR10(id=${row[0]})}" class="btn btn-success btn-sm"
+									onclick="return confirm('Are you sure you want to complete this record?');">
+									<i class="fas fa-check"></i>
+								</a>
+								<span th:if="${row[10].toString().equals('C')}" class="badge bg-success">
+									<i class="fas fa-check-circle"></i> Completed
+								</span>
+								&nbsp; &nbsp;
+								<a th:href="@{/dtlFloodDroughtArea}" th:if="${row[10].toString().equals('C')}"
+									class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
+							
+									Next <i class="fas fa-arrow-right"></i>
+							
+								</a>
+							
+							</td>
+							<td th:unless="${stat.first || row[0] != agroClimateList[stat.index-1][0]}"></td>
+							   
 			                   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[2] : ''}"> </td>
 							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[6] : ''}"> </td>
 			                   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[5] : ''}"> </td>
@@ -596,50 +634,7 @@
 							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[12] : ''}"> </td>
 							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[13] : ''}"> </td>
 							   
-							   <td th:if="${stat.first || row[0] != agroClimateList[stat.index-1][0]}">
-							   		&nbsp; &nbsp; 
-							   		<a th:if="${row[10].toString().equals('D')}" title="Delete"
-							   			th:href="@{/deleteAgroClimateConditionPPR10(id=${row[0]})}"
-							   			class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-							   			<i class="fas fa-trash"></i>
-							   		</a>
-							   		&nbsp; &nbsp; 
-												
-								<!--	<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${row[0]}" data-bs-toggle="modal" data-bs-target="#editModal">
-											<i class="fas fa-edit"></i>
-									</button>-->
-									<button type="button"
-									        th:if="${row[10].toString().equals('D')}"
-									        title="Edit"
-									        class="btn btn-primary btn-sm editBtn"
-									        th:data-id="${row[0]}"
-									        data-bs-toggle="modal"
-									        data-bs-target="#editModal">
-									    <i class="fas fa-edit"></i>
-									</button>
-							   		&nbsp; &nbsp; 
-							   		<a th:if="${row[10].toString().equals('D')}" title="Complete"
-							   			th:href="@{/completeAgroClimateConditionPPR10(id=${row[0]})}"
-							   			class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-							   			<i class="fas fa-check"></i>
-							   		</a>
-							   		<span th:if="${row[10].toString().equals('C')}"
-							   			class="badge bg-success">
-							   			<i class="fas fa-check-circle"></i> Completed
-							   		</span>	
-									&nbsp; &nbsp; 
-									<a th:href="@{/dtlFloodDroughtArea}" th:if="${row[10].toString().equals('C')}"
-									   class="btn btn-primary btn-sm ms-2 next-btn"
-									   title="Go to Next Form">
-
-									    Next <i class="fas fa-arrow-right"></i>
-
-									</a>
-									
-									
-									
-							   	</td>
-							   	<td th:unless="${stat.first || row[0] != agroClimateList[stat.index-1][0]}"></td>
+							   
 			                   
 			               </tr>
 			               <tr th:if="${#lists.isEmpty(agroClimateList)}">

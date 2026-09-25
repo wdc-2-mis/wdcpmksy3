@@ -565,6 +565,7 @@
 			           <thead class="table-primary">
 			               <tr>
 			                   <!--<th>S.No.</th>-->
+							   <th>Action</th>
 			                   <th>Block Name</th>
 							   <th>Village Name</th>
 			                   <th>Name of Watershed</th>
@@ -576,7 +577,7 @@
 								    (No. of People)
 							   </th>
 			                   <th>Main reason of Migration</th>
-							   <th>Action</th>
+							  
 			                   
 			               </tr>
 			              
@@ -584,6 +585,47 @@
 			           <tbody>
 
 			               <tr th:each="rec : ${records}">
+							
+							<td th:if="${rec.status.toString().equals('D')}">
+								&nbsp; &nbsp;
+								<a title="Delete" th:href="@{/deleteLivelihoodSummaryPPR13(id=${rec.pprLivelihoodId})}"
+									class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
+									<i class="fas fa-trash"></i>
+								</a>
+								&nbsp; &nbsp;
+							
+								<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn"
+									th:attr="data-id=${rec.pprLivelihoodId}, data-block=${rec.village.gramPanchayat.block.blockName}, data-district=${rec.ppr.district.distName},
+																										data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, data-watershedid=${rec.microWatershed.mwId}, data-villid=${rec.village.vcode}, data-migstatus=${rec.migratedPeople}, data-reson=${rec.migrationReason}"
+									th:data-livelihoodids="${#strings.listJoin(rec.existingLivelihoodActivities.![livelihoodActivity.livelihoodActivityId], ',')}"
+									data-bs-toggle="modal" data-bs-target="#editModal"
+									th:data-livelihoodinvids="${#strings.listJoin(rec.projectLivelihoodInterventions.![livelihoodIntervention.livelihoodInterventionId], ',')}">
+									<i class="fas fa-edit"></i>
+								</button>
+							
+								&nbsp; &nbsp;
+								<a title="Complete" th:href="@{/completeLivelihoodSummaryPPR13(id=${rec.pprLivelihoodId})}"
+									class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
+									<i class="fas fa-check"></i>
+								</a>
+							
+							</td>
+							<td th:if="${rec.status.toString().equals('C')}">
+							
+								<span class="badge bg-success">
+									<i class="fas fa-check-circle"></i> Completed
+								</span>
+							
+								&nbsp; &nbsp;
+								<a th:href="@{/pprEmploymentGeneration}" class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
+							
+									Next <i class="fas fa-arrow-right"></i>
+							
+								</a>
+							
+							</td>
+							
+							
 								<td th:text="${rec.village.gramPanchayat.block.blockName}"></td>
 								<td th:text="${rec.village.villageName}"></td>
 								<td th:text="${rec.microWatershed.mwName}"></td>
@@ -602,43 +644,7 @@
 								<td th:text="${rec.migratedPeople}"></td>
 								<td th:text="${rec.migrationReason}"></td>
 								
-							   <td th:if="${rec.status.toString().equals('D')}">
-							   		&nbsp; &nbsp; 
-							   		<a title="Delete" th:href="@{/deleteLivelihoodSummaryPPR13(id=${rec.pprLivelihoodId})}"
-							   			class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-							   			<i class="fas fa-trash"></i>
-							   		</a>
-							   		&nbsp; &nbsp; 
-												
-									<button type="button" title="Edit"  class="btn btn-primary btn-sm editBtn" 	th:attr="data-id=${rec.pprLivelihoodId}, data-block=${rec.village.gramPanchayat.block.blockName}, data-district=${rec.ppr.district.distName},
-												data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, data-watershedid=${rec.microWatershed.mwId}, data-villid=${rec.village.vcode}, data-migstatus=${rec.migratedPeople}, data-reson=${rec.migrationReason}"  
-												th:data-livelihoodids="${#strings.listJoin(rec.existingLivelihoodActivities.![livelihoodActivity.livelihoodActivityId], ',')}" data-bs-toggle="modal"   data-bs-target="#editModal"
-												th:data-livelihoodinvids="${#strings.listJoin(rec.projectLivelihoodInterventions.![livelihoodIntervention.livelihoodInterventionId], ',')}" >
-									    <i class="fas fa-edit"></i>
-									</button>
-									
-							   		&nbsp; &nbsp; 
-							   		<a  title="Complete"	th:href="@{/completeLivelihoodSummaryPPR13(id=${rec.pprLivelihoodId})}"
-							   			class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-							   			<i class="fas fa-check"></i>
-							   		</a>
-							   		
-							   	</td>
-							   	<td th:if="${rec.status.toString().equals('C')}">
-									
-									<span class="badge bg-success">
-										<i class="fas fa-check-circle"></i> Completed
-									</span>
-									
-									&nbsp; &nbsp;
-									<a th:href="@{/pprEmploymentGeneration}" 
-										class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
-									
-										Next <i class="fas fa-arrow-right"></i>
-									
-									</a>
-									
-								</td>
+							 
 			                   
 			               </tr>
 			               <tr th:if="${#lists.isEmpty(records)}">
