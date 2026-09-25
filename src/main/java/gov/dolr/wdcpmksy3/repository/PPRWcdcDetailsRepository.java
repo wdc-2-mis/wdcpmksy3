@@ -36,6 +36,9 @@ public interface PPRWcdcDetailsRepository extends JpaRepository<PPRWcdcDetails, 
 	    @Query(value ="select ppr_wcdc_id, dcode, status from ppr_wcdc_details where status='C' and dcode=:district", nativeQuery = true)
 		List<Object[]> getPPR4BWCDCList( Integer district);
 		
+		@Query(" SELECT CASE WHEN COUNT(w) > 0 THEN true ELSE false END FROM PPRWcdcDetails w  WHERE w.institutionalStructure.stCode = :stCode AND w.status = 'C'")
+		boolean existsByStCodeAndStatusC(@Param("stCode") Integer stCode);
+		
 		 
 
 }

@@ -39,6 +39,7 @@ import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionaryWorkExperience;
 import gov.dolr.wdcpmksy3.entity.SlnaFunctionary;
 import gov.dolr.wdcpmksy3.entity.SlnaFunctionaryWorkExperience;
 import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
+import gov.dolr.wdcpmksy3.repository.PPRWcdcDetailsRepository;
 import gov.dolr.wdcpmksy3.repository.PprWcdcFunctionaryRepository;
 import gov.dolr.wdcpmksy3.repository.PprWcdcFunctionaryWorkExperienceRepository;
 import gov.dolr.wdcpmksy3.repository.SlnaFunctionaryRepository;
@@ -88,6 +89,9 @@ public class PPR1Controller {
     
     @Autowired
     private PprWcdcFunctionaryRepository wdcrep;
+    
+    @Autowired
+	private PPRWcdcDetailsRepository pprwdcddetail;
     
     @Autowired
     private PprWcdcFunctionaryWorkExperienceRepository wdcexprep;
@@ -804,6 +808,8 @@ public class PPR1Controller {
             finalList.add(newRow);
             previousId = currentId;
         }
+        boolean exists=false;
+        exists=pprwdcddetail.existsByStCodeAndStatusC(stcode);
 
         model.addAttribute("functionariesList", finalList);
         model.addAttribute("designationList", dserv.getAllDesignationDetails());
@@ -811,6 +817,10 @@ public class PPR1Controller {
         model.addAttribute("distList", districtService.findCompletedDistrictsByState(stcode));
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
+		model.addAttribute("existssl", exists);
+		if (!exists) {
+	        model.addAttribute( "error1", "Please complete the Functionaries of Watershed Cell before Details of Watershed Cell Functionaries at District Level.");
+	    }
         return "wcdcFunctionariesPPR4";
     } 
     

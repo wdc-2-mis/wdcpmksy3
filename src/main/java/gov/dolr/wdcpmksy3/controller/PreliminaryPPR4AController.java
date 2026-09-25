@@ -90,7 +90,7 @@ public class PreliminaryPPR4AController {
         for (Object[] row : list) {
 
 		    Integer id = (Integer) row[0];
-		    System.out.println("Idkdy : " + id);
+		   // System.out.println("Idkdy : " + id);
 		}
         boolean exists=false;
         exists=institutionalRepo.existsByStCodeAndStatus(stcode, 'C');
@@ -150,9 +150,8 @@ public class PreliminaryPPR4AController {
 			    System.out.println("Id : " + id);
 			}
 
-	            String mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6)+ "_" + MoUfile.getOriginalFilename();
-	            MoUfile.transferTo(new File(uploadPath + mouFileName));
-
+	        //    String mouFileName = UUID.randomUUID().toString().replace("-", "").substring(0, 6)+ "_" + MoUfile.getOriginalFilename();
+	       //     MoUfile.transferTo(new File(uploadPath + mouFileName));
 	            InstitutionalStructure inst = institutionalRepo.getReferenceById(id.longValue());
 	            PPRWcdcDetails obj = new PPRWcdcDetails();
 	            obj.setInstitutionalStructure(inst);
@@ -160,12 +159,20 @@ public class PreliminaryPPR4AController {
 	            obj.setExecutingAgency(agency);
 	            obj.setChairmanStatus(chairman);
 	            obj.setMouDate(MoU);
-	            obj.setMouFile(uploadPath + mouFileName);
+	        //    obj.setMouFile(uploadPath + mouFileName);
 	            obj.setStatus(action);
 	            obj.setCreatedBy(userid);
 	            obj.setCreatedDate(LocalDateTime.now());
-	           // obj.setRequestIp(getClientIpAddr(request));
+	            obj.setRequestIp(getClientIpAddr(request));
+	            obj=pprwdcddetail.save(obj);
+	            
+	            Integer ide = obj.getPprWcdcId();
+	            
+	            obj.setMouFile(uploadPath + ide + "_"+ MoUfile.getOriginalFilename());
 	            pprwdcddetail.save(obj);
+	 	        
+	            MoUfile.transferTo(new File(uploadPath + ide + "_"+ MoUfile.getOriginalFilename()));
+	            
 
 	            redirectAttributes.addFlashAttribute( "success", "Record Saved Successfully."
 	            );
