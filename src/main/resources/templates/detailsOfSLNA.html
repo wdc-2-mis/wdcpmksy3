@@ -9,20 +9,38 @@
 
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<style>
-		.required{
-		    color:red;
-		}
+	.required{
+	    color:red;
+	}
 
-		
+	.field-error{
+	    color:red;
+	    font-size:13px;
+	    margin-top:4px;
+	    display:block;
+	}
+
+	.is-invalid{
+	    border-color:#dc3545 !important;
+	}
+
+	.radio-error{
+	    color:red;
+	    font-size:13px;
+	    margin-top:4px;
+	    display:block;
+	}
 	</style>
 <script th:inline="javascript">
 
 	// Restrict dates before 2025
 	document.addEventListener("DOMContentLoaded", function () {
-
 		const appointmentDate = document.getElementsByName("appointmentDate")[0];
-
-		appointmentDate.setAttribute("min", "2025-01-01");
+		appointmentDate.setAttribute("min", "2026-01-01");
+		
+		const today = new Date().toISOString().split("T")[0]; 
+			appointmentDate.setAttribute("max", today); 
+			mouDate.setAttribute("max", today);
 
 	});
 	
@@ -99,89 +117,216 @@
 	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
-	    // Select all forms on the page
-	    const forms = document.querySelectorAll("form");
-
+	    const forms = document.querySelectorAll("#saveForm, #editForm");
 	    forms.forEach(form => {
+	        const firstName = form.querySelector("input[name='firstName']");
+	        const lastName = form.querySelector("input[name='lastName']");
+	        const designation = form.querySelector("select[name='designation']");
+	        const qualification = form.querySelector("select[name='qualification']");
+	        const appointmentDate = form.querySelector("input[name='appointmentDate']");
+	        const tenure = form.querySelector("input[name='tenure']");
+	        const phone = form.querySelector("input[name='phone']");
+	        const email = form.querySelector("input[name='email']");
+	        const memberRadios = form.querySelectorAll("input[name='memberType']");
+	        const joiningRadios = form.querySelectorAll("input[name='joiningType']");
+
+			function showError(field, message) {
+			            if (!field) return;
+			            field.classList.add("is-invalid");
+			            const error = form.querySelector("[data-error-for='" + field.name + "']");
+			            if (error) error.textContent = message;
+			        }
+
+			        function clearError(field) {
+			            if (!field) return;
+			            field.classList.remove("is-invalid");
+			            const error = form.querySelector("[data-error-for='" + field.name + "']");
+			            if (error) error.textContent = "";
+			        }
+
+			        function showRadioError(name, message) {
+			            const error = form.querySelector("[data-error-for='" + name + "']");
+			            if (error) error.textContent = message;
+			        }
+
+			        function clearRadioError(name) {
+			            const error = form.querySelector("[data-error-for='" + name + "']");
+			            if (error) error.textContent = "";
+			        }
+
+			        function validateField(field) {
+			            if (!field) return true;
+			            const value = field.value.trim();
+			            clearError(field);
+
+			            if (field.name === "firstName") {
+			                if (!value) {
+			                    showError(field, "First Name is required.");
+			                    return false;
+			                }
+			                if (!/^[A-Za-z ]+$/.test(value)) {
+			                    showError(field, "First Name should contain only letters.");
+			                    return false;
+			                }
+			                if (value.length < 2) {
+			                    showError(field, "First Name must be at least 2 characters.");
+			                    return false;
+			                }
+			            }
+
+			            if (field.name === "lastName") {
+			                if (!value) {
+			                    showError(field, "Last Name is required.");
+			                    return false;
+			                }
+			                if (!/^[A-Za-z ]+$/.test(value)) {
+			                    showError(field, "Last Name should contain only letters.");
+			                    return false;
+			                }
+			                if (value.length < 2) {
+			                    showError(field, "Last Name must be at least 2 characters.");
+			                    return false;
+			                }
+			            }
+
+			            if (field.name === "designation") {
+			                if (!value) {
+			                    showError(field, "Please select a Designation.");
+			                    return false;
+			                }
+			            }
+
+			            if (field.name === "qualification") {
+			                if (!value) {
+			                    showError(field, "Please select a Qualification.");
+			                    return false;
+			                }
+			            }
+
+			            if (field.name === "appointmentDate") {
+			                if (!value) {
+			                    showError(field, "Appointment Date is required.");
+			                    return false;
+			                }
+			                const selectedDate = new Date(value);
+			                const minDate = new Date("2026-01-01");
+			                const today = new Date();
+			                selectedDate.setHours(0, 0, 0, 0);
+			                minDate.setHours(0, 0, 0, 0);
+			                today.setHours(0, 0, 0, 0);
+			                if (selectedDate < minDate) {
+			                    showError(field, "Appointment Date cannot be before 01-01-2026.");
+			                    return false;
+			                }
+			                if (selectedDate > today) {
+			                    showError(field, "Appointment Date cannot be a future date.");
+			                    return false;
+			                }
+			            }
+
+			            if (field.name === "tenure") {
+			                if (!value) {
+			                    showError(field, "Tenure Period is required.");
+			                    return false;
+			                }
+			                if (!/^\d+$/.test(value)) {
+			                    showError(field, "Tenure Period must contain numbers only.");
+			                    return false;
+			                }
+			                const tenureValue = parseInt(value);
+			                if (tenureValue < 1 || tenureValue > 99) {
+			                    showError(field, "Tenure Period must be between 1 and 99 years.");
+			                    return false;
+			                }
+			            }
+
+			            if (field.name === "phone") {
+			                if (!value) {
+			                    showError(field, "Phone number is required.");
+			                    return false;
+			                }
+			                if (!/^[0-9]{10}$/.test(value)) {
+			                    showError(field, "Phone number must contain exactly 10 digits.");
+			                    return false;
+			                }
+			                if (!/^[6-9]/.test(value)) {
+			                    showError(field, "Phone number must start with 6, 7, 8 or 9.");
+			                    return false;
+			                }
+			                const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
+			                if (isDuplicatePhone(value, currentId)) {
+			                    showError(field, "This phone number is already saved for another Member.");
+			                    return false;
+			                }
+			            }
+
+			            if (field.name === "email") {
+			                if (!value) {
+			                    showError(field, "Email is required.");
+			                    return false;
+			                }
+			                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			                if (!emailPattern.test(value)) {
+			                    showError(field, "Please enter a valid email address.");
+			                    return false;
+			                }
+			                const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
+			                if (isDuplicateEmail(value, currentId)) {
+			                    showError(field, "This email is already saved for another Member.");
+			                    return false;
+			                }
+			            }
+
+			            return true;
+			        }
+
 	        form.addEventListener("submit", function (event) {
-	            let valid = true;
-	            let messages = [];
-
-	            // Member type (radio)
-	            const memberRadios = form.querySelectorAll("input[name='memberType']");
+	            event.preventDefault();
 	            if (memberRadios.length && ![...memberRadios].some(r => r.checked)) {
-	                valid = false;
-	                messages.push("Please select a Member Type.");
+	                showRadioError("memberType", "Please select a Member Type.");
+	                memberRadios[0].focus();
+	                return;
 	            }
-
-	            // First name
-	            const firstName = form.querySelector("input[name='firstName']");
-	            if (firstName && !firstName.value.trim()) {
-	                valid = false;
-	                messages.push("First Name is required.");
+	            clearRadioError("memberType");
+	            if (firstName && !validateField(firstName)) {
+	                firstName.focus();
+	                return;
 	            }
-
-	            // Last name
-	            const lastName = form.querySelector("input[name='lastName']");
-	            if (lastName && !lastName.value.trim()) {
-	                valid = false;
-	                messages.push("Last Name is required.");
+	            if (lastName && !validateField(lastName)) {
+	                lastName.focus();
+	                return;
 	            }
-
-	            // Designation
-	            const designation = form.querySelector("select[name='designation']");
-	            if (designation && !designation.value) {
-	                valid = false;
-	                messages.push("Please select a Designation.");
+	            if (designation && !validateField(designation)) {
+	                designation.focus();
+	                return;
 	            }
-
-	            // Qualification
-	            const qualification = form.querySelector("select[name='qualification']");
-	            if (qualification && !qualification.value) {
-	                valid = false;
-	                messages.push("Please select a Qualification.");
+	            if (qualification && !validateField(qualification)) {
+	                qualification.focus();
+	                return;
 	            }
-
-	            // Appointment date
-	            const appointmentDate = form.querySelector("input[name='appointmentDate']");
-	            if (appointmentDate && !appointmentDate.value) {
-	                valid = false;
-	                messages.push("Appointment Date is required.");
+	            if (appointmentDate && !validateField(appointmentDate)) {
+	                appointmentDate.focus();
+	                return;
 	            }
-
-	            // Joining type (radio)
-	            const joiningRadios = form.querySelectorAll("input[name='joiningType']");
 	            if (joiningRadios.length && ![...joiningRadios].some(r => r.checked)) {
-	                valid = false;
-	                messages.push("Please select Nature of Appointment.");
+	                showRadioError("joiningType", "Please select Nature of Appointment.");
+	                joiningRadios[0].focus();
+	                return;
 	            }
-
-	            // Tenure
-	            const tenure = form.querySelector("input[name='tenure']");
-	            if (tenure && !tenure.value.trim()) {
-	                valid = false;
-	                messages.push("Tenure Period is required.");
+	            clearRadioError("joiningType");
+	            if (tenure && !validateField(tenure)) {
+	                tenure.focus();
+	                return;
 	            }
-
-	            // Phone
-	            const phone = form.querySelector("input[name='phone']");
-	            if (phone && !phone.value.trim()) {
-	                valid = false;
-	                messages.push("Phone number is required.");
+	            if (phone && !validateField(phone)) {
+	                phone.focus();
+	                return;
 	            }
-
-	            // Email
-	            const email = form.querySelector("input[name='email']");
-	            if (email && !email.value.trim()) {
-	                valid = false;
-	                messages.push("Email is required.");
+	            if (email && !validateField(email)) {
+	                email.focus();
+	                return;
 	            }
-
-	            // If invalid, stop submission and show alert
-	            if (!valid) {
-	                event.preventDefault();
-	                alert(messages.join("\n"));
-	            }
+	            form.submit();
 	        });
 	    });
 	});
@@ -294,7 +439,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 	        <div class="card-body">
-	            <form th:action="@{/saveDetailsOfSLNA}" method="post">
+	            <form id="saveForm" th:action="@{/saveDetailsOfSLNA}" method="post">
 	                <!-- Member Details -->
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Member Details <span class="required">*</span></label>
@@ -304,6 +449,7 @@
 	                            <input class="form-check-input" type="radio" name="memberType" th:id="'member'+${member.memberId}" th:value="${member.memberId}" />
 	                            <label class="form-check-label" th:for="'member'+${member.memberId}" th:text="${member.memberType}"> </label>
 	                        </div>
+							<div class="field-error" data-error-for="memberType"></div>
 	                    </div>
 	                </div>
 
@@ -311,9 +457,11 @@
 					    <label class="col-md-3 fw-bold">Name <span class="required">*</span></label>
 					    <div class="col-md-4">
 					        <input type="text" class="form-control" name="firstName" placeholder="First Name">
+							<div class="field-error" data-error-for="firstName"></div>
 					    </div>
 					    <div class="col-md-4">
 					        <input type="text" class="form-control" name="lastName" placeholder="Last Name">
+							<div class="field-error" data-error-for="lastName"></div>
 					    </div>
 					</div>
 
@@ -324,6 +472,7 @@
 	                            <option value="">--Select--</option>
 	                            <option th:each="d : ${designationList}" th:value="${d.designationId}" th:text="${d.designationName}"> </option>
 	                        </select>
+							<div class="field-error" data-error-for="designation"></div>
 	                    </div>
 	                </div>
 
@@ -334,13 +483,15 @@
 	                            <option value="">--Select--</option>
 	                            <option th:each="q : ${qualificationList}" th:value="${q.qualificationId}" th:text="${q.qualificationName}"> </option>
 	                        </select>
+							<div class="field-error" data-error-for="qualification"></div>
 	                    </div>
 	                </div>
 
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold">Appointment Date <span class="required">*</span></label>
 	                    <div class="col-md-4">
-	                        <input type="date" class="form-control" name="appointmentDate" min="2025-01-01" th:value="${appointmentDate}" required>
+	                        <input type="date" class="form-control" name="appointmentDate" min="2026-01-01" th:value="${appointmentDate}" onkeydown="return false;">
+							<div class="field-error" data-error-for="appointmentDate"></div>
 	                    </div>
 	                </div>
 					
@@ -355,6 +506,7 @@
 	                            <input class="form-check-input" type="radio" name="joiningType" value="P">
 	                            <label class="form-check-label"> Part Time </label>
 	                        </div>
+							<div class="radio-error" data-error-for="joiningType"></div>
 	                    </div>
 	                </div>
 
@@ -362,6 +514,7 @@
 	                    <label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 	                    <div class="col-md-3">
 	                        <input type="text" class="form-control" name="tenure" oninput="validateInteger(this,2)">
+							<div class="field-error" data-error-for="tenure"></div>
 	                    </div>
 	                </div>
 					
@@ -369,6 +522,7 @@
 	                    <label class="col-md-3 fw-bold"> Phone No <span class="required">*</span></label>
 	                    <div class="col-md-4">
 	                        <input type="text" class="form-control" name="phone" oninput="validateInteger(this,10)">
+							<div class="field-error" data-error-for="phone"></div>
 	                    </div>
 	                </div>
 
@@ -376,6 +530,7 @@
 	                    <label class="col-md-3 fw-bold"> Email <span class="required">*</span></label>
 	                    <div class="col-md-5">
 	                        <input type="email" class="form-control" name="email">
+							<div class="field-error" data-error-for="email"></div>
 	                    </div>
 	                </div>
 
@@ -488,9 +643,11 @@
 							<label class="col-md-3 fw-bold">Name <span class="required">*</span></label>
 							<div class="col-md-4">
 								<input type="text" class="form-control" id="firstName" name="firstName">
+								<div class="field-error" data-error-for="firstName"></div>
 							</div>
 							<div class="col-md-4">
 								<input type="text" class="form-control" id="lastName" name="lastName">
+								<div class="field-error" data-error-for="lastName"></div>
 							</div>
 						</div>
 						
@@ -502,6 +659,7 @@
 									<option th:each="d : ${designationList}" th:value="${d.designationId}" th:text="${d.designationName}">
 									</option>
 								</select>
+								<div class="field-error" data-error-for="designation"></div>
 							</div>
 						</div>
 						
@@ -513,14 +671,16 @@
 									<option th:each="q : ${qualificationList}" th:value="${q.qualificationId}" th:text="${q.qualificationName}">
 									</option>
 								</select>
+								<div class="field-error" data-error-for="qualification"></div>
 							</div>
 						</div>
 						
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold">Appointment Date <span class="required">*</span></label>
 							<div class="col-md-4">
-								<input type="date" id="appointmentDate" class="form-control" name="appointmentDate" min="2025-01-01"
+								<input type="date" id="appointmentDate" class="form-control" name="appointmentDate" min="2026-01-01"
 									th:value="${appointmentDate}" required>
+									<div class="field-error" data-error-for="appointmentDate"></div>
 							</div>
 						</div>
 						
@@ -535,20 +695,23 @@
 									<input class="form-check-input" type="radio" name="joiningType" value="P" id="joiningPart">
 									<label class="form-check-label"> Part Time </label>
 								</div>
+								<div class="field-error" data-error-for="joiningType"></div>
 							</div>
 						</div>
 						
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 							<div class="col-md-3">
-								<input type="text" id="tenure" class="form-control" name="tenure" oninput="validateInteger(this,2)">
+								<input type="text" id="tenure" class="form-control" name="tenure">
+								<div class="field-error" data-error-for="tenure"></div>
 							</div>
 						</div>
 						
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold"> Phone No <span class="required">*</span></label>
 							<div class="col-md-4">
-								<input type="text" id="phoneNo" class="form-control" name="phone" oninput="validateInteger(this,10)">
+								<input type="text" id="phoneNo" class="form-control" name="phone">
+								<div class="field-error" data-error-for="phone"></div>
 							</div>
 						</div>
 						
@@ -556,6 +719,7 @@
 							<label class="col-md-3 fw-bold"> Email <span class="required">*</span></label>
 							<div class="col-md-5">
 								<input type="email" id="emailId" class="form-control" name="email">
+								<div class="field-error" data-error-for="email"></div>
 							</div>
 						</div>
 						
