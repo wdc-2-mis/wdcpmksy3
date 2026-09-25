@@ -45,6 +45,8 @@
 
 
 <script>
+	
+	
 
 	document.addEventListener("DOMContentLoaded", function () {
 		
@@ -412,6 +414,26 @@
 				            });
 				
 		});
+		
+		document.getElementById("livact").addEventListener("change", function () {
+
+		    const selectedNames = Array.from(this.selectedOptions)
+		        .map(option => option.text)
+		        .join(", ");
+
+		    document.getElementById("livactDisplay").textContent = selectedNames;
+		});
+
+
+		// Display selected Livelihood Interventions
+		document.getElementById("livinv").addEventListener("change", function () {
+
+		    const selectedNames = Array.from(this.selectedOptions)
+		        .map(option => option.text)
+		        .join(", ");
+
+		    document.getElementById("livinvDisplay").textContent = selectedNames;
+		});
 	});
 
 </script>
@@ -500,7 +522,7 @@
 							<label class="form-label">
 								<b> Livelihood Activities </b><span class="required">*</span>
 							</label>
-							<select class="form-select" name="livact" id="livact" multiple>
+							<select class="form-select" name="livact" id="livact" style="width: 300px;" multiple>
 									<option value="" disabled>--Select Activities--</option>
 									<th:block th:each="act : ${LivelihoodActList}">
 											<option th:value="${act.livelihoodActivityId}"
@@ -508,12 +530,13 @@
 											</option>
 									</th:block>
 							</select>
+							<div id="livactDisplay" class="mt-2 text-primary"></div>
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">
 								<b> Livelihood Interventions under Project</b> <span class="required">*</span>
 							</label>
-							<select class="form-select" name="livinv" id="livinv" multiple>
+							<select class="form-select" name="livinv" id="livinv" style="width: 300px;" multiple>
 									<option value="" disabled>--Select Livelihood Interventions--</option>
 									<th:block th:each="inv : ${LivelihoodInvList}">
 											<option th:value="${inv.livelihoodInterventionId}"
@@ -521,6 +544,7 @@
 											</option>
 									</th:block>
 							</select>
+							 <div id="livinvDisplay" class="mt-2 text-primary"></div>
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">

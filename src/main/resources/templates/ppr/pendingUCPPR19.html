@@ -48,6 +48,22 @@
 
 	document.addEventListener("DOMContentLoaded", function () {
 		
+		const dueDate = document.getElementsByName("dueDate")[0];
+		const ucDate = document.getElementsByName("ucDate")[0];
+		const fromDate = document.getElementsByName("fromDate")[0];
+		const toDate = document.getElementsByName("toDate")[0];
+
+		dueDate.setAttribute("min", "2026-01-01");
+		ucDate.setAttribute("min", "2026-01-01");
+		fromDate.setAttribute("min", "2026-01-01");
+		toDate.setAttribute("min", "2026-01-01");
+			
+		const today = new Date().toISOString().split("T")[0]; 
+		dueDate.setAttribute("max", today); 
+		ucDate.setAttribute("max", today);
+		fromDate.setAttribute("max", today); 
+		toDate.setAttribute("max", today);
+		
 			var editModal = document.getElementById('editModal');
 		   	editModal.addEventListener('show.bs.modal', function (event) {
 		       var button = event.relatedTarget;
@@ -374,7 +390,7 @@
 				             <label class="form-label">
 				                 District<span class="required">*</span>
 				              </label>
-							<select id="district" name="district" class="form-select">
+							<select id="district" name="district" class="form-select" required>
 								<option value="">--Select District--</option>
 								<th:block th:each="dist : ${distList}">
 									<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
@@ -387,7 +403,7 @@
 							<label class="form-label">
 								Project<span class="required">*</span>
 							</label>
-							<select id="project" name="project" class="form-select">
+							<select id="project" name="project" class="form-select" required>
 								<option value="">--Select Project--</option>
 							</select>
 						</div>
@@ -406,22 +422,22 @@
 							<label class="form-label">
 								 Installment No. <span class="required">*</span>
 							</label>
-							<input type="text" name="installment" id="installment" class="form-control" 
-									style="height:40px; width: 300px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')"  >
+							<input type="text" name="installment" id="installment" class="form-control" style="height:40px; width: 300px;" 
+									oninput="this.value=this.value.replace(/[^0-9]/g,'')"  required >
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">
 								Amount Released (Rs. in Lakh) <span class="required">*</span>
 							</label>
-							<input type="text" name="released" id="released" class="form-control"
-									style="height:40px; width: 300px;" oninput="validateDecimal(this,11,5)">
+							<input type="text" name="released" id="released" class="form-control" style="height:40px; width: 300px;" 
+									oninput="validateDecimal(this,11,5)" required >
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">
 								Amount Utilized (Rs. in Lakh) <span class="required">*</span>
 							</label>
-							<input type="text" name="utilized" id="utilized" class="form-control"
-								style="height:40px; width: 300px;" oninput="validateDecimal(this,11,5)">
+							<input type="text" name="utilized" id="utilized" class="form-control" style="height:40px; width: 300px;" 
+							  oninput="validateDecimal(this,11,5)" required>
 						</div>
 						
 						<div class="col-md-12">
@@ -438,7 +454,8 @@
 							</label>
 							
 							<div class="d-flex align-items-center gap-4">
-								<input type="date" name="dueDate" id="dueDate" class="form-control" min="2026-01-01" style="height:40px; width: 300px;">
+								<input type="date" name="dueDate" id="dueDate" class="form-control" min="2026-01-01" style="height:40px; width: 300px;"
+											onkeydown="return false;" required>
 							</div>
 							
 						</div>
@@ -450,7 +467,7 @@
 						    </label>
 
 						    <div class="d-flex align-items-center gap-4">
-								<input type="text" name="ucamount" id="ucamount" class="form-control"
+								<input type="text" name="ucamount" id="ucamount" class="form-control" required
 									style="height:40px; width: 300px;" oninput="validateDecimal(this,11,5)">
 						    </div>
 						</div>
@@ -468,7 +485,7 @@
 								Date
 							</label>
 							<div class="d-flex align-items-center gap-4">
-								<input type="date" name="ucDate" id="ucDate" class="form-control" min="2026-01-01"
+								<input type="date" name="ucDate" id="ucDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
 									style="height:40px; width: 300px;">
 							</div>
 						</div>
@@ -478,7 +495,7 @@
 						    </label>
 
 							<div class="d-flex align-items-center gap-4">
-								<input type="text" name="ducamount" id="ducamount" class="form-control" style="height:40px; width: 300px;"
+								<input type="text" name="ducamount" id="ducamount" class="form-control" style="height:40px; width: 300px;" required
 									oninput="validateDecimal(this,11,5)">
 							</div>
 						</div>
@@ -487,7 +504,7 @@
 							<label class="form-label">
 								Reasion of not Submitting
 							</label>
-							<textarea name="reasion" id="reasion" class="form-control" rows="2"></textarea>
+							<textarea name="reasion" id="reasion" class="form-control" rows="2" required></textarea>
 						
 						</div>
 						<div class="col-md-12">
@@ -503,9 +520,9 @@
 								Period of pending UC 
 							</label>
 							<div class="d-flex align-items-center gap-4">
-								<input type="date" name="fromDate" id="fromDate" class="form-control" min="2026-01-01"
+								<input type="date" name="fromDate" id="fromDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
 									style="height:40px; width: 300px;"> &nbsp; To &nbsp;
-								<input type="date" name="toDate" id="toDate" class="form-control" min="2026-01-01"
+								<input type="date" name="toDate" id="toDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
 									style="height:40px; width: 300px;">
 							</div>
 							
