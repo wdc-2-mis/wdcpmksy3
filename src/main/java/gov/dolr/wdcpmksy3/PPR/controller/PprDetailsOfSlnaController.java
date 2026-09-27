@@ -92,7 +92,6 @@ public class PprDetailsOfSlnaController {
             return "redirect:/login";
         boolean exists=false;
         exists = institutionalStructureRepo.existsByStCodeAndStatus(stcode, 'C');
-        System.out.println("check "+exists);
         if(!exists)
         	model.addAttribute("success", "Please complete the Institutional Structure Details before entering Details of SLNA.");
 		model.addAttribute("statename", statename);

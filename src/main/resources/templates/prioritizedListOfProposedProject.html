@@ -21,6 +21,11 @@
 		.is-invalid {
 			border-color: #dc3545 !important;
 		}
+		.field-error {
+		    color: red;
+		    font-size: 14px;
+		    margin-top: 4px;
+		}
 	</style>
 <script th:inline="javascript">
 
@@ -103,7 +108,61 @@
 				});
 			});
 		});
-	
+		
+		document.addEventListener("DOMContentLoaded", function () {
+		    const criteriaModal = document.getElementById("criteriaModal");
+		    const criteriaSaveBtn = document.getElementById("criteriaSaveBtn");
+		    const criteriaCancelBtn = document.getElementById("criteriaCancelBtn");
+		    const criteriaData = document.getElementById("criteriaData");
+		    // =========================
+		    // CRITERIA SAVE
+		    // =========================
+			document.getElementById("criteriaSaveBtn").addEventListener("click", function() {
+			    const error = document.getElementById("criteriaModalError");
+			    error.textContent = "";
+			    let selected = false;
+			    let valid = true;
+			    let result = [];
+			    document.querySelectorAll("#criteriaModal tbody tr").forEach(function(row) {
+			        const chk = row.querySelector(".criteriaCheck");
+			        const radio = row.querySelector(".scoreRadio:checked");
+			        if(chk && chk.checked) {
+			            selected = true;
+			            if(!radio) {
+			                valid = false;
+			            } else {
+			                result.push(chk.value + ":" + row.querySelector(".marks").innerText.trim());
+			            }
+			        }
+			    });
+			    if(!selected) {
+			        error.textContent = "Please select at least one criteria.";
+			        return;
+			    }
+			    if(!valid) {
+			        error.textContent = "Please select a radio button for each selected criteria.";
+			        return;
+			    }
+			    document.getElementById("criteriaData").value = result.join(",");
+			    bootstrap.Modal.getInstance(document.getElementById("criteriaModal")).hide();
+			});
+		    // =========================
+		    // CRITERIA CANCEL
+		    // =========================
+		    criteriaCancelBtn.addEventListener("click", function () {
+		        criteriaModal.querySelectorAll(".criteriaCheck").forEach(function(checkbox) {
+		            checkbox.checked = false;
+		        });
+		        criteriaModal.querySelectorAll(".scoreRadio").forEach(function(radio) {
+		            radio.checked = false;
+		        });
+		        criteriaModal.querySelectorAll(".marks").forEach(function(marks) {
+		            marks.innerText = "0";
+		        });
+		        criteriaData.value = "";
+		        bootstrap.Modal.getOrCreateInstance(criteriaModal).hide();
+		    });
+		});
 		
 		document.addEventListener("DOMContentLoaded", function () {
 			const form = document.getElementById("projectForm");
@@ -113,9 +172,12 @@
 				document.querySelectorAll("#criteriaModal tbody tr").forEach(function(row){
 					const chk = row.querySelector(".criteriaCheck");
 					if(chk && chk.checked){
-						const criteriaId = chk.value;
-						const marks = row.querySelector(".marks").innerText.trim();
-						result.push(criteriaId + ":" + marks);
+					    const selectedRadio = row.querySelector(".scoreRadio:checked");
+					    if(selectedRadio){
+					        const criteriaId = chk.value;
+					        const marks = row.querySelector(".marks").innerText.trim();
+					        result.push(criteriaId + ":" + marks);
+					    }
 					}
 				});
 				document.getElementById("criteriaData").value = result.join(",");
@@ -210,6 +272,38 @@
 					showError(proposedCost,"Proposed Cost must be greater than zero.");
 					return;
 				}
+				// =========================
+				// CRITERIA VALIDATION
+				// =========================
+				let criteriaValid = true;
+				let criteriaSelected = false;
+				document.querySelectorAll("#criteriaModal tbody tr").forEach(function (row) {
+					const checkbox = row.querySelector(".criteriaCheck");
+					const selectedRadio = row.querySelector(".scoreRadio:checked");
+					if (checkbox && checkbox.checked) {
+						criteriaSelected = true;
+						if (!selectedRadio) {
+							criteriaValid = false;
+						}
+					}
+				});
+				if (!criteriaSelected) {
+					e.preventDefault();
+					const criteriaError = document.querySelector('[data-error-for="criteriaData"]');
+					if (criteriaError) {
+						criteriaError.innerText = "Please select at least one criteria and marks.";
+					}
+					return;
+				}
+				if (!criteriaValid) {
+					e.preventDefault();
+					const criteriaError = document.querySelector('[data-error-for="criteriaData"]');
+					if (criteriaError) {
+						criteriaError.innerText = "Please select marks for all selected criteria.";
+					}
+					return;
+				}
+				
 			});
 			// =========================
 			// REMOVE ERROR ON CHANGE
@@ -370,7 +464,6 @@
 	        if (checkbox) {
 	            checkbox.checked = true;
 	        }
-	        updateEditCriteriaData();
 	    }
 	    // Checkbox changed
 	    if (e.target.classList.contains("criteriaCheck")) {
@@ -384,7 +477,6 @@
 	            // Reset marks
 	            row.querySelector(".marks").innerText = "0";
 	        }
-	        updateEditCriteriaData();
 	    }
 		
 		//Edit Radio changed
@@ -492,81 +584,212 @@
 
 	
 	document.addEventListener("DOMContentLoaded", function () {
-				document.getElementById("editProjectForm").addEventListener("submit", function(e){
-					updateEditCriteriaData();
-				    const district = document.getElementById("editDistrict").value;
-				    const project = document.getElementById("editProject").value.trim();
-				    const microWatershed = document.getElementById("editMicroWatershed").value;
-				    const treatedArea = document.getElementById("editTreatedArea").value;
-				    const proposedCost = document.getElementById("editProposedCost").value;
-				    const projectType = document.querySelector("input[name='projectType']:checked");
-				    if(district === ""){
-				        alert("Please select District.");
-				        e.preventDefault();
-				        return;
-				    }
-				    if(project === ""){
-				        alert("Project Name is missing.");
-				        e.preventDefault();
-				        return;
-				    }
-				    if(microWatershed === ""){
-				        alert("Please select Micro-watershed.");
-				        e.preventDefault();
-				        return;
-				    }
-				    if(treatedArea === ""){
-				        alert("Please enter Proposed Project Area.");
-				        e.preventDefault();
-				        return;
-				    }
-				    if(Number(treatedArea) <= 0){
-				        alert("Project Area must be greater than zero.");
-				        e.preventDefault();
-				        return;
-				    }
-				    if(!projectType){
-				        alert("Please select Project Type.");
-				        e.preventDefault();
-				        return;
-				    }
-				    if(proposedCost === ""){
-				        alert("Please enter Proposed Cost.");
-				        e.preventDefault();
-				        return;
-				    }
-				    if(Number(proposedCost) <= 0){
-				        alert("Proposed Cost must be greater than zero.");
-				        e.preventDefault();
-				        return;
-				    }
-				});
+	    const editForm = document.getElementById("editProjectForm");
+	    if (!editForm) {
+	        return;
+	    }
+	    editForm.addEventListener("submit", function (e) {
+	        e.preventDefault();
+	        // =========================
+	        // CLEAR OLD ERRORS
+	        // =========================
+	        editForm.querySelectorAll(".field-error").forEach(function (error) {
+	            error.innerText = "";
+	        });
+	        let isValid = true;
+	        let firstInvalidField = null;
+	        // =========================
+	        // GET VALUES
+	        // =========================
+	        const treatedArea = document.getElementById("editTreatedArea").value.trim();
+	        const proposedCost = document.getElementById("editProposedCost").value.trim();
+	        const projectType = document.querySelector("#editProjectForm input[name='projectType']:checked");
+	        // =========================
+	        // TREATED AREA
+	        // =========================
+	        if (!treatedArea) {
+	            const error = editForm.querySelector('[data-error-for="editTreatedArea"]');
+	            if (error) {
+	                error.innerText = "Treated Area is required.";
+	            }
+	            isValid = false;
+	            if (!firstInvalidField) {
+	                firstInvalidField = document.getElementById("editTreatedArea");
+	            }
+	        }
+	        // =========================
+	        // PROJECT TYPE
+	        // =========================
+	        if (!projectType) {
+	            const error = editForm.querySelector('[data-error-for="editProjectType"]');
+	            if (error) {
+	                error.innerText = "Project Type is required.";
+	            }
+	            isValid = false;
+	            if (!firstInvalidField) {
+	                firstInvalidField = editForm.querySelector(".editProjectType");
+	            }
+	        }
+	        // =========================
+	        // PROPOSED COST
+	        // =========================
+	        if (!proposedCost) {
+	            const error = editForm.querySelector('[data-error-for="editProposedCost"]');
+	            if (error) {
+	                error.innerText = "Proposed Cost is required.";
+	            }
+	            isValid = false;
+	            if (!firstInvalidField) {
+	                firstInvalidField = document.getElementById("editProposedCost");
+	            }
+	        }
+	        // =========================
+	        // EDIT CRITERIA VALIDATION
+	        // =========================
+	        let hasSelectedCriteria = false;
+	        let criteriaMissingRadio = false;
+	        document.querySelectorAll("#editCriteriaModal tbody tr").forEach(function (row) {
+	            const checkbox = row.querySelector(".editCriteriaCheck");
+	            const radio = row.querySelector(".editScoreRadio:checked");
+	            if (checkbox && checkbox.checked) {
+	                hasSelectedCriteria = true;
+	                if (!radio) {
+	                    criteriaMissingRadio = true;
+	                }
+	            }
+	        });
+	        const criteriaError = editForm.querySelector('[data-error-for="editCriteriaData"]');
+	        if (!hasSelectedCriteria) {
+	            if (criteriaError) {
+	                criteriaError.innerText = "Please select at least one criteria.";
+	            }
+	            isValid = false;
+	            if (!firstInvalidField) {
+	                firstInvalidField = document.getElementById("editCriteriaLink");
+	            }
+	        } else if (criteriaMissingRadio) {
+	            if (criteriaError) {
+	                criteriaError.innerText = "Please select a radio button for every selected criteria.";
+	            }
+	            isValid = false;
+	            if (!firstInvalidField) {
+	                firstInvalidField = document.getElementById("editCriteriaLink");
+	            }
+	        }
+	        // =========================
+	        // STOP IF INVALID
+	        // =========================
+	        if (!isValid) {
+	            if (firstInvalidField) {
+	                firstInvalidField.focus();
+	            }
+	            return;
+	        }
+	        // =========================
+	        // UPDATE CRITERIA DATA
+	        // =========================
+	        updateEditCriteriaData();
+	        // =========================
+	        // SUBMIT FORM
+	        // =========================
+	        editForm.submit();
+	    });
+	});
 
-			});
 			
+			let savedEditCriteriaState = [];
 			document.addEventListener("DOMContentLoaded", function () {
-				const editCriteriaLink = document.getElementById("editCriteriaLink");
-				const editModalElement = document.getElementById("editModal");
-				const editCriteriaModalElement = document.getElementById("editCriteriaModal");
-				if (editCriteriaLink && editModalElement && editCriteriaModalElement) {
-					const editModal = bootstrap.Modal.getOrCreateInstance(editModalElement);
-					const editCriteriaModal = bootstrap.Modal.getOrCreateInstance(editCriteriaModalElement);
-					editCriteriaLink.addEventListener("click", function () {
-						// Hide Edit Project modal
-						editModal.hide();
-						// Open Criteria modal after Edit Project modal is completely hidden
-						editModalElement.addEventListener("hidden.bs.modal", function openCriteria() {
-							editCriteriaModal.show();
-							editModalElement.removeEventListener("hidden.bs.modal", openCriteria);
-						});
-					});
-					// When Criteria modal is closed, reopen Edit Project modal
-					editCriteriaModalElement.addEventListener("hidden.bs.modal", function () {
-						editModal.show();
-					});
-				}
+			    const editCriteriaLink = document.getElementById("editCriteriaLink");
+			    const editModalElement = document.getElementById("editModal");
+			    const editCriteriaModalElement = document.getElementById("editCriteriaModal");
+			    if (editCriteriaLink && editModalElement && editCriteriaModalElement) {
+			        const editModal = bootstrap.Modal.getOrCreateInstance(editModalElement);
+			        const editCriteriaModal = bootstrap.Modal.getOrCreateInstance(editCriteriaModalElement);
+			        //Open Edit Criteria
+			        editCriteriaLink.addEventListener("click", function () {
+			            //Save current criteria state before opening popup
+			            savedEditCriteriaState = [];
+			            document.querySelectorAll("#editCriteriaModal tbody tr").forEach(function (row) {
+			                const checkbox = row.querySelector(".editCriteriaCheck");
+			                const marks = row.querySelector(".editMarks");
+			                const selectedRadio = row.querySelector(".editScoreRadio:checked");
+			                if (checkbox) {
+			                    savedEditCriteriaState.push({
+			                        criteriaId: checkbox.value,
+			                        checked: checkbox.checked,
+			                        marks: marks ? marks.innerText.trim() : "0",
+			                        radioValue: selectedRadio ? selectedRadio.value : null
+			                    });
+			                }
+			            });
+			            editModal.hide();
+			            editModalElement.addEventListener("hidden.bs.modal", function openCriteria() {
+			                editCriteriaModal.show();
+			                editModalElement.removeEventListener("hidden.bs.modal", openCriteria);
+			            });
+			        });
+			        //Edit Criteria Save
+			        document.getElementById("criteriaEditSaveBtn").addEventListener("click", function () {
+			            const error = document.getElementById("criteriaEditModalError");
+			            error.innerText = "";
+			            let valid = true;
+			            let hasSelectedCriteria = false;
+			            document.querySelectorAll("#editCriteriaModal tbody tr").forEach(function (row) {
+			                const checkbox = row.querySelector(".editCriteriaCheck");
+			                const radio = row.querySelector(".editScoreRadio:checked");
+			                if (checkbox && checkbox.checked) {
+			                    hasSelectedCriteria = true;
+			                    if (!radio) {
+			                        valid = false;
+			                    }
+			                }
+			            });
+			            if (!hasSelectedCriteria) {
+			                error.innerText = "Please select at least one criteria.";
+			                return;
+			            }
+			            if (!valid) {
+			                error.innerText = "Please select a radio button for every selected criteria.";
+			                return;
+			            }
+			            updateEditCriteriaData();
+			            editCriteriaModal.hide();
+			        });
+			        //Edit Criteria Cancel
+			        document.getElementById("criteriaEditCancelBtn").addEventListener("click", function () {
+			            const error = document.getElementById("criteriaEditModalError");
+			            error.innerText = "";
+			            //Restore previous state
+			            savedEditCriteriaState.forEach(function (saved) {
+			                const checkbox = document.querySelector(
+			                    '.editCriteriaCheck[value="' + saved.criteriaId + '"]'
+			                );
+			                if (!checkbox) {
+			                    return;
+			                }
+			                const row = checkbox.closest("tr");
+			                checkbox.checked = saved.checked;
+			                row.querySelectorAll(".editScoreRadio").forEach(function (radio) {
+			                    radio.checked = false;
+			                    if (saved.radioValue !== null && radio.value === saved.radioValue) {
+			                        radio.checked = true;
+			                    }
+			                });
+			                const marks = row.querySelector(".editMarks");
+			                if (marks) {
+			                    marks.innerText = saved.marks;
+			                }
+			            });
+			            //Restore hidden criteria data
+			            updateEditCriteriaData();
+			            editCriteriaModal.hide();
+			        });
+			        //When criteria modal closes, reopen edit modal
+			        editCriteriaModalElement.addEventListener("hidden.bs.modal", function () {
+			            editModal.show();
+			        });
+			    }
 			});
-
 		
 </script>
 	
@@ -601,7 +824,7 @@
 	                </div>
 
 					<div class="row mb-3 align-items-center">
-					    <label class="col-md-3 fw-bold">Project Name </label>
+					    <label class="col-md-3 fw-bold">Project Name <span class="required">*</span></label>
 						<div class="col-md-5">
 							<select class="form-select" id="project" name="project">
 								<option value="">--Select--</option>
@@ -631,8 +854,9 @@
 					<div class="row mb-3 align-items-center">
 					    <label class="col-md-3 fw-bold"> Proposed project area treated(in Ha.) <span class="required">*</span></label>
 					    <div class="col-md-3">
-							<input type="text" name="treatedProjectArea" id="treatedProjectArea" autocomplete="off" 
-														class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+							<input type="text" name="treatedProjectArea" id="treatedProjectArea" autocomplete="off"
+								class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" />
+							<div class="field-error" data-error-for="treatedProjectArea"></div>
 					    </div>
 					</div>										
 
@@ -645,24 +869,27 @@
 								<label class="form-check-label" th:for="'project'+${project.projectTypeId}" th:text="${project.projectType}">
 								</label>
 							</div>
+							<div class="field-error" data-error-for="projectType"></div>
 						</div>
 	                </div>
 
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Proposed Cost <span class="required">*</span></label>
 	                    <div class="col-md-3">
-							<input type="text" name="proposedCost" id="proposedCost" autocomplete="off" 
-								class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+							<input type="text" name="proposedCost" id="proposedCost" autocomplete="off" class="form-control form-control-sm"
+								oninput="validateDecimal(this,11,4)" />
+							<div class="field-error" data-error-for="proposedCost"></div>
 	                    </div>
 	                </div>
 					
 	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> Weightage under the Criteria </label>
+	                    <label class="col-md-3 fw-bold"> Weightage under the Criteria <span class="required">*</span></label>
 	                    <div class="col-md-4">
 							<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#criteriaModal">
 								Link <i class="fas fa-list"></i>
 							</button>
 							<input type="hidden" id="criteriaData" name="criteriaData">
+							<div class="field-error" data-error-for="criteriaData"></div>
 	                    </div>
 	                </div>
 
@@ -718,7 +945,6 @@
 								data-bs-target="#editModal" th:if="${#strings.trim(data.status) == 'D'}">
 								<i class="fas fa-edit"></i>
 							</button>
-							&nbsp;
 							<a th:if="${#strings.trim(data.status) == 'D'}" th:href="@{/deletePprProposedProject(id=${data.pprProposedProjectId})}"
 								class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
 								<i class="fas fa-trash"></i>
@@ -798,6 +1024,13 @@
 		                    </tbody>
 		                </table>
 		            </div>
+					<div class="modal-footer justify-content-center">
+						<div class="w-100 text-center">
+							<div class="field-error" id="criteriaModalError"></div>
+							<button type="button" class="btn btn-secondary" id="criteriaCancelBtn"> Cancel </button>
+							<button type="button" class="btn btn-success" id="criteriaSaveBtn"> Save </button>
+						</div>
+					</div>
 		        </div>
 		    </div>
 		</div>
@@ -816,39 +1049,40 @@
 						<div class="modal-body">
 							<input type="hidden" id="editPprProposedProjectId" name="pprProposedProjectId">
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">District </label>
+								<label class="col-md-5 fw-bold">District <span class="required">*</span></label>
 								<div class="col-md-5">
 									<input type="text" class="form-control" id="editDistrict" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">Project Name </label>
+								<label class="col-md-5 fw-bold">Project Name <span class="required">*</span></label>
 								<div class="col-md-5">
 									<input type="text" class="form-control" id="editProject" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">Name of Micro-watershed Proposed to be covered </label>
+								<label class="col-md-5 fw-bold">Name of Micro-watershed <span class="required">*</span></label>
 								<div class="col-md-5">
 									<input type="text" class="form-control" id="editMicroWatershed" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">Micro-watershed Code </label>
+								<label class="col-md-5 fw-bold">Micro-watershed Code </label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" id="editMicroWatershedCode" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">Proposed project area treated(in Ha.) <span class="required">*</span></label>
+								<label class="col-md-5 fw-bold">Proposed project area(in Ha.) <span class="required">*</span></label>
 								<div class="col-md-3">
-									<input type="text" name="treatedProjectArea" id="editTreatedArea" autocomplete="off" 
-																class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+									<input type="text" name="treatedProjectArea" id="editTreatedArea" autocomplete="off" class="form-control"
+										oninput="validateDecimal(this,11,4)" />
+									<div class="field-error" data-error-for="editTreatedArea"></div>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold"> Type of Project <span class="required">*</span></label>
-								<div class="col-md-9">
+								<label class="col-md-5 fw-bold"> Type of Project <span class="required">*</span></label>
+								<div class="col-md-5">
 									<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
 										<input class="form-check-input editProjectType" type="radio" name="projectType"
 											th:id="'editProject'+${project.projectTypeId}" th:value="${project.projectTypeId}">
@@ -856,20 +1090,23 @@
 											th:text="${project.projectType}">
 										</label>
 									</div>
+									<div class="field-error" data-error-for="editProjectType"></div>
 								</div>
 							</div>
 							<div class="row mb-3">
-								<label class="col-md-3 fw-bold">Proposed Cost <span class="required">*</span></label>
+								<label class="col-md-5 fw-bold">Proposed Cost <span class="required">*</span></label>
 								<div class="col-md-3">
 									<input type="text" name="proposedCost" id="editProposedCost" autocomplete="off" 
-										class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" required />
+										class="form-control" oninput="validateDecimal(this,11,4)" />
+									<div class="field-error" data-error-for="editProposedCost"></div>
 								</div>
 							</div>
 							<div class="row mb-3 align-items-center">
-								<label class="col-md-3 fw-bold"> Weightage under the Criteria </label>
+								<label class="col-md-5 fw-bold"> Weightage under the Criteria <span class="required">*</span></label>
 								<div class="col-md-4">
 									<button type="button" class="btn btn-outline-primary btn-sm" id="editCriteriaLink">Link <i class="fas fa-list"></i> </button>
 									<input type="hidden" id="editCriteriaData" name="criteriaData">
+									<div class="field-error" data-error-for="editCriteriaData"></div>
 								</div>
 							</div>
 						</div>
@@ -988,6 +1225,13 @@
 				                    </tbody>
 				                </table>
 				            </div>
+							<div class="modal-footer justify-content-center">
+							    <div class="w-100 text-center">
+							        <div class="field-error" id="criteriaEditModalError"></div>
+							        <button type="button" class="btn btn-secondary me-2" id="criteriaEditCancelBtn">Cancel</button>
+							        <button type="button" class="btn btn-success" id="criteriaEditSaveBtn">Save</button>
+							    </div>
+							</div>
 				        </div>
 				    </div>
 				</div>
