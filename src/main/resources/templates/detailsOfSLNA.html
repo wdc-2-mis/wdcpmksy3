@@ -40,34 +40,26 @@
 		
 		const today = new Date().toISOString().split("T")[0]; 
 			appointmentDate.setAttribute("max", today); 
-			mouDate.setAttribute("max", today);
-
 	});
 	
-	document.addEventListener("DOMContentLoaded", function () {
-
-	    const selectAll = document.getElementById("selectAll");
-	    const rowCheckboxes = document.querySelectorAll(".rowCheckbox");
-
-	    // Select/Deselect all rows
-	    selectAll.addEventListener("change", function () {
-	        rowCheckboxes.forEach(function (checkbox) {
-	            checkbox.checked = selectAll.checked;
-	        });
-	    });
-
-	    // Update header checkbox when any row checkbox changes
-	    rowCheckboxes.forEach(function (checkbox) {
-	        checkbox.addEventListener("change", function () {
-
-	            const total = rowCheckboxes.length;
-	            const checked = document.querySelectorAll(".rowCheckbox:checked").length;
-
-	            selectAll.checked = (total === checked);
-	        });
-	    });
-
-	});
+//	document.addEventListener("DOMContentLoaded", function () {
+//	    const selectAll = document.getElementById("selectAll");
+//	    const rowCheckboxes = document.querySelectorAll(".rowCheckbox");
+//	    // Select/Deselect all rows
+//	    selectAll.addEventListener("change", function () {
+//	        rowCheckboxes.forEach(function (checkbox) {
+//	            checkbox.checked = selectAll.checked;
+//	        });
+//	    });
+//	    // Update header checkbox when any row checkbox changes
+//	    rowCheckboxes.forEach(function (checkbox) {
+//	        checkbox.addEventListener("change", function () {
+//	            const total = rowCheckboxes.length;
+//	            const checked = document.querySelectorAll(".rowCheckbox:checked").length;
+//	            selectAll.checked = (total === checked);
+//	        });
+//	    });
+//	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
 
@@ -116,6 +108,7 @@
 			});
 	});
 	
+	
 	document.addEventListener("DOMContentLoaded", function () {
 	    const forms = document.querySelectorAll("#saveForm, #editForm");
 	    forms.forEach(form => {
@@ -130,155 +123,155 @@
 	        const memberRadios = form.querySelectorAll("input[name='memberType']");
 	        const joiningRadios = form.querySelectorAll("input[name='joiningType']");
 
+
 			function showError(field, message) {
-			            if (!field) return;
-			            field.classList.add("is-invalid");
-			            const error = form.querySelector("[data-error-for='" + field.name + "']");
-			            if (error) error.textContent = message;
-			        }
+				if (!field) return;
+				field.classList.add("is-invalid");
+				const error = form.querySelector("[data-error-for='" + field.name + "']");
+				if (error) error.textContent = message;
+			}
+			function clearError(field) {
+				if (!field) return;
+				field.classList.remove("is-invalid");
+				const error = form.querySelector("[data-error-for='" + field.name + "']");
+				if (error) error.textContent = "";
+			}
 
-			        function clearError(field) {
-			            if (!field) return;
-			            field.classList.remove("is-invalid");
-			            const error = form.querySelector("[data-error-for='" + field.name + "']");
-			            if (error) error.textContent = "";
-			        }
+			function showRadioError(name, message) {
+				const error = form.querySelector("[data-error-for='" + name + "']");
+				if (error) error.textContent = message;
+			}
 
-			        function showRadioError(name, message) {
-			            const error = form.querySelector("[data-error-for='" + name + "']");
-			            if (error) error.textContent = message;
-			        }
+			function clearRadioError(name) {
+				const error = form.querySelector("[data-error-for='" + name + "']");
+				if (error) error.textContent = "";
+			}
 
-			        function clearRadioError(name) {
-			            const error = form.querySelector("[data-error-for='" + name + "']");
-			            if (error) error.textContent = "";
-			        }
+			function validateField(field) {
+				if (!field) return true;
+				const value = field.value.trim();
+				clearError(field);
 
-			        function validateField(field) {
-			            if (!field) return true;
-			            const value = field.value.trim();
-			            clearError(field);
-
-			            if (field.name === "firstName") {
-			                if (!value) {
-			                    showError(field, "First Name is required.");
-			                    return false;
-			                }
-			                if (!/^[A-Za-z ]+$/.test(value)) {
-			                    showError(field, "First Name should contain only letters.");
-			                    return false;
-			                }
-			                if (value.length < 2) {
-			                    showError(field, "First Name must be at least 2 characters.");
-			                    return false;
-			                }
-			            }
+				if (field.name === "firstName") {
+					if (!value) {
+						showError(field, "First Name is required.");
+						return false;
+					}
+					if (!/^[A-Za-z ]+$/.test(value)) {
+						showError(field, "First Name should contain only letters.");
+						return false;
+					}
+					if (value.length < 2) {
+						showError(field, "First Name must be at least 2 characters.");
+						return false;
+					}
+				}
 
 			            if (field.name === "lastName") {
-			                if (!value) {
-			                    showError(field, "Last Name is required.");
-			                    return false;
-			                }
-			                if (!/^[A-Za-z ]+$/.test(value)) {
-			                    showError(field, "Last Name should contain only letters.");
-			                    return false;
-			                }
-			                if (value.length < 2) {
-			                    showError(field, "Last Name must be at least 2 characters.");
-			                    return false;
-			                }
-			            }
+					if (!value) {
+						showError(field, "Last Name is required.");
+						return false;
+					}
+					if (!/^[A-Za-z ]+$/.test(value)) {
+						showError(field, "Last Name should contain only letters.");
+						return false;
+					}
+					if (value.length < 2) {
+						showError(field, "Last Name must be at least 2 characters.");
+						return false;
+					}
+				}
 
-			            if (field.name === "designation") {
-			                if (!value) {
-			                    showError(field, "Please select a Designation.");
-			                    return false;
-			                }
-			            }
+				if (field.name === "designation") {
+					if (!value) {
+						showError(field, "Please select a Designation.");
+						return false;
+					}
+				}
 
-			            if (field.name === "qualification") {
-			                if (!value) {
-			                    showError(field, "Please select a Qualification.");
-			                    return false;
-			                }
-			            }
+				if (field.name === "qualification") {
+					if (!value) {
+						showError(field, "Please select a Qualification.");
+						return false;
+					}
+				}
 
-			            if (field.name === "appointmentDate") {
-			                if (!value) {
-			                    showError(field, "Appointment Date is required.");
-			                    return false;
-			                }
-			                const selectedDate = new Date(value);
-			                const minDate = new Date("2026-01-01");
-			                const today = new Date();
-			                selectedDate.setHours(0, 0, 0, 0);
-			                minDate.setHours(0, 0, 0, 0);
-			                today.setHours(0, 0, 0, 0);
-			                if (selectedDate < minDate) {
-			                    showError(field, "Appointment Date cannot be before 01-01-2026.");
-			                    return false;
-			                }
-			                if (selectedDate > today) {
-			                    showError(field, "Appointment Date cannot be a future date.");
-			                    return false;
-			                }
-			            }
+				if (field.name === "appointmentDate") {
+					if (!value) {
+						showError(field, "Appointment Date is required.");
+						return false;
+					}
+					const selectedDate = new Date(value);
+					const minDate = new Date("2026-01-01");
+					const today = new Date();
+					selectedDate.setHours(0, 0, 0, 0);
+					minDate.setHours(0, 0, 0, 0);
+					today.setHours(0, 0, 0, 0);
+					if (selectedDate < minDate) {
+						showError(field, "Appointment Date cannot be before 01-01-2026.");
+						return false;
+					}
+					if (selectedDate > today) {
+						showError(field, "Appointment Date cannot be a future date.");
+						return false;
+					}
+				}
 
-			            if (field.name === "tenure") {
-			                if (!value) {
-			                    showError(field, "Tenure Period is required.");
-			                    return false;
-			                }
-			                if (!/^\d+$/.test(value)) {
-			                    showError(field, "Tenure Period must contain numbers only.");
-			                    return false;
-			                }
-			                const tenureValue = parseInt(value);
-			                if (tenureValue < 1 || tenureValue > 99) {
-			                    showError(field, "Tenure Period must be between 1 and 99 years.");
-			                    return false;
-			                }
-			            }
+				if (field.name === "tenure") {
+					if (!value) {
+						showError(field, "Tenure Period is required.");
+						return false;
+					}
+					if (!/^\d+$/.test(value)) {
+						showError(field, "Tenure Period must contain numbers only.");
+						return false;
+					}
+					const tenureValue = parseInt(value);
+					if (tenureValue < 1 || tenureValue > 99) {
+						showError(field, "Tenure Period must be between 1 and 99 years.");
+						return false;
+					}
+				}
 
-			            if (field.name === "phone") {
-			                if (!value) {
-			                    showError(field, "Phone number is required.");
-			                    return false;
-			                }
-			                if (!/^[0-9]{10}$/.test(value)) {
-			                    showError(field, "Phone number must contain exactly 10 digits.");
-			                    return false;
-			                }
-			                if (!/^[6-9]/.test(value)) {
-			                    showError(field, "Phone number must start with 6, 7, 8 or 9.");
-			                    return false;
-			                }
-			                const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
-			                if (isDuplicatePhone(value, currentId)) {
-			                    showError(field, "This phone number is already saved for another Member.");
-			                    return false;
-			                }
-			            }
+				if (field.name === "phone") {
+					if (!value) {
+						showError(field, "Phone number is required.");
+						return false;
+					}
+					if (!/^[0-9]{10}$/.test(value)) {
+						showError(field, "Phone number must contain exactly 10 digits.");
+						return false;
+					}
+					if (!/^[6-9]/.test(value)) {
+						showError(field, "Phone number must start with 6, 7, 8 or 9.");
+						return false;
+					}
+					const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
+					if (isDuplicatePhone(value, currentId)) {
+						showError(field, "This phone number is already saved for another Member.");
+						return false;
+					}
+				}
 
-			            if (field.name === "email") {
-			                if (!value) {
-			                    showError(field, "Email is required.");
-			                    return false;
-			                }
-			                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-			                if (!emailPattern.test(value)) {
-			                    showError(field, "Please enter a valid email address.");
-			                    return false;
-			                }
-			                const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
-			                if (isDuplicateEmail(value, currentId)) {
-			                    showError(field, "This email is already saved for another Member.");
-			                    return false;
-			                }
-			            }
+				if (field.name === "email") {
+					if (!value) {
+						showError(field, "Email is required.");
+						return false;
+					}
+					const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+					if (!emailPattern.test(value)) {
+						showError(field, "Please enter a valid email address.");
+						return false;
+					}
+					const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
+					if (isDuplicateEmail(value, currentId)) {
+						showError(field, "This email is already saved for another Member.");
+						return false;
+					}
+				}
 
-			            return true;
-			        }
+				return true;
+			}
 
 	        form.addEventListener("submit", function (event) {
 	            event.preventDefault();
@@ -335,6 +328,16 @@
 	const ceoExists = /*[[${ceoExists}]]*/ false;
 	const phoneMap = /*[[${phoneMap}]]*/ {};
 	const emailMap = /*[[${emailMap}]]*/ {};
+	function isDuplicatePhone(phone, currentId) {
+			return Object.entries(phoneMap).some(([id, value]) =>
+				value === phone && String(id) !== String(currentId)
+			);
+		}
+	function isDuplicateEmail(email, currentId) {
+			return Object.entries(emailMap).some(([id, value]) =>
+				value === email && String(id) !== String(currentId)
+			);
+		}
 	document.addEventListener("DOMContentLoaded", function () {
 	    const saveButton = document.querySelector("button[name='action'][value='D']");
 		const updateButton = document.querySelector("button[name='updateAction'][value='D']");
@@ -342,9 +345,32 @@
 		
 		const phoneInputs = document.querySelectorAll("input[name='phone']");
 		const emailInputs = document.querySelectorAll("input[name='email']");
+		
+		function showError(field, message, form) {
+			if (!field) return;
+			field.classList.add("is-invalid");
+			const error = form.querySelector("[data-error-for='" + field.name + "']");
+			if (error) error.textContent = message;
+			field.value = "";
+			field.focus();
+		}
+		
+		function showRadioError(field, message, form) {
+			const error = form.querySelector("[data-error-for='" + field.name + "']");
+			if (error) error.textContent = message;
+		}
+		
+		function hideError(field, form){
+			if (!field) return;
+			field.classList.remove("is-invalid");
+			const error = form.querySelector("[data-error-for='" + field.name + "']");
+			if (error) error.textContent = "";
+		}
 
 	    memberRadios.forEach(radio => {
 	        radio.addEventListener("change", function () {
+				const form = radio.closest("form");
+				hideError(radio, form);
 				phoneInputs.forEach(phoneInput => {
 					phoneInput.value = "";
 				});
@@ -356,11 +382,15 @@
 	            if (chairpersonExists && selectedText === "Chairperson") {
 	                saveButton.disabled = true;
 					updateButton.disabled = true;
-	                alert(selectedText + " details for this SLNA is already saved. You cannot save again.");
+					const message = selectedText + " details for this SLNA is already saved. You cannot save again.";
+					showRadioError(radio, message, form);
+//	                alert(selectedText + " details for this SLNA is already saved. You cannot save again.");
 	            } else if (ceoExists && selectedText === "CEO") {
 					saveButton.disabled = true;
 					updateButton.disabled = true;
-					alert(selectedText + " details for this SLNA is already saved. You cannot save again.");
+					const message = selectedText + " details for this SLNA is already saved. You cannot save again.";
+					showRadioError(radio, message, form);
+//					alert(selectedText + " details for this SLNA is already saved. You cannot save again.");
 				} else{
 	                saveButton.disabled = false;
 					updateButton.disabled = false;
@@ -372,31 +402,22 @@
 			return selected && selected.nextElementSibling.textContent.trim() === "Member";
 		}
 		
-		function isDuplicatePhone(phone, currentId) {
-		    return Object.entries(phoneMap).some(([id, value]) =>
-		        value === phone && String(id) !== String(currentId)
-		    );
-		}
-
-		function isDuplicateEmail(email, currentId) {
-		    return Object.entries(emailMap).some(([id, value]) =>
-		        value === email && String(id) !== String(currentId)
-		    );
-		}
 		phoneInputs.forEach(phoneInput => {
 		    phoneInput.addEventListener("blur", function () {
 		        const form = phoneInput.closest("form");
+				hideError(phoneInput, form);
 		        if (!isMemberSelected(form))
 		            return;
 		        const phone = phoneInput.value.trim();
 		        if (!phone)
-		            return;
-		        const currentId =
-		            form.querySelector("input[name='pprSlna']")?.value || "";
+					return;
+				if (!/^[0-9]{10}$/.test(phone))
+					showError(phoneInput, "Phone number must contain exactly 10 digits.", form);
+				if (!/^[6-9]/.test(phone))
+					showError(phoneInput, "Phone number must start with 6, 7, 8 or 9.", form);
+		        const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
 		        if (isDuplicatePhone(phone, currentId)) {
-		            alert("This phone number is already saved for another Member.");
-		            phoneInput.value = "";
-		            phoneInput.focus();
+					showError(phoneInput, "This phone number is already saved for another Member.", form);
 		        }
 		    });
 		});
@@ -404,17 +425,18 @@
 		emailInputs.forEach(emailInput => {
 		    emailInput.addEventListener("blur", function () {
 		        const form = emailInput.closest("form");
+				hideError(emailInput, form);
 		        if (!isMemberSelected(form))
 		            return;
 		        const email = emailInput.value.trim();
-		        if (!email)
-		            return;
-		        const currentId =
-		            form.querySelector("input[name='pprSlna']")?.value || "";
+				if (!email)
+					return;
+				const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				if (!emailPattern.test(email)) 
+					showError(emailInput, "Please enter a valid email address.", form);
+		        const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
 		        if (isDuplicateEmail(email, currentId)) {
-		            alert("This email is already saved for another Member.");
-		            emailInput.value = "";
-		            emailInput.focus();
+					showError(emailInput, "This email is already saved for another Member.", form);
 		        }
 		    });
 		});
@@ -513,7 +535,8 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 	                    <div class="col-md-3">
-	                        <input type="text" class="form-control" name="tenure" oninput="validateInteger(this,2)">
+							<input type="text" class="form-control" name="tenure" maxlength="2" inputmode="numeric"
+								oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
 							<div class="field-error" data-error-for="tenure"></div>
 	                    </div>
 	                </div>
@@ -521,7 +544,8 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Phone No <span class="required">*</span></label>
 	                    <div class="col-md-4">
-	                        <input type="text" class="form-control" name="phone" oninput="validateInteger(this,10)">
+	                        <input type="text" class="form-control" name="phone" maxlength="10" inputmode="numeric" 
+							oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
 							<div class="field-error" data-error-for="phone"></div>
 	                    </div>
 	                </div>
@@ -529,7 +553,7 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Email <span class="required">*</span></label>
 	                    <div class="col-md-5">
-	                        <input type="email" class="form-control" name="email">
+	                        <input type="text" class="form-control" name="email">
 							<div class="field-error" data-error-for="email"></div>
 	                    </div>
 	                </div>
@@ -542,7 +566,7 @@
 	                </div>
 
 					<div class="text-center mt-4">
-						<button type="submit" name="action"  value="D" class="btn btn-warning">
+						<button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!exists}">
 					         <i class="fas fa-save"></i>
 					          Save As Draft
 					     </button>
@@ -710,7 +734,8 @@
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold"> Phone No <span class="required">*</span></label>
 							<div class="col-md-4">
-								<input type="text" id="phoneNo" class="form-control" name="phone">
+								<input type="text" id="phoneNo" class="form-control" name="phone" maxlength="10" inputmode="numeric"
+									oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
 								<div class="field-error" data-error-for="phone"></div>
 							</div>
 						</div>

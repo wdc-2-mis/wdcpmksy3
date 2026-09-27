@@ -28,6 +28,7 @@ import gov.dolr.wdcpmksy3.entity.Designation;
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.MemberDetails;
 import gov.dolr.wdcpmksy3.entity.Qualification;
+import gov.dolr.wdcpmksy3.repository.InstitutionalStructureRepository;
 import gov.dolr.wdcpmksy3.service.DesignationService;
 import gov.dolr.wdcpmksy3.service.InstitutionalStructureService;
 import gov.dolr.wdcpmksy3.service.MemberDetailsService;
@@ -52,9 +53,12 @@ public class PprDetailsOfSlnaController {
 	
 	@Autowired
 	QualificationService qualificationService;
+	
+	@Autowired
+	private InstitutionalStructureRepository institutionalStructureRepo;
 
 	@GetMapping("/detailsOfSLNA")
-    public String detailsOfSLNA(HttpSession session, Model model) {
+    public String detailsOfSLNA(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -84,10 +88,13 @@ public class PprDetailsOfSlnaController {
 		Map<Integer, String> phoneMap = allList.stream().filter(p -> p.getPhoneNo() != null).collect(Collectors.toMap(PprSlnaDetails::getPprSlnaId,PprSlnaDetails::getPhoneNo));
 		Map<Integer, String> emailMap = allList.stream().filter(p -> p.getEmailId() != null).collect(Collectors.toMap(PprSlnaDetails::getPprSlnaId,PprSlnaDetails::getEmailId));
 
-        if(userid==null){
-
+        if(userid==null)
             return "redirect:/login";
-        }
+        boolean exists=false;
+        exists = institutionalStructureRepo.existsByStCodeAndStatus(stcode, 'C');
+        System.out.println("check "+exists);
+        if(!exists)
+        	model.addAttribute("success", "Please complete the Institutional Structure Details before entering Details of SLNA.");
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
 		model.addAttribute("memberDetailsList", memberDetailsList);
@@ -99,6 +106,7 @@ public class PprDetailsOfSlnaController {
 		model.addAttribute("ceoExists", ceoExists);
 		model.addAttribute("phoneMap", phoneMap);
 		model.addAttribute("emailMap", emailMap);
+		model.addAttribute("exists",exists);
         return "detailsOfSLNA";
     }
 	
@@ -115,7 +123,6 @@ public class PprDetailsOfSlnaController {
 	        @RequestParam String phone,
 	        @RequestParam String email,
 	        @RequestParam(required = false) String fax,
-	        @RequestParam Character action,
 	        RedirectAttributes redirectAttributes,
 	        HttpSession session) throws IOException {
 		String userid=(String)session.getAttribute("userid");
@@ -152,7 +159,7 @@ public class PprDetailsOfSlnaController {
 			details.setRequestIp(CommonFunctions.getClientIpAddr(request));
 
 			// Example if your table has status
-			details.setStatus(action);
+			details.setStatus('D');
 
 			pprSlnaDetailsService.save(details);
 
