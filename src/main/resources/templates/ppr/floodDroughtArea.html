@@ -41,59 +41,76 @@
 
            <!-- District + Village Row -->
 <div class="row mb-4">
-    <div class="col-md-3">
-        <label class="fw-bold">District Name:</label>
-    </div>
-    <div class="col-md-3">
-        <input type="text" class="form-control" th:value="${district.distName}" readonly />
-        <input type="hidden" class="form-control" id="dcode" name="dcode" th:value="${district.dcode}"/>
-    </div>
-
-    <div class="col-md-2">
-        <label class="fw-bold">Village:</label><span class="required">*</span>
-    </div>
     <div class="col-md-4">
-        <select id="village" name="village" class="form-control form-control-sm" required>
-            <option value="">--Select Village--</option>
-            <th:block th:each="vill : ${villages}">
-                <option th:value="${vill.vcode}" th:text="${vill.villageName}"></option>
-            </th:block>
-        </select>
-        <div class="invalid-feedback">Please select a Village.</div>
+				             <label class="form-label">
+				                 <b> District </b><span class="required">*</span>
+				              </label>
+								<select id="district" name="district" class="form-select" >
+									<option value="">--Select District--</option>
+										<th:block th:each="dist : ${distList}">
+											<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
+										</th:block>
+								</select>
+<div class="invalid-feedback">
+        Please select District.
     </div>
+				       	</div>
+<div class="col-md-4">
+							<label class="form-label">
+								<b> Project </b><span class="required">*</span>
+							</label>
+							<select id="project" name="project" class="form-select">
+							    <option value="">--Select Project--</option>
+							</select>
+							<div class="invalid-feedback">
+        Please select Project.
+    </div>
+				        </div>
+
+    <div class="col-md-4">
+							<label class="form-label">
+								<b>Name of the Village</b> <span class="required">*</span>
+							</label>
+							<select id="village" name="village" class="form-select">
+							    <option value="">--Select Village--</option>
+							</select>
+							<div class="invalid-feedback">
+        Please select Village.
+    </div>
+						</div>
 </div>
 
-                 <div class="row mb-4">
+<div class="row mb-4">
+    <div class="col-md-6">
+				             <label class="form-label">
+				                 <b> Financial Year </b><span class="required">*</span>
+				              </label>
+								<select id="yearId" name="yearId" class="form-select" >
+									<option value="">--Select Year--</option>
+										<th:block th:each="year : ${yearList}">
+											<option th:value="${year.finYrCd}" th:text="${year.year}"></option>
+										</th:block>
+								</select>
+<div class="invalid-feedback">
+        Please select Financial Year.
+    </div>
+				       	</div>
+<div class="col-md-6">
+				             <label class="form-label">
+				                 <b> Month </b><span class="required">*</span>
+				              </label>
+								<select id="monthId" name="monthId" class="form-select" >
+									<option value="">--Select Month--</option>
+										<th:block th:each="month : ${monthList}">
+											<option th:value="${month.monthId}" th:text="${month.monthName}"></option>
+										</th:block>
+								</select>
+<div class="invalid-feedback">
+        Please select Month.
+    </div>
+				       	</div>
 
-					<div class="col-md-3">
-							<label class="fw-bold">Year:</label><span class="required">*</span>
-						</div>
-						<div class="col-md-3">
-							<select id="yearId" name="yearId"
-								class="form-control form-control-sm" required>
-								<option value="">--Select Year--</option>
-								<th:block th:each="year : ${yearList}">
-									<option th:value="${year.finYrCd}" th:text="${year.year}"></option>
-								</th:block>
-							</select>
-						</div>
-						
-						<div class="col-md-2">
-							<label class="fw-bold">Month:</label><span class="required">*</span>
-						</div>
-						
-						<div class="col-md-4">
-							<select id="monthId" name="monthId" class="form-control form-control-sm" required>
-								<option value="">--Select Month--</option>
-								<th:block th:each="month : ${monthList}">
-									<option th:value="${month.monthId}"
-										th:text="${month.monthName}"></option>
-								</th:block>
-							</select>
-						</div>
- 
-						
-					
+                
 					</div>
 
 <!-- Particular Row -->
@@ -104,7 +121,7 @@
             <input class="form-check-input" type="radio" name="disasterTypeId" th:value="${dt.disasterTypeId}" required/>
             <label class="form-check-label" th:text="${dt.disasterName}"></label>
         </div>
-        <div class="invalid-feedback" style="display:none;">Please select Particular.</div>
+        <div class="invalid-feedback">Please select Particular.</div>
     </div>
 </div>
 
@@ -120,7 +137,7 @@
             <input class="form-check-input" type="radio" name="periodicity" value="Q" required />
             <label class="form-check-label">Quarterly</label>
         </div>
-        <div class="invalid-feedback" style="display:none;">Please select a Periodicity.</div>
+        <div class="invalid-feedback">Please select a Periodicity.</div>
     </div>
 </div>
 
@@ -137,7 +154,7 @@
             <input class="form-check-input" type="radio" name="affected" value="N" required />
             <label class="form-check-label">No</label>
         </div>
-        <div class="invalid-feedback" style="display:none;">Please select Affected status.</div>
+        <div class="invalid-feedback">Please select Affected status.</div>
     </div>
 </div>
 
@@ -506,83 +523,534 @@
 	
 </div>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("floodDroughtForm");  // <-- make sure this is NOT commented
-    const saveConfirmModalEl = document.getElementById("saveConfirmModal");
-
-    let saveConfirmModal = null;
-    if (saveConfirmModalEl) {
-        saveConfirmModal = new bootstrap.Modal(saveConfirmModalEl);
-    }
-
-    if (!form) {
-        console.error("Form with id 'floodDroughtForm' not found in DOM.");
-        return;
-    }
-
-    form.addEventListener("submit", function(e) {
-        e.preventDefault();
-
-        let firstMissing = null;
-
-        // reset all alerts before validation
-        form.querySelectorAll(".invalid-feedback").forEach(el => el.style.display = "none");
-        form.querySelectorAll("input, select").forEach(el => el.classList.remove("is-invalid"));
-
-        const requiredFields = form.querySelectorAll("input[required], select[required]");
-        requiredFields.forEach(function(field) {
-            if (field.type === "radio") {
-                const group = form.querySelectorAll(`input[name="${field.name}"]`);
-                const checked = Array.from(group).some(r => r.checked);
-                if (!checked && !firstMissing) {
-                    firstMissing = field;
-                    field.closest(".col-md-9").querySelector(".invalid-feedback").style.display = "block";
-                }
-            } else if (!field.value || field.value.trim() === "") {
-                if (!firstMissing) {
-                    firstMissing = field;
-                    field.classList.add("is-invalid");
-                    field.closest(".col-md-4, .col-md-9").querySelector(".invalid-feedback").style.display = "block";
-                }
-            }
-        });
-
-        if (firstMissing) {
-            return; // stop here, alerts are shown
-        }
-
-        if (saveConfirmModal) {
-            saveConfirmModal.show();
-        }
-
-        const confirmBtn = document.getElementById("confirmSaveBtn");
-        if (confirmBtn) {
-            confirmBtn.addEventListener("click", function() {
-                form.submit();
-            }, { once: true });
-        }
-    });
-
-    // hide alerts when user interacts
-    form.querySelectorAll("input, select").forEach(function(field) {
-        field.addEventListener("change", function() {
-            if (field.type === "radio") {
-                field.closest(".col-md-9").querySelector(".invalid-feedback").style.display = "none";
-            } else {
-                field.classList.remove("is-invalid");
-                const feedback = field.closest(".col-md-4, .col-md-9").querySelector(".invalid-feedback");
-                if (feedback) feedback.style.display = "none";
-            }
-        });
-    });
-});
-
-// hide alerts when user interacts
-
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const editModal = document.getElementById("editModal");
+    /* =========================================================
+       COMMON VALIDATION FUNCTION
+       For text boxes and dropdowns
+       ========================================================= */
+
+    function validateTextField(field) {
+
+        if (!field) {
+            return false;
+        }
+
+        const value = field.value ? field.value.trim() : "";
+
+        const feedback =
+            field.parentElement.querySelector(".invalid-feedback");
+
+        if (value === "") {
+
+            field.classList.add("is-invalid");
+
+            if (feedback) {
+                feedback.style.display = "block";
+            }
+
+            return false;
+        }
+
+        field.classList.remove("is-invalid");
+
+        if (feedback) {
+            feedback.style.display = "none";
+        }
+
+        return true;
+    }
+
+
+    /* =========================================================
+       RADIO GROUP VALIDATION
+       Particular / Periodicity / Affected
+       ========================================================= */
+
+    function validateRadioGroup(groupName) {
+
+        const radios =
+            document.querySelectorAll(
+                '#floodDroughtForm input[name="' + groupName + '"]'
+            );
+
+        if (!radios.length) {
+            return false;
+        }
+
+        const checked =
+            Array.from(radios).some(function (radio) {
+                return radio.checked;
+            });
+
+        /*
+         * Find the container containing the radio buttons.
+         */
+        const container =
+            radios[0].closest(".col-md-9");
+
+        if (!container) {
+            return checked;
+        }
+
+        const feedback =
+            container.querySelector(".invalid-feedback");
+
+        if (!checked) {
+
+            if (feedback) {
+                feedback.style.display = "block";
+            }
+
+            return false;
+        }
+
+        if (feedback) {
+            feedback.style.display = "none";
+        }
+
+        return true;
+    }
+
+
+    /* =========================================================
+       DISTRICT → PROJECT
+       ========================================================= */
+
+    const district =
+        document.getElementById("district");
+
+    const project =
+        document.getElementById("project");
+
+    const village =
+        document.getElementById("village");
+
+
+    if (district) {
+
+        district.addEventListener("change", function () {
+
+            const districtId = this.value;
+
+            /*
+             * Clear Project
+             */
+            project.innerHTML =
+                '<option value="">--Select Project--</option>';
+
+            /*
+             * Clear Village
+             */
+            village.innerHTML =
+                '<option value="">--Select Village--</option>';
+
+            /*
+             * Validate District
+             */
+            validateTextField(this);
+
+            if (districtId === "") {
+                return;
+            }
+
+            fetch(
+                '/getProjectsByDistrictPPR10?dcode=' +
+                districtId
+            )
+
+                .then(function (response) {
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "Failed to load projects"
+                        );
+                    }
+
+                    return response.json();
+                })
+
+                .then(function (data) {
+
+                    data.forEach(function (item) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value = item.id;
+
+                        option.textContent = item.name;
+
+                        project.appendChild(option);
+
+                    });
+
+                })
+
+                .catch(function (error) {
+
+                    console.error(
+                        "Error loading projects:",
+                        error
+                    );
+
+                });
+
+        });
+
+    }
+
+
+    /* =========================================================
+       PROJECT → VILLAGE
+       ========================================================= */
+
+    if (project) {
+
+        project.addEventListener("change", function () {
+
+            const projectId = this.value;
+
+            /*
+             * Clear Village
+             */
+            village.innerHTML =
+                '<option value="">--Select Village--</option>';
+
+            /*
+             * Validate Project
+             */
+            validateTextField(this);
+
+            if (projectId === "") {
+                return;
+            }
+
+            fetch(
+                "/getVillagesByProjectPPR10?pprId=" +
+                projectId
+            )
+
+                .then(function (response) {
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "Failed to load villages"
+                        );
+                    }
+
+                    return response.json();
+                })
+
+                .then(function (data) {
+
+                    data.forEach(function (item) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value = item.id;
+
+                        option.textContent = item.name;
+
+                        village.appendChild(option);
+
+                    });
+
+                })
+
+                .catch(function (error) {
+
+                    console.error(
+                        "Error loading villages:",
+                        error
+                    );
+
+                });
+
+        });
+
+    }
+
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    const form =
+        document.getElementById("floodDroughtForm");
+
+    const saveConfirmModalEl =
+        document.getElementById("saveConfirmModal");
+
+    let saveConfirmModal = null;
+
+
+    if (saveConfirmModalEl) {
+
+        saveConfirmModal =
+            new bootstrap.Modal(saveConfirmModalEl);
+
+    }
+
+
+    if (!form) {
+
+        console.error(
+            "Form with id 'floodDroughtForm' not found in DOM."
+        );
+
+        return;
+    }
+
+
+    /* =========================================================
+       FORM SUBMIT
+       ========================================================= */
+
+    form.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        let isValid = true;
+
+
+        /* =====================================================
+           CLEAR OLD ERRORS
+           ===================================================== */
+
+        form.querySelectorAll(".invalid-feedback")
+            .forEach(function (feedback) {
+
+                feedback.style.display = "none";
+
+            });
+
+
+        form.querySelectorAll("input, select")
+            .forEach(function (field) {
+
+                field.classList.remove("is-invalid");
+
+            });
+
+
+        /* =====================================================
+           DROPDOWN VALIDATION
+           ===================================================== */
+
+        const districtField =
+            document.getElementById("district");
+
+        const projectField =
+            document.getElementById("project");
+
+        const villageField =
+            document.getElementById("village");
+
+        const yearField =
+            document.getElementById("yearId");
+
+        const monthField =
+            document.getElementById("monthId");
+
+
+        if (!validateTextField(districtField)) {
+            isValid = false;
+        }
+
+        if (!validateTextField(projectField)) {
+            isValid = false;
+        }
+
+        if (!validateTextField(villageField)) {
+            isValid = false;
+        }
+
+        if (!validateTextField(yearField)) {
+            isValid = false;
+        }
+
+        if (!validateTextField(monthField)) {
+            isValid = false;
+        }
+
+
+        /* =====================================================
+           PARTICULAR VALIDATION
+           ===================================================== */
+
+        if (!validateRadioGroup("disasterTypeId")) {
+
+            isValid = false;
+
+        }
+
+
+        /* =====================================================
+           PERIODICITY VALIDATION
+           ===================================================== */
+
+        if (!validateRadioGroup("periodicity")) {
+
+            isValid = false;
+
+        }
+
+
+        /* =====================================================
+           AFFECTED VALIDATION
+           ===================================================== */
+
+        if (!validateRadioGroup("affected")) {
+
+            isValid = false;
+
+        }
+
+
+        /* =====================================================
+           STOP SUBMISSION IF INVALID
+           ===================================================== */
+
+        if (!isValid) {
+
+            /*
+             * Find first invalid dropdown.
+             */
+            const firstInvalid =
+                form.querySelector(".is-invalid");
+
+            if (firstInvalid) {
+
+                firstInvalid.focus();
+
+            }
+
+            return;
+        }
+
+
+        /* =====================================================
+           SAVE CONFIRMATION MODAL
+           ===================================================== */
+
+        if (saveConfirmModal) {
+
+            saveConfirmModal.show();
+
+            const confirmBtn =
+                document.getElementById("confirmSaveBtn");
+
+
+            if (confirmBtn) {
+
+                /*
+                 * onclick prevents multiple event listeners.
+                 */
+                confirmBtn.onclick = function () {
+
+                    form.submit();
+
+                };
+
+            }
+
+        } else {
+
+            /*
+             * Fallback if modal does not exist.
+             */
+            form.submit();
+
+        }
+
+    });
+
+
+    /* =========================================================
+       DROPDOWN CHANGE
+       REMOVE ERROR IMMEDIATELY
+       ========================================================= */
+
+    const dropdownIds = [
+        "district",
+        "project",
+        "village",
+        "yearId",
+        "monthId"
+    ];
+
+
+    dropdownIds.forEach(function (id) {
+
+        const field =
+            document.getElementById(id);
+
+        if (field) {
+
+            field.addEventListener(
+                "change",
+                function () {
+
+                    validateTextField(this);
+
+                }
+            );
+
+        }
+
+    });
+
+
+    /* =========================================================
+       RADIO CHANGE
+       REMOVE ERROR IMMEDIATELY
+       ========================================================= */
+
+    const radioGroups = [
+        "disasterTypeId",
+        "periodicity",
+        "affected"
+    ];
+
+
+    radioGroups.forEach(function (groupName) {
+
+        const radios =
+            form.querySelectorAll(
+                'input[name="' + groupName + '"]'
+            );
+
+
+        radios.forEach(function (radio) {
+
+            radio.addEventListener(
+                "change",
+                function () {
+
+                    /*
+                     * As soon as user selects a radio,
+                     * hide its error message.
+                     */
+                    validateRadioGroup(groupName);
+
+                }
+            );
+
+        });
+
+    });
+
+
+    /* =========================================================
+       EDIT MODAL
+       ========================================================= */
+
+    const editModal =
+        document.getElementById("editModal");
+
 
     if (!editModal) {
 
@@ -592,126 +1060,223 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    editModal.addEventListener("show.bs.modal", function (event) {
+    /* =========================================================
+       LOAD DATA INTO EDIT MODAL
+       ========================================================= */
 
-        const button = event.relatedTarget;
+    editModal.addEventListener(
+        "show.bs.modal",
+        function (event) {
 
-        console.log("Edit button:", button);
+            const button =
+                event.relatedTarget;
 
-        if (!button) {
 
-            console.error("No relatedTarget found");
+            console.log(
+                "Edit button:",
+                button
+            );
 
-            return;
+
+            if (!button) {
+
+                console.error(
+                    "No relatedTarget found"
+                );
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               GET DATA ATTRIBUTES
+               --------------------------------------------- */
+
+            const id =
+                button.getAttribute("data-id");
+
+            const district =
+                button.getAttribute("data-district");
+
+            const village =
+                button.getAttribute("data-village");
+
+            const yearId =
+                button.getAttribute("data-year");
+
+            const monthId =
+                button.getAttribute("data-month");
+
+            const disaster =
+                button.getAttribute("data-disaster");
+
+            const periodicity =
+                button.getAttribute("data-periodicity");
+
+            const affected =
+                button.getAttribute("data-affected");
+
+
+            /* ---------------------------------------------
+               CONSOLE
+               --------------------------------------------- */
+
+            console.log("ID:", id);
+
+            console.log(
+                "District:",
+                district
+            );
+
+            console.log(
+                "Village:",
+                village
+            );
+
+            console.log(
+                "Month ID:",
+                monthId
+            );
+
+            console.log(
+                "Year ID:",
+                yearId
+            );
+
+            console.log(
+                "Disaster:",
+                disaster
+            );
+
+            console.log(
+                "Periodicity:",
+                periodicity
+            );
+
+            console.log(
+                "Affected:",
+                affected
+            );
+
+
+            /* ---------------------------------------------
+               SET BASIC FIELDS
+               --------------------------------------------- */
+
+            document.getElementById(
+                "pprDisasterId"
+            ).value = id || "";
+
+
+            document.getElementById(
+                "editDistrict"
+            ).value = district || "";
+
+
+            document.getElementById(
+                "editVillage"
+            ).value = village || "";
+
+
+            document.getElementById(
+                "editMonth"
+            ).value = monthId || "";
+
+
+            document.getElementById(
+                "editYear"
+            ).value = yearId || "";
+
+
+            console.log(
+                "Month ID from button:",
+                monthId
+            );
+
+
+            console.log(
+                "Year ID from button:",
+                yearId
+            );
+
+
+            /* ---------------------------------------------
+               PARTICULAR
+               --------------------------------------------- */
+
+            document
+                .querySelectorAll(
+                    '#editParticularRadios input[name="disasterTypeId"]'
+                )
+                .forEach(function (radio) {
+
+                    radio.checked =
+                        String(radio.value) ===
+                        String(disaster);
+
+                });
+
+
+            /* ---------------------------------------------
+               PERIODICITY
+               --------------------------------------------- */
+
+            document
+                .querySelectorAll(
+                    '#editForm input[name="periodicity"]'
+                )
+                .forEach(function (radio) {
+
+                    radio.checked =
+                        String(radio.value) ===
+                        String(periodicity);
+
+                });
+
+
+            /* ---------------------------------------------
+               AFFECTED
+               --------------------------------------------- */
+
+            document
+                .querySelectorAll(
+                    '#editForm input[name="affected"]'
+                )
+                .forEach(function (radio) {
+
+                    radio.checked =
+                        String(radio.value).toLowerCase() ===
+                        String(affected).toLowerCase();
+
+                });
+
         }
+    );
 
-    const id =
-            button.getAttribute("data-id");
 
-        const district =
-            button.getAttribute("data-district");
+    /* =========================================================
+       EDIT MODAL - REMOVE FOCUS BEFORE CLOSE
+       ========================================================= */
 
-        const village =
-            button.getAttribute("data-village");
+    editModal.addEventListener(
+        "hide.bs.modal",
+        function () {
 
-        const yearId =
-            button.getAttribute("data-year");
+            if (
+                document.activeElement &&
+                editModal.contains(document.activeElement)
+            ) {
 
-        const monthId =
-            button.getAttribute("data-month");
+                document.activeElement.blur();
 
-        const disaster =
-            button.getAttribute("data-disaster");
-
-        const periodicity =
-            button.getAttribute("data-periodicity");
-
-        const affected =
-            button.getAttribute("data-affected");
-   console.log("ID:", id);
-        console.log("District:", district);
-        console.log("Village:", village);
-        console.log("Month ID:", monthId);
-        console.log("Year ID:", yearId);
-        console.log("Disaster:", disaster);
-        console.log("Periodicity:", periodicity);
-        console.log("Affected:", affected);
-
-    document.getElementById("pprDisasterId").value =
-            id || "";
-
-        document.getElementById("editDistrict").value =
-            district || "";
-
-        document.getElementById("editVillage").value =
-            village || "";
-
-       document.getElementById("editMonth").value =
-            monthId || "";
-
-       document.getElementById("editYear").value =
-            yearId || "";
-            
-            
-            console.log("Month ID from button:", monthId);
-            console.log("Year ID from button:", yearId);
-
-       document
-            .querySelectorAll(
-                '#editParticularRadios input[name="disasterTypeId"]'
-            )
-            .forEach(function (radio) {
-
-                radio.checked =
-                    String(radio.value) === String(disaster);
-
-            });
-
-     document
-            .querySelectorAll(
-                '#editForm input[name="periodicity"]'
-            )
-            .forEach(function (radio) {
-
-                radio.checked =
-                    String(radio.value) ===
-                    String(periodicity);
-
-            });
-
-      document
-            .querySelectorAll(
-                '#editForm input[name="affected"]'
-            )
-            .forEach(function (radio) {
-
-                radio.checked =
-                    String(radio.value).toLowerCase() ===
-                    String(affected).toLowerCase();
-
-            });
-
-    });
-    editModal.addEventListener("hide.bs.modal", function () {
-
-        if (document.activeElement &&
-            editModal.contains(document.activeElement)) {
-
-            document.activeElement.blur();
+            }
 
         }
-
-    });
+    );
 
 });
 
-document.getElementById("editModal").addEventListener("hide.bs.modal", function () {
 
-    if (document.activeElement) {
-        document.activeElement.blur();
-    }
-
-});
 
 </script>
 </div>

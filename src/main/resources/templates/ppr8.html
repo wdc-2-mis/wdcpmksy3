@@ -29,96 +29,147 @@
 
 
 	<script>
+		
+document.addEventListener("DOMContentLoaded", function () {
 
-		document.addEventListener("DOMContentLoaded", function () {
+    // =========================================================
+    // CALCULATE NET BALANCE AREA FOR EDIT MODAL
+    // =========================================================
+    function calculateEditBalanceArea() {
 
-			var editModal = document.getElementById('editModal');
+        let sanctionArea =
+            parseFloat(document.getElementById("projSanctionedArea1").value) || 0;
 
-editModal.addEventListener('show.bs.modal', function (event) {
+        let netArea =
+            parseFloat(document.getElementById("netArea1").value) || 0;
 
-    var button = event.relatedTarget;
+        let proposedArea =
+            parseFloat(document.getElementById("proposedArea1").value) || 0;
 
-    var Id = button.getAttribute('data-id');
-    var state = button.getAttribute('data-state');
-    var district = button.getAttribute('data-district');
-    var project = button.getAttribute('data-project');
-    var block = button.getAttribute('data-block');
-    var scheme = button.getAttribute('data-scheme');
+        let otherArea =
+            parseFloat(document.getElementById("proposedAreaOthers1").value) || 0;
 
-    var projSanctionedNo =
-        button.getAttribute('data-projSanctionedNo');
+        let balance =
+            sanctionArea - (netArea + proposedArea + otherArea);
 
-    var projSanctionedArea =
-        button.getAttribute('data-projSanctionedArea');
-
-    var netArea =
-        button.getAttribute('data-netArea');
-
-    var proposedArea =
-        button.getAttribute('data-proposedArea');
-
-    var proposedAreaOthers =
-        button.getAttribute('data-proposedAreaOthers');
-
-    var netBalArea =
-        button.getAttribute('data-netBalArea');
-
-
-    // Populate modal fields
-
-    document.getElementById('pprProposedAreaId').value = Id;
-
-    document.getElementById('stateName1').value = state;
-
-    document.getElementById('district1').value = district;
-
-    document.getElementById('project1').value = project;
-
-    document.getElementById('block1').value = block;
-
-    document.getElementById('projSanctionedNo1').value =
-        projSanctionedNo;
-
-    document.getElementById('projSanctionedArea1').value =
-        projSanctionedArea;
-
-    document.getElementById('netArea1').value =
-        netArea;
-
-    document.getElementById('proposedArea1').value =
-        proposedArea;
-
-    document.getElementById('proposedAreaOthers1').value =
-        proposedAreaOthers;
-
-    document.getElementById('netBalArea1').value =
-        netBalArea;
-
-
-    // ==========================================
-    // SELECT TYPE OF SCHEME IN EDIT MODAL
-    // ==========================================
-
-    console.log("Scheme from table:", scheme);
-
-    var schemeRadios =
-        editModal.querySelectorAll('input[name="scheme1"]');
-
-    schemeRadios.forEach(function (radio) {
-
-        radio.checked = false;
-
-        if (radio.value.trim() === scheme.trim()) {
-            radio.checked = true;
+        // Don't allow negative balance
+        if (balance < 0) {
+            balance = 0;
         }
+
+        document.getElementById("netBalArea1").value =
+            balance.toFixed(2);
+    }
+
+
+    // =========================================================
+    // EDIT MODAL
+    // =========================================================
+    var editModal = document.getElementById("editModal");
+
+    editModal.addEventListener("show.bs.modal", function (event) {
+
+        var button = event.relatedTarget;
+
+        var Id = button.getAttribute("data-id");
+        var state = button.getAttribute("data-state");
+        var district = button.getAttribute("data-district");
+        var project = button.getAttribute("data-project");
+        var block = button.getAttribute("data-block");
+        var scheme = button.getAttribute("data-scheme");
+
+        var projSanctionedNo =
+            button.getAttribute("data-projSanctionedNo");
+
+        var projSanctionedArea =
+            button.getAttribute("data-projSanctionedArea");
+
+        var netArea =
+            button.getAttribute("data-netArea");
+
+        var proposedArea =
+            button.getAttribute("data-proposedArea");
+
+        var proposedAreaOthers =
+            button.getAttribute("data-proposedAreaOthers");
+
+
+        // =====================================================
+        // POPULATE EDIT MODAL
+        // =====================================================
+
+        document.getElementById("pprProposedAreaId").value = Id;
+
+        document.getElementById("stateName1").value = state;
+
+        document.getElementById("district1").value = district;
+
+        document.getElementById("project1").value = project;
+
+        document.getElementById("block1").value = block;
+
+        document.getElementById("projSanctionedNo1").value =
+            projSanctionedNo;
+
+        document.getElementById("projSanctionedArea1").value =
+            projSanctionedArea;
+
+        document.getElementById("netArea1").value =
+            netArea;
+
+        document.getElementById("proposedArea1").value =
+            proposedArea;
+
+        document.getElementById("proposedAreaOthers1").value =
+            proposedAreaOthers;
+
+
+        // =====================================================
+        // CALCULATE INITIAL BALANCE
+        // =====================================================
+
+        calculateEditBalanceArea();
+
+
+        // =====================================================
+        // SELECT TYPE OF SCHEME
+        // =====================================================
+
+        console.log("Scheme from table:", scheme);
+
+        var schemeRadios =
+            editModal.querySelectorAll('input[name="scheme1"]');
+
+        schemeRadios.forEach(function (radio) {
+
+            radio.checked = false;
+
+            if (radio.value.trim() === scheme.trim()) {
+                radio.checked = true;
+            }
+
+        });
 
     });
 
+
+    // =========================================================
+    // RECALCULATE WHEN EDIT MODAL VALUES CHANGE
+    // =========================================================
+
+    document.getElementById("projSanctionedArea1")
+        .addEventListener("input", calculateEditBalanceArea);
+
+    document.getElementById("netArea1")
+        .addEventListener("input", calculateEditBalanceArea);
+
+    document.getElementById("proposedArea1")
+        .addEventListener("input", calculateEditBalanceArea);
+
+    document.getElementById("proposedAreaOthers1")
+        .addEventListener("input", calculateEditBalanceArea);
+
 });
-
-
-		});
-
 
 
 		document.addEventListener("DOMContentLoaded", function () {
@@ -260,9 +311,7 @@ editModal.addEventListener('show.bs.modal', function (event) {
             document.getElementById("proposedAreaOthers")
         );
 
-        validateTextField(
-            document.getElementById("netBalArea")
-        );
+        
 
 
         // ==========================================
@@ -452,8 +501,8 @@ editModal.addEventListener('show.bs.modal', function (event) {
         balance.toFixed(2);
 }
 
-			document.getElementById("projSanctionedArea")
-    .addEventListener("keyup", calculateBalanceArea);
+document.getElementById("projSanctionedArea")
+.addEventListener("keyup", calculateBalanceArea);
 
 document.getElementById("netArea")
     .addEventListener("keyup", calculateBalanceArea);
@@ -483,7 +532,6 @@ document.getElementById("proposedAreaOthers")
 				input.value = parts[0] + '.' + parts.slice(1).join('');
 			}
 		}
-
 
 
 	</script>
@@ -769,11 +817,7 @@ document.getElementById("proposedAreaOthers")
 						</div>
 
 						<div class="col-md-4">
-							<input type="text" class="form-control form-control-sm" name="netBalArea" id="netBalArea" maxlength="10"
-								oninput="validateDecimal(this, 11,5)" required>
-								<div class="invalid-feedback">
-        Please enter Net Balance Area (ha).
-    </div>
+							<input type="text" class="form-control form-control-sm" name="netBalArea" id="netBalArea" maxlength="10" readonly>
 						</div>
 
 					</div>
@@ -1119,10 +1163,10 @@ document.getElementById("proposedAreaOthers")
 											</div>
 
 											<div class="col-md-4">
-												<input type="text" class="form-control form-control-sm" id="netBalArea1"
-													name="netBalArea1" maxlength="10"
-													oninput="validateDecimal(this, 11,5)">
+												<input type="text" class="form-control form-control-sm" id="netBalArea1" name="netBalArea1" maxlength="10" readonly>
 											</div>
+											
+											
 
 										</div>
 

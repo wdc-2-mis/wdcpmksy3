@@ -78,10 +78,11 @@ public class PprDisasterDetailsService {
 	    return ip;  
 	}
 	
-	public void saveRecords(Integer dcode, Integer vcode, Integer disasterTypeId, String periodicity, String affected, Integer yearId, Integer monthId, String userId,
+	public void saveRecords(Integer dcode, Integer project, Integer vcode, Integer disasterTypeId, String periodicity, String affected, Integer yearId, Integer monthId, String userId,
 			HttpServletRequest request) {
 		PprDisasterDetails details = new PprDisasterDetails();
-		MPpr ppr = pprRepo.findByDistrict_Dcode(dcode);
+		MPpr ppr = pprRepo.getReferenceById(project);
+		
 		MVillage vCode = new MVillage();
 		vCode.setVcode(vcode);
 		MDisasterType dtype = new MDisasterType();

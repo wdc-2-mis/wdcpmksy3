@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import gov.dolr.wdcpmksy3.PPR.entity.DisasterType;
 import gov.dolr.wdcpmksy3.PPR.entity.PprDisasterDetails;
 import gov.dolr.wdcpmksy3.PPR.repository.DisasterTypeRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRSoilErosionService;
 import gov.dolr.wdcpmksy3.PPR.service.PprDisasterDetailsService;
 import gov.dolr.wdcpmksy3.PPR.service.VillageService;
@@ -41,6 +42,9 @@ public class PPRFloodProjectAreaController {
 	@Autowired
     private PPRSoilErosionService soilErosionService;
 	
+	@Autowired
+	private VillageRepository villrepo;
+	 
 	@GetMapping("/dtlFloodDroughtArea")
     public String dtlFloodDroughtArea(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -55,15 +59,9 @@ public class PPRFloodProjectAreaController {
         }
         List<DisasterType> disasterTypes = DTrepo.findAll();
         model.addAttribute("disasterTypes", disasterTypes);
-        List<MDistrict> districts = districtService.getPPRDistrictsByState(stcode);
-        Integer dcode  = districts.get(0).getDcode();
-        if (!districts.isEmpty()) {
-        	 model.addAttribute("district", districts.get(0));  
-        }
         
-		
-		  List<MVillage> villages = villService.findVillagesByDistrict(dcode);
-		  model.addAttribute("villages", villages);
+        model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
+        model.addAttribute("villageList", villrepo.getVillagesByState(stcode));
 		  List<PprDisasterDetails> records = pprAreaService.findAll(); 
 		  model.addAttribute("records", records);
 		  model.addAttribute("monthList", soilErosionService.getAllMonths());
@@ -72,12 +70,12 @@ public class PPRFloodProjectAreaController {
 	}
 	
 	@PostMapping("/saveFloodDrought")
-	public String saveFloodDrought(HttpSession session, @RequestParam("dcode") Integer dcode, @RequestParam("village") Integer vcode, @RequestParam("disasterTypeId") Integer disasterTypeId, @RequestParam("periodicity") String periodicity, @RequestParam("affected") String affected,
+	public String saveFloodDrought(HttpSession session, @RequestParam("district") Integer dcode, @RequestParam Integer project, @RequestParam("village") Integer vcode, @RequestParam("disasterTypeId") Integer disasterTypeId, @RequestParam("periodicity") String periodicity, @RequestParam("affected") String affected,
 			@RequestParam("yearId") Integer yearId, @RequestParam("monthId") Integer monthId, RedirectAttributes redirectAttributes, HttpServletRequest request) {
 
 		String userId = (String) session.getAttribute("userid");
 		  try {
-			    pprAreaService.saveRecords(dcode, vcode, disasterTypeId, periodicity, affected, yearId, monthId, userId, request);
+			    pprAreaService.saveRecords(dcode, project, vcode, disasterTypeId, periodicity, affected, yearId, monthId, userId, request);
 	            redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
 		    } catch (Exception ex) {
 		        redirectAttributes.addFlashAttribute("error", "Failed to save records: " + ex.getMessage());
