@@ -58,7 +58,7 @@ public class PprDetailsOfSlnaController {
 	private InstitutionalStructureRepository institutionalStructureRepo;
 
 	@GetMapping("/detailsOfSLNA")
-    public String detailsOfSLNA(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+    public String detailsOfSLNA(HttpSession session, Model model) {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -70,37 +70,43 @@ public class PprDetailsOfSlnaController {
 		designationList = designationService.getAllDesignationDetails();
 		List<Qualification> qualificationList = new ArrayList<>();
 		qualificationList = qualificationService.getAllQualification();
-		List<PprSlnaDetails> detailsOfSLNAList = new ArrayList<>();
-		detailsOfSLNAList = pprSlnaDetailsService.getDraftdataOfSlnaDetails();
+		List<PprSlnaDetails> allList = new ArrayList<>();
+//		detailsOfSLNAList = pprSlnaDetailsService.getDraftdataOfSlnaDetails();
 //		List<PprSlnaDetails> detailsOfSLNAComList = new ArrayList<>();
 //		detailsOfSLNAComList = pprSlnaDetailsService.getComdataOfSlnaDetails();
-		
+		boolean chairpersonExists = false;
+		boolean ceoExists = false;
+		Map<Integer, String> phoneMap = new LinkedHashMap<>();
+		Map<Integer, String> emailMap = new LinkedHashMap<>();
 		List<Object[]> object = isserv.getPPR1List(stcode);
 		Integer instId = object.stream().mapToInt(arr -> (Integer) arr[0]).findFirst().orElse(0);
-		InstitutionalStructure instStructobj = isserv.getById((long)instId);
-		List<PprSlnaDetails> allList = pprSlnaDetailsService.getSlnaDetailsByInstStruc(instStructobj);
+		if(instId >0) {
+			InstitutionalStructure instStructobj = isserv.getById((long)instId);
+			allList = pprSlnaDetailsService.getSlnaDetailsByInstStruc(instStructobj);
 
-		boolean chairpersonExists = allList.stream().anyMatch(s -> s.getMember() != null && s.getMember().getMemberId() != null
-				&& s.getMember().getMemberId().equals(1));
-		boolean ceoExists = allList.stream().anyMatch(s -> s.getMember() != null && s.getMember().getMemberId() != null
-				&& s.getMember().getMemberId().equals(2));
+			chairpersonExists = allList.stream().anyMatch(s -> s.getMember() != null && s.getMember().getMemberId() != null
+					&& s.getMember().getMemberId().equals(1));
+			ceoExists = allList.stream().anyMatch(s -> s.getMember() != null && s.getMember().getMemberId() != null
+					&& s.getMember().getMemberId().equals(2));
+			
+			phoneMap = allList.stream().filter(p -> p.getPhoneNo() != null).collect(Collectors.toMap(PprSlnaDetails::getPprSlnaId,PprSlnaDetails::getPhoneNo));
+			emailMap = allList.stream().filter(p -> p.getEmailId() != null).collect(Collectors.toMap(PprSlnaDetails::getPprSlnaId,PprSlnaDetails::getEmailId));
+		}
 		
-		Map<Integer, String> phoneMap = allList.stream().filter(p -> p.getPhoneNo() != null).collect(Collectors.toMap(PprSlnaDetails::getPprSlnaId,PprSlnaDetails::getPhoneNo));
-		Map<Integer, String> emailMap = allList.stream().filter(p -> p.getEmailId() != null).collect(Collectors.toMap(PprSlnaDetails::getPprSlnaId,PprSlnaDetails::getEmailId));
 
         if(userid==null)
             return "redirect:/login";
         boolean exists=false;
         exists = institutionalStructureRepo.existsByStCodeAndStatus(stcode, 'C');
         if(!exists)
-        	model.addAttribute("success", "Please complete the Institutional Structure Details before entering Details of SLNA.");
+        	model.addAttribute("error1", "Please complete the Institutional Structure Details before entering Details of SLNA.");
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
 		model.addAttribute("memberDetailsList", memberDetailsList);
 		model.addAttribute("designationList",designationList);
 //		model.addAttribute("detailsOfSLNAComList",detailsOfSLNAComList);
 		model.addAttribute("qualificationList",qualificationList);
-		model.addAttribute("detailsOfSLNAList",detailsOfSLNAList);
+		model.addAttribute("detailsOfSLNAList",allList);
 		model.addAttribute("chairpersonExists", chairpersonExists);
 		model.addAttribute("ceoExists", ceoExists);
 		model.addAttribute("phoneMap", phoneMap);

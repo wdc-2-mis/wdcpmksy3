@@ -460,6 +460,17 @@
 				<span th:text="${success}"></span>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
+			<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+				<span th:text="${error}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
+				<i class="fas fa-exclamation-triangle me-2"></i>
+				<strong>Action Required:</strong>
+				<span th:text="${error1}"></span>
+				<a th:href="@{/institutionalStructurePPR1}" class="btn btn-sm btn-primary ms-3">Go to Institutional Structure</a>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
 	        <div class="card-body">
 	            <form id="saveForm" th:action="@{/saveDetailsOfSLNA}" method="post">
 	                <!-- Member Details -->

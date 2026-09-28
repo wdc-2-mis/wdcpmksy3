@@ -79,14 +79,21 @@
 	            return response.json();
 	        })
 	        .then(data => {
-	            if (data.exists) {
-	                alert("This Micro-watershed is already saved for the selected District.");
-	                // Reset Micro-watershed
-	                microWatershedElement.value = "";
-	                // Reset code
-	                microWatershedCodeElement.value = "";
-	            }
-	        })
+					if (data.exists) {
+
+						microWatershedElement.classList.add("is-invalid");
+						const error = document.createElement("div");
+						error.className = "validation-error";
+						error.innerText = "This Micro-watershed is already saved for the selected District.";
+						microWatershedElement.parentNode.appendChild(error);
+						microWatershedElement.focus();
+						//	                alert("This Micro-watershed is already saved for the selected District.");
+						// Reset Micro-watershed
+						microWatershedElement.value = "";
+						// Reset code
+						microWatershedCodeElement.value = "";
+					}
+				})
 	        .catch(error => {
 	            console.error("Error:", error);
 	        });
@@ -790,6 +797,24 @@
 			        });
 			    }
 			});
+			
+			document.addEventListener("DOMContentLoaded", function () {
+			    const nextBtn = document.getElementById("nextBtn");
+			    if (nextBtn) {
+			        nextBtn.addEventListener("click", function () {
+			            const district = document.getElementById("district");
+			            if (!district || !district.value) {
+			                alert("Please select District first.");
+			                if (district) {
+			                    district.focus();
+			                }
+			                return;
+			            }
+			            const dcode = district.value;
+			            window.location.href = "/pprProjectAtGlance?dcode=" + encodeURIComponent(dcode);
+			        });
+			    }
+			});
 		
 </script>
 	
@@ -899,7 +924,12 @@
 					          Save As Draft
 					     </button>
 	                </div>
-
+					<div class="text-end mt-2" id="nextBtnContainer" th:if="${selectedDistrict != null}">
+						<button type="button" id="nextBtn" class="btn btn-primary">
+							Project at a Glance
+							<i class="fas fa-arrow-right ms-1"></i>
+						</button>
+					</div>
 	            </form>
 			</div>
 		</div>
