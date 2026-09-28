@@ -61,4 +61,14 @@ public interface PPRSoilErosionRepository extends JpaRepository<PPRSoilErosion, 
 	@Transactional
 	@Query("UPDATE PPRSoilErosion w SET w.status = 'D' WHERE w.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+    
+    @Query("""
+            SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
+            FROM PPRSoilErosion s
+            JOIN s.ppr p
+            JOIN p.institutionalStructure i
+            WHERE i.stCode = :stCode
+              AND s.status = 'C'
+        """)
+        boolean existsByStCodeAndStatusC(@Param("stCode") Integer stCode);
 }

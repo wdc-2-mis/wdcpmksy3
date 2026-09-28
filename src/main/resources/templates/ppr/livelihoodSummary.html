@@ -465,7 +465,21 @@
 		    <span th:text="${error}"></span>
 		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-
+		<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
+		
+			<i class="fas fa-exclamation-triangle me-2"></i>
+		
+			<strong>Action Required:</strong>
+			<span th:text="${error1}"></span>
+		
+			<a th:href="@{/pprSoilErosion}" class="btn btn-sm btn-primary ms-3">
+				Go to PPR Soil Erosion Details
+			</a>
+		
+			<button type="button" class="btn-close" data-bs-dismiss="alert">
+			</button>
+		
+		</div>
         <div class="card-body">
 
              <form id="livelihoodSummary" th:action="@{/saveLivelihoodSummaryPPR13}" method="post">
@@ -476,7 +490,7 @@
 				             <label class="form-label">
 				                 <b> District </b><span class="required">*</span>
 				              </label>
-								<select id="district" name="district" class="form-select" >
+								<select id="district" name="district" class="form-select" required>
 									<option value="">--Select District--</option>
 										<th:block th:each="dist : ${distList}">
 											<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
@@ -488,7 +502,7 @@
 							<label class="form-label">
 								<b> Block </b><span class="required">*</span>
 							</label>
-							<select id="block" name="block" class="form-select">
+							<select id="block" name="block" class="form-select" required>
 								<option value="">--Select Block--</option>
 							</select>
 						</div>
@@ -496,7 +510,7 @@
 							<label class="form-label">
 								<b> Project </b><span class="required">*</span>
 							</label>
-							<select id="project" name="project" class="form-select">
+							<select id="project" name="project" class="form-select" required>
 								<option value="">--Select Project--</option>
 							</select>					
 						</div>
@@ -504,7 +518,7 @@
 							<label class="form-label">
 								<b> Name of Watershed </b><span class="required">*</span>
 							</label>
-							<select id="watershed" name="watershed" class="form-select">
+							<select id="watershed" name="watershed" class="form-select" required>
 							    <option value="">--Select Micro Watershed--</option>
 							</select>
 				        </div>
@@ -512,7 +526,7 @@
 							<label class="form-label">
 								<b> Village</b> <span class="required">*</span>
 							</label>
-							<select id="village" name="village" class="form-select">
+							<select id="village" name="village" class="form-select" required>
 							    <option value="">--Select Village--</option>
 							</select>
 						</div>
@@ -522,7 +536,7 @@
 							<label class="form-label">
 								<b> Livelihood Activities </b><span class="required">*</span>
 							</label>
-							<select class="form-select" name="livact" id="livact" style="width: 300px;" multiple>
+							<select class="form-select" name="livact" id="livact"  required multiple>
 									<option value="" disabled>--Select Activities--</option>
 									<th:block th:each="act : ${LivelihoodActList}">
 											<option th:value="${act.livelihoodActivityId}"
@@ -536,7 +550,7 @@
 							<label class="form-label">
 								<b> Livelihood Interventions under Project</b> <span class="required">*</span>
 							</label>
-							<select class="form-select" name="livinv" id="livinv" style="width: 300px;" multiple>
+							<select class="form-select" name="livinv" id="livinv" required multiple>
 									<option value="" disabled>--Select Livelihood Interventions--</option>
 									<th:block th:each="inv : ${LivelihoodInvList}">
 											<option th:value="${inv.livelihoodInterventionId}"
@@ -550,7 +564,7 @@
 							<label class="form-label">
 									<b>Current Migration Status (No. of People)</b> <span class="required">*</span>
 							</label>
-							<input type="text" name="migrat" id="migrat" class="form-control" style="height:40px; width: 300px;" oninput="validateInteger(this,10)" >
+							<input type="text" name="migrat" id="migrat" class="form-control" style="height:40px; width: 300px;" oninput="validateInteger(this,10)" required>
 						
 						</div>
 				       	
@@ -559,7 +573,7 @@
 				               <label class="form-label">
 				                  <b>Main reason of Migration</b> <span class="required">*</span>
 				               </label>
-							  <textarea name="reason" id="reason" class="form-control" rows="2"></textarea>
+							  <textarea name="reason" id="reason" class="form-control" rows="2" required></textarea>
 				        </div>
 						 
 						
@@ -568,7 +582,7 @@
 				</div>
 				
 						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning">
+							<button type="submit" name="action"  value="D" class="btn btn-warning" th:disabled="${!existssl}">
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>

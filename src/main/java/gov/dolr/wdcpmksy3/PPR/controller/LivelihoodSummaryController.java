@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprAgroClimate;
 import gov.dolr.wdcpmksy3.PPR.entity.PprLivelihood;
+import gov.dolr.wdcpmksy3.PPR.repository.PPRSoilErosionRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprLivelihoodRepository;
 import gov.dolr.wdcpmksy3.PPR.service.LivelihoodActivityServices;
 import gov.dolr.wdcpmksy3.PPR.service.LivelihoodInterventionServices;
@@ -47,6 +48,9 @@ public class LivelihoodSummaryController {
 	@Autowired
     private PprLivelihoodRepository livrepo;
 	
+	@Autowired
+    private PPRSoilErosionRepository soil;
+	
 	@GetMapping("/livelihoodSummaryPPR13")
     public String livelihoodSummaryPPR13(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -65,7 +69,13 @@ public class LivelihoodSummaryController {
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("LivelihoodActList", laser.getAllLivelihoodActivity());
         model.addAttribute("LivelihoodInvList", liser.getAllLivelihoodIntervention());
-	
+        boolean exists=false;
+        exists=soil.existsByStCodeAndStatusC(stcode);
+        model.addAttribute("existssl", exists);
+		if (!exists) {
+	        model.addAttribute( "error1", "Please complete the PPR Soil Erosion Details.");
+	    }
+        
         return "ppr/livelihoodSummary";
     }
 	
