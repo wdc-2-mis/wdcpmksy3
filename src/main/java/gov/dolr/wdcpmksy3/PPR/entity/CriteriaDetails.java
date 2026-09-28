@@ -25,7 +25,7 @@ public class CriteriaDetails {
     private Criteria criteria;
 
     @Column(name = "scored_marks")
-    private Integer scoredMarks;
+    private Double scoredMarks;
 
     @Column(name = "remarks", length = 500)
     private String remarks;
@@ -80,11 +80,11 @@ public class CriteriaDetails {
 		this.criteria = criteria;
 	}
 
-	public Integer getScoredMarks() {
+	public Double getScoredMarks() {
         return scoredMarks;
     }
 
-    public void setScoredMarks(Integer scoredMarks) {
+    public void setScoredMarks(Double scoredMarks) {
         this.scoredMarks = scoredMarks;
     }
 

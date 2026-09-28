@@ -242,10 +242,10 @@
 						showError(field, "Phone number must contain exactly 10 digits.");
 						return false;
 					}
-					if (!/^[6-9]/.test(value)) {
-						showError(field, "Phone number must start with 6, 7, 8 or 9.");
-						return false;
-					}
+//					if (!/^[6-9]/.test(value)) {
+//						showError(field, "Phone number must start with 6, 7, 8 or 9.");
+//						return false;
+//					}
 					const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
 					if (isDuplicatePhone(value, currentId)) {
 						showError(field, "This phone number is already saved for another Member.");
@@ -413,8 +413,8 @@
 					return;
 				if (!/^[0-9]{10}$/.test(phone))
 					showError(phoneInput, "Phone number must contain exactly 10 digits.", form);
-				if (!/^[6-9]/.test(phone))
-					showError(phoneInput, "Phone number must start with 6, 7, 8 or 9.", form);
+//				if (!/^[6-9]/.test(phone))
+//					showError(phoneInput, "Phone number must start with 6, 7, 8 or 9.", form);
 		        const currentId = form.querySelector("input[name='pprSlna']")?.value || "";
 		        if (isDuplicatePhone(phone, currentId)) {
 					showError(phoneInput, "This phone number is already saved for another Member.", form);

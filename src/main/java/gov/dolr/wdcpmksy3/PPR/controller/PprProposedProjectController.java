@@ -82,9 +82,9 @@ public class PprProposedProjectController {
 			proposedProjectService.changeStatusByPprId(pprid);
         }
 		if(dcode != null){
+			model.addAttribute("selectedDistrict", dcode);
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
 	        if(!pprList.isEmpty()){
-	        	model.addAttribute("selectedDistrict", dcode);
 	        	model.addAttribute("pprList", pprList);
 	            model.addAttribute("microWatershedList", pprService.getMicroWatershedsByDistrict(dcode));
 	            if(project != null) {

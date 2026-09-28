@@ -68,7 +68,7 @@ public class PprProposedProjectService {
                 continue;
             }
             Integer criteriaId=Integer.parseInt(value[0]);
-            Integer marks=Integer.parseInt(value[1]);
+            Double marks=Double.valueOf(value[1]);
             CriteriaDetails details=new CriteriaDetails();
             details.setCriteria(
                     criteriaRepo.findById(criteriaId).get());
@@ -117,7 +117,7 @@ public class PprProposedProjectService {
 					continue;
 				}
 				Integer criteriaId = Integer.parseInt(value[0]);
-				Integer marks = Integer.parseInt(value[1]);
+				Double marks = Double.valueOf(value[1]);
 				CriteriaDetails details = new CriteriaDetails();
 				details.setCriteria(criteriaRepo.findById(criteriaId).get());
 				details.setScoredMarks(marks);

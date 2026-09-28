@@ -72,9 +72,9 @@ public class PprProjectAtGlanceController {
 			pprProjectGlanceServ.changeStatusByPprId(pprid);
         }
 		if(dcode != null){
+			model.addAttribute("selectedDistrict", dcode);
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
 	        if(!pprList.isEmpty()){
-	        	model.addAttribute("selectedDistrict", dcode);
 	        	model.addAttribute("blockList", mBlockRepo.findByDistrict_DcodeOrderByBlockNameAsc(dcode));
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
