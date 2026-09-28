@@ -32,7 +32,7 @@ public class PprAgroClimate {
     @Column(name = "area", precision = 20, scale = 4)
     private BigDecimal area;
 
-    @Column(name = "avg_rainfall", precision = 6, scale = 4)
+    @Column(name = "avg_rainfall", precision = 20, scale = 4)
     private BigDecimal avgRainfall;
 
     @Column(name = "topography", length = 50)

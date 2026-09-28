@@ -109,4 +109,16 @@ public interface WdcpmksyRoleMenuMapRepository extends JpaRepository<WdcpmksyRol
 			    ORDER BY rolename, parentname, sequence
 			    """, nativeQuery = true)
 			List<RoleMenuProjection> getMenuAllRole(@Param("roleId") Integer roleId);
+			
+			@Query("""
+			        SELECT r.role.roleId
+			        FROM WdcpmksyRoleMenuMap r
+			        WHERE r.submenu.submenuId = :submenuId
+			        """)
+			    List<Integer> findRoleIdsBySubmenuId(@Param("submenuId") Integer submenuId);
+			
+			
+			
+			
+			
 }
