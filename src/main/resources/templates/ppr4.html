@@ -63,26 +63,44 @@
 			const mouFile = document.getElementById("MoUfile");
 
 			function validatePDF(input) {
-				if (input.files.length === 0) return true;
 
-				const file = input.files[0];
-				const fileName = file.name.toLowerCase();
+				    if (input.files.length === 0) {
+				        return true;
+				    }
 
-				if (file.type !== "application/pdf" && !fileName.endsWith(".pdf")) {
-					alert("Only PDF files are allowed.");
-					input.value = "";
-					return false;
+				    const file = input.files[0];
+				    const fileName = file.name;
+
+				    // Check file name - special symbols are not allowed
+				    // Allowed: A-Z, a-z, 0-9, underscore (_), hyphen (-), and .pdf
+				    const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
+
+				    if (!fileNamePattern.test(fileName)) {
+				        alert("File name should contain only letters, numbers, underscore (_) or hyphen (-).");
+				        input.value = "";
+				        return false;
+				    }
+
+				    // Check PDF type
+				    if (file.type !== "application/pdf" &&
+				        !fileName.toLowerCase().endsWith(".pdf")) {
+
+				        alert("Only PDF files are allowed.");
+				        input.value = "";
+				        return false;
+				    }
+
+				    // Check file size - maximum 5 MB
+				    const maxSize = 5 * 1024 * 1024;
+
+				    if (file.size > maxSize) {
+				        alert("PDF file size must not be more than 5 MB.");
+				        input.value = "";
+				        return false;
+				    }
+
+				    return true;
 				}
-				const maxSize = 5 * 1024 * 1024; // 5 MB
-
-				if (file.size > maxSize) {
-					alert("PDF file size must not be more than 5 MB.");
-					input.value = "";
-					return false;
-				}
-
-				return true;
-			}
 
 			mouFile.addEventListener("change", function () {
 				if (validatePDF(this)) {
