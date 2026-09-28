@@ -185,96 +185,74 @@ public class PreliminaryPPR4AController {
 	        return "redirect:/login";
 	    }
 	}
-	
-    @GetMapping("/deletePreliminaryPPR4A")
-    public String deletePreliminaryPPR4A(HttpSession session, Model model, @RequestParam("id") Integer id,  
-    		RedirectAttributes redirectAttributes) {
 
-		
-		String statename=session.getAttribute("statename").toString();
-		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-		String userid=(String)session.getAttribute("userid");
+	@GetMapping("/deletePreliminaryPPR4A")
+	public String deletePreliminaryPPR4A(HttpSession session, @RequestParam("id") Integer id,
+			RedirectAttributes redirectAttributes) {
+
+		String userid = (String) session.getAttribute("userid");
+
+		if (userid == null) {
+			return "redirect:/login";
+		}
+
 		try {
-			
-	        if(userid==null){
-	
-	            return "redirect:/login";
-	        }
-	        PPRWcdcDetails data = pprWcdcDetailsService.getById(id);
-            if (data == null) {
-                redirectAttributes.addFlashAttribute("error", "Record not found.");
-                return "redirect:/preliminaryPPR4A";
-            }
-            
-            deleteFile(data.getMouFile());
-            pprWcdcDetailsService.delete(id);
+			PPRWcdcDetails data = pprWcdcDetailsService.getById(id);
 
-            model.addAttribute("success", "Record deleted successfully.");
+			if (data == null) {
+				redirectAttributes.addFlashAttribute("error", "Record not found.");
+			} else {
+				deleteFile(data.getMouFile());
+				pprWcdcDetailsService.delete(id);
+				redirectAttributes.addFlashAttribute("success", "Record deleted successfully.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+		}
 
-            model.addAttribute("ppr4List", pprWcdcDetailsService.getPPR4List(stcode));	
-            model.addAttribute("distList", districtService.getDistrictsByState(stcode)); 
-    		model.addAttribute("statename", statename);
-    		model.addAttribute("stcode", stcode);
+		return "redirect:/preliminaryPPR4A";
+	}
 
-        } 
-        catch (Exception e) {
+	private void deleteFile(String filePath) {
 
-        	 model.addAttribute("error", "Unable to delete record.");
-            e.printStackTrace();
-        }
-        return "ppr4";
-    }
-    
-    private void deleteFile(String filePath) {
+		if (filePath != null && !filePath.isBlank()) {
+			try {
+				Path path = Paths.get(filePath);
+				if (Files.exists(path)) {
+					Files.delete(path);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-        if (filePath != null && !filePath.isBlank()) 
-        {
-            try {
-                Path path = Paths.get(filePath);
-                if (Files.exists(path)) {
-                    Files.delete(path);
-                }
-            } 
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-	
-    @GetMapping("/completePreliminaryPPR4A")
-    public String completePreliminaryPPR4A(HttpSession session, Model model, @RequestParam("id") Integer id,  
-    		RedirectAttributes redirectAttributes) {
+	@GetMapping("/completePreliminaryPPR4A")
+	public String completePreliminaryPPR4A(HttpSession session, @RequestParam("id") Integer id,
+			RedirectAttributes redirectAttributes) {
 
-		String statename=session.getAttribute("statename").toString();
-		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-		String userid=(String)session.getAttribute("userid");
-		 	try {
+		String userid = (String) session.getAttribute("userid");
 
-		 		if(userid==null){
+		if (userid == null) {
+			return "redirect:/login";
+		}
 
-		            return "redirect:/login";
-		        }
-		 		boolean updated= pprWcdcDetailsService.completeRecordPPR4(id);
-		        if (updated) {
-		        	model.addAttribute("success", "Record completed successfully.");
-		        } 
-		        else {
-		        	model.addAttribute("success", "Record not found.");
-		        }
-		        model.addAttribute("ppr4List",
-		                pprWcdcDetailsService.getPPR4List(stcode));
-		        model.addAttribute("distList", districtService.getDistrictsByState(stcode));
-	    		model.addAttribute("statename", statename);
-	    		model.addAttribute("stcode", stcode);
-		    } 
-		 	catch (Exception e) {
+		try {
+			boolean updated = pprWcdcDetailsService.completeRecordPPR4(id);
 
-		 		model.addAttribute("error", "Unable to complete record.");
-		    }
-       
-        return "ppr4";
-    }
-    
+			if (updated) {
+				redirectAttributes.addFlashAttribute("success", "Record completed successfully.");
+			} else {
+				redirectAttributes.addFlashAttribute("error", "Record not found.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("error", "Unable to complete record.");
+		}
+
+		return "redirect:/preliminaryPPR4A";
+	}
     @GetMapping("/viewPdfPreliminaryPPR4A")
     public ResponseEntity<Resource> viewPdfPPR4(@RequestParam Integer id)
             throws IOException {
