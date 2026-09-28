@@ -431,8 +431,8 @@
 									class="required">*</span>
 							</div>
 							<div class="col-md-4">
-								<select id="project" name="project" class="form-control form-control-sm" required>
-									<option value="">--Select Project--</option>
+								<select id="project" name="pprId" class="form-control form-control-sm" required>
+								    <option value="">--Select Project--</option>
 								</select>
 							</div>
 
@@ -441,8 +441,8 @@
 									class="required">*</span>
 							</div>
 							<div class="col-md-4">
-								<select id="watershed" name="watershed" class="form-control form-control-sm" required>
-									<option value="">--Select Micro Watershed--</option>
+								<select id="watershed" name="watershedId" class="form-control form-control-sm" required>
+								    <option value="">--Select Micro Watershed--</option>
 								</select>
 							</div>
 						</div>
@@ -453,8 +453,8 @@
 									class="required">*</span>
 							</div>
 							<div class="col-md-4">
-								<select id="village" name="village" class="form-control form-control-sm" required>
-									<option value="">--Select Village--</option>
+								<select id="village" name="villageId" class="form-control form-control-sm" required>
+								    <option value="">--Select Village--</option>
 								</select>
 							</div>
 						</div>
@@ -535,14 +535,14 @@
 						        <button type="submit" class="btn btn-warning px-4 fw-semibold">
 						            <i class="fa fa-save me-1"></i> Save as Draft
 						        </button>
-						    </div>
+						<!---------   </div>
 
 						    <a th:href="@{/pprWaterOutcomes}" class="btn btn-outline-secondary"
 						        style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
 						        Skip <i class="fas fa-arrow-right"></i>
 						    </a>
 
-						</div>
+						</div>--------->
 					</form>
 
 					<!-- ================= DRAFT DETAILS ================= -->
@@ -565,7 +565,7 @@
 									<th class="table-primary">No. of days Migrating</th>
 									<th class="table-primary">Major reason(s) for Migration</th>
 									<th class="table-primary">Expected reduction</th>
-									<th class="table-primary" style="min-width:120px;">Action</th>
+									<th class="table-primary text-center" style="min-width:160px;">Action</th>
 								</tr>
 							</thead>
 
