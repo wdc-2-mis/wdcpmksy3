@@ -14,6 +14,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MWaterQuality;
 import gov.dolr.wdcpmksy3.PPR.entity.PprDrinkingWater;
 import gov.dolr.wdcpmksy3.PPR.entity.PprLivelihood;
 import gov.dolr.wdcpmksy3.PPR.repository.PprLivelihoodRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprWaterOutcomeRepository;
 import gov.dolr.wdcpmksy3.PPR.service.DrinkingWaterServices;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.repository.MWaterQualityRepository;
@@ -37,6 +38,9 @@ public class DrinkingWaterController {
 	@Autowired
     private PprDrinkingWaterRepository dwrepo;
 	
+	@Autowired
+    private PprWaterOutcomeRepository repository;
+	
 	@GetMapping("/drinkingWaterStatus")
     public String drinkingWaterStatus(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -50,6 +54,14 @@ public class DrinkingWaterController {
         if (pprid != null) {
         	serv.changeStatusByPprId(pprid);
         }
+        
+        boolean exists=false;
+        exists=repository.existsByPpr_InstitutionalStructure_StCodeAndStatus(stcode, "C");
+        model.addAttribute("existssl", exists);
+		if (!exists) {
+	        model.addAttribute( "error1", "Please complete the Average ground water table depth in Project Area");
+	    }
+        
         List<MWaterQuality> waterQualityList =wtrqua.findAll();
         model.addAttribute("waterQualityList", waterQualityList);
         List<PprDrinkingWater> records = dwrepo.findByPpr_District_State_StCode(stcode);

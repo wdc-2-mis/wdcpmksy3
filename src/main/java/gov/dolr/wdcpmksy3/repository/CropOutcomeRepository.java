@@ -26,5 +26,7 @@ public interface CropOutcomeRepository extends JpaRepository<PprCropOutcome, Int
 	@Transactional
 	@Query("UPDATE PprCropOutcome c SET c.status = 'D' WHERE c.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+	
+	boolean existsByPpr_InstitutionalStructure_StCodeAndStatus(Integer stCode, String status);
 
 }

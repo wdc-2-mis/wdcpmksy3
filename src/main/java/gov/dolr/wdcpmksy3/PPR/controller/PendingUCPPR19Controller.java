@@ -17,6 +17,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.PprPendingUcRepository;
 import gov.dolr.wdcpmksy3.PPR.service.FinYearService;
 import gov.dolr.wdcpmksy3.PPR.service.PendingUCPPR19Services;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
+import gov.dolr.wdcpmksy3.repository.CropOutcomeRepository;
 import gov.dolr.wdcpmksy3.service.DistrictService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -36,6 +37,9 @@ public class PendingUCPPR19Controller {
 	@Autowired
     private PendingUCPPR19Services services;
 	
+	@Autowired
+	 private CropOutcomeRepository pprCropOutcomeRepo;
+	
 	@GetMapping("/pendingUCPPR19")
     public String pendingUCPPR19(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -49,6 +53,14 @@ public class PendingUCPPR19Controller {
         if (pprid != null) {
         	services.changeStatusByPprId(pprid);
         }
+        
+        boolean exists=false;
+        exists=pprCropOutcomeRepo.existsByPpr_InstitutionalStructure_StCodeAndStatus(stcode, "C");
+        model.addAttribute("existssl", exists);
+		if (!exists) {
+	        model.addAttribute( "error1", "Please complete the Major crops grown and their productivity in the Project.");
+	    }
+        
         List<PprPendingUc> records = ucrepo.findByPpr_District_State_StCode(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));

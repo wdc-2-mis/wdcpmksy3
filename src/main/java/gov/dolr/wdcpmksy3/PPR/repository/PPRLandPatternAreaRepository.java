@@ -58,4 +58,6 @@ public interface PPRLandPatternAreaRepository extends JpaRepository<PPRLandPatte
 	@Transactional
 	@Query("UPDATE PPRLandPatternArea l SET l.status = 'D' WHERE l.pprId.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+	
+	boolean existsByPprId_InstitutionalStructure_StCodeAndStatus(Integer stCode, Character status);
 }

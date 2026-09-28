@@ -48,6 +48,8 @@ public interface PprWaterOutcomeRepository extends JpaRepository<PprWaterOutcome
 	@Query("UPDATE PprWaterOutcome w SET w.status = 'D' WHERE w.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	   
 	
+	 boolean existsByPpr_InstitutionalStructure_StCodeAndStatus(Integer stCode, String status);
+	
 	
 
 }
