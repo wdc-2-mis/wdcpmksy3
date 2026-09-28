@@ -159,33 +159,45 @@ document.addEventListener("DOMContentLoaded", function () {
 	const notificationFile1 = document.getElementById("notificationFile1");
 	const mouFile1 = document.getElementById("mouFile1");
 
-	    function validatePDF(input) {
-			
-			if (input.files.length === 0) {
-			        return true;
-			   }
+	function validatePDF(input) {
 
-			    const file = input.files[0];
-			    const fileName = file.name.toLowerCase();
-
-			    // Check PDF type
-			    if (file.type !== "application/pdf" && !fileName.endsWith(".pdf")) {
-			        alert("Only PDF files are allowed.");
-			        input.value = "";
-			        return false;
-			    }
-
-			    // Check file size - maximum 5 MB
-			    const maxSize = 5 * 1024 * 1024; // 5 MB
-
-			    if (file.size > maxSize) {
-			        alert("PDF file size must not be more than 5 MB.");
-			        input.value = "";
-			        return false;
-			    }
-
-			    return true;
+	    if (input.files.length === 0) {
+	        return true;
 	    }
+
+	    const file = input.files[0];
+	    const fileName = file.name;
+
+	    // Check file name - special symbols are not allowed
+	    // Allowed: A-Z, a-z, 0-9, underscore (_), hyphen (-), and .pdf
+	    const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
+
+	    if (!fileNamePattern.test(fileName)) {
+	        alert("File name should contain only letters, numbers, underscore (_) or hyphen (-).");
+	        input.value = "";
+	        return false;
+	    }
+
+	    // Check PDF type
+	    if (file.type !== "application/pdf" &&
+	        !fileName.toLowerCase().endsWith(".pdf")) {
+
+	        alert("Only PDF files are allowed.");
+	        input.value = "";
+	        return false;
+	    }
+
+	    // Check file size - maximum 5 MB
+	    const maxSize = 5 * 1024 * 1024;
+
+	    if (file.size > maxSize) {
+	        alert("PDF file size must not be more than 5 MB.");
+	        input.value = "";
+	        return false;
+	    }
+
+	    return true;
+	}
 
 	    function validateSameFile(changedInput, otherInput) {
 

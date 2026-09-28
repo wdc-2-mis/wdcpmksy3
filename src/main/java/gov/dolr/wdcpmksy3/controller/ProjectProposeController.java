@@ -25,9 +25,9 @@ public class ProjectProposeController {
         System.out.println("kdy" +hash); // true
         
         boolean isValid = encoder.matches("kdy123", hash);
-        System.out.println(isValid); // true
+        System.out.println(isValid); // true  
 
-
+        // return "ppr1";
         return "projectPropose";
     }
 
