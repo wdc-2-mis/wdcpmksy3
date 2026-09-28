@@ -104,6 +104,69 @@
 	});
 	
 	document.addEventListener("DOMContentLoaded", function () {
+			const blockElement = document.getElementById("editBlock");
+			const gpElement = document.getElementById("editGrampanchayat");
+			const villageElement = document.getElementById("editVillage");
+			blockElement.addEventListener("change", function () {
+				const block = blockElement.value;
+				gpElement.innerHTML = '<option value="">--Select--</option>';
+				villageElement.innerHTML = "";
+				if (!block) {
+					return;
+				}
+				fetch("/getGPlistbyBlock?blockcode=" + encodeURIComponent(block))
+				    .then(response => {
+				        if (!response.ok) {
+				            throw new Error("Failed to load Gram Panchayat");
+				        }
+				        return response.json();
+				    })
+				    .then(data => {
+				        data.forEach(function (gp) {
+				            const option = document.createElement("option");
+				            option.value = gp.gcode;
+				            option.textContent = gp.gramPanchayatName;
+				            gpElement.appendChild(option);
+				        });
+				    })
+				    .catch(error => {
+				        console.error("Error loading Gram Panchayat:", error);
+				    });
+				});
+
+
+			// GP change
+			gpElement.addEventListener("change", function () {
+				const gcode = gpElement.value;
+				// Clear villages
+				villageElement.innerHTML = "";
+				if (!gcode) {
+					return;
+				}
+				fetch("/getVillageListByGcode?gcode=" + encodeURIComponent(gcode))
+				    .then(response => {
+				        if (!response.ok) {
+				            throw new Error("Failed to load villages");
+				        }
+				        return response.json();
+				    })
+				    .then(data => {
+				        data.forEach(function (village) {
+				            const option = document.createElement("option");
+				            option.value = village.vcode;
+				            option.textContent = village.villageName;
+				            villageElement.appendChild(option);
+				        });
+				    })
+				    .catch(error => {
+				        console.error("Error loading villages:", error);
+				    });
+			});
+		});
+	
+	
+	
+	document.addEventListener("DOMContentLoaded", function () {
 	    document.querySelectorAll(".editBtn").forEach(function (btn) {
 	        btn.addEventListener("click", function () {
 	            const id = this.getAttribute("data-id");
@@ -298,7 +361,7 @@
 	        if (projectTypes.length === 0) {
 	            return true;
 	        }
-	        const container = projectTypes[0].closest(".col-md-9");
+	        const container = projectTypes[0].closest(".col-md-5");
 	        let error = container.querySelector(".validation-error");
 	        if (!selected) {
 	            if (!error) {
@@ -527,7 +590,7 @@
 
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold">Type of Project <span class="required">*</span></label>
-						<div class="col-md-9">
+						<div class="col-md-5">
 							<div class="form-check form-check-inline" th:each="project : ${projectTypeList}">
 								<input class="form-check-input" type="radio" name="projectType" th:id="'project'+${project.projectTypeId}" th:value="${project.projectTypeId}"/>
 								<label class="form-check-label" th:for="'project'+${project.projectTypeId}" th:text="${project.projectType}"></label>
@@ -557,7 +620,9 @@
 					<div class="row mb-3 align-items-center">
 						<label class="col-md-3 fw-bold">Villages <span class="required">*</span></label>
 						<div class="col-md-3">
-							<select class="form-select" id="villages" name="villages" multiple></select>
+							<select class="form-select" id="villages" name="villages" multiple>
+								<option value="" disabled>--Select Villages--</option>
+							</select>
 							<small class="text-muted">Hold Ctrl and select multiple villages</small>
 							<div id="villagesDisplay" class="mt-2 text-primary"></div>
 						</div>
@@ -663,6 +728,7 @@
 		            <th>Project Cost (Rs in Lakh)</th>
 		            <th>Name of PIA</th>
 					<th>Address of PIA</th>
+					<th>Comment</th>
 		            <th>Action</th>
 		        </tr>
 		        </thead>
@@ -695,6 +761,7 @@
 		            <td th:text="${data.projectCost}"></td>
 					<td th:text="${data.pia.piaName}"></td>
 					<td th:text="${data.pia.address}"></td>
+					<td th:text="${data.comments}"></td>
 					<td>
 						<div class="d-flex align-items-center gap-2">
 							<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${data.pprProjectGlanceId}" data-bs-toggle="modal"
@@ -716,7 +783,7 @@
 		            </td>
 		        </tr>
 		        <tr th:if="${#lists.isEmpty(pprProjectAtGlanceList)}">
-		            <td colspan="15" class="text-center text-danger">
+		            <td colspan="16" class="text-center text-danger">
 		                No records found.
 		            </td>
 		        </tr>
@@ -782,7 +849,9 @@
 							<div class="row mb-3 align-items-center">
 								<label class="col-md-4 fw-bold">Villages <span class="required">*</span></label>
 								<div class="col-md-5">
-									<select class="form-select" id="editVillage" name="villages" multiple></select>
+									<select class="form-select" id="editVillage" name="villages" multiple>
+										<option value="" disabled>--Select Villages--</option>
+									</select>
 									<small class="text-muted">Hold Ctrl and select multiple villages</small>
 									<div id="editVillageDisplay" class="mt-2 text-primary"></div>
 								</div>
