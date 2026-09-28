@@ -122,6 +122,7 @@ public class PPRAgroClimateConditionController {
 	        Map<String, Object> map = new HashMap<>();
 	        map.put("id", p.getPprId());
 	        map.put("name", p.getProjectName());
+	        map.put("selectedDistrict", dcode);
 	        return map;
 	    }).toList();
 	}

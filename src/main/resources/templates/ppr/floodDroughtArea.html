@@ -113,55 +113,132 @@
                 
 					</div>
 
-<!-- Particular Row -->
+
 <div class="row mb-4 align-items-center">
-    <label class="col-md-3 fw-bold">Particular:<span class="required">*</span></label>
+
+    <label class="col-md-3 fw-bold">
+        Particular:
+        <span class="required">*</span>
+    </label>
+
     <div class="col-md-9">
-        <div th:each="dt : ${disasterTypes}" class="form-check form-check-inline me-5">
-            <input class="form-check-input" type="radio" name="disasterTypeId" th:value="${dt.disasterTypeId}" required/>
-            <label class="form-check-label" th:text="${dt.disasterName}"></label>
+
+        <div th:each="dt : ${disasterTypes}"
+             class="form-check form-check-inline me-5">
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="disasterTypeId"
+                   th:value="${dt.disasterTypeId}"
+               />
+
+            <label class="form-check-label"
+                   th:text="${dt.disasterName}">
+            </label>
+
         </div>
-        <div class="invalid-feedback">Please select Particular.</div>
+
+        <div class="invalid-feedback"
+             style="display:none;">
+            Please select Particular.
+        </div>
+
     </div>
+
 </div>
 
-<!-- Periodicity Row -->
+
 <div class="row mb-4">
-    <label class="col-md-3 fw-bold">Periodicity:<span class="required">*</span></label>
+
+    <label class="col-md-3 fw-bold">
+        Periodicity:
+        <span class="required">*</span>
+    </label>
+
     <div class="col-md-9">
+
         <div class="form-check form-check-inline me-4">
-            <input class="form-check-input" type="radio" name="periodicity" value="A" required />
-            <label class="form-check-label">Annual</label>
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="periodicity"
+                   value="A"
+                    />
+
+            <label class="form-check-label">
+                Annual
+            </label>
+
         </div>
+
         <div class="form-check form-check-inline me-4">
-            <input class="form-check-input" type="radio" name="periodicity" value="Q" required />
-            <label class="form-check-label">Quarterly</label>
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="periodicity"
+                   value="Q"
+                    />
+
+            <label class="form-check-label">
+                Quarterly
+            </label>
+
         </div>
-        <div class="invalid-feedback">Please select a Periodicity.</div>
+
+        <div class="invalid-feedback"
+             style="display:none;">
+            Please select a Periodicity.
+        </div>
+
     </div>
+
 </div>
 
-
-<!-- Affected Row -->
 <div class="row mb-4">
-    <label class="col-md-3 fw-bold">Affected:<span class="required">*</span></label>
+
+    <label class="col-md-3 fw-bold">
+        Affected:
+        <span class="required">*</span>
+    </label>
+
     <div class="col-md-9">
+
         <div class="form-check form-check-inline me-5">
-            <input class="form-check-input" type="radio" name="affected" value="Y" required />
-            <label class="form-check-label">Yes</label>
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="affected"
+                   value="Y"
+                    />
+
+            <label class="form-check-label">
+                Yes
+            </label>
+
         </div>
+
         <div class="form-check form-check-inline me-5">
-            <input class="form-check-input" type="radio" name="affected" value="N" required />
-            <label class="form-check-label">No</label>
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="affected"
+                   value="N"
+                    />
+
+            <label class="form-check-label">
+                No
+            </label>
+
         </div>
-        <div class="invalid-feedback">Please select Affected status.</div>
+
+        <div class="invalid-feedback"
+             style="display:none;">
+            Please select Affected status.
+        </div>
+
     </div>
+
 </div>
-
-
-
-
-
 
 <!-- Save Button -->
 <div class="text-center mt-4">
@@ -204,6 +281,8 @@
         <thead class="table-light">
             <tr>
                 <th class="table-primary">S No.</th>
+                <th class="table-primary">District</th>
+                <th class="table-primary">Project</th>
                 <th class="table-primary">Village</th>
                 <th class="table-primary">Year</th>
                 <th class="table-primary">Month</th>
@@ -216,6 +295,8 @@
         <tbody>
             <tr th:each="rec, iterStat : ${records}">
                 <td th:text="${iterStat.index + 1}"></td>
+                <td th:text="${rec.ppr.district.distName}"></td>
+                <td th:text="${rec.ppr.projectName}"></td>
                 <td th:text="${rec.vcode.villageName}"></td>
                 <td th:text="${rec.year.year}"></td>
                 <td th:text="${rec.month.monthName}"></td>
@@ -233,6 +314,7 @@
    						data-bs-target="#editModal"
 						th:data-id="${rec.pprDisasterId}"
    						th:data-district="${rec.ppr.district.distName}"
+   						th:data-project="${rec.ppr.projectName}"
    						th:data-village="${rec.vcode.villageName}"
    						th:data-month="${rec.month.monthId}"
    						th:data-year="${rec.year.finYrCd}"
@@ -295,22 +377,31 @@
                     <div class="row mb-4">
 
                         <!-- District -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
 
                             <label class="form-label fw-bold">
-                                District Name
+                                District Name <span class="text-danger">*</span>
                             </label>
 
                             <input type="text" class="form-control" id="editDistrict" name="district" readonly>
 
                         </div>
 
-
-                        <!-- Village -->
-                        <div class="col-md-6">
+                     <div class="col-md-4">
 
                             <label class="form-label fw-bold">
-                                Village
+                                Project Name <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="text" class="form-control" id="editProject" name="project" readonly>
+
+                        </div>
+
+                        <!-- Village -->
+                        <div class="col-md-4">
+
+                            <label class="form-label fw-bold">
+                                Village <span class="text-danger">*</span>
                             </label>
 
                             <input type="text" class="form-control" id="editVillage" name="village" readonly>
@@ -325,7 +416,7 @@
     <div class="col-md-6">
 
         <label class="form-label fw-bold">
-            Financial Year
+            Financial Year <span class="text-danger">*</span>
         </label>
 
         <select class="form-select"
@@ -349,7 +440,7 @@
     <div class="col-md-6">
 
         <label class="form-label fw-bold">
-            Month
+            Month <span class="text-danger">*</span>
         </label>
 
         <select class="form-select"
@@ -382,7 +473,7 @@
                         <div class="col-md-3">
 
                             <label class="form-label fw-bold">
-                                Particular
+                                Particular <span class="text-danger">*</span>
                             </label>
 
                         </div>
@@ -412,7 +503,7 @@
                         <div class="col-md-3">
 
                             <label class="form-label fw-bold">
-                                Periodicity
+                                Periodicity <span class="text-danger">*</span>
                             </label>
 
                         </div>
@@ -426,7 +517,7 @@
                                     <input class="form-check-input" type="radio" name="periodicity" value="A">
 
                                     <label class="form-check-label">
-                                        Annual
+                                        Annual 
                                     </label>
 
                                 </div>
@@ -455,7 +546,7 @@
                         <div class="col-md-3">
 
                             <label class="form-label fw-bold">
-                                Affected
+                                Affected <span class="text-danger">*</span>
                             </label>
 
                         </div>
@@ -1097,6 +1188,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const district =
                 button.getAttribute("data-district");
+                
+            const project =
+                button.getAttribute("data-project");    
 
             const village =
                 button.getAttribute("data-village");
@@ -1173,6 +1267,10 @@ document.addEventListener("DOMContentLoaded", function () {
             ).value = district || "";
 
 
+			document.getElementById(
+                "editProject"
+            ).value = project || "";
+            
             document.getElementById(
                 "editVillage"
             ).value = village || "";

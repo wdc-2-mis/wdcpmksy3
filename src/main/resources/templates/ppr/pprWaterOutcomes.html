@@ -13,222 +13,138 @@
 </style>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================================================
+    // GET MAIN FORM FIELDS
+    // =========================================================
 
     const district = document.getElementById("district");
     const project = document.getElementById("project");
     const watershed = document.getElementById("watershed");
     const village = document.getElementById("village");
     const form = document.getElementById("groundWaterDepthArea");
-    
 
-    district.addEventListener("change", function () {
-    let districtId = this.value;
-    const recordsTableBody = document.getElementById("recordsTableBody");
-    const recordsDiv = document.getElementById("recordsDiv");
+    const recordsTableBody =
+        document.getElementById("recordsTableBody");
 
-    // reset dependent dropdowns
-    project.innerHTML = '<option value="">--Select Project--</option>';
-    watershed.innerHTML = '<option value="">--Select Micro Watershed--</option>';
-    village.innerHTML = '<option value="">--Select Village--</option>';
+    const recordsDiv =
+        document.getElementById("recordsDiv");
 
-    recordsTableBody.innerHTML = "";
-    recordsDiv.style.display = "none";
 
-    if (districtId === "") return;
+    // =========================================================
+    // COMMON TEXT / DROPDOWN VALIDATION
+    // =========================================================
 
-    // load projects (already in your code)
-    fetch("/getProjectsByDistrictLandPattern?dcode=" + districtId)
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(function(item) {
-                let option = document.createElement("option");
-                option.value = item.id;
-                option.textContent = item.name;
-                project.appendChild(option);
-            });
-        })
-        .catch(error => console.error("Project Loading Error :", error));
-        
-console.log("Calling getWaterOutcomesByDistrict with dcode:", districtId);
-  fetch("/getWaterOutcomesByDistrict?dcode=" + districtId)
-    .then(response => response.text())
-    .then(text => {
+    function validateTextField(field) {
 
-        console.log("Records API Response:", text);
-
-        let data;
-
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            console.error("Invalid JSON response:", text);
-            throw new Error("Server returned HTML instead of JSON");
+        if (!field) {
+            return false;
         }
 
-        recordsTableBody.innerHTML = "";
+        const value = field.value
+            ? field.value.trim()
+            : "";
 
-        // Login/session error
-        if (data.length === 1 && data[0].error) {
+        const feedback =
+            field.parentElement.querySelector(".invalid-feedback");
 
-            recordsTableBody.innerHTML = `
-                <tr>
-                    <td colspan="9" class="text-center text-danger">
-                        ${data[0].error}
-                    </td>
-                </tr>
-            `;
 
-            recordsDiv.style.display = "block";
-            return;
+        if (value === "") {
+
+            field.classList.add("is-invalid");
+
+            if (feedback) {
+                feedback.style.display = "block";
+            }
+
+            return false;
         }
 
-        // No records
-        if (data.length === 0) {
 
-            recordsTableBody.innerHTML = `
-                <tr>
-                    <td colspan="9" class="text-center text-danger">
-                        No data found
-                    </td>
-                </tr>
-            `;
+        field.classList.remove("is-invalid");
 
-        } else {
-
-            // Records found
-            data.forEach(function(rec, index) {
-
-                let actionHtml = "";
-
-                if (rec.status === "D") {
-
-                    actionHtml = `
-                    
-                    
-                    <button type="button"
-                class="btn btn-sm btn-primary editBtn"
-                data-id="${rec.id}"
-                data-district="${rec.district || ''}"
-                data-project="${rec.project || ''}"
-                data-watershed="${rec.watershed || ''}"
-                data-village="${rec.village || ''}"
-                data-source-id="${rec.sourceId || ''}"
-                data-source="${rec.source || ''}"
-                data-pre-project="${rec.preProject || ''}"
-                data-post-project="${rec.postProject || ''}"
-                data-remarks="${rec.remarks || ''}"
-                data-bs-toggle="modal"
-                data-bs-target="#editModal">
-
-            <i class="fas fa-edit"></i>
-        </button>
-
-                       &nbsp; &nbsp;
-                    <a href="/completeWaterOutcome?id=${rec.id}" 
-                    
-                      class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to complete this record?');"><i class="fas fa-check"></i></a>
-                      
-                          &nbsp; &nbsp;
-                    <a href="/deleteWaterOutcome?id=${rec.id}" 
-                       class="btn btn-sm btn-danger"
-                       onclick="return confirm('Are you sure you want to delete this record?');">
-                       <i class="fas fa-trash"></i>
-                    </a>
-                        
-                    `;
-
-                } else {
-
-                    actionHtml = `
-                        <span class="badge bg-success">
-                            Data Completed
-                        </span>
-                    `;
-                }
-
-                recordsTableBody.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${rec.project}</td>
-                        <td>${rec.watershed}</td>
-                        <td>${rec.village}</td>
-                        <td>${rec.source}</td>
-                        <td>${rec.preProject}</td>
-                        <td>${rec.postProject}</td>
-                        <td>${rec.remarks || ""}</td>
-                        <td>${actionHtml}</td>
-                    </tr>
-                `;
-            });
+        if (feedback) {
+            feedback.style.display = "none";
         }
 
-        recordsDiv.style.display = "block";
-    })
-    .catch(error => {
-
-        console.error("Records Loading Error:", error);
-
-        recordsTableBody.innerHTML = `
-            <tr>
-                <td colspan="9" class="text-center text-danger">
-                    Unable to load records
-                </td>
-            </tr>
-        `;
-
-        recordsDiv.style.display = "block";
-    });
-  
-
-});
-    
-document.addEventListener("click", function (e) {
-
-    const editBtn = e.target.closest(".editBtn");
-
-    if (!editBtn) {
-        return;
+        return true;
     }
 
-    document.getElementById("editId").value =
-        editBtn.dataset.id;
 
-    document.getElementById("editDistrict").value =
-        editBtn.dataset.district;
-    document.getElementById("editProject").value =
-        editBtn.dataset.project;
+    // =========================================================
+    // RADIO GROUP VALIDATION
+    // =========================================================
 
-    document.getElementById("editWatershed").value =
-        editBtn.dataset.watershed;
+    function validateRadioGroup(groupName) {
 
-    document.getElementById("editVillage").value =
-        editBtn.dataset.village;
+        const radios = document.querySelectorAll(
+            '#groundWaterDepthArea input[name="' +
+            groupName +
+            '"]'
+        );
 
-   const sourceId = editBtn.dataset.sourceId;
 
-    document.querySelectorAll(".editSourceRadio")
-        .forEach(function (radio) {
+        if (!radios.length) {
+            return false;
+        }
 
-            radio.checked =
-                radio.value === sourceId;
 
-        });
+        const checked =
+            Array.from(radios).some(function (radio) {
+                return radio.checked;
+            });
 
-    document.getElementById("editPreProject").value =
-        editBtn.dataset.preProject;
 
-   document.getElementById("editPostProject").value =
-        editBtn.dataset.postProject;
+        const container =
+            radios[0].closest(".col-md-9");
 
-   document.getElementById("editRemarks").value =
-        editBtn.dataset.remarks;
 
-});
+        if (!container) {
+            return checked;
+        }
 
-  project.addEventListener("change", function () {
 
-        let pprId = this.value;
+        const feedback =
+            container.querySelector(".invalid-feedback");
+
+
+        if (!checked) {
+
+            if (feedback) {
+                feedback.style.display = "block";
+            }
+
+            return false;
+        }
+
+
+        if (feedback) {
+            feedback.style.display = "none";
+        }
+
+        return true;
+    }
+
+
+    // =========================================================
+    // DISTRICT CHANGE
+    // =========================================================
+
+    district.addEventListener("change", function () {
+
+        const districtId = this.value;
+
+
+        // Clear district error
+        validateTextField(this);
+
+
+        // Reset dependent dropdowns
+
+        project.innerHTML =
+            '<option value="">--Select Project--</option>';
 
         watershed.innerHTML =
             '<option value="">--Select Micro Watershed--</option>';
@@ -236,84 +152,761 @@ document.addEventListener("click", function (e) {
         village.innerHTML =
             '<option value="">--Select Village--</option>';
 
-        if (pprId === "") {
+
+        // Clear their previous validation errors
+
+        project.classList.remove("is-invalid");
+        watershed.classList.remove("is-invalid");
+        village.classList.remove("is-invalid");
+
+
+        const projectFeedback =
+            project.parentElement.querySelector(".invalid-feedback");
+
+        const watershedFeedback =
+            watershed.parentElement.querySelector(".invalid-feedback");
+
+        const villageFeedback =
+            village.parentElement.querySelector(".invalid-feedback");
+
+
+        if (projectFeedback) {
+            projectFeedback.style.display = "none";
+        }
+
+        if (watershedFeedback) {
+            watershedFeedback.style.display = "none";
+        }
+
+        if (villageFeedback) {
+            villageFeedback.style.display = "none";
+        }
+
+
+        // Clear records
+
+        recordsTableBody.innerHTML = "";
+
+        recordsDiv.style.display = "none";
+
+
+        if (districtId === "") {
             return;
         }
 
-        fetch("/getMicroWatershedsByProject?pprId=" + pprId)
-            .then(response => response.json())
-            .then(data => {
 
-                data.forEach(function(item){
+        // =====================================================
+        // LOAD PROJECTS
+        // =====================================================
 
-                    let option = document.createElement("option");
+        fetch(
+            "/getProjectsByDistrictLandPattern?dcode=" +
+            districtId
+        )
 
-                    option.value = item.id;
-                    option.textContent = item.name;
+        .then(response => response.json())
 
-                    watershed.appendChild(option);
+        .then(data => {
+
+            data.forEach(function (item) {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = item.id;
+                option.textContent = item.name;
+
+                project.appendChild(option);
+
+            });
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Project Loading Error :",
+                error
+            );
+
+        });
+
+
+        // =====================================================
+        // LOAD EXISTING RECORDS
+        // =====================================================
+
+        console.log(
+            "Calling getWaterOutcomesByDistrict with dcode:",
+            districtId
+        );
+
+
+        fetch(
+            "/getWaterOutcomesByDistrict?dcode=" +
+            districtId
+        )
+
+        .then(response => response.text())
+
+        .then(text => {
+
+            console.log(
+                "Records API Response:",
+                text
+            );
+
+
+            let data;
+
+
+            try {
+
+                data = JSON.parse(text);
+
+            } catch (e) {
+
+                console.error(
+                    "Invalid JSON response:",
+                    text
+                );
+
+                throw new Error(
+                    "Server returned HTML instead of JSON"
+                );
+            }
+
+
+            recordsTableBody.innerHTML = "";
+
+
+            // =================================================
+            // LOGIN / SESSION ERROR
+            // =================================================
+
+            if (
+                data.length === 1 &&
+                data[0].error
+            ) {
+
+                recordsTableBody.innerHTML = `
+
+                    <tr>
+
+                        <td colspan="9"
+                            class="text-center text-danger">
+
+                            ${data[0].error}
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                recordsDiv.style.display = "block";
+
+                return;
+            }
+
+
+            // =================================================
+            // NO RECORDS
+            // =================================================
+
+            if (data.length === 0) {
+
+                recordsTableBody.innerHTML = `
+
+                    <tr>
+
+                        <td colspan="9"
+                            class="text-center text-danger">
+
+                            No data found
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+            // =================================================
+            // RECORDS FOUND
+            // =================================================
+
+            else {
+
+                data.forEach(function (rec, index) {
+
+                    let actionHtml = "";
+
+
+                    if (rec.status === "D") {
+
+                        actionHtml = `
+
+                            <button type="button"
+
+                                class="btn btn-sm btn-primary editBtn"
+
+                                data-id="${rec.id}"
+
+                                data-district="${rec.district || ''}"
+
+                                data-project="${rec.project || ''}"
+
+                                data-watershed="${rec.watershed || ''}"
+
+                                data-village="${rec.village || ''}"
+
+                                data-source-id="${rec.sourceId || ''}"
+
+                                data-source="${rec.source || ''}"
+
+                                data-pre-project="${rec.preProject || ''}"
+
+                                data-post-project="${rec.postProject || ''}"
+
+                                data-remarks="${rec.remarks || ''}"
+
+                                data-bs-toggle="modal"
+
+                                data-bs-target="#editModal">
+
+                                <i class="fas fa-edit"></i>
+
+                            </button>
+
+                            &nbsp; &nbsp;
+
+                            <a href="/completeWaterOutcome?id=${rec.id}"
+
+                               class="btn btn-sm btn-success"
+
+                               onclick="return confirm('Are you sure you want to complete this record?');">
+
+                                <i class="fas fa-check"></i>
+
+                            </a>
+
+                            &nbsp; &nbsp;
+
+                            <a href="/deleteWaterOutcome?id=${rec.id}"
+
+                               class="btn btn-sm btn-danger"
+
+                               onclick="return confirm('Are you sure you want to delete this record?');">
+
+                                <i class="fas fa-trash"></i>
+
+                            </a>
+
+                        `;
+
+                    }
+
+                    else {
+
+                        actionHtml = `
+
+                            <span class="badge bg-success">
+
+                                Data Completed
+
+                            </span>
+
+                        `;
+
+                    }
+
+
+                    recordsTableBody.innerHTML += `
+
+                        <tr>
+
+                            <td>${index + 1}</td>
+
+                            <td>${rec.project}</td>
+
+                            <td>${rec.watershed}</td>
+
+                            <td>${rec.village}</td>
+
+                            <td>${rec.source}</td>
+
+                            <td>${rec.preProject}</td>
+
+                            <td>${rec.postProject}</td>
+
+                            <td>${rec.remarks || ""}</td>
+
+                            <td>${actionHtml}</td>
+
+                        </tr>
+
+                    `;
 
                 });
 
-            })
-            .catch(error => {
-                console.error("Micro Watershed Loading Error :", error);
-            });
+            }
+
+
+            recordsDiv.style.display = "block";
+
+        })
+
+
+        .catch(error => {
+
+            console.error(
+                "Records Loading Error:",
+                error
+            );
+
+
+            recordsTableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="9"
+                        class="text-center text-danger">
+
+                        Unable to load records
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            recordsDiv.style.display = "block";
+
+        });
 
     });
 
-   watershed.addEventListener("change", function () {
 
-        let pprId = project.value;
+    // =========================================================
+    // PROJECT CHANGE
+    // =========================================================
+
+    project.addEventListener("change", function () {
+
+        const pprId = this.value;
+
+
+        // Validate selected project
+
+        validateTextField(this);
+
+
+        // Reset dependent dropdowns
+
+        watershed.innerHTML =
+            '<option value="">--Select Micro Watershed--</option>';
 
         village.innerHTML =
             '<option value="">--Select Village--</option>';
 
+
+        // Clear validation errors
+
+        watershed.classList.remove("is-invalid");
+        village.classList.remove("is-invalid");
+
+
+        const watershedFeedback =
+            watershed.parentElement.querySelector(".invalid-feedback");
+
+        const villageFeedback =
+            village.parentElement.querySelector(".invalid-feedback");
+
+
+        if (watershedFeedback) {
+            watershedFeedback.style.display = "none";
+        }
+
+        if (villageFeedback) {
+            villageFeedback.style.display = "none";
+        }
+
+
         if (pprId === "") {
             return;
         }
 
-        fetch("/getVillagesByProject?pprId=" + pprId)
-            .then(response => {
 
-                if (!response.ok) {
-                    throw new Error(
-                        "Village API failed: " + response.status
-                    );
-                }
+        // =====================================================
+        // LOAD MICRO WATERSHEDS
+        // =====================================================
 
-                return response.json();
-            })
-            .then(data => {
+        fetch(
+            "/getMicroWatershedsByProject?pprId=" +
+            pprId
+        )
 
-                data.forEach(function(item) {
+        .then(response => response.json())
 
-                    let option = document.createElement("option");
+        .then(data => {
 
-                    option.value = item.id;
-                    option.textContent = item.name;
+            data.forEach(function (item) {
 
-                    village.appendChild(option);
+                const option =
+                    document.createElement("option");
 
-                });
+                option.value = item.id;
+                option.textContent = item.name;
 
-            })
-            .catch(error => {
-
-                console.error(
-                    "Village Loading Error :",
-                    error
-                );
+                watershed.appendChild(option);
 
             });
 
-    });
-    
-   }); 
-   
-  
+        })
 
-   
+        .catch(error => {
+
+            console.error(
+                "Micro Watershed Loading Error :",
+                error
+            );
+
+        });
+
+    });
+
+
+    // =========================================================
+    // MICRO WATERSHED CHANGE
+    // =========================================================
+
+    watershed.addEventListener("change", function () {
+
+        const pprId = project.value;
+
+
+        // Validate selected watershed
+
+        validateTextField(this);
+
+
+        // Reset village
+
+        village.innerHTML =
+            '<option value="">--Select Village--</option>';
+
+
+        village.classList.remove("is-invalid");
+
+
+        const villageFeedback =
+            village.parentElement.querySelector(".invalid-feedback");
+
+
+        if (villageFeedback) {
+            villageFeedback.style.display = "none";
+        }
+
+
+        if (pprId === "") {
+            return;
+        }
+
+
+        // =====================================================
+        // LOAD VILLAGES
+        // =====================================================
+
+        fetch(
+            "/getVillagesByProject?pprId=" +
+            pprId
+        )
+
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Village API failed: " +
+                    response.status
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(data => {
+
+            data.forEach(function (item) {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = item.id;
+                option.textContent = item.name;
+
+                village.appendChild(option);
+
+            });
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Village Loading Error :",
+                error
+            );
+
+        });
+
+    });
+
+
+    // =========================================================
+    // VILLAGE CHANGE
+    // =========================================================
+
+    village.addEventListener("change", function () {
+
+        validateTextField(this);
+
+    });
+
+
+    // =========================================================
+    // SOURCES RADIO CHANGE
+    // =========================================================
+
+    document.querySelectorAll(
+        '#groundWaterDepthArea input[name="sourceTypeId"]'
+    )
+    .forEach(function (radio) {
+
+        radio.addEventListener("change", function () {
+
+            validateRadioGroup("sourceTypeId");
+
+        });
+
+    });
+
+
+    // =========================================================
+    // TEXT FIELD INPUT VALIDATION
+    // =========================================================
+
+    const preProject =
+        document.getElementById("pre_project");
+
+    const expectedPost =
+        document.getElementById("expected_post");
+
+
+    if (preProject) {
+
+        preProject.addEventListener(
+            "input",
+            function () {
+
+                validateTextField(this);
+
+            }
+        );
+
+    }
+
+
+    if (expectedPost) {
+
+        expectedPost.addEventListener(
+            "input",
+            function () {
+
+                validateTextField(this);
+
+            }
+        );
+
+    }
+
+
+    // =========================================================
+    // MAIN FORM SUBMIT VALIDATION
+    // =========================================================
+
+    form.addEventListener("submit", function (event) {
+
+        let isValid = true;
+
+
+        // -----------------------------------------------------
+        // DROPDOWN VALIDATION
+        // -----------------------------------------------------
+
+        if (!validateTextField(district)) {
+            isValid = false;
+        }
+
+
+        if (!validateTextField(project)) {
+            isValid = false;
+        }
+
+
+        if (!validateTextField(watershed)) {
+            isValid = false;
+        }
+
+
+        if (!validateTextField(village)) {
+            isValid = false;
+        }
+
+
+        // -----------------------------------------------------
+        // SOURCE RADIO VALIDATION
+        // -----------------------------------------------------
+
+        if (!validateRadioGroup("sourceTypeId")) {
+            isValid = false;
+        }
+
+
+        // -----------------------------------------------------
+        // TEXT FIELD VALIDATION
+        // -----------------------------------------------------
+
+        if (!validateTextField(preProject)) {
+            isValid = false;
+        }
+
+
+        if (!validateTextField(expectedPost)) {
+            isValid = false;
+        }
+
+
+        // -----------------------------------------------------
+        // REMARKS
+        // -----------------------------------------------------
+        // Remarks is OPTIONAL according to your current HTML
+        // because there is no * beside Remarks.
+        //
+        // Therefore we are NOT validating Remarks here.
+        //
+        // If Remarks should be mandatory, use:
+        //
+        // const remarks = document.getElementById("remarks");
+        //
+        // if (!validateTextField(remarks)) {
+        //     isValid = false;
+        // }
+
+
+        // -----------------------------------------------------
+        // STOP SUBMISSION IF INVALID
+        // -----------------------------------------------------
+
+        if (!isValid) {
+
+            event.preventDefault();
+
+
+            const firstInvalid =
+                document.querySelector(
+                    "#groundWaterDepthArea .is-invalid"
+                );
+
+
+            if (firstInvalid) {
+
+                firstInvalid.focus();
+
+            }
+
+
+            return false;
+        }
+
+
+        // -----------------------------------------------------
+        // ALL VALID
+        // -----------------------------------------------------
+
+        return true;
+
+    });
+
+
+    // =========================================================
+    // EDIT BUTTON
+    // =========================================================
+
+    document.addEventListener("click", function (e) {
+
+        const editBtn =
+            e.target.closest(".editBtn");
+
+
+        if (!editBtn) {
+            return;
+        }
+
+
+        document.getElementById("editId").value =
+            editBtn.dataset.id;
+
+
+        document.getElementById("editDistrict").value =
+            editBtn.dataset.district;
+
+
+        document.getElementById("editProject").value =
+            editBtn.dataset.project;
+
+
+        document.getElementById("editWatershed").value =
+            editBtn.dataset.watershed;
+
+
+        document.getElementById("editVillage").value =
+            editBtn.dataset.village;
+
+
+        const sourceId =
+            editBtn.dataset.sourceId;
+
+
+        document.querySelectorAll(".editSourceRadio")
+            .forEach(function (radio) {
+
+                radio.checked =
+                    radio.value === sourceId;
+
+            });
+
+
+        document.getElementById("editPreProject").value =
+            editBtn.dataset.preProject;
+
+
+        document.getElementById("editPostProject").value =
+            editBtn.dataset.postProject;
+
+
+        document.getElementById("editRemarks").value =
+            editBtn.dataset.remarks;
+
+    });
+
+
+});
 </script>
 
 </head>
@@ -351,24 +944,36 @@ document.addEventListener("click", function (e) {
 						<label>District Name:</label><span class="required">*</span>
 					</div>
 					<div class="col-md-3">
-						<select id="district" name="district"
-							class="form-control form-control-sm" required>
-							<option value="">--Select District--</option>
-							<th:block th:each="dist : ${distList}">
-								<option th:value="${dist.dcode}" th:text="${dist.distName}">
-								</option>
-							</th:block>
-						</select>
-					</div>
+    <select id="district"
+            name="district"
+            class="form-control form-control-sm">
+        <option value="">--Select District--</option>
+        <th:block th:each="dist : ${distList}">
+            <option th:value="${dist.dcode}"
+                    th:text="${dist.distName}">
+            </option>
+        </th:block>
+    </select>
+
+    <div class="invalid-feedback">
+        Please select District.
+    </div>
+</div>
 
 					<div class="col-md-2">
 						<label>Project Name:</label><span class="required">*</span>
 					</div>
 					<div class="col-md-3">
-						<select id="project" name="project" class="form-control form-control-sm" required>
-							   <option value="">--Select Project--</option>
-						</select>
-					</div>
+    <select id="project"
+            name="project"
+            class="form-control form-control-sm">
+        <option value="">--Select Project--</option>
+    </select>
+
+    <div class="invalid-feedback">
+        Please select Project.
+    </div>
+</div>
 				</div>
 				
 				<div class="row mb-4">
@@ -376,67 +981,124 @@ document.addEventListener("click", function (e) {
 						<label>Micro Watershed Name:</label><span class="required">*</span>
 					</div>
 					<div class="col-md-3">
-						<select id="watershed" name="watershed"
-							class="form-control form-control-sm" required>
-							<option value="">--Select Micro Watershed--</option>
-						</select>
-					</div>
+    <select id="watershed"
+            name="watershed"
+            class="form-control form-control-sm">
+        <option value="">--Select Micro Watershed--</option>
+    </select>
+
+    <div class="invalid-feedback">
+        Please select Micro Watershed.
+    </div>
+</div>
 
 					<div class="col-md-2">
 						<label>Village Name:</label><span class="required">*</span>
 					</div>
 					<div class="col-md-3">
-						<select id="village" name="village" class="form-control form-control-sm" required>
-							    <option value="">--Select Village--</option>
-						</select>
-					</div>
+    <select id="village"
+            name="village"
+            class="form-control form-control-sm">
+        <option value="">--Select Village--</option>
+    </select>
+
+    <div class="invalid-feedback">
+        Please select Village.
+    </div>
+</div>
 
 				</div>
 				
 				
 				<div class="row mb-4 align-items-center">
-    				<label class="col-md-3 fw-bold">Sources:<span class="required">*</span></label>
-    				<div class="col-md-9">
-        				<div th:each="ws : ${mWaterSource}" class="form-check form-check-inline me-5">
-            				<input class="form-check-input" type="radio" name="sourceTypeId" th:value="${ws.waterSourceId}" required/>
-            		<label class="form-check-label" th:text="${ws.sourceName}"></label>
-        			</div>
-        			<div class="invalid-feedback" style="display:none;">Please select Sources.</div>
-    				</div>
-				</div>
+    <label class="col-md-3 fw-bold">
+        Sources:<span class="required">*</span>
+    </label>
+
+    <div class="col-md-9">
+
+        <div th:each="ws : ${mWaterSource}"
+             class="form-check form-check-inline me-5">
+
+            <input class="form-check-input"
+                   type="radio"
+                   name="sourceTypeId"
+                   th:value="${ws.waterSourceId}"/>
+
+            <label class="form-check-label"
+                   th:text="${ws.sourceName}">
+            </label>
+
+        </div>
+
+        <div class="invalid-feedback" style="display:none;">
+            Please select Sources.
+        </div>
+
+    </div>
+</div>
 				
 				 <div class="row mb-2">
-					<div class="col-md-3">
-						<label>Pre-Project Level:</label><span
-							class="required">*</span>
-					</div>
-					<div class="col-md-5">
-						<input type="text" name="pre_project" id="pre_project" autocomplete="off" 
-							class="form-control form-control-sm"  maxlength = "10" required />
-					</div>
-				</div>
+    <div class="col-md-3">
+        <label>
+            Pre-Project Level:
+        </label>
+        <span class="required">*</span>
+    </div>
+
+    <div class="col-md-5">
+        <input type="text"
+               name="pre_project"
+               id="pre_project"
+               autocomplete="off"
+               class="form-control form-control-sm"
+               oninput="validateDecimal(this, 10, 4)" />
+
+        <div class="invalid-feedback">
+            Please enter Pre-Project Level.
+        </div>
+    </div>
+</div>
 				
 				<div class="row mb-2">
-					<div class="col-md-3">
-						<label>Expected post project Level:</label><span
-							class="required">*</span>
-					</div>
-					<div class="col-md-5">
-						<input type="text" name="expected_post" id="expected_post" autocomplete="off" 
-							class="form-control form-control-sm" maxlength = "10" required />
-					</div>
-				</div>
+    <div class="col-md-3">
+        <label>
+            Expected post project Level:
+        </label>
+        <span class="required">*</span>
+    </div>
+
+    <div class="col-md-5">
+        <input type="text"
+               name="expected_post"
+               id="expected_post"
+               autocomplete="off"
+               class="form-control form-control-sm"
+               oninput="validateDecimal(this, 10, 4)" />
+
+        <div class="invalid-feedback">
+            Please enter Expected Post-Project Level.
+        </div>
+    </div>
+</div>
 				
 				<div class="row mb-2">
-					<div class="col-md-3">
-						<label>Remarks:</label>
-					</div>
-					<div class="col-md-5">
-						<textarea name="remarks" id="remarks" autocomplete="off" 
-							class="form-control form-control-sm"  rows="4" maxlength = "500" required ></textarea>
-							
-					</div>
-				</div>	
+    <div class="col-md-3">
+        <label>Remarks:</label>
+       
+    </div>
+
+    <div class="col-md-5">
+        <textarea name="remarks"
+                  id="remarks"
+                  autocomplete="off"
+                  class="form-control form-control-sm"
+                  rows="4"
+                  maxlength="500"></textarea>
+
+       
+    </div>
+</div>
 				<div class="text-center mt-4">
 						<button type="submit" name="action" value="D" class="btn btn-warning"><i class="fas fa-save"></i> Save as Draft
 						</button>
@@ -501,7 +1163,7 @@ document.addEventListener("click", function (e) {
                     <div class="col-md-6 mb-3">
 
                             <label class="form-label fw-bold">
-                                District Name
+                                District Name<span class="required">*</span>
                             </label>
 
                             <input type="text"
@@ -514,7 +1176,7 @@ document.addEventListener("click", function (e) {
                         <div class="col-md-6 mb-3">
 
                             <label class="form-label fw-bold">
-                                Project Name
+                                Project Name<span class="required">*</span>
                             </label>
 
                             <input type="text"
@@ -527,7 +1189,7 @@ document.addEventListener("click", function (e) {
                         <div class="col-md-6 mb-3">
 
                             <label class="form-label fw-bold">
-                                Micro Watershed
+                                Micro Watershed<span class="required">*</span>
                             </label>
 
                             <input type="text"
@@ -540,7 +1202,7 @@ document.addEventListener("click", function (e) {
                         <div class="col-md-6 mb-3">
 
                             <label class="form-label fw-bold">
-                                Village Name
+                                Village Name<span class="required">*</span>
                             </label>
 
                             <input type="text"

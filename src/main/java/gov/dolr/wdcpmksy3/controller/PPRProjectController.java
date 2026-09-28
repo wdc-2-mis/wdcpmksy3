@@ -87,7 +87,7 @@ public class PPRProjectController {
 	    model.addAttribute("statename", statename);
 	    model.addAttribute("stcode", stcode);
 
-	    List<MPpr> records = pprRepo.findAllOrderByStatusAndId();
+	    List<MPpr> records = pprRepo.findByStateOrdered(stcode);
 	    model.addAttribute("records", records);
 
 	    return "ppr/pprDistrict";

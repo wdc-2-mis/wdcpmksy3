@@ -405,8 +405,17 @@ document.addEventListener("DOMContentLoaded", function () {
 		========================================================== */
 		document.addEventListener("DOMContentLoaded", function () {
 			document.getElementById("district").addEventListener("change", function () {
+		 let dcode = this.value;	
+			
+document.getElementById('nextBtn').addEventListener('click', function() {
+    const dcode = document.getElementById('districtSelect').value;
+    if (dcode) {
+        window.location.href = '/landPatternArea?dcode=' + dcode;
+    }
+});
 
-    let dcode = this.value;
+
+   
 
     let project = document.getElementById("project");
 
@@ -830,7 +839,16 @@ document.getElementById("proposedAreaOthers")
 						</button>
 					</div>
 
+<div class="text-end mt-2" id="nextBtnContainer" style="display:none;">
+    <button type="button" id="nextBtn" class="btn btn-primary">
+        Land Pattern Area
+        <i class="fas fa-arrow-right ms-1"></i>
+    </button>
+</div>
 
+		
+		
+					
 				</form>
 
 

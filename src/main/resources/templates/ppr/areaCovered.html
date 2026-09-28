@@ -175,7 +175,7 @@
 				<div class="row mb-2">
     				<div class="col-md-2"></div>
     				<div class="col-md-3 fw-bold text-center">No.</div>
-    				<div class="col-md-3 fw-bold text-center">Area</div>
+    				<div class="col-md-3 fw-bold text-center">Area (in ha.)</div>
 				</div>
 
               <th:block th:each="scheme : ${schemeList}">
@@ -240,7 +240,7 @@
 							
 							<div class="text-end mt-2"
      id="nextBtnContainer"
-     style="display: none;">
+     th:if="${selectedDcode != null}">
 
     <button type="button"
             id="nextBtn"

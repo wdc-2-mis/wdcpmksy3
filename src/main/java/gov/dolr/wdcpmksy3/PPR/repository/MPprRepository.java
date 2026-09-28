@@ -24,9 +24,12 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 	MPpr findByDistrict_Dcode(Integer district);
 	
 	List<MPpr> findByDistrict_DcodeAndStatusOrderByProjectNameAsc(Integer dcode, String status);
+	
+	@Query("SELECT p FROM MPpr p " +
+		       "WHERE p.district.state.stCode = :stcode " +
+		       "ORDER BY CASE WHEN p.status = 'C' THEN 1 ELSE 0 END, p.pprId ASC")
+		List<MPpr> findByStateOrdered(@Param("stcode") Integer stcode);
 
-	@Query("SELECT p FROM MPpr p ORDER BY CASE WHEN p.status = 'C' THEN 1 ELSE 0 END, p.pprId ASC")
-	List<MPpr> findAllOrderByStatusAndId();
 
 	boolean existsByDistrict_DcodeAndStatus(Integer dcode, String status);
 
