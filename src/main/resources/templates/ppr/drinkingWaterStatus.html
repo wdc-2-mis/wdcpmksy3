@@ -48,6 +48,242 @@
 
 	document.addEventListener("DOMContentLoaded", function () {
 		
+		
+				const form1 = document.getElementById("drinkingWater");
+
+				   if (!form1) {
+				       return;
+				   }
+
+				   form1.addEventListener("submit", function (e) {
+
+				       let isValid = true;
+
+				       // ==========================================
+				       // District
+				       // ==========================================
+
+				       const district = document.getElementById("district");
+
+				       if (district.value === "") {
+
+				           district.classList.add("is-invalid");
+				           district.classList.remove("is-valid");
+
+				           isValid = false;
+
+				       } else {
+
+				           district.classList.remove("is-invalid");
+				           district.classList.add("is-valid");
+				       }
+
+
+				       // ==========================================
+				       // Project
+				       // ==========================================
+
+				       const project = document.getElementById("project");
+
+				       if (project.value === "") {
+
+				           project.classList.add("is-invalid");
+				           project.classList.remove("is-valid");
+
+				           isValid = false;
+
+				       } else {
+
+				           project.classList.remove("is-invalid");
+				           project.classList.add("is-valid");
+				       }
+
+
+				       // ==========================================
+				       // village
+				       // ==========================================
+
+				       const village = document.getElementById("village");
+
+				       if (village.value === "") {
+
+				           village.classList.add("is-invalid");
+				           village.classList.remove("is-valid");
+
+				           isValid = false;
+
+				       } else {
+
+				           village.classList.remove("is-invalid");
+				           village.classList.add("is-valid");
+				       }
+					   
+					   
+					   const watershed = document.getElementById("watershed");
+
+					   if (watershed.value === "") {
+
+						   watershed.classList.add("is-invalid");
+						   watershed.classList.remove("is-valid");
+
+						   isValid = false;
+
+					   } else {
+
+						   watershed.classList.remove("is-invalid");
+						   watershed.classList.add("is-valid");
+					   }
+					   
+					   const preQualityId = document.querySelector('input[name="preQualityId"]:checked');
+
+					   const schemeError =
+						   document.getElementById("schemeError");
+
+					   if (!preQualityId) {
+
+						   schemeError.style.display = "block";
+
+						   isValid = false;
+
+					   } else {
+
+						   schemeError.style.display = "none";
+					   }
+					   
+					   const postQualityId = document.querySelector('input[name="postQualityId"]:checked');
+
+					   const schemeError1 =
+						   document.getElementById("schemeError1");
+
+					   if (!postQualityId) {
+
+						   schemeError1.style.display = "block";
+
+						   isValid = false;
+
+					   } else {
+
+						   schemeError1.style.display = "none";
+					   }
+				       // ==========================================
+				       // Helper function for text fields
+				       // ==========================================
+
+				       function validateTextField(element) {
+
+				           if (element.value.trim() === "") {
+
+				               element.classList.add("is-invalid");
+				               element.classList.remove("is-valid");
+
+				               isValid = false;
+
+				           } else {
+
+				               element.classList.remove("is-invalid");
+				               element.classList.add("is-valid");
+				           }
+				       }
+
+
+				       // ==========================================
+				       // Numeric / Area fields
+				       // ==========================================
+					   
+				       validateTextField(
+				           document.getElementById("preQualityWater")
+				       );
+
+				       validateTextField(
+				           document.getElementById("postQualityWater")
+				       );
+
+				       // ==========================================
+				       // Stop form submission if invalid
+				       // ==========================================
+
+				       if (!isValid) {
+
+				           e.preventDefault();
+				           e.stopPropagation();
+
+				           // Scroll to first invalid field
+				           const firstInvalid =
+				               form1.querySelector(".is-invalid");
+
+				           if (firstInvalid) {
+
+				               firstInvalid.scrollIntoView({
+				                   behavior: "smooth",
+				                   block: "center"
+				               });
+
+				               firstInvalid.focus();
+				           }
+
+				           return false;
+				       }
+
+				   });
+				   
+				   const fields = form1.querySelectorAll(
+				          "input, select"
+				   );
+				   
+				   fields.forEach(function (field) {
+
+					field.addEventListener("change", function () {
+
+						if (field.value.trim() !== "") {
+
+							field.classList.remove("is-invalid");
+							field.classList.add("is-valid");
+
+						}
+
+					});
+
+					field.addEventListener("input", function () {
+
+						if (field.value.trim() !== "") {
+
+							field.classList.remove("is-invalid");
+							field.classList.add("is-valid");
+
+						}
+
+					});
+					
+					document.querySelectorAll('input[name="preQualityId"]')
+						   .forEach(function (radio) {
+
+							   radio.addEventListener("change", function () {
+
+								   document.getElementById(
+									   "schemeError"
+								   ).style.display = "none";
+
+							   });
+
+						   });
+						   document.querySelectorAll('input[name="postQualityId"]')
+						   .forEach(function (radio) {
+
+							   radio.addEventListener("change", function () {
+
+								   document.getElementById(
+									   "schemeError1"
+								   ).style.display = "none";
+
+							   });
+
+						   });	   
+
+				});
+		
+		
+		
+		
 			var editModal = document.getElementById('editModal');
 		   	editModal.addEventListener('show.bs.modal', function (event) {
 		       var button = event.relatedTarget;
@@ -218,7 +454,7 @@
 
 	    const form = document.getElementById("drinkingWater");
 
-	    form.addEventListener("submit", function (e) {
+	    form.addEventListener("submit1", function (e) {
 
 			const district = document.getElementsByName("district")[0];  
 	        const project = document.getElementsByName("project")[0]; 
@@ -382,7 +618,7 @@
 		    <span th:text="${error}"></span>
 		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
+		<!--<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
 		
 			<i class="fas fa-exclamation-triangle me-2"></i>
 		
@@ -396,10 +632,10 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert">
 			</button>
 		
-		</div>
+		</div>-->
         <div class="card-body">
 
-             <form id="drinkingWater" th:action="@{/saveDrinkingWaterStatus}" method="post">
+             <form id="drinkingWater" th:action="@{/saveDrinkingWaterStatus}" method="post" novalidate>
 				
 				<div class="row g-4">
 					
@@ -413,7 +649,7 @@
 									<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
 								</th:block>
 							</select>
-
+							<div class="invalid-feedback">Please select a District.</div>
 				       	</div>
 						
 						<div class="col-md-6">
@@ -423,6 +659,7 @@
 							<select id="project" name="project" class="form-select">
 								<option value="">--Select Project--</option>
 							</select>
+							<div class="invalid-feedback">Please select a Project.</div>
 						</div>
 				        <div class="col-md-6">
 							<label class="form-label">
@@ -431,6 +668,7 @@
 							<select id="watershed" name="watershed" class="form-select">
 							    <option value="">--Select Micro Watershed--</option>
 							</select>
+							<div class="invalid-feedback">Please select a Micro Watershed.</div>
 				        </div>
 						<div class="col-md-6">
 							<label class="form-label">
@@ -439,6 +677,7 @@
 							<select id="village" name="village" class="form-select">
 							    <option value="">--Select Village--</option>
 							</select>
+							<div class="invalid-feedback">Please select a Village.</div>
 						</div>
 						
 						<div class="col-md-12">
@@ -455,6 +694,7 @@
 							</label>
 							<input type="text" name="preQualityWater" id="preQualityWater" class="form-control" 
 							style="height:40px; width: 300px;" oninput="validateInteger(this,2)"  >
+							<div class="invalid-feedback">Please enter Availability of Water (No. of month in a year) .</div>
 						
 						</div>
 				       	
@@ -479,6 +719,11 @@
 						            </label>
 						        </div>
 						    </div>
+							<div id="schemeError"
+							            class="text-danger small mt-1"
+							            style="display:none;">
+							           Please select Pre-Project Quality of Water.
+							       </div>
 						</div>
 						
 						<div class="col-md-12">
@@ -495,6 +740,7 @@
 							</label>
 							<input type="text" name="postQualityWater" id="postQualityWater" class="form-control" style="height:40px; width: 300px;"
 								oninput="validateInteger(this,2)">
+								<div class="invalid-feedback">Please enter Expected Availability of Water (No. of month in a year)</div>
 						
 						</div>
 						<div class="col-md-6">
@@ -516,6 +762,9 @@
 						            </label>
 						        </div>
 						    </div>
+							<div id="schemeError1" class="text-danger small mt-1" style="display:none;">
+								Please select Post-Project Quality of Water.
+							</div>
 						</div>
 						
 						<div class="col-md-6"> 		</div>				 
@@ -523,7 +772,7 @@
 				</div>
 				
 						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning" th:disabled="${!existssl}">
+							<button type="submit" name="action"  value="D" class="btn btn-warning" >
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>

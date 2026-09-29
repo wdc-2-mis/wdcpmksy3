@@ -355,6 +355,17 @@ public class PprAreaCoverService {
 	    return wcarearepo.changeStatusByPprId(pprId);
 	}
 
-	
+	public void skipAreaCover(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprWatershedCoveredArea entity = new PprWatershedCoveredArea(); 
+    	MPpr ppr = pprRepo.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus("S"); 
+    	entity.setCreatedBy(userId); 
+    	entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+        wcarearepo.save(entity);
+    }
 
 }

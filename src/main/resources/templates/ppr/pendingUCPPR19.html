@@ -379,7 +379,7 @@
 		    <span th:text="${error}"></span>
 		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
+		<!--<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
 		
 			<i class="fas fa-exclamation-triangle me-2"></i>
 		
@@ -393,7 +393,7 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert">
 			</button>
 		
-		</div>
+		</div>-->
         <div class="card-body">
 
              <form id="drinkingWater" th:action="@{/savePendingUCPPR19}" method="post">
@@ -555,7 +555,7 @@
 				</div>
 				
 						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning" th:disabled="${!existssl}">
+							<button type="submit" name="action"  value="D" class="btn btn-warning" >
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>

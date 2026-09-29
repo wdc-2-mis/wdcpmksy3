@@ -45,10 +45,226 @@
 
 
 <script>
-	
-	
-
 	document.addEventListener("DOMContentLoaded", function () {
+		
+		const form1 = document.getElementById("livelihoodSummary");
+		       
+				   if (!form1) {
+				       return;
+				   }
+
+				   form1.addEventListener("submit", function (e) {
+
+				       let isValid = true;
+
+				       // ==========================================
+				       // District
+				       // ==========================================
+
+				       const district = document.getElementById("district");
+
+				       if (district.value === "") {
+
+				           district.classList.add("is-invalid");
+				           district.classList.remove("is-valid");
+
+				           isValid = false;
+
+				       } else {
+
+				           district.classList.remove("is-invalid");
+				           district.classList.add("is-valid");
+				       }
+					   
+					   const block = document.getElementById("block");
+
+					   if (block.value === "") {
+
+						   block.classList.add("is-invalid");
+						   block.classList.remove("is-valid");
+
+						   isValid = false;
+
+					   } else {
+
+						   block.classList.remove("is-invalid");
+						   block.classList.add("is-valid");
+					   }
+					   
+				       // ==========================================
+				       // Project
+				       // ==========================================
+
+				       const project = document.getElementById("project");
+
+				       if (project.value === "") {
+
+				           project.classList.add("is-invalid");
+				           project.classList.remove("is-valid");
+
+				           isValid = false;
+
+				       } else {
+
+				           project.classList.remove("is-invalid");
+				           project.classList.add("is-valid");
+				       }
+
+
+				       // ==========================================
+				       // village
+				       // ==========================================
+
+				       const village = document.getElementById("village");
+
+				       if (village.value === "") {
+
+				           village.classList.add("is-invalid");
+				           village.classList.remove("is-valid");
+
+				           isValid = false;
+
+				       } else {
+
+				           village.classList.remove("is-invalid");
+				           village.classList.add("is-valid");
+				       }
+					  
+						const watershed = document.getElementById("watershed");
+
+					   if (watershed.value === "") {
+
+						   watershed.classList.add("is-invalid");
+						   watershed.classList.remove("is-valid");
+
+						   isValid = false;
+
+					   } else {
+
+						   watershed.classList.remove("is-invalid");
+						   watershed.classList.add("is-valid");
+					   }			
+									
+					   const livact = document.getElementById("livact");
+
+					   if (livact.value === "") {
+
+						   livact.classList.add("is-invalid");
+						   livact.classList.remove("is-valid");
+
+						   isValid = false;
+
+					   } else {
+
+						   livact.classList.remove("is-invalid");
+						   livact.classList.add("is-valid");
+					   }
+					   
+					   const livinv = document.getElementById("livinv");
+
+					   if (livinv.value === "") {
+
+						   livinv.classList.add("is-invalid");
+						   livinv.classList.remove("is-valid");
+
+						   isValid = false;
+
+					   } else {
+
+						   livinv.classList.remove("is-invalid");
+						   livinv.classList.add("is-valid");
+					   }
+				      
+				       // ==========================================
+				       // Helper function for text fields
+				       // ==========================================
+
+				       function validateTextField(element) {
+
+				           if (element.value.trim() === "") {
+
+				               element.classList.add("is-invalid");
+				               element.classList.remove("is-valid");
+
+				               isValid = false;
+
+				           } else {
+
+				               element.classList.remove("is-invalid");
+				               element.classList.add("is-valid");
+				           }
+				       }
+
+
+				       // ==========================================
+				       // Numeric / Area fields
+				       // ==========================================
+					  
+				       validateTextField(
+				           document.getElementById("migrat")
+				       );
+
+				       validateTextField(
+				           document.getElementById("reason")
+				       );
+
+				       // ==========================================
+				       // Stop form submission if invalid
+				       // ==========================================
+
+				       if (!isValid) {
+
+				           e.preventDefault();
+				           e.stopPropagation();
+
+				           // Scroll to first invalid field
+				           const firstInvalid =
+				               form1.querySelector(".is-invalid");
+
+				           if (firstInvalid) {
+
+				               firstInvalid.scrollIntoView({
+				                   behavior: "smooth",
+				                   block: "center"
+				               });
+
+				               firstInvalid.focus();
+				           }
+
+				           return false;
+				       }
+
+				   });
+				   
+				   const fields = form1.querySelectorAll(
+				          "input, select"
+				   );
+				   
+				   fields.forEach(function (field) {
+
+					field.addEventListener("change", function () {
+
+						if (field.value.trim() !== "") {
+
+							field.classList.remove("is-invalid");
+							field.classList.add("is-valid");
+
+						}
+
+					});
+
+					field.addEventListener("input", function () {
+
+						if (field.value.trim() !== "") {
+
+							field.classList.remove("is-invalid");
+							field.classList.add("is-valid");
+
+						}
+
+					});
+
+				});
 		
 			var editModal = document.getElementById('editModal');
 		   	editModal.addEventListener('show.bs.modal', function (event) {
@@ -258,7 +474,7 @@
 
 	    const form = document.getElementById("livelihoodSummary");
 
-	    form.addEventListener("submit", function (e) {
+	    form.addEventListener("submit1", function (e) {
 
 			const district = document.getElementsByName("district")[0];  
 			const block = document.getElementsByName("block")[0];
@@ -465,7 +681,7 @@
 		    <span th:text="${error}"></span>
 		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
+		<!--<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
 		
 			<i class="fas fa-exclamation-triangle me-2"></i>
 		
@@ -479,10 +695,10 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert">
 			</button>
 		
-		</div>
+		</div>-->
         <div class="card-body">
 
-             <form id="livelihoodSummary" th:action="@{/saveLivelihoodSummaryPPR13}" method="post">
+             <form id="livelihoodSummary" th:action="@{/saveLivelihoodSummaryPPR13}" method="post" novalidate>
 				
 				<div class="row g-4">
 					
@@ -496,7 +712,7 @@
 											<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
 										</th:block>
 								</select>
-
+								<div class="invalid-feedback">Please select a District.</div>
 				       	</div>
 						<div class="col-md-4">
 							<label class="form-label">
@@ -505,6 +721,7 @@
 							<select id="block" name="block" class="form-select" required>
 								<option value="">--Select Block--</option>
 							</select>
+							<div class="invalid-feedback">Please select a Block.</div>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label">
@@ -512,7 +729,8 @@
 							</label>
 							<select id="project" name="project" class="form-select" required>
 								<option value="">--Select Project--</option>
-							</select>					
+							</select>	
+							<div class="invalid-feedback">Please select a Project.</div>				
 						</div>
 				        <div class="col-md-4">
 							<label class="form-label">
@@ -521,6 +739,7 @@
 							<select id="watershed" name="watershed" class="form-select" required>
 							    <option value="">--Select Micro Watershed--</option>
 							</select>
+							<div class="invalid-feedback">Please select a Micro Watershed.</div>
 				        </div>
 						<div class="col-md-4">
 							<label class="form-label">
@@ -529,6 +748,7 @@
 							<select id="village" name="village" class="form-select" required>
 							    <option value="">--Select Village--</option>
 							</select>
+							<div class="invalid-feedback">Please select Village</div>
 						</div>
 						
 						<div class="col-md-12"></div>
@@ -544,6 +764,7 @@
 											</option>
 									</th:block>
 							</select>
+							<div class="invalid-feedback">Please select Livelihood Activities</div>
 							<div id="livactDisplay" class="mt-2 text-primary"></div>
 						</div>
 						<div class="col-md-6">
@@ -558,6 +779,7 @@
 											</option>
 									</th:block>
 							</select>
+							<div class="invalid-feedback">Please select Livelihood Interventions under Project</div>
 							 <div id="livinvDisplay" class="mt-2 text-primary"></div>
 						</div>
 						<div class="col-md-6">
@@ -565,7 +787,7 @@
 									<b>Current Migration Status (No. of People)</b> <span class="required">*</span>
 							</label>
 							<input type="text" name="migrat" id="migrat" class="form-control" style="height:40px; width: 300px;" oninput="validateInteger(this,10)" required>
-						
+							<div class="invalid-feedback">Please Enter Current Migration Status (No. of People)</div>
 						</div>
 				       	
 						 
@@ -574,6 +796,7 @@
 				                  <b>Main reason of Migration</b> <span class="required">*</span>
 				               </label>
 							  <textarea name="reason" id="reason" class="form-control" rows="2" required></textarea>
+							  <div class="invalid-feedback">Please Enter Main reason of Migration</div>
 				        </div>
 						 
 						
@@ -582,7 +805,7 @@
 				</div>
 				
 						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning" th:disabled="${!existssl}">
+							<button type="submit" name="action"  value="D" class="btn btn-warning" >
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>

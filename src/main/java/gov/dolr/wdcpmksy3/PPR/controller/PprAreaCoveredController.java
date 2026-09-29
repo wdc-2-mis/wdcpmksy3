@@ -196,4 +196,17 @@ public class PprAreaCoveredController {
 
 	    return "redirect:/areaCoveredUnderWP";
 	}
+	
+	@GetMapping("/skipAreaCover")
+    public String skipAreaCover(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+	        pprAreaService.skipAreaCover(pprid, userId, servletRequest);
+           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+	    } catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+	    }
+         return "redirect:/viewPPR";
+    }
 }

@@ -328,6 +328,7 @@
 										<a th:href="@{/pprDistrict}" class="btn btn-primary btn-sm btn-blink">
 											<i class="fas fa-plus"></i> Add Details
 										</a>
+										
 									</div>
 								</td>
 							</tr>
@@ -416,6 +417,13 @@
 												class="btn btn-primary btn-sm btn-blink">
 												<i class="fas fa-plus"></i> Add Details
 											</a>
+											&nbsp; &nbsp;
+											<a title="skip"
+												th:href="@{/skipAreaCover(pprid=${selectedProject})}" class="btn btn-secondary"
+												onclick="return confirm('Are you sure you want to skip this PPR ?');">
+												<i class="fas fa-skip">Skip</i>
+											</a>
+											
 										</div>
 									</td>
 								</tr>

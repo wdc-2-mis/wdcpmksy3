@@ -19,11 +19,11 @@ public class PprWatershedCoveredArea {
     private MPpr ppr;
 
     @ManyToOne
-    @JoinColumn(name = "mw_id", nullable = false)
+    @JoinColumn(name = "mw_id", nullable = true)
     private MicroWatershed microWatershed;
 
     @ManyToOne
-    @JoinColumn(name = "scheme_id", nullable = false)
+    @JoinColumn(name = "scheme_id", nullable = true)
     private MScheme scheme;
 
     @Column(name = "no_mw")

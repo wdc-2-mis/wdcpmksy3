@@ -48,6 +48,164 @@
 
 	document.addEventListener("DOMContentLoaded", function () {
 		
+		const form1 = document.getElementById("drinkingWater");
+
+		if (!form1) {
+			return;
+		}
+
+		form1.addEventListener("submit", function (e) {
+
+			let isValid = true;
+
+			// ==========================================
+			// District
+			// ==========================================
+
+			const district = document.getElementById("district");
+
+			if (district.value === "") {
+
+				district.classList.add("is-invalid");
+				district.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				district.classList.remove("is-invalid");
+				district.classList.add("is-valid");
+			}
+
+
+			// ==========================================
+			// Project
+			// ==========================================
+
+			const project = document.getElementById("project");
+
+			if (project.value === "") {
+
+				project.classList.add("is-invalid");
+				project.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				project.classList.remove("is-invalid");
+				project.classList.add("is-valid");
+			}
+
+			// ==========================================
+			// Helper function for text fields
+			// ==========================================
+
+			function validateTextField(element) {
+
+				if (element.value.trim() === "") {
+
+					element.classList.add("is-invalid");
+					element.classList.remove("is-valid");
+
+					isValid = false;
+
+				} else {
+
+					element.classList.remove("is-invalid");
+					element.classList.add("is-valid");
+				}
+			}
+
+
+			// ==========================================
+			// Numeric / Area fields
+			// ==========================================
+
+			validateTextField(
+				document.getElementById("totcost")
+			);
+
+			validateTextField(
+				document.getElementById("state")
+			);
+			
+			validateTextField(
+				document.getElementById("dolr")
+			);
+
+			validateTextField(
+				document.getElementById("interest")
+			);
+
+			validateTextField(
+				document.getElementById("total")
+			);
+
+			validateTextField(
+				document.getElementById("balance")
+			);
+
+			// ==========================================
+			// Stop form submission if invalid
+			// ==========================================
+
+			if (!isValid) {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				// Scroll to first invalid field
+				const firstInvalid =
+					form1.querySelector(".is-invalid");
+
+				if (firstInvalid) {
+
+					firstInvalid.scrollIntoView({
+						behavior: "smooth",
+						block: "center"
+					});
+
+					firstInvalid.focus();
+				}
+
+				return false;
+			}
+
+		});
+
+		const fields = form1.querySelectorAll(
+			"input, select"
+		);
+
+		fields.forEach(function (field) {
+
+			field.addEventListener("change", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+			field.addEventListener("input", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+		});
+				
+				
+		
 			var editModal = document.getElementById('editModal');
 		   	editModal.addEventListener('show.bs.modal', function (event) {
 		       var button = event.relatedTarget;
@@ -150,7 +308,7 @@
 
 	    const form = document.getElementById("drinkingWater");
 
-	    form.addEventListener("submit", function (e) {
+	    form.addEventListener("submit1", function (e) {
 
 			const district = document.getElementsByName("district")[0];  
 	        const project = document.getElementsByName("project")[0]; 
@@ -291,7 +449,7 @@
 									<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
 								</th:block>
 							</select>
-
+							<div class="invalid-feedback">Please select a District.</div>
 				       	</div>
 						
 						<div class="col-md-6">
@@ -301,6 +459,7 @@
 							<select id="project" name="project" class="form-select">
 								<option value="">--Select Project--</option>
 							</select>
+							<div class="invalid-feedback">Please select a Project.</div>
 						</div>
 				       
 						<div class="col-md-6">
@@ -309,6 +468,7 @@
 							</label>
 							<input type="text" name="totcost" id="totcost" class="form-control" 
 									style="height:40px; width: 300px;" oninput="validateDecimal(this,11,5)" >
+							<div class="invalid-feedback">Please Enter Total Cost (Rs in Lakh) .</div>
 						</div>
 						
 						<div class="col-md-12">
@@ -323,6 +483,7 @@
 							<div class="d-flex align-items-center gap-4">
 								<input type="text" name="state" id="state" class="form-control" style="height:40px; width: 300px;"
 									oninput="validateDecimal(this,11,5)">
+								<div class="invalid-feedback">Please Enter Total State Fund Released (Rs in Lakh)</div>
 							</div>
 							
 						</div>
@@ -334,16 +495,18 @@
 						    <div class="d-flex align-items-center gap-4">
 								<input type="text" name="dolr" id="dolr" class="form-control"
 									style="height:40px; width: 300px;" oninput="validateDecimal(this,11,5)">
+								<div class="invalid-feedback">Please Enter Total DoLR Fund Released (Rs in Lakh)</div>
 						    </div>
 						</div>
 												
 						<div class="col-md-6">
 							<label class="form-label">
-								Interest <span class="required">*</span>
+								Interest (Rs in Lakh)  <span class="required">*</span>
 							</label>
 							<div class="d-flex align-items-center gap-4">
 								<input type="text" name="interest" id="interest" class="form-control" style="height:40px; width: 300px;"
 										oninput="validateDecimal(this,11,2)">
+										<div class="invalid-feedback">Please Enter Total Interest</div>		
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -354,6 +517,7 @@
 							<div class="d-flex align-items-center gap-4">
 								<input type="text" name="total" id="total" class="form-control" style="height:40px; width: 300px;"
 									oninput="validateDecimal(this,11,5)">
+									<div class="invalid-feedback">Please Enter Total (Rs in Lakh) </div>	
 							</div>
 						</div>
 						
@@ -365,6 +529,7 @@
 							<div class="d-flex align-items-center gap-4">
 								<input type="text" name="balance" id="balance" class="form-control" style="height:40px; width: 300px;"
 									oninput="validateDecimal(this,11,5)">
+									<div class="invalid-feedback">Please Enter Unspent Balance (Rs in Lakh) </div>
 							</div>
 						</div>
 						 	
@@ -375,8 +540,13 @@
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>
+							<!-- &nbsp;&nbsp;&nbsp;&nbsp;
+							<button type="submit" name="action" value="skip" formnovalidate class="btn btn-secondary">
+								Skip
+							</button>-->
+							
 						</div>
-				
+						
             </form>
 
         </div>
@@ -525,7 +695,7 @@
 							
 								<div class="col-md-6">
 									<label class="form-label">
-										Interest <span class="required">*</span>
+										Interest (Rs in Lakh)<span class="required">*</span>
 									</label>
 									<div class="d-flex align-items-center gap-4">
 										<input type="text" name="interest1" id="interest1" class="form-control" style="height:40px; width: 300px;"

@@ -62,6 +62,9 @@ public class MPpr {
     @OneToMany(mappedBy = "ppr", cascade = CascadeType.ALL,  orphanRemoval = true)
     private List<PprAgroClimate> agroClimateList = new ArrayList<PprAgroClimate>();
     
+    @OneToMany(mappedBy = "ppr", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MSanction> sanctions = new ArrayList<>();
+    
     public String getMicroIdsCsv() {
         if (microWatersheds == null || microWatersheds.isEmpty()) {
             return "";
@@ -196,6 +199,14 @@ public class MPpr {
 
 	public void setPprSeqNo(Integer pprSeqNo) {
 		this.pprSeqNo = pprSeqNo;
+	}
+
+	public List<MSanction> getSanctions() {
+		return sanctions;
+	}
+
+	public void setSanctions(List<MSanction> sanctions) {
+		this.sanctions = sanctions;
 	}
     
 	

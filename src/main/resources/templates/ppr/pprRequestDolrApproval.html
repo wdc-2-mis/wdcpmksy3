@@ -21,6 +21,114 @@
 							window.location.href = "/pprRequestDolrApproval";
 						}
 					});
+					
+				const form1 = document.getElementById("approveForm");
+
+				if (!form1) {
+					return;
+				}
+
+				form1.addEventListener("submit", function (e) {
+
+					let isValid = true;
+					// ==========================================
+					// Helper function for text fields
+					// ==========================================
+
+					function validateTextField(element) {
+
+						if (element.value.trim() === "") {
+
+							element.classList.add("is-invalid");
+							element.classList.remove("is-valid");
+
+							isValid = false;
+
+						} else {
+
+							element.classList.remove("is-invalid");
+							element.classList.add("is-valid");
+						}
+					}
+
+					// ==========================================
+					// Numeric / Area fields
+					// ==========================================
+
+					validateTextField(
+						document.getElementById("preQualityWater")
+					);
+
+					validateTextField(
+						document.getElementById("postQualityWater")
+					);
+
+					// ==========================================
+					// Stop form submission if invalid
+					// ==========================================
+
+					if (!isValid) {
+
+						e.preventDefault();
+						e.stopPropagation();
+
+						// Scroll to first invalid field
+						const firstInvalid =
+							form1.querySelector(".is-invalid");
+
+						if (firstInvalid) {
+
+							firstInvalid.scrollIntoView({
+								behavior: "smooth",
+								block: "center"
+							});
+
+							firstInvalid.focus();
+						}
+
+						return false;
+					}
+
+				});
+
+				const fields = form1.querySelectorAll(
+					"input, select"
+				);
+				fields.forEach(function (field) {
+
+					field.addEventListener("change", function () {
+
+						if (field.value.trim() !== "") {
+
+							field.classList.remove("is-invalid");
+							field.classList.add("is-valid");
+
+						}
+
+					});
+
+					field.addEventListener("input", function () {
+
+						if (field.value.trim() !== "") {
+
+							field.classList.remove("is-invalid");
+							field.classList.add("is-valid");
+
+						}
+
+					});
+
+				});
+							
+								
+					
+					
+					
+					
+					
+					
+					
+					
 				});
 				
 				function openRemarksModal(element, action) {
@@ -51,6 +159,21 @@
 						} else if (action === "refer") {
 							window.location.href = "/referBackPprReqForAprov?id=" + encodeURIComponent(tranId) + "&remarks=" + encodeURIComponent(remarks);
 						}
+					}
+					
+					function openApprovalModal(element, action) {
+							const tranId = element.getAttribute("data-tranid");
+							const dist = element.getAttribute("data-district");
+							const pprname = element.getAttribute("data-ppr");
+							//const finyr = element.getAttribute("data-finyr");
+							
+							document.getElementById("pprid").value = tranId;
+							document.getElementById("distname").value = dist;
+							document.getElementById("pprname").value = pprname;
+							//document.getElementById("finyrname").value = finyr;
+							
+							const modal = new bootstrap.Modal(document.getElementById("ApproveModal"));
+							modal.show();
 					}
 					
 					document.addEventListener("DOMContentLoaded", function () {
@@ -220,10 +343,17 @@
 										onclick="openRemarksModal(this, 'refer')" class="btn btn-primary btn-sm">
 										Refer
 									</a>
-									<a th:href="@{/approvePprReqForAprov(id=${data.tranId})}"
-										class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to Approve this record?');">
+									
+									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}, data-district=${data.districtName}, data-ppr=${data.projectName}, data-finyr=${data.finYear}" 
+											onclick="openApprovalModal(this, 'A')"
+										class="btn btn-success btn-sm">
 										Approve
 									</a>
+									
+									<!--<a th:href="@{/approvePprReqForAprov(id=${data.tranId})}"
+										class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to Approve this record?');">
+										Approve
+									</a>-->
 								</div>
 				            </td>
 				        </tr>
@@ -258,6 +388,91 @@
 						</div>
 					</div>
 				</div>
+				<!-- ========================= -->
+				<!-- Approve PPR DETAILS  -->
+				<!-- ========================= -->
+				<div class="modal fade" id="ApproveModal">
+					<div class="modal-dialog modal-xl">
+						<div class="modal-content">
+							<div class="modal-header bg-primary text-white">
+								<h5>Approve PPR Details</h5>
+								<button class="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div class="modal-body">
+								<form id="approveForm" th:action="@{/approvePprReqForAprov}" method="post">
+									<input type="hidden" id="pprid" name="pprid">
+									<!-- Member Details -->
+									<div class="row g-4">
+										
+										<div class="col-md-6">
+											<label class="form-label">
+												<b> District Name</b><span class="required">*</span>
+											</label>
+											<input type="text" name="distname" id="distname" class="form-control" readonly>
+										
+										</div>
+																	
+										<div class="col-md-6">
+											<label class="form-label">
+												<b> PPR Name</b><span class="required">*</span>
+											</label>
+											<input type="text" name="pprname" id="pprname" class="form-control" readonly >
+										
+										</div>
+																	
+										<div class="col-md-6">
+											<label class="form-label">
+												<b> Proposed Area </b><span class="required">*</span>
+											</label>
+											<input type="text" name="areap" id="areap" class="form-control" style="height:40px; width: 300px;"												oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')" required>
+												<div class="invalid-feedback">Please enter Proposed Area</div>
+										</div>
+				
+										<div class="col-md-6">
+											<label class="form-label">
+												<b> Total Cost </b><span class="required">*</span>
+											</label>
+											<input type="text" name="cost" id="cost" class="form-control" style="height:40px; width: 300px;"
+												oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')" required>
+				
+										</div>
+										<div class="col-md-6">
+											<label class="form-label">
+												<b>Central Share</b> <span class="required">*</span>
+											</label>
+											<input type="text" name="central" id="central" class="form-control" style="height:40px; width: 300px;"
+												oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')" required>
+				
+										</div>
+										<div class="col-md-6">
+											<label class="form-label">
+												<b>State Share</b><span class="required">*</span>
+											</label>
+											<input type="text" name="state" id="state" class="form-control" style="height:40px; width: 300px;"
+												oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')" required>
+										</div>
+										
+									</div>
+									<div class="text-center mt-4">
+										<button type="submit" name="updateAction" class="btn btn-warning">
+											<i class="fas fa-save"></i>
+											Approve
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				
+				
+				
+				
+				
+				
+				
+				
 				<!-- ========================= -->
 				<!-- VIEW PPR DETAILS MODAL -->
 				<!-- ========================= -->

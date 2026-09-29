@@ -1,5 +1,6 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.PprWcdcUnspentBalanceRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PdfService;
 import gov.dolr.wdcpmksy3.PPR.service.PprProposedProjectService;
 import gov.dolr.wdcpmksy3.PPR.service.PprTransactionService;
+import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.CropOutcomeRepository;
@@ -57,6 +59,7 @@ import gov.dolr.wdcpmksy3.repository.PprProposedAreaRepository;
 import gov.dolr.wdcpmksy3.repository.ProfileProjection;
 import gov.dolr.wdcpmksy3.repository.UserMapRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -188,13 +191,13 @@ public class PprDolrApprovalController {
 		return "redirect:/pprRequestDolrApproval";
 	}
 	
-	@GetMapping("/approvePprReqForAprov")
+	@GetMapping("/approvePprReqForAprov1")
 	public String approvePprReqForAprov(@RequestParam("id") Integer tranId,
 			HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 
 		try {
 			Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
-			pprTransactionServ.approveSlnaReqFromDolr(tranId, regid);
+			pprTransactionServ.approveSlnaReqFromDolr1(tranId, regid);
 			redirectAttributes.addFlashAttribute("success", "PPR Request Approved Successfully.");
 		}catch (Exception e) {
 	        redirectAttributes.addFlashAttribute("error", "Unable to Approve PPR Request.");
@@ -202,6 +205,41 @@ public class PprDolrApprovalController {
 
 		return "redirect:/pprRequestDolrApproval";
 	}
+	
+	 @PostMapping("/approvePprReqForAprov")
+	 public String approvePprReqForAprov(HttpSession session, Model model, HttpServletRequest request,
+	    		@RequestParam Integer pprid,
+	    		@RequestParam BigDecimal areap,
+	    		@RequestParam BigDecimal cost,
+	    		@RequestParam BigDecimal central,
+	    		@RequestParam BigDecimal state,
+	            RedirectAttributes redirectAttributes) {
+	   
+				Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+				Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
+				String userid=(String)session.getAttribute("userid");
+				try {
+					
+					 if(userid==null){
+	
+				            return "redirect:/login";
+				     }
+					boolean save=false;
+					save=pprTransactionServ.approveSlnaReqFromDolr(pprid, areap, cost, central, state, regid,
+							 userid, CommonFunctions.getClientIpAddr(request));
+					
+					if(save)
+						redirectAttributes.addFlashAttribute( "success", "PPR Request Approved Successfully.");
+					else
+						redirectAttributes.addFlashAttribute("error", "Unable to Approve PPR Request.");
+				}
+				catch (Exception e) {
+	
+						e.printStackTrace();
+				        redirectAttributes.addFlashAttribute("error", "Unable to Approve PPR Request.");
+				}
+				return "redirect:/pprRequestDolrApproval";	
+	    }
 	
 	@GetMapping("/viewPprRequest")
     public String viewPprRequest(HttpSession session, Model model,  @RequestParam("id") Integer pprId) {
