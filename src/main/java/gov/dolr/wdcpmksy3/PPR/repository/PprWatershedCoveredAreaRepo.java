@@ -34,5 +34,7 @@ public interface PprWatershedCoveredAreaRepo extends JpaRepository<PprWatershedC
 	int changeStatusByPprId(@Param("pprId") Integer pprId);
 	
 	List<PprWatershedCoveredArea> findByPprPprIdAndStatus(Integer pprId, String status);
+	
+	List<PprWatershedCoveredArea> findByPprPprIdAndStatusIn( Integer pprId, List<String> statuses);
 
 }

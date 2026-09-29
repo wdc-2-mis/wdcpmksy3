@@ -382,50 +382,83 @@
 
 							<tbody>
 								<tr th:each="row, stat : ${watershedList}">
-									<td th:text="${stat.count}"></td>
-									<td th:text="${row.mwName}"></td>
 
-									<td th:text="${row.preNo}"></td>
-									<td th:text="${row.preArea}"></td>
+								    <td th:text="${stat.count}"></td>
 
-									<td th:text="${row.dpapNo}"></td>
-									<td th:text="${row.dpapArea}"></td>
+								    <td th:text="${row.mwName}"></td>
 
-									<td th:text="${row.ddpNo}"></td>
-									<td th:text="${row.ddpArea}"></td>
+								    <td th:text="${row.preNo}"></td>
+								    <td th:text="${row.preArea}"></td>
 
-									<td th:text="${row.iwdpNo}"></td>
-									<td th:text="${row.iwdpArea}"></td>
+								    <td th:text="${row.dpapNo}"></td>
+								    <td th:text="${row.dpapArea}"></td>
 
-									<td th:text="${row.iwmpNo}"></td>
-									<td th:text="${row.iwmpArea}"></td>
+								    <td th:text="${row.ddpNo}"></td>
+								    <td th:text="${row.ddpArea}"></td>
 
-									<td th:text="${row.pmksyNo}"></td>
-									<td th:text="${row.pmksyArea}"></td>
+								    <td th:text="${row.iwdpNo}"></td>
+								    <td th:text="${row.iwdpArea}"></td>
 
-									<td th:text="${row.otherNo}"></td>
-									<td th:text="${row.otherArea}"></td>
+								    <td th:text="${row.iwmpNo}"></td>
+								    <td th:text="${row.iwmpArea}"></td>
+
+								    <td th:text="${row.pmksyNo}"></td>
+								    <td th:text="${row.pmksyArea}"></td>
+
+								    <td th:text="${row.otherNo}"></td>
+								    <td th:text="${row.otherArea}"></td>
+
 								</tr>
 
-								<tr th:if="${#lists.isEmpty(watershedList)}">
-									<td colspan="16">
-										<div class="d-flex justify-content-center align-items-center gap-3">
-											<span class="text-danger">No records found.</span>
-											<i class="fas fa-arrow-right arrow-blink"></i>
-											<!-- TODO: confirm URL -->
-											<a th:href="@{/areaCoveredUnderWP}"
-												class="btn btn-primary btn-sm btn-blink">
-												<i class="fas fa-plus"></i> Add Details
-											</a>
-											&nbsp; &nbsp;
-											<a title="skip"
-												th:href="@{/skipAreaCover(pprid=${selectedProject})}" class="btn btn-secondary"
-												onclick="return confirm('Are you sure you want to skip this PPR ?');">
-												<i class="fas fa-skip">Skip</i>
-											</a>
-											
-										</div>
-									</td>
+								<tr th:if="${!hasC and !hasS}">
+
+								    <td colspan="16">
+
+								        <div class="d-flex justify-content-center align-items-center gap-3">
+
+								            <span class="text-danger">
+								                No records found.
+								            </span>
+
+								            <i class="fas fa-arrow-right arrow-blink"></i>
+
+								            <a th:href="@{/areaCoveredUnderWP}"
+								               class="btn btn-primary btn-sm btn-blink">
+
+								                <i class="fas fa-plus"></i>
+								                Add Details
+
+								            </a>
+
+								            <a title="skip"
+								               th:href="@{/skipAreaCover(pprid=${selectedProject})}"
+								               class="btn btn-secondary"
+								               onclick="return confirm('Are you sure you want to skip this PPR ?');">
+
+								                <i class="fas fa-skip"></i>
+								                Skip
+
+								            </a>
+
+								        </div>
+
+								    </td>
+
+								</tr>
+								<tr th:if="${hasS}">
+
+								    <td colspan="16">
+
+								        <div class="d-flex justify-content-center align-items-center gap-3">
+
+								            <span class="text-warning">
+								                This PPR has been skipped.
+								            </span>
+
+								        </div>
+
+								    </td>
+
 								</tr>
 							</tbody>
 

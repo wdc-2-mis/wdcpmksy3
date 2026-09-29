@@ -284,13 +284,15 @@ public class PPRViewController {
     private Map<String, Object> fetchReportData(Integer dcode, Integer project, Integer finYrCd) {
 
         Map<String, Object> data = new LinkedHashMap<>();
-
+        List<String> statuses = List.of("C", "S");
         // ---- PPR-1 ----
         List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus(dcode, project, finYrCd, "C");
         data.put("records", records);
 
         // ---- PPR-2 ----
-        List<PprWatershedCoveredArea> areaRecords = area.findByPprPprIdAndStatus(project, "C");
+        
+      //  List<PprWatershedCoveredArea> areaRecords = area.findByPprPprIdAndStatus(project, "C");
+   /*     List<PprWatershedCoveredArea> areaRecords = area.findByPprPprIdAndStatusIn(project, statuses);
 
         Map<Integer, WatershedAreaBean> map = new LinkedHashMap<>();
         for (PprWatershedCoveredArea row : areaRecords) {
@@ -312,7 +314,123 @@ public class PPRViewController {
             }
             map.put(mwId, bean);
         }
-        data.put("watershedList", new ArrayList<>(map.values()));
+        data.put("watershedList", new ArrayList<>(map.values())); */
+       // List<String> statuses = List.of("C", "S");
+
+        List<PprWatershedCoveredArea> areaRecords =
+                area.findByPprPprIdAndStatusIn(project, statuses);
+
+
+        // Check whether C and S records exist
+        boolean hasC = areaRecords.stream()
+                .anyMatch(row -> "C".equals(row.getStatus()));
+
+        boolean hasS = areaRecords.stream()
+                .anyMatch(row -> "S".equals(row.getStatus()));
+
+
+        // Send these flags to Thymeleaf
+        data.put("hasC", hasC);
+        data.put("hasS", hasS);
+
+
+        Map<Integer, WatershedAreaBean> map = new LinkedHashMap<>();
+
+
+        for (PprWatershedCoveredArea row : areaRecords) {
+
+            // Only C records should be converted to watershedList
+            if (!"C".equals(row.getStatus())) {
+                continue;
+            }
+
+            // Check Micro Watershed
+            if (row.getMicroWatershed() == null) {
+                continue;
+            }
+
+            Integer mwId = row.getMicroWatershed().getMwId();
+
+            if (mwId == null) {
+                continue;
+            }
+
+
+            WatershedAreaBean bean = map.getOrDefault(
+                    mwId,
+                    new WatershedAreaBean()
+            );
+
+
+            bean.setMwId(mwId);
+
+            bean.setMwName(
+                    row.getMicroWatershed().getMwName()
+            );
+
+
+            // Check Scheme
+            if (row.getScheme() == null) {
+                map.put(mwId, bean);
+                continue;
+            }
+
+
+            Integer scheme = row.getScheme().getSchemeId();
+
+            if (scheme == null) {
+                map.put(mwId, bean);
+                continue;
+            }
+
+
+            switch (scheme) {
+
+                case 1:
+                    bean.setPreNo(row.getNoMw());
+                    bean.setPreArea(row.getAreaMw());
+                    break;
+
+                case 2:
+                    bean.setDpapNo(row.getNoMw());
+                    bean.setDpapArea(row.getAreaMw());
+                    break;
+
+                case 3:
+                    bean.setDdpNo(row.getNoMw());
+                    bean.setDdpArea(row.getAreaMw());
+                    break;
+
+                case 4:
+                    bean.setIwdpNo(row.getNoMw());
+                    bean.setIwdpArea(row.getAreaMw());
+                    break;
+
+                case 5:
+                    bean.setIwmpNo(row.getNoMw());
+                    bean.setIwmpArea(row.getAreaMw());
+                    break;
+
+                case 6:
+                    bean.setPmksyNo(row.getNoMw());
+                    bean.setPmksyArea(row.getAreaMw());
+                    break;
+
+                case 7:
+                    bean.setOtherNo(row.getNoMw());
+                    bean.setOtherArea(row.getAreaMw());
+                    break;
+
+                default:
+                    break;
+            }
+
+
+            map.put(mwId, bean);
+        }
+
+
+        data.put("watershedList", new ArrayList<>(map.values()) );
 
         // ---- PPR-3 ----
         List<PprProposedProject> detailsOfListOfProposedProject = repository.findByPprPprIdAndStatus(project, 'C');
