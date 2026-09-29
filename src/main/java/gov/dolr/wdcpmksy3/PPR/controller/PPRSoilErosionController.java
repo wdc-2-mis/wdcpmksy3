@@ -18,7 +18,9 @@ import gov.dolr.wdcpmksy3.PPR.dto.PPRSoilErosionDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.PPRSoilErosionFormDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MErosion;
 import gov.dolr.wdcpmksy3.PPR.entity.MErosionType;
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PPRSoilErosion;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRSoilErosionService;
 import gov.dolr.wdcpmksy3.service.DistrictService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,8 +35,12 @@ public class PPRSoilErosionController {
 	@Autowired
     private PPRSoilErosionService soilErosionService;
 	
+	@Autowired
+	private MPprRepository mPprRepo;
+	
 	@GetMapping("/pprSoilErosion")
-    public String soilErosionForm(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) {
+    public String soilErosionForm(HttpSession session, Model model, @RequestParam(required = false) Integer dcode,
+    		@RequestParam(required = false) Integer pprid, @RequestParam(required = false) Integer project) {
 		
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		Object userid = session.getAttribute("userid");
@@ -44,6 +50,18 @@ public class PPRSoilErosionController {
         }
         if (pprid != null) {
         	soilErosionService.changeStatusByPprId(pprid);
+        }
+        if(dcode != null){
+        	List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
+        	if(!pprList.isEmpty()){
+	        	model.addAttribute("pprList", pprList);
+	        	if(project != null) {
+	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
+	        		model.addAttribute("soilErosionList",soilErosionService.getByPprId(project));
+	        		model.addAttribute("pprId", project);
+	        	}
+        	}
+			model.addAttribute("selectedDistrict", dcode);
         }
         List<MErosion> erosionList = soilErosionService.getErosionList();
         
