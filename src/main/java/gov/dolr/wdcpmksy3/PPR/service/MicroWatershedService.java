@@ -23,5 +23,8 @@ public class MicroWatershedService {
 		return repository.getById(id);
 	}
 
+	public List<MicroWatershed> getListOfMicroWatershedByPprId(Integer pprId){
+		return repository.getListOfMicroWatershedbyMwIds(pprId);
+	}
 	
 }

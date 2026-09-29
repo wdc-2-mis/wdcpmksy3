@@ -86,10 +86,10 @@ public class PprProposedProjectController {
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
 	        if(!pprList.isEmpty()){
 	        	model.addAttribute("pprList", pprList);
-	            model.addAttribute("microWatershedList", pprService.getMicroWatershedsByDistrict(dcode));
 	            if(project != null) {
 	            	MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	 	            model.addAttribute("pprId", project);
+	 	           model.addAttribute("microWatershedList", microWatershedServ.getListOfMicroWatershedByPprId(project));
 	 	            model.addAttribute("detailsOfListOfProposedProject", proposedProjectService.getPprProposedProjectList(ppr));
 	            }
 	        }
