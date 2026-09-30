@@ -1,6 +1,8 @@
 package gov.dolr.wdcpmksy3.PPR.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.PprVillageRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.ProjectTypeRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.entity.MVillage;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -223,5 +226,18 @@ public class PprProjectGlanceService {
 
 		pprVillageRepo.changeStatusByPprId(pprId);
 	}
+	
+public void skipProjectAtGlanceDetails(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprProjectGlance entity = new PprProjectGlance();
+    	MPpr ppr = mPprRepo.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    //	entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate(new Date() ); 
+    	pprProjectGlanceRepo.save(entity);
+    }
 
 }

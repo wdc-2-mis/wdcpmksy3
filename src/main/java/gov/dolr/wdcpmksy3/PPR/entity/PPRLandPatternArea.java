@@ -21,11 +21,11 @@ public class PPRLandPatternArea {
     private MPpr pprId;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mw_id", nullable = false)
+    @JoinColumn(name = "mw_id", nullable = true)
     private MicroWatershed microWatershed;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vcode", nullable = false)
+    @JoinColumn(name = "vcode", nullable = true)
     private MVillage village;
 	
 	@Column(name = "village_area", precision = 20, scale = 4)

@@ -45,5 +45,7 @@ public interface PprProposedProjectRepository extends JpaRepository<PprProposedP
 			+ "ppp.ppr.district.distName, ppp.ppr.finYear.finYrDesc "
 			+ "order by ppp.ppr.projectName, ppp.ppr.district.distName")
 	PprRequestDolrApprovalDto getPprRequestDolrApprovalData(@Param("ppr") MPpr ppr);
+	
+	List<PprProposedProject> findByPprPprIdAndStatusIn(Integer pprId, List<Character> statuses);
 
 }

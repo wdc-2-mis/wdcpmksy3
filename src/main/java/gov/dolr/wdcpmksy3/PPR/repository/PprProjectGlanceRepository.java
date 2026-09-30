@@ -20,5 +20,7 @@ public interface PprProjectGlanceRepository extends JpaRepository<PprProjectGlan
 	@Transactional
 	@Query(" UPDATE PprProjectGlance p SET p.status = 'D' WHERE p.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);
+	
+	List<PprProjectGlance> findByPprPprIdAndStatusIn( Integer pprId, List<Character> statuse);
 
 }

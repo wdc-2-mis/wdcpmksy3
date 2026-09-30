@@ -433,23 +433,25 @@ public class PPRViewController {
         data.put("watershedList", new ArrayList<>(map.values()) );
 
         // ---- PPR-3 ----
-        List<PprProposedProject> detailsOfListOfProposedProject = repository.findByPprPprIdAndStatus(project, 'C');
+        List<Character> statuse = List.of('C', 'S');
+        
+        List<PprProposedProject> detailsOfListOfProposedProject = repository.findByPprPprIdAndStatusIn(project, statuse);
         data.put("detailsOfListOfProposedProject", detailsOfListOfProposedProject);
 
         // ---- PPR-4 ----
-        List<PprProjectGlance> pprProjectAtGlanceList = pprProjectGlanceRepo.findByPprPprIdAndStatus(project, 'C');
+        List<PprProjectGlance> pprProjectAtGlanceList = pprProjectGlanceRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pprProjectAtGlanceList", pprProjectAtGlanceList);
 
         // ---- PPR-8 ----
-        List<PprProposedArea> ppr8List = pprProposedAreaRepo.findByPprPprIdAndStatus(project, 'C');
+        List<PprProposedArea> ppr8List = pprProposedAreaRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("ppr8List", ppr8List);
 
         // ---- PPR-9 ----
-        List<PPRLandPatternArea> landPatternAreaList = landPatternAreaRepo.findByPprIdPprIdAndStatus(project, 'C');
+        List<PPRLandPatternArea> landPatternAreaList = landPatternAreaRepo.findByPprIdPprIdAndStatusIn(project, statuse);
         data.put("landPatternAreaList", landPatternAreaList);
 
         // ---- PPR-10 ----
-        List<PprAgroClimate> ppr10List = agroClimateRepo.findByPprPprIdAndStatus(project, 'C');
+        List<PprAgroClimate> ppr10List = agroClimateRepo.findByPprPprIdAndStatusIn(project, statuse );
         data.put("ppr10List", ppr10List);
 
         // ---- PPR-11 ----

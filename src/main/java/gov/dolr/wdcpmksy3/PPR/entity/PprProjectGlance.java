@@ -21,15 +21,15 @@ public class PprProjectGlance {
     private MPpr ppr;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mw_id", nullable = false)
+    @JoinColumn(name = "mw_id", nullable = true)
     private MicroWatershed microWatershed;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_type_id", nullable = false)
+    @JoinColumn(name = "project_type_id", nullable = true)
     private ProjectType projectType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="pia_id", nullable = false)
+    @JoinColumn(name="pia_id", nullable = true)
     private MPiaDetails pia;
 
     @Column(name="selection_reason", length = 200)

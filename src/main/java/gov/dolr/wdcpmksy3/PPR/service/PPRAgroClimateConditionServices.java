@@ -23,6 +23,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.SoilTypeRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.entity.MVillage;
 import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionary;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional
@@ -174,6 +175,17 @@ public class PPRAgroClimateConditionServices {
 		}
 		return state;
 	}
-	
+	public void skipAgroClimateConditionPPR10(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprAgroClimate entity = new PprAgroClimate(); 
+    	MPpr ppr = mprep.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    //	entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	agcrepo.save(entity);
+    }
 
 }

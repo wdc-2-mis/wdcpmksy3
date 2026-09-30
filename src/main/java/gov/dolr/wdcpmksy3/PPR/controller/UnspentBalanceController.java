@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.entity.PprPendingUc;
@@ -52,6 +53,14 @@ public class UnspentBalanceController {
         
         return "ppr/unspentBalancePPR20";
     }
+	
+	@GetMapping("/checkUnspentBalancePPR20")
+	@ResponseBody
+	public boolean checkUnspentBalancePPR20(
+	        @RequestParam("pprId") Integer pprId) {
+
+	    return unblance.existsByPprPprId(pprId);
+	}
 	
 	 @PostMapping("/saveUnspentBalancePPR20")
 	 public String saveUnspentBalancePPR20(HttpSession session, Model model, HttpServletRequest request,
@@ -188,4 +197,36 @@ public class UnspentBalanceController {
 					}
 				return "redirect:/unspentBalancePPR20";	
 	    }
+	 
+	 @PostMapping("/skipUnspentBalancePPR20")
+	 public String skipUnspentBalancePPR20(HttpSession session, Model model, HttpServletRequest request,
+	         @RequestParam("skipdistrict") Integer district,
+	         @RequestParam("skipproject") Integer project,
+	         @RequestParam("skipaction") String action,
+	         RedirectAttributes redirectAttributes) {
+
+		 String userid=(String)session.getAttribute("userid");
+		 try {
+				
+			 if(userid==null){
+
+		            return "redirect:/login";
+		     }
+
+	     boolean save=false;
+	    	
+		//	save=serv.saveUnspentBalancePPR20(project, userid, CommonFunctions.getClientIpAddr(request));
+			
+			if(save)
+				redirectAttributes.addFlashAttribute( "success", "Details of Unspent balance as on date District-wise (PPR20) saved successfully.");
+			else
+				redirectAttributes.addFlashAttribute("error", "Unable to saved Details of Unspent balance as on date District-wise (PPR20)");
+			}
+			catch (Exception e) {
+
+				e.printStackTrace();
+		        redirectAttributes.addFlashAttribute("error", "Unable to saved Details of Unspent balance as on date District-wise (PPR20)");
+			}
+		return "redirect:/unspentBalancePPR20";	
+	 }
 }

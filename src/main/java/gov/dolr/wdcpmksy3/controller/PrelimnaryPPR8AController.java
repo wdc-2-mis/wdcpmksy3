@@ -317,4 +317,18 @@ public class PrelimnaryPPR8AController {
 	        return "redirect:/login";
 	    }
 	}
+	
+	@GetMapping("/skipPreliminaryPPR8")
+    public String skipPreliminaryPPR8(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  pprProposedAreaService.skipPreliminaryPPR8(pprid, userId, servletRequest);
+           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+	    }
+         return "redirect:/viewPPR";
+    }
 }

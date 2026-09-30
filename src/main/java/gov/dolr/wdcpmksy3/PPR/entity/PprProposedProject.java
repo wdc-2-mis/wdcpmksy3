@@ -24,11 +24,11 @@ public class PprProposedProject {
     private MPpr ppr;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mw_id", nullable = false)
+    @JoinColumn(name = "mw_id", nullable = true)
     private MicroWatershed microWatershed;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_type_id", nullable = false)
+    @JoinColumn(name = "project_type_id", nullable = true)
     private ProjectType projectType;
 
     @Column(name = "treated_area", precision = 20, scale = 4)

@@ -24,4 +24,6 @@ public interface PprProposedAreaRepository extends JpaRepository<PprProposedArea
     @Transactional
     @Query(" UPDATE PprProposedArea p SET p.status = 'D' WHERE p.ppr.pprId = :pprId")
     int changeStatusByPprId(@Param("pprId") Integer pprId);
+    
+    List<PprProposedArea> findByPprPprIdAndStatusIn( Integer pprId, List<Character> statuses);
 }

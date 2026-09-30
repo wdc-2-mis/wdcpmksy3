@@ -344,6 +344,18 @@ public class PPRLandPatternAreaController {
 	    return "redirect:/pprLandPatternArea";
 
 	}
-	
+	@GetMapping("/skippprLandPatternArea")
+    public String skippprLandPatternArea(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  landPatternAreaService.skippprLandPatternArea(pprid, userId, servletRequest);
+           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+	    }
+         return "redirect:/viewPPR";
+    }
 	
 }

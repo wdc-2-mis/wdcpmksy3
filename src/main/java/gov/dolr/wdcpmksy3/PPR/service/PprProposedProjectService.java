@@ -13,12 +13,14 @@ import gov.dolr.wdcpmksy3.PPR.dto.PprProposedProjectDto;
 import gov.dolr.wdcpmksy3.PPR.entity.CriteriaDetails;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProposedProject;
+import gov.dolr.wdcpmksy3.PPR.entity.PprWatershedCoveredArea;
 import gov.dolr.wdcpmksy3.PPR.repository.CriteriaDetailsRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.CriteriaRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProposedProjectRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.ProjectTypeRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -183,5 +185,18 @@ public class PprProposedProjectService {
 
 		criteriaDetailsRepo.changeStatusByPprId(pprId);
 	}
+	
+public void skipProposedProjectDetails(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprProposedProject entity = new PprProposedProject(); 
+    	MPpr ppr = pprRepository.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	repository.save(entity);
+    }
 
 }

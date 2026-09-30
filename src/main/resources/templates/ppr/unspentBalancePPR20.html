@@ -377,7 +377,10 @@
 
 		    let districtId = this.value;
 		    let project = document.getElementById("project");
-			
+			let skipButton = document.getElementById("skipButton");
+
+			    // Disable Skip until a project is selected and checked
+			    skipButton.disabled = true;
 		    // Clear existing options
 		    project.innerHTML = '<option value="">--Select Project--</option>';
 		    if (districtId === "") {
@@ -400,8 +403,76 @@
 				
 		});
 		
+		document.getElementById("project").addEventListener("change", function () {
+
+		    const pprId = this.value;
+		    const skipButton = document.getElementById("skipButton");
+			//alert("kfy");
+		    // No project selected
+		    if (pprId === "") {
+		        skipButton.disabled = true;
+		        return;
+		    }
+
+		    fetch('/checkUnspentBalancePPR20?pprId=' + pprId)
+		        .then(response => {
+
+		            if (!response.ok) {
+		                throw new Error("Server error");
+		            }
+
+		            return response.json();
+		        })
+		        .then(exists => {
+
+		            if (exists === true) {
+
+		                // Already exists
+		                skipButton.disabled = true;
+
+		            } else {
+
+		                // Does not exist
+		                skipButton.disabled = false;
+		            }
+		        })
+		        .catch(error => {
+
+		            console.error("Error checking PPR20:", error);
+
+		            // Disable for safety if AJAX fails
+		            skipButton.disabled = true;
+		        });
+		});
+		
+		
+		
+		
 	
 	});
+	
+	function submitSkipForm() {
+
+	    const district = document.getElementById("district");
+	    const project = document.getElementById("project");
+
+	    if (district.value === "") {
+	        alert("Please select District.");
+	        district.focus();
+	        return;
+	    }
+
+	    if (project.value === "") {
+	        alert("Please select Project.");
+	        project.focus();
+	        return;
+	    }
+
+	    document.getElementById("skipDistrict").value = district.value;
+	    document.getElementById("skipProject").value = project.value;
+
+	    document.getElementById("skipForm").submit();
+	}
 
 </script>
 
@@ -541,13 +612,29 @@
 							      Save as Draft
 							</button>
 							<!-- &nbsp;&nbsp;&nbsp;&nbsp;
-							<button type="submit" name="action" value="skip" formnovalidate class="btn btn-secondary">
-								Skip
-							</button>-->
+							 <button type="button"
+							         id="skipButton"
+							         class="btn btn-secondary"
+							         disabled
+							         onclick="submitSkipForm()">
+							     Skip
+							 </button> -->
 							
 						</div>
 						
             </form>
+			<form id="skipForm"
+			      th:action="@{/skipUnspentBalancePPR20}"
+			      method="post"
+			      style="display:none;">
+
+			    <input type="hidden" name="skipdistrict" id="skipDistrict">
+
+			    <input type="hidden" name="skipproject" id="skipProject">
+
+			    <input type="hidden" name="skipaction" value="S">
+
+			</form>
 
         </div>
 		

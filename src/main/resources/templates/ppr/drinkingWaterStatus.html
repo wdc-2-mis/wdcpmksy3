@@ -588,6 +588,41 @@
 				
 		});
 	});
+	
+	function submitSkipForm() {
+
+	    const district = document.getElementById("district");
+	    const project = document.getElementById("project");
+
+	    // District mandatory
+	    if (district.value.trim() === "") {
+	        district.classList.add("is-invalid");
+	        district.focus();
+
+	        alert("Please select District.");
+	        return false;
+	    }
+
+	    // Project mandatory
+	    if (project.value.trim() === "") {
+	        project.classList.add("is-invalid");
+	        project.focus();
+
+	        alert("Please select Project.");
+	        return false;
+	    }
+
+	    // Remove invalid state
+	    district.classList.remove("is-invalid");
+	    project.classList.remove("is-invalid");
+
+	    // Put values into separate form
+	    document.getElementById("skipDistrict").value = district.value;
+	    document.getElementById("skipProject").value = project.value;
+
+	    // Submit separate form
+	    document.getElementById("skipForm").submit();
+	}
 
 </script>
 
@@ -776,9 +811,27 @@
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>
+							<!--&nbsp;&nbsp;&nbsp;&nbsp;
+							<button type="button" class="btn btn-secondary" onclick="submitSkipForm()">
+									Skip
+							</button>-->
 						</div>
 				
             </form>
+			
+			<!-- Separate form for Skip -->
+			<form id="skipForm"
+			      th:action="@{/skipDrinkingWaterStatus}"
+			      method="post"
+			      style="display:none;">
+
+			    <input type="hidden" name="district" id="skipDistrict">
+
+			    <input type="hidden" name="project" id="skipProject">
+
+			    <input type="hidden" name="action" value="skip">
+
+			</form>
 
         </div>
 		

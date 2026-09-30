@@ -5,11 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MScheme;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
 import gov.dolr.wdcpmksy3.repository.MSchemeRepository;
 import gov.dolr.wdcpmksy3.repository.PprProposedAreaRepository;
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.LocalDateTime;
 import java.util.List;
 @Service
 public class PprProposedAreaService {
@@ -19,6 +24,9 @@ public class PprProposedAreaService {
 
     @Autowired
     private PprProposedAreaRepository repository;
+    
+    @Autowired
+	private MPprRepository mpprRepository;
 
     @Transactional
     public void saveDraft(PprProposedArea area, String scheme) {
@@ -53,4 +61,17 @@ public class PprProposedAreaService {
 	public int changeStatusByPprId(Integer pprId) {
 	    return repository.changeStatusByPprId(pprId);
 	}
+    
+public void skipPreliminaryPPR8(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprProposedArea entity = new PprProposedArea(); 
+    	MPpr ppr = mpprRepository.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	repository.save(entity);
+    }
 }

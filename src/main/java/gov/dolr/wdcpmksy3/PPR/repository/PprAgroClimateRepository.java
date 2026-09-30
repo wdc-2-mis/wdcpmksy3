@@ -31,6 +31,8 @@ public interface PprAgroClimateRepository extends JpaRepository<PprAgroClimate, 
 	
 	List<PprAgroClimate> findByPprPprIdAndStatus(Integer pprId, Character status);
 	
+	List<PprAgroClimate> findByPprPprIdAndStatusIn(Integer pprId, List<Character> statuses);
+	
 	@Modifying
 	@Transactional
 	@Query("UPDATE PprAgroClimate c SET c.status = 'D' WHERE c.ppr.pprId = :pprId")

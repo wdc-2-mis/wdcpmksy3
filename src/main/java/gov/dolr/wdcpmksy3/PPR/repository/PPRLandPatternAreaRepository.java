@@ -54,6 +54,8 @@ public interface PPRLandPatternAreaRepository extends JpaRepository<PPRLandPatte
 	
 	List<PPRLandPatternArea> findByPprIdPprIdAndStatus(Integer pprId, Character status);
 	
+	List<PPRLandPatternArea> findByPprIdPprIdAndStatusIn(Integer pprId, List<Character> statuses);
+	
 	@Modifying
 	@Transactional
 	@Query("UPDATE PPRLandPatternArea l SET l.status = 'D' WHERE l.pprId.pprId = :pprId")

@@ -23,7 +23,7 @@ public class PprAgroClimate {
     private MPpr ppr;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vcode", nullable = false)
+    @JoinColumn(name = "vcode", nullable = true)
     private MVillage village;
 
     @Column(name = "zone_name", length = 50)

@@ -22,5 +22,7 @@ public interface PprWcdcUnspentBalanceRepository extends JpaRepository<PprWcdcUn
 	@Transactional
 	@Query("UPDATE PprWcdcUnspentBalance b SET b.status = 'D' WHERE b.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+	
+	boolean existsByPprPprId(Integer pprId);
 
 }
