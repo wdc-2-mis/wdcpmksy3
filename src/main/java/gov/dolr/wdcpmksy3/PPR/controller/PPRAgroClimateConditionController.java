@@ -114,7 +114,7 @@ public class PPRAgroClimateConditionController {
 	
 	@GetMapping("/getProjectsByDistrictPPR10")
 	@ResponseBody
-	public List<Map<String, Object>> getProjectsByDistrict(@RequestParam Integer dcode) {
+	public List<Map<String, Object>> getProjectsByDistrict(@RequestParam Integer dcode, Model model) {
 
 	    List<MPpr> projects = pprService.getProjectsByDistrict(dcode);
 
@@ -123,6 +123,7 @@ public class PPRAgroClimateConditionController {
 	        map.put("id", p.getPprId());
 	        map.put("name", p.getProjectName());
 	        map.put("selectedDistrict", dcode);
+	        model.addAttribute("selectedDcode", dcode);
 	        return map;
 	    }).toList();
 	}

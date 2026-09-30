@@ -31,7 +31,7 @@ public class CoveredAreaDTO {
     private String status;
     private String dist_name;
     private BigDecimal mw_area;
-    
+    private String proj_name;
 	public Integer getPprId() {
 		return pprId;
 	}
@@ -193,6 +193,12 @@ public class CoveredAreaDTO {
 	}
 	public void setMw_id(Integer mw_id) {
 		this.mw_id = mw_id;
+	}
+	public String getProj_name() {
+		return proj_name;
+	}
+	public void setProj_name(String proj_name) {
+		this.proj_name = proj_name;
 	}
     
     

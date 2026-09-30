@@ -35,22 +35,74 @@ public class PprAreaCoveredController {
 	@Autowired
 	private PprAreaCoverService pprAreaService;
 	
-	@GetMapping("/areaCoveredUnderWP")
-    public String areaCoveredUnderWP(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
-	{
-		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-		Object userid = session.getAttribute("userid");
-        if(userid==null){
+	@GetMapping({"/areaCoveredUnderWP", "/areaCoveredUnderWP/{dcode}/{proj_id}"})
+	public String areaCoveredUnderWP(HttpSession session, Model model, @PathVariable(required = false) Integer dcode, @PathVariable(name = "proj_id", required = false) Integer projId,
+	 @RequestParam(required = false) Integer pprid) {
 
-            return "redirect:/login";
-        }
-        if (pprid != null) {
-        	pprAreaService.changeStatusByPprId(pprid);
-        }
-        model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
-        model.addAttribute("schemeList", pprAreaService.getAllSchemes().stream().limit(6));
-        return "ppr/areaCovered";
+	    Object userid = session.getAttribute("userid");
+
+	    if (userid == null) {
+	        return "redirect:/login";
+	    }
+
+	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+
+	    Integer selectedPprId = projId != null
+	            ? projId
+	            : pprid;
+
+
+	    if (selectedPprId != null) {
+	        pprAreaService.changeStatusByPprId(selectedPprId);
+	    }
+
+	    model.addAttribute(
+	            "distList",
+	            districtService.getPPRDistrictsByState(stcode)
+	    );
+
+	    model.addAttribute(
+	            "schemeList",
+	            pprAreaService.getAllSchemes()
+	                    .stream()
+	                    .limit(6)
+	    );
+
+	    List<CoveredAreaDTO> records =
+	            pprAreaService.getSchemeAreasByState(stcode);
+
+	    System.out.println("records data: " + records);
+
+	    model.addAttribute("records", records);
+
+	    model.addAttribute("selectedDcode", dcode);
+
+	    model.addAttribute("selectedPprId", selectedPprId);
+
+
+	    return "ppr/areaCovered";
 	}
+	
+	@GetMapping("/projectStats/{pprId}")
+		@ResponseBody
+		public Map<String, Object> getProjectStats(
+		        @PathVariable Integer pprId) {
+
+		    Map<String, Object> result = new HashMap<>();
+
+		    result.put(
+		            "totalMw",
+		            pprService.getTotalMicroWatershedsByPprId(pprId)
+		    );
+
+		    result.put(
+		            "microWatersheds",
+		            pprService.getMicroWatershedsByPprId(pprId)
+		    );
+
+		    return result;
+		}
+
 	
 
 	@GetMapping("/areaCoveredUnderWP/{dcode}")
@@ -85,6 +137,7 @@ public class PprAreaCoveredController {
 	    return "ppr/areaCovered";
 	}
 	
+	
 	@GetMapping("/districtStats/{dcode}")
 	@ResponseBody
 	public Map<String, Object> getDistrictStats(@PathVariable Integer dcode, Model model) {
@@ -98,16 +151,32 @@ public class PprAreaCoveredController {
 	    return result;
 	}
 
-	
-
-	@GetMapping("/microWatershedArea/{mwId}")
+	@GetMapping("/microWatershedArea/{pprId}/{mwId}")
 	@ResponseBody
-	public Map<String, Object> getMicroWatershedArea(@PathVariable Integer mwId) {
-	    Map<String, Object> result = new HashMap<>();
-	    result.put("area", pprService.getMicroWatershedArea(mwId));
-	    result.put("status", pprAreaService.getMicroWatershedStatus(mwId));
+	public Map<String, Object> getMicroWatershedArea(
+	        @PathVariable Integer pprId,
+	        @PathVariable Integer mwId) {
+
+	    Map<String, Object> result =
+	            new HashMap<>();
+
+	    result.put(
+	            "area",
+	            pprService.getMicroWatershedArea(mwId)
+	    );
+
+	    String status = pprAreaService.getMicroWatershedStatus(pprId, mwId);
+	    result.put("status", status);
+
+	    if ("C".equalsIgnoreCase(status)) {
+	        result.put("error", "Data already completed for this watershed.");
+	    } else if ("D".equalsIgnoreCase(status)) {
+	        result.put("error", "Data already exists in draft mode.");
+	    }
+
 	    return result;
 	}
+
 
 	
 	

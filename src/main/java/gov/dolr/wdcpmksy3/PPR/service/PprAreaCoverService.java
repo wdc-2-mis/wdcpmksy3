@@ -368,4 +368,63 @@ public class PprAreaCoverService {
         wcarearepo.save(entity);
     }
 
+	public List<CoveredAreaDTO> getSchemeAreasByState(Integer stcode) {
+	    List<Object[]> rows = repo.findWatershedDataByState(stcode);
+
+	    return rows.stream().map(r -> {
+	        CoveredAreaDTO dto = new CoveredAreaDTO();
+	        dto.setPprId(((Number) r[0]).intValue());
+	        dto.setDist_name((String) r[1]);
+	        dto.setMw_id(((Number) r[2]).intValue());
+	        dto.setMw_name((String) r[3]);
+	        dto.setMw_area(r[4] != null ? new BigDecimal(r[4].toString()) : null);
+	        dto.setPre_scheme((String) r[5]);
+	        dto.setPre_no(r[6] != null ? ((Number) r[6]).intValue() : null);
+	        dto.setPre_area(r[7] != null ? new BigDecimal(r[7].toString()) : null);
+
+	        dto.setDpap_scheme((String) r[8]);
+	        dto.setDpap_no(r[9] != null ? ((Number) r[9]).intValue() : null);
+	        dto.setDpap_area(r[10] != null ? new BigDecimal(r[10].toString()) : null);
+
+	        dto.setDdp_scheme((String) r[11]);
+	        dto.setDdp_no(r[12] != null ? ((Number) r[12]).intValue() : null);
+	        dto.setDdp_area(r[13] != null ? new BigDecimal(r[13].toString()) : null);
+
+	        dto.setIwdp_scheme((String) r[14]);
+	        dto.setIwdp_no(r[15] != null ? ((Number) r[15]).intValue() : null);
+	        dto.setIwdp_area(r[16] != null ? new BigDecimal(r[16].toString()) : null);
+
+	        dto.setIwmp_scheme((String) r[17]);
+	        dto.setIwmp_no(r[18] != null ? ((Number) r[18]).intValue() : null);
+	        dto.setIwmp_area(r[19] != null ? new BigDecimal(r[19].toString()) : null);
+
+	        dto.setWdc_scheme((String) r[20]);
+	        dto.setWdc_no(r[21] != null ? ((Number) r[21]).intValue() : null);
+	        dto.setWdc_area(r[22] != null ? new BigDecimal(r[22].toString()) : null);
+	        
+	         
+	        dto.setOther_scheme((String) r[23]);
+	        dto.setOther_no(r[24] != null ? ((Number) r[24]).intValue() : null);
+	        dto.setOther_area(r[25] != null ? new BigDecimal(r[25].toString()) : null);
+
+	        dto.setStatus((String) r[26]);
+	        dto.setProj_name((String) r[27]);
+	        
+	        
+	        return dto;
+	    }).collect(Collectors.toList());
+	}public String getMicroWatershedStatus(
+	        Integer pprId,
+	        Integer mwId) {
+
+	    return wcarearepo
+	            .findTopByPpr_PprIdAndMicroWatershed_MwIdOrderByIdDesc(
+	                    pprId,
+	                    mwId
+	            )
+	            .map(PprWatershedCoveredArea::getStatus)
+	            .orElse(null);
+	}
+
+	
 }

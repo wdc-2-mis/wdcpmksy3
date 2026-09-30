@@ -311,4 +311,15 @@ return "Error updating record: " + e.getMessage();
 
 	    return count > 0;
 	}
+
+	public Integer getTotalMicroWatershedsByPprId(Integer pprId) {
+
+	    return pmwRepo.countMicroWatershedsByPprId(pprId);
+	}
+
+	public List<MicroWatershedDTO> getMicroWatershedsByPprId(Integer pprId) {
+	    return pmwRepo.getMicroWatershedsByPprId(pprId);
+	}
+	
+	
 }
