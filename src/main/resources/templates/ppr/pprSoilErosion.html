@@ -69,181 +69,147 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     if (form) {
-        form.addEventListener("submit", function (e) {
-        	const selectedMonth = document.getElementById("month").value;
-        	const selectedYear = document.getElementById("year").value;
-        	if (!selectedMonth) {
-        	    e.preventDefault();
-        	    alert("Please select Month.");
-        	    document.getElementById("month").focus();
-        	    return;
-        	}
-        	if (!selectedYear) {
-        	    e.preventDefault();
-        	    alert("Please select Year.");
-        	    document.getElementById("year").focus();
-        	    return;
-        	}
-        	document.querySelectorAll(".erosion-month-id").forEach(function(input) {
-        	    input.value = selectedMonth;
-        	});
-        	document.querySelectorAll(".erosion-year-id").forEach(function(input) {
-        	    input.value = selectedYear;
-        	});
-        	document.querySelectorAll('.duplicate-row').forEach(function(el) {
-                el.classList.remove('duplicate-row');
-            });
-            const selectedErosion = document.querySelector('input[name="erosionId"]:checked');
-            if (!selectedErosion) {
-                e.preventDefault();
-                alert("Please select Water Erosion or Wind Erosion.");
-                return;
-            }
-            const erosionRows = document.querySelectorAll("#soilErosionEntryBody tr");
-            if (erosionRows.length === 0) {
-                e.preventDefault();
-                alert("No erosion types available.");
-                return;
-            }
-            const erosionCategory = selectedErosion.dataset.category || "";
-            const isWaterErosion = erosionCategory === "Water Erosion";
-            const isWindErosion = erosionCategory === "Wind Erosion";
-            let hasCompleteRow = false;
-            let invalid = null;
-            let firstInvalidField = null;
-            let missingFieldName = "";
-            let duplicateTypeIds = [];
-            let duplicateTypeNames = [];
-            let submittedTypeIds = [];
-            erosionRows.forEach(function (row) {
-            	const typeIdInput = row.querySelector('input[name$=".erosionTypeId"]');
-                const typeNameSpan = row.querySelector('.erosion-type-name');
-                if (typeIdInput && typeNameSpan) {
-                    const typeId = parseInt(typeIdInput.value);
-                    const typeName = typeNameSpan.textContent.trim();
-                    // Get the input values to check if row has data
-                    const affected = row.querySelector('input[name$=".affectedArea"]');
-                    const runoff = row.querySelector('input[name$=".runoff"]');
-                    const soilLoss = row.querySelector('input[name$=".avgSoilLoss"]');
-                    const affectedValue = affected ? affected.value.trim() : "";
-                    const runoffValue = runoff ? runoff.value.trim() : "";
-                    const soilLossValue = soilLoss ? soilLoss.value.trim() : "";
-                    const hasData = affectedValue !== "" || runoffValue !== "" || soilLossValue !== "";
-                    if (hasData) {
-                        // Check against existing database records
-                        const existingRecord = existingErosionRecords.find(function(item) {
-                            return item.erosionTypeId === typeId;
-                        });
-                        if (existingRecord) {
-                            if (!duplicateTypeNames.includes(typeName)) {
-                                duplicateTypeNames.push(typeName);
-                                duplicateTypeIds.push(typeId);
-                            }
-                            row.classList.add('duplicate-row');
-                        }
-                        // Check for duplicates within the current rows
-                        if (submittedTypeIds.includes(typeId)) {
-                            if (!duplicateTypeNames.includes(typeName)) {
-                                duplicateTypeNames.push(typeName);
-                                duplicateTypeIds.push(typeId);
-                            }
-                            row.classList.add('duplicate-row');
-                        } else {
-                            submittedTypeIds.push(typeId);
-                        }
-                    }
-                }
-            	if (invalid !== null) {
-                    return;
-                }
-                const affected = row.querySelector('input[name$=".affectedArea"]');
-                const runoff = row.querySelector('input[name$=".runoff"]');
-                const soilLoss = row.querySelector('input[name$=".avgSoilLoss"]');
-                if (!affected || !runoff || !soilLoss) {
-                    return;
-                }
-                const affectedValue = affected.value.trim();
-                const runoffValue = runoff.value.trim();
-                const soilLossValue = soilLoss.value.trim();
-                const allBlank = affectedValue === "" && runoffValue === "" && soilLossValue === "";
-                if (allBlank) {
-                    return;
-                }
-                const validationResult = validateSoilErosionFields(erosionCategory, affected, runoff, soilLoss);
-                	if (!validationResult.valid) {
-                	    invalid = true;
-                	    firstInvalidField = validationResult.field;
-                	    missingFieldName = getFieldName(validationResult.field);
-                	    return;
-                	}
-                	hasCompleteRow = true;
-            });
-            /* -------------------------------------------------
-            CHECK FOR DUPLICATES
-            ------------------------------------------------- */
-         // Check for duplicates
-            if (duplicateTypeNames.length > 0) {
-            	e.preventDefault();
-            	let hasCompleted = false;
-                let hasDraft = false;
-                duplicateTypeIds.forEach(function(typeId) {
-                    const record = existingErosionRecords.find(function(item) {
-                        return item.erosionTypeId === typeId;
-                    });
-                    if (record) {
-                        if (record.status === 'C') {
-                            hasCompleted = true;
-                        } else if (record.status === 'D') {
-                            hasDraft = true;
-                        }
-                    }
-                });
-                // Show appropriate alert
-                if (hasCompleted) {
-                    alert("Data is already completed. You cannot add new records.");
-                } else if (hasDraft) {
-                    alert("A draft already exists. Please edit the existing draft instead of creating a new record.");
-                } 
-                
-                // Clear values from duplicate rows
-                const duplicateRows = document.querySelectorAll('.duplicate-row');
-                duplicateRows.forEach(function(row) {
-                    const inputs = row.querySelectorAll('input[type="text"]');
-                    inputs.forEach(function(input) {
-                        input.value = '';
-                    });
-                    row.classList.remove('duplicate-row');
-                });
-                return;
-            }
-            if (invalid) {
-                e.preventDefault();
-                if (missingFieldName) {
-                    alert("Please enter " + missingFieldName + ".");
-                } else {
-                    alert("Please fill all required fields.");
-                }
-                if (firstInvalidField) {
-                    firstInvalidField.focus();
-                    firstInvalidField.select();
-                }
-                return;
-            }
-
-            if (!hasCompleteRow) {
-                e.preventDefault();
-                alert("Please enter complete details for at least one erosion type.");
-                return;
-            }
-
-//             const confirmed =
-//                 confirm("Are you sure you want to save the soil erosion details as draft?");
-
-//             if (!confirmed) {
-//                 e.preventDefault();
-//             }
-
-        });
+		form.addEventListener("submit", function(e) {
+		    e.preventDefault();
+		    clearValidationErrors(form);
+			const district = document.getElementById("district");
+			const project = document.getElementById("project");
+		    const month = document.getElementById("month");
+		    const year = document.getElementById("year");
+		    const selectedErosion = document.querySelector('input[name="erosionId"]:checked');
+			// 1. DISTRICT
+			if (!district.value.trim()) {
+				showFieldError(district, "Please select District.");
+				district.focus();
+				return;
+			}
+			// 2. PROJECT
+			if (!project.value.trim()) {
+				showFieldError(project, "Please select project.");
+				project.focus();
+				return;
+			}
+		    // 1. MONTH
+		    if (!month.value.trim()) {
+		        showFieldError(month, "Please select Month.");
+		        month.focus();
+		        return;
+		    }
+		    // 2. YEAR
+		    if (!year.value.trim()) {
+		        showFieldError(year, "Please select Year.");
+		        year.focus();
+		        return;
+		    }
+		    // 3. TYPE OF EROSION
+		    if (!selectedErosion) {
+		        const errorDiv = document.querySelector('[data-error-for="erosionId"]');
+		        if (errorDiv) {
+		            errorDiv.textContent = "Please select Water Erosion or Wind Erosion.";
+		        }
+		        return;
+		    }
+		    const erosionRows = document.querySelectorAll("#soilErosionEntryBody tr");
+		    if (erosionRows.length === 0) {
+		        const errorDiv = document.querySelector('[data-error-for="erosionId"]');
+		        if (errorDiv) {
+		            errorDiv.textContent = "No erosion types available.";
+		        }
+		        return;
+		    }
+		    const erosionCategory = selectedErosion.dataset.category || "";
+		    let hasCompleteRow = false;
+		    // Validate rows one by one
+		    for (const row of erosionRows) {
+		        const affected = row.querySelector('input[name$=".affectedArea"]');
+		        const runoff = row.querySelector('input[name$=".runoff"]');
+		        const soilLoss = row.querySelector('input[name$=".avgSoilLoss"]');
+		        if (!affected || !runoff || !soilLoss) {
+		            continue;
+		        }
+		        const affectedValue = affected.value.trim();
+		        const runoffValue = runoff.value.trim();
+		        const soilLossValue = soilLoss.value.trim();
+		        // Completely blank row - ignore
+		        if (
+		            affectedValue === "" &&
+		            runoffValue === "" &&
+		            soilLossValue === ""
+		        ) {
+		            continue;
+		        }
+		        // AFFECTED AREA
+		        if (affectedValue === "") {
+		            showFieldError(affected, "Please enter Affected Area.");
+		            affected.focus();
+		            return;
+		        }
+		        // RUNOFF - required only for Water Erosion
+		        if (erosionCategory === "Water Erosion" && runoffValue === "") {
+		            showFieldError(runoff, "Please enter Runoff.");
+		            runoff.focus();
+		            return;
+		        }
+		        // SOIL LOSS
+		        if (soilLossValue === "") {
+		            showFieldError(soilLoss, "Please enter Average Soil Loss.");
+		            soilLoss.focus();
+		            return;
+		        }
+		        hasCompleteRow = true;
+		    }
+		    // At least one complete row
+		    if (!hasCompleteRow) {
+		        const firstRow = erosionRows[0];
+		        const affected = firstRow.querySelector('input[name$=".affectedArea"]');
+		        if (affected) {
+		            showFieldError(
+		                affected,
+		                "Please enter details for at least one erosion type."
+		            );
+		            affected.focus();
+		        }
+		        return;
+		    }
+		    // Set month/year into hidden fields
+		    document.querySelectorAll(".erosion-month-id").forEach(function(input) {
+		        input.value = month.value;
+		    });
+		    document.querySelectorAll(".erosion-year-id").forEach(function(input) {
+		        input.value = year.value;
+		    });
+		    // Submit after all validation passes
+		    form.submit();
+		});
+		
+		function showFieldError(field, message) {
+		    if (!field) {
+		        return;
+		    }
+		    field.classList.add("is-invalid");
+		    let errorDiv = null;
+		    const parent = field.parentElement;
+		    if (parent) {
+		        errorDiv = parent.querySelector('.validation-error[data-error-for="' + field.id + '"]');
+		    }
+		    if (!errorDiv) {
+		        const td = field.closest("td");
+		        if (td) {
+		            errorDiv = td.querySelector(".validation-error");
+		        }
+		    }
+		    if (errorDiv) {
+		        errorDiv.textContent = message;
+		    }
+		}
+		function clearValidationErrors(form) {
+		    form.querySelectorAll(".validation-error").forEach(function(error) {
+		        error.textContent = "";
+		    });
+		    form.querySelectorAll(".is-invalid").forEach(function(field) {
+		        field.classList.remove("is-invalid");
+		    });
+		}
 
     }
     
@@ -458,16 +424,19 @@ document.addEventListener("DOMContentLoaded", function () {
                             <input type="text" name="erosionList[${index}].affectedArea"
                                 class="form-control form-control-sm soil-input mx-auto" 
                                 autocomplete="off" oninput="validateDecimal(this,10,4)">
+							<div class="validation-error" data-error-for="affectedArea"></div>
                         </td>
                         <td class="text-center">
                             <input type="text" name="erosionList[${index}].runoff"
                                 class="form-control form-control-sm soil-input mx-auto"
                                 autocomplete="off" oninput="validateDecimal(this,4,4)">
+							<div class="validation-error" data-error-for="runoff"></div>
                         </td>
                         <td class="text-center">
                             <input type="text" name="erosionList[${index}].avgSoilLoss"
                                 class="form-control form-control-sm soil-input mx-auto"
                                 autocomplete="off" oninput="validateDecimal(this,2,4)">
+							<div class="validation-error" data-error-for="avgSoilLoss"></div>
                         </td>
                     </tr>
                 `;
@@ -527,38 +496,60 @@ document.addEventListener("DOMContentLoaded", function () {
     /* -------------------------------------------------
     EDIT BUTTON CLICK
     ------------------------------------------------- */
-
-    document.addEventListener("click", function (e) {
-            const btn = e.target.closest(".editBtn");
-            if (!btn) {
-                return;
-            }
-            const modalElement = document.getElementById("editSoilModal");
-            if (!modalElement) {
-                console.error("Edit soil modal not found.");
-                return;
-            }
-            /* -------------------------------------------------
-               SET VALUES
-               ------------------------------------------------- */
-            document.getElementById("editSoilId").value = btn.dataset.id || "";
-            document.getElementById("editSoilDistrict").value = btn.dataset.district || "";
-			document.getElementById("editMonth").value = btn.dataset.monthname || "";
-			document.getElementById("editMonthId").value = btn.dataset.month || "";
-            document.getElementById("editYear").value = btn.dataset.yearvalue || "";
-            document.getElementById("editYearId").value = btn.dataset.year || "";
-            document.getElementById("editSoilErosion").value = btn.dataset.erosion || "";
-            document.getElementById("editSoilErosionType").value = btn.dataset.erosiontype || "";
-            document.getElementById("editAffectedArea").value = btn.dataset.affected || "";
-            document.getElementById("editRunoff").value = btn.dataset.runoff || "";
-            document.getElementById("editAvgSoilLoss").value = btn.dataset.soilloss || "";
-            /* -------------------------------------------------
-               OPEN BOOTSTRAP MODAL
-               ------------------------------------------------- */
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        }
-    );
+	document.querySelectorAll(".editBtn").forEach(function (btn) {
+		btn.addEventListener("click", function () {
+		const id = this.getAttribute("data-id");
+		console.log("Editing ID:", id);
+		fetch("/getSoilErosionById?id=" + encodeURIComponent(id))
+				.then(async response => {
+					console.log("Response status:", response.status);
+					console.log("Response URL:", response.url);
+					console.log("Content-Type:", response.headers.get("content-type"));
+					const text = await response.text();
+					console.log("Response body:", text);
+					if (!response.ok) {
+						throw new Error("HTTP error: " + response.status);
+					}
+					if (!text.trim().startsWith("{")) {
+						throw new Error("Server did not return JSON. Response was HTML.");
+					}
+					return JSON.parse(text);
+				})
+				.then(data => {
+					console.log("Edit data:", data);
+					document.getElementById("editSoilId").value = id;
+					document.getElementById("editSoilDistrict").value = data.distName;
+					document.getElementById("editSoilProject").value = data.projectName;
+					document.getElementById("editMonth").value = data.month;
+					document.getElementById("editYear").value = data.year;
+					document.getElementById("editSoilErosion").value = data.erosion;
+					document.getElementById("editSoilErosionType").value = data.erosionType;
+					document.getElementById("editAffectedArea").value = data.affectedArea;
+					document.getElementById("editRunoff").value = data.runoff;
+					document.getElementById("editAvgSoilLoss").value = data.avgSoilLoss;
+				})
+				.catch(error => {
+					console.error("Error loading edit details:", error);
+					alert("Unable to load project details.");
+				});
+		});
+	});
+	
+	const nextBtn = document.getElementById("nextBtn");
+	if (nextBtn) {
+		nextBtn.addEventListener("click", function () {
+			const district = document.getElementById("district");
+			if (!district || !district.value) {
+				alert("Please select District first.");
+				if (district) {
+					district.focus();
+				}
+				return;
+			}
+			const dcode = district.value;
+			window.location.href = "/livelihoodSummaryPPR13?dcode=" + encodeURIComponent(dcode);
+		});
+	}
 });
 
 </script>
@@ -606,6 +597,7 @@ document.addEventListener("DOMContentLoaded", function () {
 								<option th:each="d : ${distList}" th:value="${d.dcode}" th:text="${d.distName}"
 									th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"></option>
 							</select>
+							<div class="validation-error" data-error-for="district"></div>
 						</div>
 						<div class="col-md-2">
 							<label>Project Name:</label><span class="required">*</span>
@@ -616,6 +608,7 @@ document.addEventListener("DOMContentLoaded", function () {
 								<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
 									th:selected="${pprId != null and pprId == p.pprId}"> </option>
 							</select>
+							<div class="validation-error" data-error-for="project"></div>
 						</div>
 <!--						<div class="col-md-3">-->
 <!--							<input type="text" id="districtName" class="form-control form-control-sm"-->
@@ -629,24 +622,26 @@ document.addEventListener("DOMContentLoaded", function () {
 							<label>Month:</label><span class="required">*</span>
 						</div>
 						<div class="col-md-3">
-							<select id="month" name="monthId" class="form-select" required>
+							<select id="month" name="monthId" class="form-select">
 								<option value="">--Select Month--</option>
 								<th:block th:each="month : ${monthList}">
 									<option th:value="${month.monthId}"
 										th:text="${month.monthName}"></option>
 								</th:block>
 							</select>
+							<div class="validation-error" data-error-for="month"></div>
 						</div>
 						<div class="col-md-2">
 							<label>Year:</label><span class="required">*</span>
 						</div>
 						<div class="col-md-3">
-							<select id="year" name="yearId" class="form-select" required>
+							<select id="year" name="yearId" class="form-select">
 								<option value="">--Select Year--</option>
 								<th:block th:each="year : ${yearList}">
 									<option th:value="${year.finYrCd}" th:text="${year.year}"></option>
 								</th:block>
 							</select>
+							<div class="validation-error" data-error-for="year"></div>
 						</div>
 					</div>
 					<div class="row mb-4">
@@ -661,6 +656,7 @@ document.addEventListener("DOMContentLoaded", function () {
 										<span th:text="${erosion.categoryType}"></span>
 									</label>
 								</th:block>
+								<div class="validation-error" data-error-for="erosionId"></div>
 							</div>
 						</div>
 					</div>
@@ -688,6 +684,12 @@ document.addEventListener("DOMContentLoaded", function () {
 								<i class="fas fa-save"></i> Save as Draft
 							</button>
 						</div>
+					</div>
+					<div class="text-end mt-2" id="nextBtnContainer" th:if="${selectedDistrict != null}">
+						<button type="button" id="nextBtn" class="btn btn-primary">
+							Add Details of Livelihood
+							<i class="fas fa-arrow-right ms-1"></i>
+						</button>
 					</div>
 				</form>
 			</div>
@@ -766,12 +768,12 @@ document.addEventListener("DOMContentLoaded", function () {
          EDIT MODAL
          ===================================================== -->
 
-		<div class="modal fade" id="editSoilModal" tabindex="-1" aria-hidden="true">
+		<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header bg-primary text-white">
-						<h5 class="modal-title">Edit Soil Erosion Details</h5>
-						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+						<h5 class="modal-title" id="editModalLabel">Edit Soil Erosion Details</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
 					</div>
 					<div class="modal-body">
 						<form id="editSoilForm" th:action="@{/updatePPRSoilErosion}" method="post">
