@@ -162,15 +162,15 @@ public class PdfService {
                 addRow(t4,
                         safe(d.getPpr().getDistrict().getDistName()),
                         safe(d.getPpr().getProjectName()),
-                        safe(d.getProjectType().getProjectType()),
+                        safe(d.getProjectType() != null? d.getProjectType().getProjectType() : null),
                         block,
                         gp,
                         villages.toString(),
-                        safe(d.getMicroWatershed().getMwCode()),
-                        safe(d.getSelectionReason()),
-                        safe(d.getProjectArea()),
-                        safe(d.getProposedArea()),
-                        safe(d.getProjectCost()),
+                        safe(d.getMicroWatershed() != null? d.getMicroWatershed().getMwCode(): null),
+		                safe(d.getSelectionReason()),
+		                safe(d.getProjectArea()),
+		                safe(d.getProposedArea()),
+		                safe(d.getProjectCost()),
                         safe(d.getPia() != null ? d.getPia().getPiaName() : null),
                         safe(d.getPia() != null ? d.getPia().getAddress() : null));
             }
@@ -282,10 +282,13 @@ public class PdfService {
             for (PprDisasterDetails d : ppr11) {
                 addRow(t11,
                         String.valueOf(sno++),
-                        safe(d.getVcode().getVillageName()),
-                        safe(d.getYear().getYear()),
-                        safe(d.getMonth().getMonthName()),
-                        safe(d.getDtype().getDisasterName()),
+                        safe(d.getVcode() != null ? d.getVcode().getVillageName() : null),
+
+                        safe(d.getYear() != null ? d.getYear().getYear() : null),
+
+                        safe(d.getMonth() != null ? d.getMonth().getMonthName() : null),
+
+                        safe(d.getDtype() != null ? d.getDtype().getDisasterName() : null),
                         "Q".equals(d.getPeriodicity()) ? "Quarterly" : "Annual",
                         Boolean.TRUE.equals(d.getAffected()) ? "Yes" : "No");
             }
@@ -432,8 +435,8 @@ public class PdfService {
                 addRow(t17,
                         safe(d.getPpr().getDistrict().getDistName()),
                         safe(d.getPpr().getProjectName()),
-                        safe(d.getMicroWatershed().getMwName()),
-                        safe(d.getVillage().getVillageName()),
+                        safe(d.getMicroWatershed() != null ? d.getMicroWatershed().getMwName(): null),
+                        safe(d.getVillage() != null ? d.getVillage().getVillageName() : null),
                         safe(d.getPreWaterAvailabilityMonths()),
                         safe(d.getPreWaterQuality() != null ? d.getPreWaterQuality().getWaterQualityType() : null),
                         safe(d.getPostWaterAvailabilityMonths()),
@@ -455,8 +458,13 @@ public class PdfService {
             for (PprCropOutcome d : ppr18) {
                 addRow(t18,
                         String.valueOf(sno++),
-                        safe(d.getSeason().getSeasonName()),
-                        safe(d.getCropType().getCropName()),
+                        safe(d.getSeason() != null
+                        ? d.getSeason().getSeasonName()
+                        : null),
+
+                safe(d.getCropType() != null
+                        ? d.getCropType().getCropName()
+                        : null),
                         safe(d.getCurrentArea()), safe(d.getCurrentProd()),
                         safe(d.getExpectedArea()), safe(d.getExpectedProd()));
             }
