@@ -272,6 +272,8 @@ public class PprDolrApprovalController {
 	private Map<String, Object> fetchReportData(Integer dcode, Integer project, Integer finYrCd) {
 
         Map<String, Object> data = new LinkedHashMap<>();
+        List<Character> statuses = List.of('C');
+        List<String> status = List.of("C");
 
         // ---- PPR-1 ----
         List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus(dcode, project, finYrCd, "C");
@@ -339,11 +341,11 @@ public class PprDolrApprovalController {
         data.put("pprEmploymentList", pprEmploymentList);
 
         // ---- PPR-15 ----
-        List<Map<String, Object>> ppr15List = pprMigrationDetailsRepo.getMigrationDetailsByProjectAndStatus(project, "C");
+        List<Map<String, Object>> ppr15List = pprMigrationDetailsRepo.getMigrationDetailsByProjectAndStatus(project, statuses);
         data.put("ppr15List", ppr15List);
 
         // ---- PPR-16 ----
-        List<PprWaterOutcome> pprWaterOutcomesList = pprWaterOutcomeRepo.findByPprIdAndStatus(project, "C");
+        List<PprWaterOutcome> pprWaterOutcomesList = pprWaterOutcomeRepo.findByPprIdAndStatusIn(project, statuses);
         data.put("pprWaterOutcomesList", pprWaterOutcomesList);
 
         // ---- PPR-17 ----

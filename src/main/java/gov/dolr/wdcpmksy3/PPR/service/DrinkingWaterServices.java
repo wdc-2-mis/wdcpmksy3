@@ -24,6 +24,7 @@ import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.entity.MVillage;
 import gov.dolr.wdcpmksy3.repository.MWaterQualityRepository;
 import gov.dolr.wdcpmksy3.repository.PprDrinkingWaterRepository;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class DrinkingWaterServices {
@@ -132,5 +133,18 @@ public class DrinkingWaterServices {
 	public int changeStatusByPprId(Integer pprId) {
 	    return dwrepo.changeStatusByPprId(pprId);
 	}
+	
+	 public void skipDrinkingWaterStatus(Integer pprid, String userId, HttpServletRequest servletRequest) {
+	        
+		 	PprDrinkingWater entity = new PprDrinkingWater(); 
+	    	MPpr ppr = mprep.getReferenceById(pprid);
+	    	
+	    	entity.setPpr(ppr); 
+	    	entity.setStatus('S'); 
+	    	entity.setCreatedBy(userId); 
+	    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+	    	entity.setCreatedDate( LocalDateTime.now() ); 
+	    	dwrepo.save(entity);
+	    }
 
 }

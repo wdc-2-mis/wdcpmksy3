@@ -16,6 +16,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprPendingUc;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprPendingUcRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.WdcpmksyMFinYearRepository;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class PendingUCPPR19Services {
@@ -121,5 +122,18 @@ public class PendingUCPPR19Services {
 	public int changeStatusByPprId(Integer pprId) {
 	    return ucrepo.changeStatusByPprId(pprId);
 	}
+	
+	public void skipPendingUCPPR19(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprPendingUc entity = new PprPendingUc(); 
+    	MPpr ppr = mprep.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	ucrepo.save(entity);
+    }
 
 }

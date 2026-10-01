@@ -441,11 +441,11 @@ public class PPRViewController {
         // ---- PPR-4 ----
         List<PprProjectGlance> pprProjectAtGlanceList = pprProjectGlanceRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pprProjectAtGlanceList", pprProjectAtGlanceList);
-
+       
         // ---- PPR-8 ----
         List<PprProposedArea> ppr8List = pprProposedAreaRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("ppr8List", ppr8List);
-
+       
         // ---- PPR-9 ----
         List<PPRLandPatternArea> landPatternAreaList = landPatternAreaRepo.findByPprIdPprIdAndStatusIn(project, statuse);
         data.put("landPatternAreaList", landPatternAreaList);
@@ -471,27 +471,27 @@ public class PPRViewController {
         data.put("pprEmploymentList", pprEmploymentList);
 
         // ---- PPR-15 ----
-        List<Map<String, Object>> ppr15List = pprMigrationDetailsRepo.getMigrationDetailsByProjectAndStatus(project, "C");
+        List<Map<String, Object>> ppr15List = pprMigrationDetailsRepo.getMigrationDetailsByProjectAndStatus(project, statuse);
         data.put("ppr15List", ppr15List);
 
         // ---- PPR-16 ----
-        List<PprWaterOutcome> pprWaterOutcomesList = pprWaterOutcomeRepo.findByPprIdAndStatus(project, "C");
+        List<PprWaterOutcome> pprWaterOutcomesList =pprWaterOutcomeRepo.findByPprIdAndStatusIn(project, statuse);
         data.put("pprWaterOutcomesList", pprWaterOutcomesList);
-
+     //   System.out.println("kdy"+pprWaterOutcomesList.size());
         // ---- PPR-17 ----
-        List<PprDrinkingWater> pprDrinkingWaterList = pprDrinkingWaterRepo.findByPprPprIdAndStatus(project, 'C');
+        List<PprDrinkingWater> pprDrinkingWaterList = pprDrinkingWaterRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pprDrinkingWaterList", pprDrinkingWaterList);
 
         // ---- PPR-18 ----
-        List<PprCropOutcome> cropOutcomes = cropOutcomeRepo.findByPprPprIdAndStatus(project, "C");
+        List<PprCropOutcome> cropOutcomes = cropOutcomeRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("cropOutcomes", cropOutcomes);
 
         // ---- PPR-19 ----
-        List<PprPendingUc> pendingUCList = pprPendingUcRepo.findByPprPprIdAndStatus(project, 'C');
+        List<PprPendingUc> pendingUCList = pprPendingUcRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pendingUCList", pendingUCList);
 
         // ---- PPR-20 ----
-        List<PprWcdcUnspentBalance> draftList = pprUnspentBalanceRepo.findByPprPprIdAndStatus(project, 'C');
+        List<PprWcdcUnspentBalance> draftList = pprUnspentBalanceRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("draftList", draftList);
 
         return data;

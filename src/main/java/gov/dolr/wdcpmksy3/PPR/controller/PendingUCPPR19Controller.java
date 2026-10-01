@@ -211,5 +211,19 @@ public class PendingUCPPR19Controller {
 				}
 				return "redirect:/pendingUCPPR19";	
 	    }
+	
+	@GetMapping("/skipPendingUCPPR19")
+    public String skipPendingUCPPR19(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  services.skipPendingUCPPR19(pprid, userId, servletRequest);
+           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+	    }
+         return "redirect:/viewPPR";
+    }
 
 }

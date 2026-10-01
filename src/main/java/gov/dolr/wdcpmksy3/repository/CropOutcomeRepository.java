@@ -28,5 +28,7 @@ public interface CropOutcomeRepository extends JpaRepository<PprCropOutcome, Int
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
 	boolean existsByPpr_InstitutionalStructure_StCodeAndStatus(Integer stCode, String status);
+	
+	List<PprCropOutcome> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
 
 }

@@ -12,6 +12,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MWaterSource;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.entity.PprDisasterDetails;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWaterOutcome;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWaterOutcomeRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.WaterSourceRepository;
 import gov.dolr.wdcpmksy3.entity.MVillage;
@@ -26,6 +27,9 @@ public class PprWaterOutcomeService {
 
 	@Autowired
 	private MPprService pprService;
+	
+	@Autowired
+	private MPprRepository mpprrepo;
 	
 	@Autowired
 	private WaterSourceRepository waterSourceRepository;
@@ -90,7 +94,7 @@ public class PprWaterOutcomeService {
 		details.setPreProjectLevel(preProject);
 		details.setPostProjectLevel(expected_post);
 		details.setRemarks(remarks);
-		details.setStatus("D");
+		details.setStatus('D');
 		details.setRequestIp(getClientIpAddr(request));
 	    details.setCreatedBy(userId); 
 	    details.setCreatedDate(LocalDateTime.now());
@@ -141,7 +145,7 @@ public class PprWaterOutcomeService {
 	                                    "Water outcome record not found."
 	                            ));
 
-	    outcome.setStatus("C");
+	    outcome.setStatus('C');
 	    repository.save(outcome);
 	}
 
@@ -163,5 +167,17 @@ public class PprWaterOutcomeService {
 	    return repository.changeStatusByPprId(pprId);
 	}
 
+	public void skipPprWaterOutcomes(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprWaterOutcome entity = new PprWaterOutcome(); 
+    	MPpr ppr = mpprrepo.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	repository.save(entity);
+    }
 	
 }

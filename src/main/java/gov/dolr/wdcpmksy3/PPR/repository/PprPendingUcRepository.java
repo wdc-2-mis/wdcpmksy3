@@ -33,4 +33,6 @@ public interface PprPendingUcRepository extends JpaRepository<PprPendingUc, Inte
 	@Transactional
 	@Query("UPDATE PprPendingUc u SET u.status = 'D' WHERE u.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+    
+    List<PprPendingUc> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
 }

@@ -30,8 +30,8 @@ public class PprPendingUc {
     private MPpr ppr;
 
     // Relation with m_fin_year
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "fin_yr_cd", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fin_yr_cd", nullable = true)
     private MFinYear finYear;
 
     @Column(name = "installment_no")

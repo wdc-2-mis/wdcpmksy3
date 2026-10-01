@@ -24,5 +24,7 @@ public interface PprWcdcUnspentBalanceRepository extends JpaRepository<PprWcdcUn
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
 	boolean existsByPprPprId(Integer pprId);
+	
+	List<PprWcdcUnspentBalance> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
 
 }

@@ -191,4 +191,19 @@ public class PPRCropRelatedOutcomeController {
 
 	    return "redirect:/pprCropOutcomes";
 	}
+	
+	@GetMapping("/skipPprCropOutcomes")
+    public String skipPprCropOutcomes(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  outcomeService.skipPprCropOutcomes(pprid, userId, servletRequest);
+           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+	    }
+         return "redirect:/viewPPR";
+    }
+	
 }

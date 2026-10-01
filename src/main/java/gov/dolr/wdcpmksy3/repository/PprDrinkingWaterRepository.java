@@ -20,5 +20,7 @@ public interface PprDrinkingWaterRepository extends JpaRepository<PprDrinkingWat
 	@Transactional
 	@Query("UPDATE PprDrinkingWater w SET w.status = 'D' WHERE w.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+	
+	List<PprDrinkingWater> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
 
 }

@@ -198,8 +198,8 @@ public class UnspentBalanceController {
 				return "redirect:/unspentBalancePPR20";	
 	    }
 	 
-	 @PostMapping("/skipUnspentBalancePPR20")
-	 public String skipUnspentBalancePPR20(HttpSession session, Model model, HttpServletRequest request,
+	 @PostMapping("/skipUnspentBalancePPR201")
+	 public String skipUnspentBalancePPR201(HttpSession session, Model model, HttpServletRequest request,
 	         @RequestParam("skipdistrict") Integer district,
 	         @RequestParam("skipproject") Integer project,
 	         @RequestParam("skipaction") String action,
@@ -229,4 +229,19 @@ public class UnspentBalanceController {
 			}
 		return "redirect:/unspentBalancePPR20";	
 	 }
+	 
+	 	@GetMapping("/skipUnspentBalancePPR20")
+	    public String skipUnspentBalancePPR20(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+	    		HttpSession session, RedirectAttributes redirectAttributes) {
+		  String userId = (String) session.getAttribute("userid");
+		  try {
+			  serv.skipUnspentBalancePPR20(pprid, userId, servletRequest);
+	           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+		    } 
+		  	catch (Exception ex) {
+		        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+		    }
+	         return "redirect:/viewPPR";
+	    }
+
 }

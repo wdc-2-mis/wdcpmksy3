@@ -13,6 +13,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MSeason;
 import gov.dolr.wdcpmksy3.PPR.entity.PprCropOutcome;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWaterOutcome;
 import gov.dolr.wdcpmksy3.PPR.repository.CropTypeRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MSeasonRepo;
 import gov.dolr.wdcpmksy3.repository.CropOutcomeRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,9 @@ public class PprCropOutcomeService {
 	 
 	 @Autowired
 	 private CropTypeRepository cropTypeRepo;
+	 
+	 @Autowired
+	 private MPprRepository pprRepository;
 
 	 public static String getClientIpAddr(HttpServletRequest request) {  
 		    String ip = request.getHeader("X-Forwarded-For");  
@@ -135,7 +139,7 @@ public class PprCropOutcomeService {
 	            );
 	        }
 
-	        outcome.setStatus("D");
+	        outcome.setStatus('D');
 	        outcome.setRequestIp(getClientIpAddr(request));
 	        outcome.setCreatedBy(userId);
 	        outcome.setCreatedDate(LocalDateTime.now());
@@ -229,7 +233,7 @@ public class PprCropOutcomeService {
 	                                    "Crop outcome record not found."
 	                            ));
 
-	    outcome.setStatus("C");
+	    outcome.setStatus('C');
 	    pprCropOutcomeRepo.save(outcome);
 		
 	}
@@ -251,6 +255,19 @@ public class PprCropOutcomeService {
 	public int changeStatusByPprId(Integer pprId) {
 	    return pprCropOutcomeRepo.changeStatusByPprId(pprId);
 	}
+	
+	public void skipPprCropOutcomes(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprCropOutcome entity = new PprCropOutcome(); 
+    	MPpr ppr = pprRepository.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	pprCropOutcomeRepo.save(entity);
+    }
 
 	
 }

@@ -180,4 +180,21 @@ public class PPRWaterOutcomesController {
 
 	    return "redirect:/pprWaterOutcomes";
 	}
+	@GetMapping("/skipPprWaterOutcomes")
+    public String skipPprWaterOutcomes(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  outcomeService.skipPprWaterOutcomes(pprid, userId, servletRequest);
+           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+	    }
+         return "redirect:/viewPPR";
+    }
+	
+	
+	
+	
 }

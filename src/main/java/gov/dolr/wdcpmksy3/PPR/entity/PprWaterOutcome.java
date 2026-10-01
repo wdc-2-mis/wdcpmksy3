@@ -20,15 +20,15 @@ public class PprWaterOutcome {
     private MPpr ppr;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vcode", nullable = false)
+    @JoinColumn(name = "vcode", nullable = true)
     private MVillage village;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mw_id", nullable = false)
+    @JoinColumn(name = "mw_id", nullable = true)
     private MicroWatershed microWatershed;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "water_source_id", nullable = false)
+    @JoinColumn(name = "water_source_id", nullable = true)
     private MWaterSource waterSource;
 
     @Column(name = "pre_project_level", length = 10)
@@ -41,7 +41,7 @@ public class PprWaterOutcome {
     private String remarks;
 
     @Column(name = "status", length = 1)
-    private String status;
+    private Character status;
 
     @Column(name = "request_ip", length = 20)
     private String requestIp;
@@ -125,11 +125,11 @@ public class PprWaterOutcome {
         this.remarks = remarks;
     }
 
-    public String getStatus() {
+    public Character getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Character status) {
         this.status = status;
     }
 

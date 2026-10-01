@@ -15,6 +15,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprPendingUc;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWcdcUnspentBalanceRepository;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UnspentBalanceServices {
@@ -104,5 +105,18 @@ public class UnspentBalanceServices {
 	public int changeStatusByPprId(Integer pprId) {
 	    return repo.changeStatusByPprId(pprId);
 	}
+	
+	public void skipUnspentBalancePPR20(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprWcdcUnspentBalance entity = new PprWcdcUnspentBalance(); 
+    	MPpr ppr = mprep.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	repo.save(entity);
+    }
 
 }

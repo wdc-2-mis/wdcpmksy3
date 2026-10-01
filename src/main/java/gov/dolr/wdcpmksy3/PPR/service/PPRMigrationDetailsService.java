@@ -2,6 +2,7 @@ package gov.dolr.wdcpmksy3.PPR.service;
 
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.HttpServletRequest;
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PPRMigrationDetails;
 import gov.dolr.wdcpmksy3.PPR.repository.PPRMigrationDetailsRepository;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
@@ -64,6 +66,18 @@ public class PPRMigrationDetailsService {
 			return repository.changeStatusByPprId(pprId);
 		}
 	
+		public void skipPreliminaryPPR15(Integer pprid, String userId, HttpServletRequest servletRequest) {
+	        
+			PPRMigrationDetails entity = new PPRMigrationDetails(); 
+	    	//MPpr ppr = pprRepository.getReferenceById(pprid);
+	    	
+	    	entity.setPprId(pprid);; 
+	    	entity.setStatus('S'); 
+	    	entity.setCreatedBy(userId); 
+	    	entity.setRequestIp( CommonFunctions.getClientIpAddr(servletRequest) ); 
+	    	entity.setCreatedDate( LocalDateTime.now() ); 
+	    	repository.save(entity);
+	    }
 	
 
 }

@@ -39,9 +39,13 @@ public interface PprWaterOutcomeRepository extends JpaRepository<PprWaterOutcome
 	        JOIN FETCH o.microWatershed mw
 	        JOIN FETCH o.village v
 	        JOIN FETCH o.waterSource ws
-	        WHERE p.pprId = :pprId AND o.status = :status
+	        WHERE p.pprId = :pprId
+	          AND o.status IN :statuses
+	        ORDER BY o.pprWaterOutcomeId
 	        """)
-	List<PprWaterOutcome> findByPprIdAndStatus(@Param("pprId") Integer pprId, @Param("status") String status);
+	List<PprWaterOutcome> findByPprIdAndStatusIn(
+	        @Param("pprId") Integer pprId,
+	        @Param("statuses") List<Character> statuses);
 	
 	@Modifying
 	@Transactional

@@ -29,12 +29,12 @@ public class PprDrinkingWater {
 
     // vcode
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vcode", nullable = false)
+    @JoinColumn(name = "vcode", nullable = true)
     private MVillage village;
 
     // mw_id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mw_id", nullable = false)
+    @JoinColumn(name = "mw_id", nullable = true)
     private MicroWatershed microWatershed;
 
     @Column(name = "pre_water_availability_months")
