@@ -69,6 +69,21 @@ public class PPRWaterOutcomesController {
         
     }
 	
+	@GetMapping("/checkWaterOutcome")
+	@ResponseBody
+	public String checkWaterOutcome(
+	        @RequestParam Integer project,
+	        @RequestParam Integer watershed,
+	        @RequestParam Integer village) {
+
+	    return outcomeService.getWaterOutcomeStatus(
+	            project,
+	            watershed,
+	            village
+	    );
+	}
+
+	
 	@ResponseBody
 	@GetMapping("/getWaterOutcomesByDistrict")
 	public List<Map<String, Object>> getWaterOutcomesByDistrict(

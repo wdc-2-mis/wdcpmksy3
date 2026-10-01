@@ -1,6 +1,7 @@
 package gov.dolr.wdcpmksy3.PPR.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -53,6 +54,13 @@ public interface PprWaterOutcomeRepository extends JpaRepository<PprWaterOutcome
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	   
 	
 	 boolean existsByPpr_InstitutionalStructure_StCodeAndStatus(Integer stCode, String status);
+
+	 Optional<PprWaterOutcome>
+	    findTopByPpr_PprIdAndMicroWatershed_MwIdAndVillage_VcodeOrderByPprWaterOutcomeIdDesc(
+	            Integer projectId,
+	            Integer watershedId,
+	            Integer vcode
+	    );
 	
 	
 

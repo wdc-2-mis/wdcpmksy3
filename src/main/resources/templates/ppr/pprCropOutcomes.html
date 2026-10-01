@@ -613,6 +613,8 @@ document.addEventListener("click", function (e) {
             <thead class="table-light">
                 <tr>
                     <th class="table-primary">S.No</th>
+                    <th class="table-primary">District</th>
+                    <th class="table-primary">Project</th>
                     <th class="table-primary">Season</th>
                     <th class="table-primary">Crop</th>
                     <th class="table-primary">Current Area</th>
@@ -628,6 +630,9 @@ document.addEventListener("click", function (e) {
                 <tr th:each="rec,  iterStat : ${cropOutcomes}">
               
                  <td th:text="${iterStat.index + 1}"></td>
+                 
+                 <td th:text="${rec.ppr.district.distName}"></td>
+                <td th:text="${rec.ppr.projectName}"></td>
                     <td th:text="${rec.season.seasonName}">
                     </td>
               
@@ -680,13 +685,13 @@ document.addEventListener("click", function (e) {
     							
     						
     							
-                             &nbsp; &nbsp;
+                             &nbsp;
                             <a th:href="@{/completeCropOutcome(id=${rec.pprCropOutcomeId})}"
                                class="btn btn-sm btn-success"
                                onclick="return confirm('Are you sure you want to complete this record?');">
                                 <i class="fas fa-check"></i>
                             </a>
-							&nbsp; &nbsp;
+							&nbsp; 
                             <a th:href="@{/deleteCropOutcome(id=${rec.pprCropOutcomeId})}"
                                class="btn btn-sm btn-danger"
                                onclick="return confirm('Are you sure you want to delete this record?');">

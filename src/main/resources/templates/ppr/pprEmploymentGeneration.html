@@ -56,52 +56,26 @@ document.addEventListener("DOMContentLoaded", function() {
     /* =========================================================
      FIELD VALIDATION WITH CUSTOM ALERTS
      ========================================================= */
-    function validateFields(row) {
-        const fields = [
-            { input: row.querySelector('input[name$=".sc"]'), name: "SC" },
-            { input: row.querySelector('input[name$=".st"]'), name: "ST" },
-            { input: row.querySelector('input[name$=".others"]'), name: "Others" },
-            { input: row.querySelector('input[name$=".women"]'), name: "Women" }
-        ];
-        
-        let hasError = false;
-        let firstInvalidField = null;
-        let fieldName = "";
-        
-        // Only validate if at least one field has data
-        let hasAnyData = false;
-        fields.forEach(function(item) {
-            if (item.input && item.input.value.trim() !== "") {
-                hasAnyData = true;
-            }
-        });
-        
-        if (!hasAnyData) {
-            return true;
-        }
-        
-        for (const item of fields) {
-            if (!item.input) continue;
-            const value = item.input.value.trim();
-            if (value === "" || isNaN(parseInt(value))) {
-                hasError = true;
-                firstInvalidField = item.input;
-                fieldName = item.name;
-                break;
-            }
-        }
-        
-        if (hasError) {
-            alert("Please enter " + fieldName + ".");
-            if (firstInvalidField) {
-                firstInvalidField.focus();
-                firstInvalidField.select();
-            }
-            return false;
-        }
-        
-        return true;
+    /* =========================================================
+   CLEAR VALIDATION
+   ========================================================= */
+
+function clearDropdownValidation(field) {
+
+    if (!field) {
+        return;
     }
+
+    field.classList.remove("is-invalid");
+    field.classList.remove("is-valid");
+}
+
+
+/* =========================================================
+   VALIDATE REQUIRED DROPDOWNS
+   ========================================================= */
+
+
 
     /* =========================================================
      CHECK EXISTING EMPLOYMENT TYPES FOR THE VILLAGE
@@ -564,6 +538,9 @@ function validateNumber(input) {
                                     <option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
                                 </th:block>
                             </select>
+                            <div class="invalid-feedback">
+                            Please select a District.
+                            </div>
                         </div>
 
                         <div class="col-md-2">
@@ -573,6 +550,9 @@ function validateNumber(input) {
                             <select id="project" name="project" class="form-control form-control-sm" required>
                                 <option value="">--Select Project--</option>
                             </select>
+                            <div class="invalid-feedback">
+                             Please select a Project.
+                             </div>
                         </div>
                     </div>
 
@@ -585,6 +565,9 @@ function validateNumber(input) {
                             <select id="watershed" name="watershed" class="form-control form-control-sm" required>
                                 <option value="">--Select Micro Watershed--</option>
                             </select>
+                            <div class="invalid-feedback">
+                            Please select a Micro Watershed.
+                            </div>
                         </div>
 
                         <div class="col-md-2">
@@ -594,6 +577,9 @@ function validateNumber(input) {
                             <select id="village" name="village" class="form-control form-control-sm" required>
                                 <option value="">--Select Village--</option>
                             </select>
+                            <div class="invalid-feedback">
+                             Please select a Village.
+                           </div>
                         </div>
                     </div>
 
@@ -618,23 +604,23 @@ function validateNumber(input) {
                                     <td class="text-center">1</td>
                                     <td>
                                         <b>Wage Employment (No. of Man-days)</b>
-                                        <input type="hidden" name="employmentList[0].employmentTypeId" value="1">
+                                        <input type="hidden" name="employmentList[0].employmentTypeId" value="1" >
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[0].sc" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                               autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[0].st" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[0].others" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[0].women" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[0].total" 
@@ -651,19 +637,19 @@ function validateNumber(input) {
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[1].sc" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[1].st" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[1].others" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[1].women" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[1].total" 
@@ -680,19 +666,19 @@ function validateNumber(input) {
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[2].sc" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[2].st" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[2].others" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[2].women" class="form-control form-control-sm employment-input"
-                                               oninput="validateNumber(this)" autocomplete="off" required >
+                                                autocomplete="off" required oninput="validateInteger(this,10)">
                                     </td>
                                     <td>
                                         <input type="text" name="employmentList[2].total" 
@@ -755,35 +741,35 @@ function validateNumber(input) {
                             <input type="hidden" id="editId" name="ppr_employment_id">
 
                             <div class="row mb-3">
-                                <div class="col-md-3"><label>District</label></div>
+                                <div class="col-md-3"><label>District<span class="required">*</span></label></div>
                                 <div class="col-md-9">
                                     <input type="text" id="editDistrict" class="form-control form-control-sm" readonly>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-3"><label>Project</label></div>
+                                <div class="col-md-3"><label>Project<span class="required">*</span></label></div>
                                 <div class="col-md-9">
                                     <input type="text" id="editProject" class="form-control form-control-sm" readonly>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-3"><label>Micro Watershed</label></div>
+                                <div class="col-md-3"><label>Micro Watershed<span class="required">*</span></label></div>
                                 <div class="col-md-9">
                                     <input type="text" id="editWatershed" class="form-control form-control-sm" readonly>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-3"><label>Village</label></div>
+                                <div class="col-md-3"><label>Village<span class="required">*</span></label></div>
                                 <div class="col-md-9">
                                     <input type="text" id="editVillage" class="form-control form-control-sm" readonly>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-3"><label>Employment Type</label></div>
+                                <div class="col-md-3"><label>Employment Type<span class="required">*</span></label></div>
                                 <div class="col-md-9">
                                     <input type="text" id="editType" class="form-control form-control-sm" readonly>
                                 </div>
@@ -792,7 +778,7 @@ function validateNumber(input) {
                             <hr>
 
                             <div class="row mb-2">
-                                <div class="col-md-4"><label>SC</label></div>
+                                <div class="col-md-4"><label>SC<span class="required">*</span></label></div>
                                 <div class="col-md-4">
                                     <input type="text" id="editSc" name="sc" class="form-control form-control-sm"
                                            oninput="validateNumber(this)" autocomplete="off" required >
@@ -800,7 +786,7 @@ function validateNumber(input) {
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-md-4"><label>ST</label></div>
+                                <div class="col-md-4"><label>ST<span class="required">*</span></label></div>
                                 <div class="col-md-4">
                                     <input type="text" id="editSt" name="st" class="form-control form-control-sm"
                                            oninput="validateNumber(this)" autocomplete="off" required >
@@ -808,7 +794,7 @@ function validateNumber(input) {
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-md-4"><label>Others</label></div>
+                                <div class="col-md-4"><label>Others<span class="required">*</span></label></div>
                                 <div class="col-md-4">
                                     <input type="text" id="editOthers" name="others" class="form-control form-control-sm"
                                            oninput="validateNumber(this)" autocomplete="off" required >
@@ -816,7 +802,7 @@ function validateNumber(input) {
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-md-4"><label>Women</label></div>
+                                <div class="col-md-4"><label>Women<span class="required">*</span></label></div>
                                 <div class="col-md-4">
                                     <input type="text" id="editWomen" name="women" class="form-control form-control-sm"
                                            oninput="validateNumber(this)" autocomplete="off" required >

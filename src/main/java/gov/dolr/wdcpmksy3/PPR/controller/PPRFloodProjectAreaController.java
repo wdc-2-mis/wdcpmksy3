@@ -18,6 +18,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRSoilErosionService;
 import gov.dolr.wdcpmksy3.PPR.service.PprDisasterDetailsService;
 import gov.dolr.wdcpmksy3.PPR.service.VillageService;
+import gov.dolr.wdcpmksy3.controller.HomeController;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
 import gov.dolr.wdcpmksy3.entity.MVillage;
 import gov.dolr.wdcpmksy3.service.DistrictService;
@@ -44,30 +45,58 @@ public class PPRFloodProjectAreaController {
 	
 	@Autowired
 	private VillageRepository villrepo;
-	 
-	@GetMapping("/dtlFloodDroughtArea")
-    public String dtlFloodDroughtArea(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
-	{
-		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-		Object userid = session.getAttribute("userid");
-        if(userid==null){
+	
+	private final HomeController homeController;
 
-            return "redirect:/login";
-        }
-        if (pprid != null) {
-        	pprAreaService.changeStatusByPprId(pprid);
-        }
-        List<DisasterType> disasterTypes = DTrepo.findAll();
-        model.addAttribute("disasterTypes", disasterTypes);
-        
-        model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
-        model.addAttribute("villageList", villrepo.getVillagesByState(stcode));
-		  List<PprDisasterDetails> records = pprAreaService.findAll(); 
-		  model.addAttribute("records", records);
-		  model.addAttribute("monthList", soilErosionService.getAllMonths());
-	      model.addAttribute("yearList", soilErosionService.getAllYears());
-       return "ppr/floodDroughtArea";
+	 
+	PPRFloodProjectAreaController(HomeController homeController) {
+        this.homeController = homeController;
+    }
+
+	
+	@GetMapping("/dtlFloodDroughtArea")
+	public String dtlFloodDroughtArea(
+	        HttpSession session,
+	        Model model,
+	        @RequestParam(required = false) Integer pprid,
+	        @RequestParam(required = false) Integer dcode) {
+
+		
+	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+	    Object userid = session.getAttribute("userid");
+
+	    if (userid == null) {
+	        return "redirect:/login";
+	    }
+
+	    if (pprid != null) {
+	        pprAreaService.changeStatusByPprId(pprid);
+	    }
+
+	    List<DisasterType> disasterTypes = DTrepo.findAll();
+
+	    model.addAttribute("disasterTypes", disasterTypes);
+	    model.addAttribute("distList",
+	            districtService.getPPRDistrictsByState(stcode));
+	    model.addAttribute("villageList",
+	            villrepo.getVillagesByState(stcode));
+
+	    List<PprDisasterDetails> records = pprAreaService.findAll();
+	    model.addAttribute("records", records);
+
+	    model.addAttribute("monthList",
+	            soilErosionService.getAllMonths());
+
+	    model.addAttribute("yearList",
+	            soilErosionService.getAllYears());
+
+	    // Send selected values to Thymeleaf/JavaScript
+	    model.addAttribute("selectedDcode", dcode);
+	    model.addAttribute("selectedPprId", pprid);
+
+	    return "ppr/floodDroughtArea";
 	}
+
 	
 	@PostMapping("/saveFloodDrought")
 	public String saveFloodDrought(HttpSession session, @RequestParam("district") Integer dcode, @RequestParam Integer project, @RequestParam("village") Integer vcode, @RequestParam("disasterTypeId") Integer disasterTypeId, @RequestParam("periodicity") String periodicity, @RequestParam("affected") String affected,

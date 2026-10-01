@@ -179,5 +179,21 @@ public class PprWaterOutcomeService {
     	entity.setCreatedDate( LocalDateTime.now() ); 
     	repository.save(entity);
     }
+
+	public String getWaterOutcomeStatus(
+	        Integer projectId,
+	        Integer watershedId,
+	        Integer vcode) {
+
+	    return repository
+	            .findTopByPpr_PprIdAndMicroWatershed_MwIdAndVillage_VcodeOrderByPprWaterOutcomeIdDesc(
+	                    projectId,
+	                    watershedId,
+	                    vcode
+	            )
+	            .map(statusRecord -> String.valueOf(statusRecord.getStatus()))
+	            .orElse(null);
+	}
+
 	
 }

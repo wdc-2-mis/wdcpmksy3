@@ -48,24 +48,32 @@
 								<select id="district" name="district" class="form-select" >
 									<option value="">--Select District--</option>
 										<th:block th:each="dist : ${distList}">
-											<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
+											<option th:value="${dist.dcode}" th:text="${dist.distName}"
+											th:selected="${selectedDcode != null and dist.dcode == selectedDcode}"></option>
 										</th:block>
 								</select>
 <div class="invalid-feedback">
         Please select District.
     </div>
 				       	</div>
+
 <div class="col-md-4">
-							<label class="form-label">
-								<b> Project </b><span class="required">*</span>
-							</label>
-							<select id="project" name="project" class="form-select">
-							    <option value="">--Select Project--</option>
-							</select>
-							<div class="invalid-feedback">
+
+    <label class="form-label">
+        <b>Project</b><span class="required">*</span>
+    </label>
+
+    <select id="project" name="project" class="form-select">
+        <option value="">--Select Project--</option>
+    </select>
+
+    <div class="invalid-feedback">
         Please select Project.
     </div>
-				        </div>
+
+</div>
+
+
 
     <div class="col-md-4">
 							<label class="form-label">
@@ -246,8 +254,16 @@
         <i class="fas fa-save"></i> Save As Draft
     </button>
 </div>
-      
-        <!-- Records List -->
+    
+
+<div class="text-end mt-2" id="nextBtnContainer">
+						<button type="button" id="nextButton" class="btn btn-primary">
+							Soil Erosion
+							<i class="fas fa-arrow-right ms-1"></i>
+						</button>
+					</div>
+					
+					
 
            
 </form>
@@ -613,42 +629,259 @@
 	
 	
 </div>
-<script>
+
+
+
+
+<script th:inline="javascript">
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    const district = document.getElementById("district");
+
+    const project = document.getElementById("project");
+
+    const village = document.getElementById("village");
+
+    const nextButton = document.getElementById("nextButton");
+
+
+
     /* =========================================================
-       COMMON VALIDATION FUNCTION
-       For text boxes and dropdowns
+       VALUES COMING FROM CONTROLLER
+       ========================================================= */
+
+    const selectedDcode = /*[[${selectedDcode}]]*/ null;
+
+    const selectedPprId = /*[[${selectedPprId}]]*/ null;
+
+
+    function loadProjects(districtId, selectedProjectId) {
+
+    project.innerHTML =
+        '<option value="">--Select Project--</option>';
+
+    village.innerHTML =
+        '<option value="">--Select Village--</option>';
+
+
+    if (!districtId || districtId === "") {
+        return;
+    }
+
+
+    fetch(
+        '/getProjectsByDistrictPPR10?dcode=' +
+        encodeURIComponent(districtId)
+    )
+    .then(function (response) {
+
+        if (!response.ok) {
+            throw new Error("Failed to load projects");
+        }
+
+        return response.json();
+    })
+    .then(function (data) {
+
+        console.log("Projects:", data);
+
+        data.forEach(function (item) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = item.id;
+            option.textContent = item.name;
+
+            project.appendChild(option);
+        });
+
+
+        /*
+         * Automatically select Project
+         */
+
+        if (
+            selectedProjectId !== null &&
+            selectedProjectId !== undefined &&
+            selectedProjectId !== ""
+        ) {
+
+            project.value =
+                String(selectedProjectId);
+
+            console.log(
+                "Selected Project:",
+                project.value
+            );
+
+
+            /*
+             * Project found
+             */
+
+            if (
+                project.value ===
+                String(selectedProjectId)
+            ) {
+
+                /*
+                 * DIRECTLY LOAD VILLAGES
+                 *
+                 * Do not depend only on
+                 * dispatchEvent().
+                 */
+
+                loadVillages(
+                    String(selectedProjectId)
+                );
+
+            } else {
+
+                console.error(
+                    "Project " +
+                    selectedProjectId +
+                    " not found in project list."
+                );
+            }
+        }
+
+    })
+    .catch(function (error) {
+
+        console.error(
+            "Error loading projects:",
+            error
+        );
+
+    });
+}
+
+function loadVillages(projectId) {
+
+    village.innerHTML =
+        '<option value="">--Select Village--</option>';
+
+
+    if (!projectId || projectId === "") {
+
+        updateNextButton();
+
+        return;
+    }
+
+
+    console.log(
+        "Loading villages for Project ID:",
+        projectId
+    );
+
+
+    fetch(
+        "/getVillagesByProjectPPR10?pprId=" +
+        encodeURIComponent(projectId)
+    )
+    .then(function (response) {
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load villages. HTTP Status: " +
+                response.status
+            );
+        }
+
+        return response.json();
+    })
+    .then(function (data) {
+
+        console.log(
+            "Villages received:",
+            data
+        );
+
+
+        data.forEach(function (item) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = item.id;
+
+            option.textContent = item.name;
+
+            village.appendChild(option);
+        });
+
+
+        console.log(
+            "Village dropdown options:",
+            village.options.length
+        );
+
+
+        updateNextButton();
+
+    })
+    .catch(function (error) {
+
+        console.error(
+            "Error loading villages:",
+            error
+        );
+    });
+}
+
+
+    /* =========================================================
+       TEXT FIELD VALIDATION
        ========================================================= */
 
     function validateTextField(field) {
 
         if (!field) {
+
             return false;
         }
 
-        const value = field.value ? field.value.trim() : "";
+
+        const value =
+            field.value
+                ? field.value.trim()
+                : "";
+
 
         const feedback =
-            field.parentElement.querySelector(".invalid-feedback");
+            field.parentElement
+                .querySelector(".invalid-feedback");
+
 
         if (value === "") {
 
             field.classList.add("is-invalid");
 
+
             if (feedback) {
-                feedback.style.display = "block";
+
+                feedback.style.display =
+                    "block";
             }
+
 
             return false;
         }
 
+
         field.classList.remove("is-invalid");
 
+
         if (feedback) {
-            feedback.style.display = "none";
+
+            feedback.style.display =
+                "none";
         }
+
 
         return true;
     }
@@ -663,43 +896,67 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const radios =
             document.querySelectorAll(
-                '#floodDroughtForm input[name="' + groupName + '"]'
+                '#floodDroughtForm input[name="' +
+                groupName +
+                '"]'
             );
 
+
         if (!radios.length) {
+
             return false;
         }
 
+
         const checked =
-            Array.from(radios).some(function (radio) {
-                return radio.checked;
-            });
+            Array.from(radios).some(
+                function (radio) {
+
+                    return radio.checked;
+
+                }
+            );
+
 
         /*
-         * Find the container containing the radio buttons.
+         * Find container containing radio buttons
          */
+
         const container =
             radios[0].closest(".col-md-9");
 
+
         if (!container) {
+
             return checked;
         }
 
+
         const feedback =
-            container.querySelector(".invalid-feedback");
+            container.querySelector(
+                ".invalid-feedback"
+            );
+
 
         if (!checked) {
 
             if (feedback) {
-                feedback.style.display = "block";
+
+                feedback.style.display =
+                    "block";
             }
+
 
             return false;
         }
 
+
         if (feedback) {
-            feedback.style.display = "none";
+
+            feedback.style.display =
+                "none";
         }
+
 
         return true;
     }
@@ -709,87 +966,37 @@ document.addEventListener("DOMContentLoaded", function () {
        DISTRICT → PROJECT
        ========================================================= */
 
-    const district =
-        document.getElementById("district");
-
-    const project =
-        document.getElementById("project");
-
-    const village =
-        document.getElementById("village");
-
-
     if (district) {
 
-        district.addEventListener("change", function () {
+        district.addEventListener(
+            "change",
+            function () {
 
-            const districtId = this.value;
+                const districtId =
+                    this.value;
 
-            /*
-             * Clear Project
-             */
-            project.innerHTML =
-                '<option value="">--Select Project--</option>';
 
-            /*
-             * Clear Village
-             */
-            village.innerHTML =
-                '<option value="">--Select Village--</option>';
+                /*
+                 * Validate District
+                 */
 
-            /*
-             * Validate District
-             */
-            validateTextField(this);
+                validateTextField(this);
 
-            if (districtId === "") {
-                return;
+
+                /*
+                 * Load Projects
+                 *
+                 * For normal user selection,
+                 * no Project needs to be auto-selected.
+                 */
+
+                loadProjects(
+                    districtId,
+                    null
+                );
+
             }
-
-            fetch(
-                '/getProjectsByDistrictPPR10?dcode=' +
-                districtId
-            )
-
-                .then(function (response) {
-
-                    if (!response.ok) {
-                        throw new Error(
-                            "Failed to load projects"
-                        );
-                    }
-
-                    return response.json();
-                })
-
-                .then(function (data) {
-
-                    data.forEach(function (item) {
-
-                        const option =
-                            document.createElement("option");
-
-                        option.value = item.id;
-
-                        option.textContent = item.name;
-
-                        project.appendChild(option);
-
-                    });
-
-                })
-
-                .catch(function (error) {
-
-                    console.error(
-                        "Error loading projects:",
-                        error
-                    );
-
-                });
-
-        });
-
+        );
     }
 
 
@@ -797,72 +1004,60 @@ document.addEventListener("DOMContentLoaded", function () {
        PROJECT → VILLAGE
        ========================================================= */
 
-    if (project) {
+   if (project) {
 
-        project.addEventListener("change", function () {
+    project.addEventListener(
+        "change",
+        function () {
 
-            const projectId = this.value;
+            const projectId =
+                this.value;
 
-            /*
-             * Clear Village
-             */
-            village.innerHTML =
-                '<option value="">--Select Village--</option>';
 
             /*
              * Validate Project
              */
+
             validateTextField(this);
 
-            if (projectId === "") {
-                return;
-            }
 
-            fetch(
-                "/getVillagesByProjectPPR10?pprId=" +
+            /*
+             * Load Village
+             */
+
+            loadVillages(
                 projectId
-            )
+            );
+        }
+    );
+}
 
-                .then(function (response) {
 
-                    if (!response.ok) {
-                        throw new Error(
-                            "Failed to load villages"
-                        );
-                    }
+    /* =========================================================
+       NEXT BUTTON
+       ========================================================= */
 
-                    return response.json();
-                })
+    function updateNextButton() {
+    const nextButton = document.getElementById("nextButton");
 
-                .then(function (data) {
+    if (!nextButton) return;
 
-                    data.forEach(function (item) {
+    if (district && district.value !== "" && project && project.value !== "") {
+        nextButton.style.display = "inline-block";
 
-                        const option =
-                            document.createElement("option");
-
-                        option.value = item.id;
-
-                        option.textContent = item.name;
-
-                        village.appendChild(option);
-
-                    });
-
-                })
-
-                .catch(function (error) {
-
-                    console.error(
-                        "Error loading villages:",
-                        error
-                    );
-
-                });
-
-        });
-
+        nextButton.onclick = function () {
+            window.location.href =
+                "/pprSoilErosion?dcode=" +
+                encodeURIComponent(district.value) +
+                "&pprid=" +
+                encodeURIComponent(project.value);
+        };
+    } else {
+        nextButton.style.display = "none";
+        nextButton.onclick = null;
     }
+}
+
 
 
     /* =========================================================
@@ -870,10 +1065,16 @@ document.addEventListener("DOMContentLoaded", function () {
        ========================================================= */
 
     const form =
-        document.getElementById("floodDroughtForm");
+        document.getElementById(
+            "floodDroughtForm"
+        );
+
 
     const saveConfirmModalEl =
-        document.getElementById("saveConfirmModal");
+        document.getElementById(
+            "saveConfirmModal"
+        );
+
 
     let saveConfirmModal = null;
 
@@ -881,8 +1082,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (saveConfirmModalEl) {
 
         saveConfirmModal =
-            new bootstrap.Modal(saveConfirmModalEl);
-
+            new bootstrap.Modal(
+                saveConfirmModalEl
+            );
     }
 
 
@@ -900,164 +1102,228 @@ document.addEventListener("DOMContentLoaded", function () {
        FORM SUBMIT
        ========================================================= */
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener(
+        "submit",
+        function (e) {
 
-        e.preventDefault();
-
-        let isValid = true;
-
-
-        /* =====================================================
-           CLEAR OLD ERRORS
-           ===================================================== */
-
-        form.querySelectorAll(".invalid-feedback")
-            .forEach(function (feedback) {
-
-                feedback.style.display = "none";
-
-            });
+            e.preventDefault();
 
 
-        form.querySelectorAll("input, select")
-            .forEach(function (field) {
-
-                field.classList.remove("is-invalid");
-
-            });
+            let isValid = true;
 
 
-        /* =====================================================
-           DROPDOWN VALIDATION
-           ===================================================== */
+            /* =================================================
+               CLEAR OLD ERRORS
+               ================================================= */
 
-        const districtField =
-            document.getElementById("district");
+            form.querySelectorAll(
+                ".invalid-feedback"
+            )
+            .forEach(
+                function (feedback) {
 
-        const projectField =
-            document.getElementById("project");
+                    feedback.style.display =
+                        "none";
 
-        const villageField =
-            document.getElementById("village");
-
-        const yearField =
-            document.getElementById("yearId");
-
-        const monthField =
-            document.getElementById("monthId");
+                }
+            );
 
 
-        if (!validateTextField(districtField)) {
-            isValid = false;
-        }
+            form.querySelectorAll(
+                "input, select"
+            )
+            .forEach(
+                function (field) {
 
-        if (!validateTextField(projectField)) {
-            isValid = false;
-        }
+                    field.classList.remove(
+                        "is-invalid"
+                    );
 
-        if (!validateTextField(villageField)) {
-            isValid = false;
-        }
-
-        if (!validateTextField(yearField)) {
-            isValid = false;
-        }
-
-        if (!validateTextField(monthField)) {
-            isValid = false;
-        }
+                }
+            );
 
 
-        /* =====================================================
-           PARTICULAR VALIDATION
-           ===================================================== */
+            /* =================================================
+               DROPDOWN VALIDATION
+               ================================================= */
 
-        if (!validateRadioGroup("disasterTypeId")) {
-
-            isValid = false;
-
-        }
-
-
-        /* =====================================================
-           PERIODICITY VALIDATION
-           ===================================================== */
-
-        if (!validateRadioGroup("periodicity")) {
-
-            isValid = false;
-
-        }
+            const districtField =
+                document.getElementById(
+                    "district"
+                );
 
 
-        /* =====================================================
-           AFFECTED VALIDATION
-           ===================================================== */
-
-        if (!validateRadioGroup("affected")) {
-
-            isValid = false;
-
-        }
+            const projectField =
+                document.getElementById(
+                    "project"
+                );
 
 
-        /* =====================================================
-           STOP SUBMISSION IF INVALID
-           ===================================================== */
+            const villageField =
+                document.getElementById(
+                    "village"
+                );
 
-        if (!isValid) {
 
-            /*
-             * Find first invalid dropdown.
-             */
-            const firstInvalid =
-                form.querySelector(".is-invalid");
+            const yearField =
+                document.getElementById(
+                    "yearId"
+                );
 
-            if (firstInvalid) {
 
-                firstInvalid.focus();
+            const monthField =
+                document.getElementById(
+                    "monthId"
+                );
+
+
+            if (
+                !validateTextField(
+                    districtField
+                )
+            ) {
+
+                isValid = false;
+            }
+
+
+            if (
+                !validateTextField(
+                    projectField
+                )
+            ) {
+
+                isValid = false;
+            }
+
+
+            if (
+                !validateTextField(
+                    villageField
+                )
+            ) {
+
+                isValid = false;
+            }
+
+
+            if (
+                !validateTextField(
+                    yearField
+                )
+            ) {
+
+                isValid = false;
+            }
+
+
+            if (
+                !validateTextField(
+                    monthField
+                )
+            ) {
+
+                isValid = false;
+            }
+
+
+            /* =================================================
+               PARTICULAR VALIDATION
+               ================================================= */
+
+            if (
+                !validateRadioGroup(
+                    "disasterTypeId"
+                )
+            ) {
+
+                isValid = false;
+            }
+
+
+            /* =================================================
+               PERIODICITY VALIDATION
+               ================================================= */
+
+            if (
+                !validateRadioGroup(
+                    "periodicity"
+                )
+            ) {
+
+                isValid = false;
+            }
+
+
+            /* =================================================
+               AFFECTED VALIDATION
+               ================================================= */
+
+            if (
+                !validateRadioGroup(
+                    "affected"
+                )
+            ) {
+
+                isValid = false;
+            }
+
+
+            /* =================================================
+               STOP SUBMISSION IF INVALID
+               ================================================= */
+
+            if (!isValid) {
+
+                const firstInvalid =
+                    form.querySelector(
+                        ".is-invalid"
+                    );
+
+
+                if (firstInvalid) {
+
+                    firstInvalid.focus();
+                }
+
+
+                return;
+            }
+
+
+            /* =================================================
+               SAVE CONFIRMATION MODAL
+               ================================================= */
+
+            if (saveConfirmModal) {
+
+                saveConfirmModal.show();
+
+
+                const confirmBtn =
+                    document.getElementById(
+                        "confirmSaveBtn"
+                    );
+
+
+                if (confirmBtn) {
+
+                    confirmBtn.onclick =
+                        function () {
+
+                            form.submit();
+
+                        };
+                }
+
+            } else {
+
+                form.submit();
 
             }
 
-            return;
         }
-
-
-        /* =====================================================
-           SAVE CONFIRMATION MODAL
-           ===================================================== */
-
-        if (saveConfirmModal) {
-
-            saveConfirmModal.show();
-
-            const confirmBtn =
-                document.getElementById("confirmSaveBtn");
-
-
-            if (confirmBtn) {
-
-                /*
-                 * onclick prevents multiple event listeners.
-                 */
-                confirmBtn.onclick = function () {
-
-                    form.submit();
-
-                };
-
-            }
-
-        } else {
-
-            /*
-             * Fallback if modal does not exist.
-             */
-            form.submit();
-
-        }
-
-    });
+    );
 
 
     /* =========================================================
@@ -1066,33 +1332,43 @@ document.addEventListener("DOMContentLoaded", function () {
        ========================================================= */
 
     const dropdownIds = [
+
         "district",
+
         "project",
+
         "village",
+
         "yearId",
+
         "monthId"
+
     ];
 
 
-    dropdownIds.forEach(function (id) {
+    dropdownIds.forEach(
+        function (id) {
 
-        const field =
-            document.getElementById(id);
+            const field =
+                document.getElementById(id);
 
-        if (field) {
 
-            field.addEventListener(
-                "change",
-                function () {
+            if (field) {
 
-                    validateTextField(this);
+                field.addEventListener(
+                    "change",
+                    function () {
 
-                }
-            );
+                        validateTextField(
+                            this
+                        );
+
+                    }
+                );
+            }
 
         }
-
-    });
+    );
 
 
     /* =========================================================
@@ -1101,38 +1377,46 @@ document.addEventListener("DOMContentLoaded", function () {
        ========================================================= */
 
     const radioGroups = [
+
         "disasterTypeId",
+
         "periodicity",
+
         "affected"
+
     ];
 
 
-    radioGroups.forEach(function (groupName) {
+    radioGroups.forEach(
+        function (groupName) {
 
-        const radios =
-            form.querySelectorAll(
-                'input[name="' + groupName + '"]'
-            );
+            const radios =
+                form.querySelectorAll(
+                    'input[name="' +
+                    groupName +
+                    '"]'
+                );
 
 
-        radios.forEach(function (radio) {
+            radios.forEach(
+                function (radio) {
 
-            radio.addEventListener(
-                "change",
-                function () {
+                    radio.addEventListener(
+                        "change",
+                        function () {
 
-                    /*
-                     * As soon as user selects a radio,
-                     * hide its error message.
-                     */
-                    validateRadioGroup(groupName);
+                            validateRadioGroup(
+                                groupName
+                            );
+
+                        }
+                    );
 
                 }
             );
 
-        });
-
-    });
+        }
+    );
 
 
     /* =========================================================
@@ -1140,12 +1424,16 @@ document.addEventListener("DOMContentLoaded", function () {
        ========================================================= */
 
     const editModal =
-        document.getElementById("editModal");
+        document.getElementById(
+            "editModal"
+        );
 
 
     if (!editModal) {
 
-        console.error("editModal not found");
+        console.error(
+            "editModal not found"
+        );
 
         return;
     }
@@ -1184,68 +1472,110 @@ document.addEventListener("DOMContentLoaded", function () {
                --------------------------------------------- */
 
             const id =
-                button.getAttribute("data-id");
+                button.getAttribute(
+                    "data-id"
+                );
 
-            const district =
-                button.getAttribute("data-district");
-                
-            const project =
-                button.getAttribute("data-project");    
 
-            const village =
-                button.getAttribute("data-village");
+            const editDistrictValue =
+                button.getAttribute(
+                    "data-district"
+                );
+
+
+            const editProjectValue =
+                button.getAttribute(
+                    "data-project"
+                );
+
+
+            const editVillageValue =
+                button.getAttribute(
+                    "data-village"
+                );
+
 
             const yearId =
-                button.getAttribute("data-year");
+                button.getAttribute(
+                    "data-year"
+                );
+
 
             const monthId =
-                button.getAttribute("data-month");
+                button.getAttribute(
+                    "data-month"
+                );
+
 
             const disaster =
-                button.getAttribute("data-disaster");
+                button.getAttribute(
+                    "data-disaster"
+                );
+
 
             const periodicity =
-                button.getAttribute("data-periodicity");
+                button.getAttribute(
+                    "data-periodicity"
+                );
+
 
             const affected =
-                button.getAttribute("data-affected");
+                button.getAttribute(
+                    "data-affected"
+                );
 
 
             /* ---------------------------------------------
                CONSOLE
                --------------------------------------------- */
 
-            console.log("ID:", id);
+            console.log(
+                "ID:",
+                id
+            );
+
 
             console.log(
                 "District:",
-                district
+                editDistrictValue
             );
+
+
+            console.log(
+                "Project:",
+                editProjectValue
+            );
+
 
             console.log(
                 "Village:",
-                village
+                editVillageValue
             );
+
 
             console.log(
                 "Month ID:",
                 monthId
             );
 
+
             console.log(
                 "Year ID:",
                 yearId
             );
+
 
             console.log(
                 "Disaster:",
                 disaster
             );
 
+
             console.log(
                 "Periodicity:",
                 periodicity
             );
+
 
             console.log(
                 "Affected:",
@@ -1259,31 +1589,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
             document.getElementById(
                 "pprDisasterId"
-            ).value = id || "";
+            ).value =
+                id || "";
 
 
             document.getElementById(
                 "editDistrict"
-            ).value = district || "";
+            ).value =
+                editDistrictValue || "";
 
 
-			document.getElementById(
+            document.getElementById(
                 "editProject"
-            ).value = project || "";
-            
+            ).value =
+                editProjectValue || "";
+
+
             document.getElementById(
                 "editVillage"
-            ).value = village || "";
+            ).value =
+                editVillageValue || "";
 
 
             document.getElementById(
                 "editMonth"
-            ).value = monthId || "";
+            ).value =
+                monthId || "";
 
 
             document.getElementById(
                 "editYear"
-            ).value = yearId || "";
+            ).value =
+                yearId || "";
 
 
             console.log(
@@ -1306,13 +1643,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 .querySelectorAll(
                     '#editParticularRadios input[name="disasterTypeId"]'
                 )
-                .forEach(function (radio) {
+                .forEach(
+                    function (radio) {
 
-                    radio.checked =
-                        String(radio.value) ===
-                        String(disaster);
+                        radio.checked =
+                            String(
+                                radio.value
+                            ) ===
+                            String(
+                                disaster
+                            );
 
-                });
+                    }
+                );
 
 
             /* ---------------------------------------------
@@ -1323,13 +1666,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 .querySelectorAll(
                     '#editForm input[name="periodicity"]'
                 )
-                .forEach(function (radio) {
+                .forEach(
+                    function (radio) {
 
-                    radio.checked =
-                        String(radio.value) ===
-                        String(periodicity);
+                        radio.checked =
+                            String(
+                                radio.value
+                            ) ===
+                            String(
+                                periodicity
+                            );
 
-                });
+                    }
+                );
 
 
             /* ---------------------------------------------
@@ -1340,13 +1689,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 .querySelectorAll(
                     '#editForm input[name="affected"]'
                 )
-                .forEach(function (radio) {
+                .forEach(
+                    function (radio) {
 
-                    radio.checked =
-                        String(radio.value).toLowerCase() ===
-                        String(affected).toLowerCase();
+                        radio.checked =
+                            String(
+                                radio.value
+                            ).toLowerCase() ===
+                            String(
+                                affected
+                            ).toLowerCase();
 
-                });
+                    }
+                );
 
         }
     );
@@ -1362,7 +1717,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (
                 document.activeElement &&
-                editModal.contains(document.activeElement)
+                editModal.contains(
+                    document.activeElement
+                )
             ) {
 
                 document.activeElement.blur();
@@ -1372,10 +1729,58 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     );
 
+
+    /* =========================================================
+       AUTO SELECT DISTRICT + PROJECT
+       WHEN OPENED WITH dcode + pprid
+       ========================================================= */
+
+    console.log(
+        "selectedDcode =",
+        selectedDcode
+    );
+
+
+    console.log(
+        "selectedPprId =",
+        selectedPprId
+    );
+
+
+    if (
+        selectedDcode !== null &&
+        selectedDcode !== undefined &&
+        selectedDcode !== ""
+    ) {
+
+        /*
+         * Select District
+         */
+
+        district.value =
+            String(selectedDcode);
+
+
+        /*
+         * Load Projects for District
+         * and automatically select PPR ID.
+         */
+
+        loadProjects(
+            String(selectedDcode),
+            selectedPprId
+        );
+
+    }
+
+
+    /*
+     * Initial Next button state
+     */
+
+    updateNextButton();
+
 });
-
-
-
 </script>
 </div>
 </body>

@@ -674,9 +674,75 @@ document.addEventListener("DOMContentLoaded", function () {
 
     village.addEventListener("change", function () {
 
-        validateTextField(this);
+    validateTextField(this);
 
+    const villageId = this.value;
+    const projectId = project.value;
+    const watershedId = watershed.value;
+
+    if (
+        villageId === "" ||
+        projectId === "" ||
+        watershedId === ""
+    ) {
+        return;
+    }
+
+    fetch(
+        "/checkWaterOutcome?project=" +
+        encodeURIComponent(projectId) +
+        "&watershed=" +
+        encodeURIComponent(watershedId) +
+        "&village=" +
+        encodeURIComponent(villageId)
+    )
+    .then(response => response.text())
+    .then(status => {
+
+        console.log(
+            "Water Outcome duplicate status:",
+            status
+        );
+
+        // C = Completed
+        if (status === "C") {
+
+            alert(
+                "Data already completed for the selected Project, Micro Watershed and Village."
+            );
+
+            saveDraftButton.disabled = true;
+        }
+
+        // D = Draft
+        else if (status === "D") {
+
+            alert(
+                "Data already exists in Draft mode for the selected Project, Micro Watershed and Village."
+            );
+
+            saveDraftButton.disabled = true;
+        }
+
+        // No existing record
+        else {
+
+            saveDraftButton.disabled = false;
+        }
+
+    })
+    .catch(error => {
+
+        console.error(
+            "Water Outcome duplicate check error:",
+            error
+        );
+
+        // In case of API error, don't unnecessarily block the form
+        saveDraftButton.disabled = false;
     });
+
+});
 
 
     // =========================================================
@@ -1100,7 +1166,7 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
 </div>
 				<div class="text-center mt-4">
-						<button type="submit" name="action" value="D" class="btn btn-warning"><i class="fas fa-save"></i> Save as Draft
+						<button type="submit" id="saveDraftButton" name="action" value="D" class="btn btn-warning"><i class="fas fa-save"></i> Save as Draft
 						</button>
 						
 					</div>		

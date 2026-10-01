@@ -263,42 +263,6 @@
 </div>
 
 
-<!-- Validation Modal -->
-<div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-danger">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">Validation Error</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p id="validationMessage"></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="saveAreaWP" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-primary">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">Confirm Save</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>Do you want to save these records?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="confirmSaveBtn">Yes, Save</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 
 <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -314,23 +278,35 @@
 
           <!-- District Name (readonly) -->
           <div class="row mb-3">
-            <div class="col-md-3">
-              <label>District Name:</label>
+            <div class="col-md-2">
+              <label>District:<span class="required">*</span></label>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-4">
               <input type="text"
        id="editDistrictName"
        name="editDistrictName"
        class="form-control form-control-sm"
        readonly>
             </div>
+            
+            <div class="col-md-2">
+              <label>Project:<span class="required">*</span></label>
+            </div>
+            <div class="col-md-4">
+              <input type="text"
+       id="editProjectName"
+       name="editProjectName"
+       class="form-control form-control-sm"
+       readonly>
+            </div>
+            
           </div>
 
 
           <!-- Micro-Watershed (readonly) -->
           <div class="row mb-3">
             <div class="col-md-3">
-              <label>Micro-Watershed:</label>
+              <label>Micro-Watershed: <span class="required">*</span></label>
             </div>
             <div class="col-md-9">
               <input type="text"
@@ -344,7 +320,7 @@
           <!-- Total Micro-Watershed Area (readonly) -->
           <div class="row mb-3">
             <div class="col-md-3">
-              <label>Total Micro-Watershed Area (in ha.):</label>
+              <label>Total Micro-Watershed Area (in ha.): <span class="required">*</span></label>
             </div>
             <div class="col-md-9">
               <input type="text"
@@ -358,7 +334,7 @@
           <!-- Scheme fields (editable) -->
           <div class="row mb-3">
             <div class="col-md-12">
-              <h6 class="fw-bold">Micro-Watershed so far under watershed Programme:</h6>
+              <h6 class="fw-bold">Micro-Watershed so far under watershed Programme: <span class="required">*</span></h6>
             </div>
           </div>
 
@@ -369,13 +345,16 @@
           </div>
 
  <div class="row mb-2">
-    <div class="col-md-4">Pre-WDC2.0:</div>
+    <div class="col-md-4">Pre-WDC2.0: <span class="required">*</span></div>
     <div class="col-md-3">
         <input type="text"
                id="editscheme1No"
                name="scheme[1].no"
                class="form-control form-control-sm" required
                oninput="validateInteger(this,10)">
+                <div class="invalid-feedback">
+            Please enter Pre-WDC2.0 No.
+        </div>
     </div>
     <div class="col-md-3">
         <input type="text"
@@ -383,17 +362,23 @@
                name="scheme[1].area"
                class="form-control form-control-sm" required
                oninput="validateDecimal(this,10,4)">
+               <div class="invalid-feedback">
+            Please enter Pre-WDC2.0 Area.
+        </div>
     </div>
     </div>
      
   <div class="row mb-2">
-    <div class="col-md-4">DPAP:</div>
+    <div class="col-md-4">DPAP:<span class="required">*</span></div>
     <div class="col-md-3">
         <input type="text"
                id="editscheme2No"
                name="scheme[2].no"
                class="form-control form-control-sm" required
                oninput="validateInteger(this,10)">
+               <div class="invalid-feedback">
+            Please enter DPAP No.
+        </div>
     </div>
     <div class="col-md-3">
         <input type="text"
@@ -401,17 +386,24 @@
                name="scheme[2].area"
                class="form-control form-control-sm" required
                oninput="validateDecimal(this,10,4)">
+          <div class="invalid-feedback">
+            Please enter DPAP Area.
+        </div>     
     </div>
     </div>     
 
 <div class="row mb-2">
-    <div class="col-md-4">DDP:</div>
+    <div class="col-md-4">DDP:<span class="required">*</span></div>
     <div class="col-md-3">
         <input type="text"
                id="editscheme3No"
                name="scheme[3].no"
                class="form-control form-control-sm" required
                oninput="validateInteger(this,10)">
+               
+               <div class="invalid-feedback">
+            Please enter DDP No.
+        </div>
     </div>
     <div class="col-md-3">
         <input type="text"
@@ -419,17 +411,23 @@
                name="scheme[3].area"
                class="form-control form-control-sm" required
                oninput="validateDecimal(this,10,4)">
+               <div class="invalid-feedback">
+            Please enter DDP Area.
+        </div>
     </div>
      </div>
    
    <div class="row mb-2">
-    <div class="col-md-4">IWDP:</div>
+    <div class="col-md-4">IWDP:<span class="required">*</span></div>
     <div class="col-md-3">
         <input type="text"
                id="editscheme4No"
                name="scheme[4].no"
                class="form-control form-control-sm" required
                oninput="validateInteger(this,10)">
+               <div class="invalid-feedback">
+            Please enter IWDP No.
+        </div>
     </div>
     <div class="col-md-3">
         <input type="text"
@@ -437,17 +435,23 @@
                name="scheme[4].area"
                class="form-control form-control-sm" required
                oninput="validateDecimal(this,10,4)">
+               <div class="invalid-feedback">
+            Please enter IWDP Area.
+        </div>
     </div>
      </div>
      
      <div class="row mb-2">
-    <div class="col-md-4">IWMP:</div>
+    <div class="col-md-4">IWMP:<span class="required">*</span></div>
     <div class="col-md-3">
         <input type="text"
                id="editscheme5No"
                name="scheme[5].no"
                class="form-control form-control-sm" required
                oninput="validateInteger(this,10)">
+               <div class="invalid-feedback">
+            Please enter IWMP No.
+        </div>
     </div>
     <div class="col-md-3">
         <input type="text"
@@ -455,17 +459,23 @@
                name="scheme[5].area"
                class="form-control form-control-sm" required
                oninput="validateDecimal(this,10,4)">
+               <div class="invalid-feedback">
+            Please enter IWMP Area.
+        </div>
     </div>
      </div>
      
      <div class="row mb-2">
-    <div class="col-md-4">WDC-PMKSY 2.0: </div>
+    <div class="col-md-4">WDC-PMKSY 2.0: <span class="required">*</span></div>
     <div class="col-md-3">
         <input type="text"
                id="editscheme6No"
                name="scheme[6].no"
                class="form-control form-control-sm" required
                oninput="validateInteger(this,10)">
+                <div class="invalid-feedback">
+            Please enter WDC-PMKSY 2.0 No.
+        </div>
     </div>
     <div class="col-md-3">
         <input type="text"
@@ -473,6 +483,9 @@
                name="scheme[6].area"
                class="form-control form-control-sm" required
                oninput="validateDecimal(this,10,4)">
+               <div class="invalid-feedback">
+            Please enter WDC-PMKSY 2.0 Area.
+        </div>
     </div>
      </div>
      
@@ -971,6 +984,7 @@ function loadProjects(districtId, projectToSelect = null) {
                            data-pprid="${record.pprId}"
 
                            data-district="${record.dist_name ?? ''}"
+                           data-proj-name="${record.proj_name ?? ''}"
 
                            data-mwid="${record.mw_id ?? ''}"
 
@@ -1014,29 +1028,28 @@ function loadProjects(districtId, projectToSelect = null) {
                        
 &nbsp
 
-                        <a href="/completeAreaConveredWP?id=${record.pprId}&mwId=${record.mw_id}"
+                        <a href="javascript:void(0)" class="btn btn-success btn-sm"
+   onclick="completeAlert('Are you sure you want to complete this record?',
+       function() {window.location.href ='/completeAreaConveredWP?id=${record.pprId}&mwId=${record.mw_id}';}
+   ); return false;">
 
-                           class="btn btn-success btn-sm"
+    <i class="fas fa-check"></i>
 
-                           onclick="return confirm('Are you sure you want to complete this record?');">
-
-                            <i class="fas fa-check"></i>
-
-                        </a>
+</a>
 
 
                       
 &nbsp
 
-                        <a href="/deleteAreaConveredWP?id=${record.pprId}&mwId=${record.mw_id}"
+                       <a href="javascript:void(0)" class="btn btn-danger btn-sm"
+   onclick="deleteAlert('Are you sure you want to delete this record?',
+       function() {window.location.href = '/deleteAreaConveredWP?id=${record.pprId}&mwId=${record.mw_id}';
+       }
+   ); return false;">
 
-                           class="btn btn-danger btn-sm"
+    <i class="fas fa-trash"></i>
 
-                           onclick="return confirm('Are you sure you want to delete this record?');">
-
-                            <i class="fas fa-trash"></i>
-
-                        </a>
+</a>
 
                         `
 
@@ -1185,6 +1198,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const pprId       = editBtn.dataset.pprid;
         const district    = editBtn.dataset.district;
+        const projname    = editBtn.dataset.projName;
         const mwId        = editBtn.dataset.mwid;
         const mwName      = editBtn.dataset.mwname;
         const totalMwArea = editBtn.dataset.totalmwarea;
@@ -1221,6 +1235,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("editDistrictName").value =
             district || "";
 
+        document.getElementById("editProjectName").value =
+            projname || "";
         document.getElementById("editMwName").value =
             mwName || "";
 
@@ -1293,6 +1309,165 @@ document.addEventListener("DOMContentLoaded", function () {
         editModal.show();
 
     });
+    
+
+         const editFields = [
+        "editscheme1No",
+        "editscheme1Area",
+        "editscheme2No",
+        "editscheme2Area",
+        "editscheme3No",
+        "editscheme3Area",
+        "editscheme4No",
+        "editscheme4Area",
+        "editscheme5No",
+        "editscheme5Area",
+        "editscheme6No",
+        "editscheme6Area"
+    ];
+
+
+    /*
+     * Validate one field
+     */
+    function validateEditField(field) {
+
+        if (!field) {
+            return true;
+        }
+
+        const value = field.value.trim();
+
+        if (value === "") {
+
+            field.classList.add("is-invalid");
+            field.classList.remove("is-valid");
+
+            return false;
+
+        } else {
+
+            field.classList.remove("is-invalid");
+            field.classList.add("is-valid");
+
+            return true;
+        }
+    }
+
+
+    /*
+     * Validate when user types
+     */
+    editFields.forEach(function (fieldId) {
+
+        const field = document.getElementById(fieldId);
+
+        if (!field) {
+            return;
+        }
+
+        field.addEventListener("input", function () {
+
+            /*
+             * Only remove blank validation
+             * when user starts entering value.
+             */
+            if (this.value.trim() !== "") {
+
+                this.classList.remove("is-invalid");
+                this.classList.add("is-valid");
+
+            } else {
+
+                this.classList.remove("is-valid");
+
+            }
+
+        });
+
+
+        /*
+         * Also validate when user leaves field
+         */
+        field.addEventListener("blur", function () {
+
+            validateEditField(this);
+
+        });
+
+    });
+
+
+    /*
+     * Find your edit form
+     *
+     * IMPORTANT:
+     * Replace "editPprForm" with your actual form ID
+     */
+    const editForm = document.getElementById("editPprForm");
+
+
+    if (editForm) {
+
+        editForm.addEventListener("submit", function (event) {
+
+            let isValid = true;
+
+            let firstInvalidField = null;
+
+
+            editFields.forEach(function (fieldId) {
+
+                const field = document.getElementById(fieldId);
+
+                if (!field) {
+                    return;
+                }
+
+                const valid = validateEditField(field);
+
+                if (!valid) {
+
+                    isValid = false;
+
+                    if (!firstInvalidField) {
+                        firstInvalidField = field;
+                    }
+                }
+
+            });
+
+
+            /*
+             * Stop form submission
+             */
+            if (!isValid) {
+
+                event.preventDefault();
+
+                /*
+                 * Move cursor to first blank field
+                 */
+                if (firstInvalidField) {
+
+                    firstInvalidField.focus();
+
+                    firstInvalidField.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+
+
 
 });
 
@@ -1321,22 +1496,15 @@ document.getElementById("mw").addEventListener("change", function() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const form = document.getElementById("institutionForm");
-    const saveModalElement = document.getElementById("saveAreaWP");
-    const confirmSaveBtn = document.getElementById("confirmSaveBtn");
+    const form =
+        document.getElementById("institutionForm");
 
     if (!form) {
-        console.error("institutionForm not found");
-        return;
-    }
 
-    if (!saveModalElement) {
-        console.error("saveAreaWP modal not found");
-        return;
-    }
+        console.error(
+            "institutionForm not found"
+        );
 
-    if (!confirmSaveBtn) {
-        console.error("confirmSaveBtn not found");
         return;
     }
 
@@ -1356,7 +1524,8 @@ form.addEventListener("submit", function (event) {
 
 
         const district = document.getElementById("district");
-
+        const project = document.getElementById("project");
+     
         if (!district || !district.value) {
 
             district.classList.add("is-invalid");
@@ -1364,6 +1533,15 @@ form.addEventListener("submit", function (event) {
             validationMessage = "Please select a District.";
 
             firstInvalidField = district;
+        }
+        
+        if (!project || !project.value) {
+
+            project.classList.add("is-invalid");
+
+            validationMessage = "Please select a Project.";
+
+            firstInvalidField = project;
         }
 
 
@@ -1463,44 +1641,48 @@ form.addEventListener("submit", function (event) {
             return;
         }
 
+        
+        
+       submitAlert(
+    "Are you sure you want to save this form?",
+    function () {
 
-       
-        console.log("Validation successful");
+        console.log(
+            "User clicked Yes, Submit"
+        );
 
-        const saveModal =
-            new bootstrap.Modal(saveModalElement);
+        let actionInput =
+            form.querySelector(
+                'input[name="action"][data-global-action="true"]'
+            );
 
-        saveModal.show();
+        if (!actionInput) {
 
-    });
+            actionInput =
+                document.createElement("input");
 
+            actionInput.type = "hidden";
 
-    confirmSaveBtn.addEventListener("click", function () {
+            actionInput.name = "action";
 
-        console.log("Yes, Save clicked");
+            actionInput.setAttribute(
+                "data-global-action",
+                "true"
+            );
 
-
-        confirmSaveBtn.disabled = true;
-
-        confirmSaveBtn.innerHTML =
-            '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-
-        // Close confirmation modal
-        const saveModal =
-            bootstrap.Modal.getInstance(saveModalElement);
-
-        if (saveModal) {
-            saveModal.hide();
+            form.appendChild(actionInput);
         }
 
-
-        // IMPORTANT
-        // Actually submit to /saveAreaWP
+        actionInput.value = "D";
 
         form.submit();
 
+    }
+);
     });
+
+
+   
 
 });
 
