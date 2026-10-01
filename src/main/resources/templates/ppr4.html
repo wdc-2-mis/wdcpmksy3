@@ -6,7 +6,6 @@
 	<meta charset="UTF-8">
 	<title>Functionaries of Watershed Cell (PPR4)</title>
 
-	<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
 	<style>
 		.required {
 			color: red;
@@ -15,180 +14,206 @@
 
 
 	<script>
+		// ==========================================================
+		// Helpers
+		// ==========================================================
+		function setInvalid(el, msg) {
+			el.classList.add("is-invalid");
+			el.classList.remove("is-valid");
+			const fb = el.parentElement.querySelector(".invalid-feedback");
+			if (fb && msg) {
+				fb.textContent = msg;
+			}
+		}
 
+		function setValid(el) {
+			el.classList.remove("is-invalid");
+			el.classList.add("is-valid");
+		}
+
+		// ==========================================================
+		// Duplicate district check (no alert)
+		// ==========================================================
 		function checkDistrictExists() {
 
-			let district = document.getElementById("district").value;
+			const district = document.getElementById("district");
 
-			if (district === "") {
+			if (district.value === "") {
 				return;
 			}
 
-			fetch('/checkDistrictExists?dcode=' + district)
+			fetch('/checkDistrictExists?dcode=' + encodeURIComponent(district.value))
 				.then(response => response.text())
 				.then(result => {
-					console.log(result);
 					if (result === "EXISTS") {
-						alert("This District Data already exists. Please select different Distrinct");
-
-						document.getElementById("district").value = "";
-						document.getElementById("district").focus();
+						district.value = "";
+						setInvalid(district, "This District data already exists. Please select a different District.");
+					} else {
+						setValid(district);
 					}
-
 				})
 				.catch(error => console.error(error));
 		}
 
-		// Restrict dates before 2026
-		document.addEventListener("DOMContentLoaded", function () {
-
-			const mouDate = document.getElementsByName("MoU")[0];
-			mouDate.setAttribute("min", "2026-01-01");
-			
-			// Restrict future dates - max is today
-			    const today = new Date();
-			    const yyyy = today.getFullYear();
-			    const mm = String(today.getMonth() + 1).padStart(2, "0");
-			    const dd = String(today.getDate()).padStart(2, "0");
-			    mouDate.setAttribute("max", `${yyyy}-${mm}-${dd}`);
-
-
-		});
-
-		// Allow only PDF files
 		document.addEventListener("DOMContentLoaded", function () {
 
 			const form = document.getElementById("institutionForm");
-
+			const district = document.getElementById("district");
+			const agency = document.getElementById("agency");
+			const chairman = document.getElementById("chairman");
+			const mouDate = document.getElementById("MoU");
 			const mouFile = document.getElementById("MoUfile");
 
-			function validatePDF(input) {
+			// ------------------------------------------------------
+			// Date limits: 01-01-2026 to today
+			// ------------------------------------------------------
+			const today = new Date();
+			const yyyy = today.getFullYear();
+			const mm = String(today.getMonth() + 1).padStart(2, "0");
+			const dd = String(today.getDate()).padStart(2, "0");
 
-				    if (input.files.length === 0) {
-				        return true;
-				    }
+			mouDate.setAttribute("min", "2026-01-01");
+			mouDate.setAttribute("max", `${yyyy}-${mm}-${dd}`);
 
-				    const file = input.files[0];
-				    const fileName = file.name;
+			// ------------------------------------------------------
+			// PDF validation - returns error message, or "" if OK
+			// ------------------------------------------------------
+			function getPdfError(input) {
 
-				    // Check file name - special symbols are not allowed
-				    // Allowed: A-Z, a-z, 0-9, underscore (_), hyphen (-), and .pdf
-				    const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
-
-				    if (!fileNamePattern.test(fileName)) {
-				        alert("File name should contain only letters, numbers, underscore (_) or hyphen (-).");
-				        input.value = "";
-				        return false;
-				    }
-
-				    // Check PDF type
-				    if (file.type !== "application/pdf" &&
-				        !fileName.toLowerCase().endsWith(".pdf")) {
-
-				        alert("Only PDF files are allowed.");
-				        input.value = "";
-				        return false;
-				    }
-
-				    // Check file size - maximum 5 MB
-				    const maxSize = 5 * 1024 * 1024;
-
-				    if (file.size > maxSize) {
-				        alert("PDF file size must not be more than 5 MB.");
-				        input.value = "";
-				        return false;
-				    }
-
-				    return true;
+				if (input.files.length === 0) {
+					return "Please upload MoU PDF.";
 				}
 
-			mouFile.addEventListener("change", function () {
-				if (validatePDF(this)) {
-					validateSameFile(this, mouFile);
+				const file = input.files[0];
+				const name = file.name;
+
+				// Only letters, numbers, underscore, hyphen + .pdf
+				if (!/^[a-zA-Z0-9_-]+\.pdf$/i.test(name)) {
+					return "File name should contain only letters, numbers, underscore (_) or hyphen (-), and end with .pdf";
+				}
+
+				if (file.type !== "application/pdf" && !name.toLowerCase().endsWith(".pdf")) {
+					return "Only PDF files are allowed.";
+				}
+
+				// Max 5 MB
+				if (file.size > 5 * 1024 * 1024) {
+					return "PDF file size must not be more than 5 MB.";
+				}
+
+				return "";
+			}
+
+			// ------------------------------------------------------
+			// Live validation: clear red as soon as user fixes it
+			// ------------------------------------------------------
+			[agency, chairman].forEach(function (field) {
+				field.addEventListener("input", function () {
+					if (field.value.trim() !== "") {
+						setValid(field);
+					}
+				});
+			});
+
+			district.addEventListener("change", function () {
+				if (district.value !== "") {
+					setValid(district);
 				}
 			});
 
+			mouDate.addEventListener("change", function () {
+				if (mouDate.value !== "") {
+					setValid(mouDate);
+				}
+			});
 
+			mouFile.addEventListener("change", function () {
+				const err = getPdfError(mouFile);
 
+				if (err) {
+					if (mouFile.files.length > 0) {
+						mouFile.value = "";
+					}
+					setInvalid(mouFile, err);
+				} else {
+					setValid(mouFile);
+				}
+			});
 
-
-
+			// ------------------------------------------------------
+			// Submit validation (Save as Draft)
+			// ------------------------------------------------------
 			form.addEventListener("submit", function (e) {
 
-				const district = document.getElementsByName("district")[0];
-				const agency = document.getElementsByName("agency")[0];
-				const chairman = document.getElementsByName("chairman")[0];
-				const mouDate = document.getElementsByName("MoU")[0];
+				let isValid = true;
 
-				const mouFile = document.getElementsByName("MoUfile")[0];
-
-
+				// District
 				if (district.value.trim() === "") {
-					alert("Please select District.");
-					district.focus();
-					e.preventDefault();
-					return false;
+					setInvalid(district, "Please select a District.");
+					isValid = false;
+				} else {
+					setValid(district);
 				}
 
+				// Agency
 				if (agency.value.trim() === "") {
-					alert("Please Enter Executing Agency ");
-					agency.focus();
-					e.preventDefault();
-					return false;
+					setInvalid(agency, "Please enter Executing Agency.");
+					isValid = false;
+				} else {
+					setValid(agency);
 				}
 
+				// Chairman
 				if (chairman.value.trim() === "") {
-					alert("Please Enter Chairman Status");
-					chairman.focus();
-					e.preventDefault();
-					return false;
+					setInvalid(chairman, "Please enter Chairman Status.");
+					isValid = false;
+				} else {
+					setValid(chairman);
 				}
 
 				// MoU Date
 				if (mouDate.value === "") {
-					alert("Please select Date of MoU.");
-					mouDate.focus();
-					e.preventDefault();
-					return false;
+					setInvalid(mouDate, "Please select Date of MoU.");
+					isValid = false;
+				} else {
+					setValid(mouDate);
 				}
 
 				// MoU PDF
-				if (mouFile.files.length === 0) {
-					alert("Please upload MoU PDF.");
-					mouFile.focus();
-					e.preventDefault();
-					return false;
+				const pdfErr = getPdfError(mouFile);
+				if (pdfErr) {
+					setInvalid(mouFile, pdfErr);
+					isValid = false;
+				} else {
+					setValid(mouFile);
 				}
 
-				// Validate PDF type
+				// Stop submit if anything is invalid
+				if (!isValid) {
 
-				const file2 = mouFile.files[0];
-
-
-
-				if (!file2.name.toLowerCase().endsWith(".pdf")) {
-					alert("MoU file must be a PDF.");
-					mouFile.value = "";
-					mouFile.focus();
 					e.preventDefault();
+					e.stopPropagation();
+
+					const firstInvalid = form.querySelector(".is-invalid");
+
+					if (firstInvalid) {
+						firstInvalid.scrollIntoView({
+							behavior: "smooth",
+							block: "center"
+						});
+						firstInvalid.focus();
+					}
+
 					return false;
 				}
-
-				// Same file validation
-
 			});
 
 		});
-
 	</script>
 
 </head>
 
 <body>
-
-
-
-
 
 	<div layout:fragment="content">
 
@@ -209,49 +234,46 @@
 				<span th:text="${error}"></span>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
-			<div th:if="${error1}"
-					     class="alert alert-warning alert-dismissible fade show"
-					     role="alert">
+			<div th:if="${error1}" class="alert alert-warning alert-dismissible fade show" role="alert">
 
-					    <i class="fas fa-exclamation-triangle me-2"></i>
+				<i class="fas fa-exclamation-triangle me-2"></i>
 
-					    <strong>Action Required:</strong>
-					    <span th:text="${error1}"></span>
+				<strong>Action Required:</strong>
+				<span th:text="${error1}"></span>
 
-					    <a th:href="@{/institutionalStructurePPR1}"
-					       class="btn btn-sm btn-primary ms-3">
-					        Go to Institutional Structure
-					    </a>
+				<a th:href="@{/institutionalStructurePPR1}" class="btn btn-sm btn-primary ms-3">
+					Go to Institutional Structure
+				</a>
 
-					    <button type="button"
-					            class="btn-close"
-					            data-bs-dismiss="alert">
-					    </button>
+				<button type="button" class="btn-close" data-bs-dismiss="alert">
+				</button>
 
-					</div>
+			</div>
 
 			<div class="card-body">
 
 				<form id="institutionForm" th:action="@{/savePreliminaryPPR4A}" method="post"
 					enctype="multipart/form-data" novalidate>
 
-
-
+					<!-- District -->
 					<div class="row mb-3">
 						<div class="col-md-3">
 							<label>District Name</label><span class="required">*</span>
 						</div>
 						<div class="col-md-5">
-							<select id="district" name="district" class="form-select" onchange="checkDistrictExists()">
+							<select id="district" name="district" class="form-select" onchange="checkDistrictExists()"
+								required>
 								<option value="">--Select District--</option>
 								<th:block th:each="dist : ${distList}">
 									<option th:value="${dist.dcode}" th:text="${dist.distName}">
 									</option>
 								</th:block>
 							</select>
-
+							<div class="invalid-feedback">Please select a District.</div>
 						</div>
 					</div>
+
+					<!-- Executing Agency -->
 					<div class="row mb-3">
 						<div class="col-md-3">
 							<label>Name of Executing Agency</label><span class="required">*</span>
@@ -259,9 +281,11 @@
 						<div class="col-md-5">
 							<input type="text" name="agency" id="agency" class="form-control"
 								placeholder="Enter Executing Agency" required>
-
+							<div class="invalid-feedback">Please enter Executing Agency.</div>
 						</div>
 					</div>
+
+					<!-- Chairman -->
 					<div class="row mb-3">
 						<div class="col-md-3">
 							<label>Status of Chairman</label><span class="required">*</span>
@@ -269,32 +293,33 @@
 						<div class="col-md-5">
 							<input type="text" name="chairman" id="chairman" class="form-control"
 								placeholder="Enter Chairman Status" required>
-
+							<div class="invalid-feedback">Please enter Chairman Status.</div>
 						</div>
 					</div>
+
+					<!-- MoU Date -->
 					<div class="row mb-3">
 						<div class="col-md-3">
 							<label>Date of Signing of MoU with SLNA</label><span class="required">*</span>
 						</div>
 						<div class="col-md-5">
-							<input type="date" name="MoU" id="MoU" class="form-control" onkeydown="return false;" required>
-
+							<input type="date" name="MoU" id="MoU" class="form-control" onkeydown="return false;"
+								required>
+							<div class="invalid-feedback">Please select Date of MoU.</div>
 						</div>
 					</div>
 
-
+					<!-- MoU File -->
 					<div class="row mb-3">
 						<div class="col-md-3">
 							<label>Upload MoU</label><span class="required">*</span>
 						</div>
 						<div class="col-md-5">
 							<input type="file" name="MoUfile" id="MoUfile" class="form-control" accept=".pdf" required>
-
+							<div class="invalid-feedback">Please upload MoU PDF.</div>
 							<small class="text-muted">
 								Only PDF file is allowed.
 							</small>
-
-
 						</div>
 					</div>
 
@@ -304,9 +329,6 @@
 							<i class="fas fa-save"></i>
 							Save as Draft
 						</button>
-						<!--<button class="btn btn-primary">
-									Submit
-								</button>-->
 					</div>
 
 				</form>
@@ -331,9 +353,6 @@
 							<th class="table-primary">Action</th>
 						</tr>
 					</tbody>
-					<!--  <tr th:each="user : ${ppr1List}">
-
-				                           <td th:text="${user[2]}"></td>-->
 
 					<tr th:each="user, stat : ${ppr4List}">
 						<td th:text="${user[1]}"></td>
@@ -349,20 +368,17 @@
 
 						<td>
 							<a th:if="${user[6].toString().equals('D')}"
-								th:href="@{/deletePreliminaryPPR4A(id=${user[0]})}" class="btn btn-danger btn-sm"
-								onclick="return confirm('Are you sure you want to delete this record?');">
+								th:href="@{/deletePreliminaryPPR4A(id=${user[0]})}" class="btn btn-danger btn-sm">
 								<i class="fas fa-trash"></i>
 							</a>
 							&nbsp; &nbsp;
 							<a th:if="${user[6].toString().equals('D')}"
-								th:href="@{/editPreliminaryPPR4A(id=${user[0]})}" class="btn btn-primary btn-sm"
-								onclick="return confirm('Are you sure you want to edit this record?');">
+								th:href="@{/editPreliminaryPPR4A(id=${user[0]})}" class="btn btn-primary btn-sm">
 								<i class="fas fa-edit"></i>
 							</a>
 							&nbsp; &nbsp;
 							<a th:if="${user[6].toString().equals('D')}"
-								th:href="@{/completePreliminaryPPR4A(id=${user[0]})}" class="btn btn-success btn-sm"
-								onclick="return confirm('Are you sure you want to complete this record?');">
+								th:href="@{/completePreliminaryPPR4A(id=${user[0]})}" class="btn btn-success btn-sm">
 								<i class="fas fa-check"></i>
 							</a>
 							<span th:if="${user[6].toString().equals('C')}" class="badge bg-success">
@@ -376,12 +392,9 @@
 
 			</div>
 
-
-
-
 		</div>
 
-		</di>
+	</div> <!-- layout fragment -->
 
 </body>
 
