@@ -15,148 +15,253 @@
 
 <script>
 
-function checkDistrictExists() {
-
-    let district = document.getElementById("district").value;
-
-    if (district === "") {
-        return;
+// ==========================================================
+// Helpers
+// ==========================================================
+function setInvalid(el, msg) {
+    el.classList.add("is-invalid");
+    el.classList.remove("is-valid");
+    const fb = el.parentElement.querySelector(".invalid-feedback");
+    if (fb && msg) {
+        fb.textContent = msg;
     }
+}
 
-    fetch('/checkDistrictExists?dcode=' + district)
-        .then(response => response.text())
-        .then(result => {
-
-            if (result === "EXISTS") {
-
-                let oldDistrict = document.getElementById("oldDistrict").value;
-
-                if(oldDistrict != district){
-
-                    alert("This District Data already exists.");
-
-                    document.getElementById("district").value = oldDistrict;
-                }
-
-            }
-
-        })
-        .catch(error => console.error(error));
-
+function setValid(el) {
+    el.classList.remove("is-invalid");
+    el.classList.add("is-valid");
 }
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const mouDate = document.getElementById("MoU");
-    mouDate.setAttribute("min","2026-01-01");
+    const form      = document.getElementById("institutionForm");
+    const agency    = document.getElementById("agency");
+    const chairman  = document.getElementById("chairman");
+    const mouDate   = document.getElementById("MoU");
+    const mouFile   = document.getElementById("MoUfile");
 
-});
+    // ------------------------------------------------------
+    // Date limits: 01-01-2026 to today
+    // ------------------------------------------------------
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
 
+    mouDate.setAttribute("min", "2026-01-01");
+    mouDate.setAttribute("max", `${yyyy}-${mm}-${dd}`);
 
-document.addEventListener("DOMContentLoaded", function () {
+    // ------------------------------------------------------
+    // PDF validation (file is OPTIONAL on edit)
+    // returns error message, or "" if OK
+    // ------------------------------------------------------
+    function getPdfError(input) {
 
-    const form = document.getElementById("institutionForm");
-    const mouFile = document.getElementById("MoUfile");
-
-    function validatePDF(input){
-
-        if(input.files.length==0){
-            return true;
+        if (input.files.length === 0) {
+            return "";
         }
 
-        const file=input.files[0];
+        const file = input.files[0];
+        const name = file.name;
 
-        if(file.type!="application/pdf" &&
-           !file.name.toLowerCase().endsWith(".pdf")){
-
-            alert("Only PDF files are allowed.");
-
-            input.value="";
-
-            return false;
+        if (!/^[a-zA-Z0-9_-]+\.pdf$/i.test(name)) {
+            return "File name should contain only letters, numbers, underscore (_) or hyphen (-), and end with .pdf";
         }
 
-        return true;
+        if (file.type !== "application/pdf" && !name.toLowerCase().endsWith(".pdf")) {
+            return "Only PDF files are allowed.";
+        }
 
+        if (file.size > 5 * 1024 * 1024) {
+            return "PDF file size must not be more than 5 MB.";
+        }
+
+        return "";
     }
 
-    mouFile.addEventListener("change",function(){
-
-        validatePDF(this);
-
+    // ------------------------------------------------------
+    // Live validation
+    // ------------------------------------------------------
+    [agency, chairman].forEach(function (field) {
+        field.addEventListener("input", function () {
+            if (field.value.trim() !== "") {
+                setValid(field);
+            } else {
+                setInvalid(field);
+            }
+        });
     });
 
-    form.addEventListener("submit",function(e){
+    mouDate.addEventListener("change", function () {
+        if (mouDate.value !== "") {
+            setValid(mouDate);
+        } else {
+            setInvalid(mouDate);
+        }
+    });
 
-        const district=document.getElementById("district");
+    mouFile.addEventListener("change", function () {
+        const err = getPdfError(mouFile);
 
-        const agency=document.getElementById("agency");
+        if (err) {
+            mouFile.value = "";
+            setInvalid(mouFile, err);
+        } else {
+            mouFile.classList.remove("is-invalid", "is-valid");
+        }
+    });
 
-        const chairman=document.getElementById("chairman");
+    // ------------------------------------------------------
+    // Submit validation (Update)
+    // ------------------------------------------------------
+    form.addEventListener("submit", function (e) {
 
-        const mouDate=document.getElementById("MoU");
+        let isValid = true;
 
-        if(district.value==""){
-
-            alert("Please select District.");
-
-            district.focus();
-
-            e.preventDefault();
-
-            return false;
-
+        // Agency
+        if (agency.value.trim() === "") {
+            setInvalid(agency, "Please enter Executing Agency.");
+            isValid = false;
+        } else {
+            setValid(agency);
         }
 
-        if(agency.value.trim()==""){
-
-            alert("Please Enter Executing Agency");
-
-            agency.focus();
-
-            e.preventDefault();
-
-            return false;
-
+        // Chairman
+        if (chairman.value.trim() === "") {
+            setInvalid(chairman, "Please enter Chairman Status.");
+            isValid = false;
+        } else {
+            setValid(chairman);
         }
 
-        if(chairman.value.trim()==""){
-
-            alert("Please Enter Chairman Status");
-
-            chairman.focus();
-
-            e.preventDefault();
-
-            return false;
-
+        // MoU Date
+        if (mouDate.value === "") {
+            setInvalid(mouDate, "Please select Date of MoU.");
+            isValid = false;
+        } else {
+            setValid(mouDate);
         }
 
-        if(mouDate.value==""){
-
-            alert("Please Select MoU Date");
-
-            mouDate.focus();
-
-            e.preventDefault();
-
-            return false;
-
+        // MoU PDF (only checked if a new file was chosen)
+        const pdfErr = getPdfError(mouFile);
+        if (pdfErr) {
+            setInvalid(mouFile, pdfErr);
+            isValid = false;
         }
 
-        validatePDF(mouFile);
+        if (!isValid) {
 
+            e.preventDefault();
+            e.stopPropagation();
+
+            const firstInvalid = form.querySelector(".is-invalid");
+
+            if (firstInvalid) {
+                firstInvalid.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+                firstInvalid.focus();
+            }
+
+            return false;
+        }
     });
 
 });
 
-</script>
+
+		// ==========================================================
+		// View MoU in popup (with Download button)
+		// ==========================================================
+		let mouBlobUrl = null;
+
+		function clearMouFrame() {
+			const frame = document.getElementById("mouFrame");
+			frame.removeAttribute("src");
+			frame.classList.add("d-none");
+			if (mouBlobUrl) {
+				URL.revokeObjectURL(mouBlobUrl);
+				mouBlobUrl = null;
+			}
+		}
+
+		function openMouPdf(id) {
+
+			const frame = document.getElementById("mouFrame");
+			const msg = document.getElementById("mouMsg");
+			const dl = document.getElementById("mouDownload");
+
+			clearMouFrame();
+			msg.textContent = "Loading PDF...";
+			msg.classList.remove("d-none");
+			dl.href = "/viewPdfPreliminaryPPR4A?id=" + encodeURIComponent(id) + "&download=true";
+
+			bootstrap.Modal.getOrCreateInstance(document.getElementById("mouModal")).show();
+
+			fetch("/viewPdfPreliminaryPPR4A?id=" + encodeURIComponent(id))
+				.then(function (response) {
+					if (!response.ok) {
+						throw new Error("HTTP " + response.status);
+					}
+					return response.blob();
+				})
+				.then(function (blob) {
+					mouBlobUrl = URL.createObjectURL(blob);
+					frame.src = mouBlobUrl;
+					frame.classList.remove("d-none");
+					msg.classList.add("d-none");
+				})
+				.catch(function (error) {
+					console.error(error);
+					msg.textContent = "Unable to load the PDF.";
+				});
+		}
+
+		document.addEventListener("click", function (e) {
+			const link = e.target.closest(".viewMouBtn");
+			if (!link) return;
+			e.preventDefault();
+			openMouPdf(link.getAttribute("data-id"));
+		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+			document.getElementById("mouModal")
+				.addEventListener("hidden.bs.modal", clearMouFrame);
+		});
+	</script>
 
 </head>
 
 <body>
 
 <div layout:fragment="content">
+
+<!-- ===================== View MoU Modal ====================== -->
+<div class="modal fade" id="mouModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered">
+		<div class="modal-content">
+
+			<div class="modal-header bg-primary text-white">
+				<h5 class="modal-title">MoU Document</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+			</div>
+
+			<div class="modal-body p-0" style="height:75vh;">
+				<div id="mouMsg" class="text-center p-4">Loading PDF...</div>
+				<iframe id="mouFrame" class="d-none" style="width:100%;height:100%;border:0;"></iframe>
+			</div>
+
+			<div class="modal-footer">
+				<a id="mouDownload" href="#" class="btn btn-success">
+					<i class="fas fa-download"></i> Download
+				</a>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+
+		</div>
+	</div>
+</div>
 
 <div class="card shadow-sm border-0">
 
@@ -202,6 +307,7 @@ Edit Functionaries of Watershed Cell (PPR4)
        id="oldDistrict"
        th:value="${editData.dcode}">
 
+<!-- District (read only) -->
 <div class="row mb-3">
 
 <div class="col-md-3">
@@ -214,7 +320,7 @@ Edit Functionaries of Watershed Cell (PPR4)
 
 <div class="col-md-5">
 
-    <select class="form-control" disabled>
+    <select class="form-select" disabled>
         <option th:each="dist : ${distList}"
                 th:value="${dist.dcode}"
                 th:text="${dist.distName}"
@@ -229,6 +335,7 @@ Edit Functionaries of Watershed Cell (PPR4)
 </div>
 </div>
 
+<!-- Executing Agency -->
 <div class="row mb-3">
 
 <div class="col-md-3">
@@ -246,12 +353,16 @@ Edit Functionaries of Watershed Cell (PPR4)
        name="executingAgency"
        class="form-control"
        placeholder="Enter Executing Agency"
-       th:value="${editData.executingAgency}">
+       th:value="${editData.executingAgency}"
+       required>
+
+<div class="invalid-feedback">Please enter Executing Agency.</div>
 
 </div>
 
 </div>
 
+<!-- Chairman -->
 <div class="row mb-3">
 
 <div class="col-md-3">
@@ -269,12 +380,16 @@ Edit Functionaries of Watershed Cell (PPR4)
        name="chairmanStatus"
        class="form-control"
        placeholder="Enter Chairman Status"
-       th:value="${editData.chairmanStatus}">
+       th:value="${editData.chairmanStatus}"
+       required>
+
+<div class="invalid-feedback">Please enter Chairman Status.</div>
 
 </div>
 
 </div>
 
+<!-- MoU Date -->
 <div class="row mb-3">
 
 <div class="col-md-3">
@@ -291,12 +406,17 @@ Edit Functionaries of Watershed Cell (PPR4)
        id="MoU"
        name="mouDate"
        class="form-control"
-       th:value="${editData.mouDate}">
+       th:value="${editData.mouDate}"
+       onkeydown="return false;"
+       required>
+
+<div class="invalid-feedback">Please select Date of MoU.</div>
 
 </div>
 
 </div>
 
+<!-- MoU File (optional on edit) -->
 <div class="row mb-3">
 
 <div class="col-md-3">
@@ -312,6 +432,8 @@ Edit Functionaries of Watershed Cell (PPR4)
        name="mouFile"
        class="form-control"
        accept=".pdf">
+
+<div class="invalid-feedback">Please upload a valid PDF.</div>
 
 <small class="text-muted">
 
@@ -386,12 +508,7 @@ Update
 
             <td>
 
-                <a th:href="@{/viewPdfPreliminaryPPR4A(id=${user[0]})}"
-                   target="_blank">
-
-                    View MoU
-
-                </a>
+                <a href="#" class="viewMouBtn" th:attr="data-id=${user[0]}">View MoU</a>
 
             </td>
 
@@ -399,8 +516,7 @@ Update
 
                 <a th:if="${user[6].toString().equals('D')}"
                    th:href="@{/deletePreliminaryPPR4A(id=${user[0]})}"
-                   class="btn btn-danger btn-sm"
-                   onclick="return confirm('Are you sure you want to delete this record?');">
+                   class="btn btn-danger btn-sm">
 
                     <i class="fas fa-trash"></i>
 
@@ -410,8 +526,7 @@ Update
 
                 <a th:if="${user[6].toString().equals('D')}"
                    th:href="@{/editPreliminaryPPR4A(id=${user[0]})}"
-                   class="btn btn-primary btn-sm"
-                   onclick="return confirm('Are you sure you want to edit this record?');">
+                   class="btn btn-primary btn-sm">
 
                     <i class="fas fa-edit"></i>
 
@@ -421,12 +536,15 @@ Update
 
                 <a th:if="${user[6].toString().equals('D')}"
                    th:href="@{/completePreliminaryPPR4A(id=${user[0]})}"
-                   class="btn btn-success btn-sm"
-                   onclick="return confirm('Are you sure you want to complete this record?');">
+                   class="btn btn-success btn-sm">
 
                     <i class="fas fa-check"></i>
 
                 </a>
+
+                <span th:if="${user[6].toString().equals('C')}" class="badge bg-success">
+                    <i class="fas fa-check-circle"></i> Completed
+                </span>
 
             </td>
 
@@ -435,6 +553,8 @@ Update
         </tbody>
 
     </table>
+
+</div>
 
 </div>
 

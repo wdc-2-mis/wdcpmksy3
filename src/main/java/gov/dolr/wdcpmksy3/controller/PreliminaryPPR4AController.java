@@ -72,6 +72,30 @@ public class PreliminaryPPR4AController {
 	@Value("${upload.path1}")
     private String uploadPath;
 	
+	// ==========================================================
+	// Server-side validation helpers
+	// ==========================================================
+
+	private boolean isBlank(String s) {
+		return s == null || s.trim().isEmpty();
+	}
+
+	/** Returns an error message if the file is not a valid PDF, otherwise null. */
+	private String validatePdf(MultipartFile file) {
+
+		String name = file.getOriginalFilename();
+
+		if (name == null || !name.matches("(?i)^[a-zA-Z0-9_-]+\\.pdf$")) {
+			return "File name should contain only letters, numbers, underscore (_) or hyphen (-), and end with .pdf";
+		}
+
+		if (file.getSize() > 5L * 1024 * 1024) {
+			return "PDF file size must not be more than 5 MB.";
+		}
+
+		return null;
+	}
+	
 	@GetMapping("/preliminaryPPR4A")
     public String ppr1(HttpSession session, Model model) 
 	{
@@ -123,17 +147,31 @@ public class PreliminaryPPR4AController {
 	public String savePreliminaryPPR4A(HttpSession session,
 	                                   Model model,
 	                                   HttpServletRequest request,
-	                                   @RequestParam Integer district,
-	                                   @RequestParam String agency,
-	                                   @RequestParam String chairman,
-	                                   @RequestParam java.time.LocalDate MoU,
-	                                   @RequestParam MultipartFile MoUfile,
+	                                   @RequestParam(required = false) Integer district,
+	                                   @RequestParam(required = false) String agency,
+	                                   @RequestParam(required = false) String chairman,
+	                                   @RequestParam(required = false) java.time.LocalDate MoU,
+	                                   @RequestParam(required = false) MultipartFile MoUfile,
 	                                   @RequestParam Character action,
 	                                   RedirectAttributes redirectAttributes) throws IOException {
 
 	    String userid = (String) session.getAttribute("userid");
 
 	    if (userid != null) {
+
+	        // ---------- server-side validation ----------
+	        if (district == null || isBlank(agency) || isBlank(chairman)
+	                || MoU == null || MoUfile == null || MoUfile.isEmpty()) {
+
+	            redirectAttributes.addFlashAttribute("error", "Please fill all the mandatory fields.");
+	            return "redirect:/preliminaryPPR4A";
+	        }
+
+	        String pdfError = validatePdf(MoUfile);
+	        if (pdfError != null) {
+	            redirectAttributes.addFlashAttribute("error", pdfError);
+	            return "redirect:/preliminaryPPR4A";
+	        }
 
 	        Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 	        Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
@@ -156,8 +194,8 @@ public class PreliminaryPPR4AController {
 	            PPRWcdcDetails obj = new PPRWcdcDetails();
 	            obj.setInstitutionalStructure(inst);
 	            obj.setDcode(district);
-	            obj.setExecutingAgency(agency);
-	            obj.setChairmanStatus(chairman);
+	            obj.setExecutingAgency(agency.trim());
+	            obj.setChairmanStatus(chairman.trim());
 	            obj.setMouDate(MoU);
 	        //    obj.setMouFile(uploadPath + mouFileName);
 	            obj.setStatus(action);
@@ -254,7 +292,8 @@ public class PreliminaryPPR4AController {
 		return "redirect:/preliminaryPPR4A";
 	}
     @GetMapping("/viewPdfPreliminaryPPR4A")
-    public ResponseEntity<Resource> viewPdfPPR4(@RequestParam Integer id)
+    public ResponseEntity<Resource> viewPdfPPR4(@RequestParam Integer id,
+            @RequestParam(defaultValue = "false") boolean download)
             throws IOException {
 
         PPRWcdcDetails data = pprwdcddetail.findById(id).orElse(null);
@@ -286,7 +325,8 @@ public class PreliminaryPPR4AController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" + fileName + "\"")
+                        (download ? "attachment" : "inline")
+                                + "; filename=\"" + fileName + "\"")
                 .body(resource);
     }
     
@@ -295,20 +335,27 @@ public class PreliminaryPPR4AController {
     @GetMapping("/editPreliminaryPPR4A")
     public String editPPR4(@RequestParam Integer id,
             Model model,
-            HttpSession session) {
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
 
-        PPRWcdcDetails data = pprwdcddetail.findById(id).orElse(null);
-
-        model.addAttribute("editData", data);
-
-        String statename = session.getAttribute("statename").toString();
-        Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
         String userid = (String) session.getAttribute("userid");
 
         if (userid == null) {
 
             return "redirect:/login";
         }
+
+        PPRWcdcDetails data = pprwdcddetail.findById(id).orElse(null);
+
+        if (data == null) {
+            redirectAttributes.addFlashAttribute("error", "Record not found.");
+            return "redirect:/preliminaryPPR4A";
+        }
+
+        model.addAttribute("editData", data);
+
+        String statename = session.getAttribute("statename").toString();
+        Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 
         model.addAttribute("distList",
                 districtService.getDistrictsByState(stcode));
@@ -330,83 +377,91 @@ public class PreliminaryPPR4AController {
             HttpServletRequest request,
 
             @RequestParam Integer pprWcdcId,
-            @RequestParam Integer dcode,
-            @RequestParam String executingAgency,
-            @RequestParam String chairmanStatus,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate mouDate,
+            @RequestParam(required = false) Integer dcode,
+            @RequestParam(required = false) String executingAgency,
+            @RequestParam(required = false) String chairmanStatus,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate mouDate,
             @RequestParam(required = false) MultipartFile mouFile,
 
             RedirectAttributes redirectAttributes) throws IOException {
 
         String userid = (String) session.getAttribute("userid");
-        Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
-        Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 
-        String mouFileName = null;
-
-        if (userid != null) {
-
-            File dir = new File(uploadPath);
-
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            PPRWcdcDetails data =
-                    pprwdcddetail.findById(pprWcdcId).orElse(null);
-
-            if (data == null) {
-            	 model.addAttribute("error",
-                        "Record not found.");
-                return "redirect:/preliminaryPPR4A";
-            }
-
-            if (mouFile != null && !mouFile.isEmpty()) {
-
-                deleteFile(data.getMouFile());
-
-                mouFileName = UUID.randomUUID()
-                        .toString()
-                        .replace("-", "")
-                        .substring(0, 6)
-                        + "_"
-                        + mouFile.getOriginalFilename();
-
-                mouFile.transferTo(new File(uploadPath + mouFileName));
-
-                data.setMouFile(uploadPath + mouFileName);
-            }
-
-           // if (dcode != null)
-                //data.setDcode(dcode);
-
-            if (executingAgency != null)
-                data.setExecutingAgency(executingAgency);
-
-            if (chairmanStatus != null)
-                data.setChairmanStatus(chairmanStatus);
-
-            if (mouDate != null)
-                data.setMouDate(mouDate);
-
-            data.setUpdatedBy(userid);
-            data.setUpdatedDate(LocalDate.now());
-            data.setRequestIp(getClientIpAddr(request));
-
-            pprwdcddetail.save(data);
-
-            redirectAttributes.addFlashAttribute("success",
-                    "Record updated successfully.");
-            model.addAttribute("ppr4List",
-                    pprWcdcDetailsService.getPPR4List(stcode));
-
-            return "redirect:/preliminaryPPR4A";
-
-        } else {
-
+        if (userid == null) {
             return "redirect:/login";
         }
+
+        PPRWcdcDetails data =
+                pprwdcddetail.findById(pprWcdcId).orElse(null);
+
+        if (data == null) {
+            redirectAttributes.addFlashAttribute("error", "Record not found.");
+            return "redirect:/preliminaryPPR4A";
+        }
+
+        // ---------- server-side validation ----------
+        if (isBlank(executingAgency)) {
+            redirectAttributes.addFlashAttribute("error", "Please enter Executing Agency.");
+            return "redirect:/editPreliminaryPPR4A?id=" + pprWcdcId;
+        }
+
+        if (isBlank(chairmanStatus)) {
+            redirectAttributes.addFlashAttribute("error", "Please enter Chairman Status.");
+            return "redirect:/editPreliminaryPPR4A?id=" + pprWcdcId;
+        }
+
+        if (mouDate == null) {
+            redirectAttributes.addFlashAttribute("error", "Please select Date of MoU.");
+            return "redirect:/editPreliminaryPPR4A?id=" + pprWcdcId;
+        }
+
+        boolean newFile = (mouFile != null && !mouFile.isEmpty());
+
+        if (newFile) {
+            String pdfError = validatePdf(mouFile);
+            if (pdfError != null) {
+                redirectAttributes.addFlashAttribute("error", pdfError);
+                return "redirect:/editPreliminaryPPR4A?id=" + pprWcdcId;
+            }
+        }
+
+        // ---------- save ----------
+        File dir = new File(uploadPath);
+
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        if (newFile) {
+
+            deleteFile(data.getMouFile());
+
+            String mouFileName = UUID.randomUUID()
+                    .toString()
+                    .replace("-", "")
+                    .substring(0, 6)
+                    + "_"
+                    + mouFile.getOriginalFilename();
+
+            mouFile.transferTo(new File(uploadPath + mouFileName));
+
+            data.setMouFile(uploadPath + mouFileName);
+        }
+
+        data.setExecutingAgency(executingAgency.trim());
+        data.setChairmanStatus(chairmanStatus.trim());
+        data.setMouDate(mouDate);
+
+        data.setUpdatedBy(userid);
+        data.setUpdatedDate(LocalDate.now());
+        data.setRequestIp(getClientIpAddr(request));
+
+        pprwdcddetail.save(data);
+
+        redirectAttributes.addFlashAttribute("success",
+                "Record updated successfully.");
+
+        return "redirect:/preliminaryPPR4A";
     }
 
   }
-   
