@@ -239,4 +239,22 @@ public class PPREmploymentGenerationController {
 
         return "redirect:/pprEmploymentGeneration";
     }
+    
+    @GetMapping("/skipEmploymentGeneration")
+    public String skipEmploymentGeneration(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  employmentService.skipEmploymentGeneration(pprid, userId, servletRequest);
+           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+	    }
+         return "redirect:/viewPPR";
+    }
+
+    
+    
+    
 }

@@ -21,19 +21,19 @@ public class PprDisasterDetails {
     private MPpr ppr;
     
     @ManyToOne
-    @JoinColumn(name = "vcode", nullable = false)
+    @JoinColumn(name = "vcode", nullable = true)
     private MVillage vcode;
 
     @ManyToOne
-    @JoinColumn(name = "disaster_type_id", nullable = false)
+    @JoinColumn(name = "disaster_type_id", nullable = true)
     private MDisasterType dtype;
     
     @ManyToOne
-    @JoinColumn(name = "month_id", nullable = false)
+    @JoinColumn(name = "month_id", nullable = true)
     private MMonth month;
     
     @ManyToOne
-    @JoinColumn(name = "year_id", nullable = false)
+    @JoinColumn(name = "year_id", nullable = true)
     private MFinYear year;
     
     @Column(name = "periodicity", length = 1)

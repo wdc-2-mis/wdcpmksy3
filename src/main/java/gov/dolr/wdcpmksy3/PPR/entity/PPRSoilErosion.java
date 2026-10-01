@@ -20,7 +20,7 @@ public class PPRSoilErosion {
     private MPpr ppr;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "erosion_type_id", nullable = false)
+    @JoinColumn(name = "erosion_type_id", nullable = true)
     private MErosionType erosionType;
 
     @Column(name = "affected_area", precision = 20, scale = 4)

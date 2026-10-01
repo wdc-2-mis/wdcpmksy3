@@ -212,5 +212,18 @@ public class PPRSoilErosionService {
 	public int changeStatusByPprId(Integer pprId) {
 	    return soilErosionRepository.changeStatusByPprId(pprId);
 	}
+    
+    public void skipPprSoilErosion(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PPRSoilErosion entity = new PPRSoilErosion(); 
+    	MPpr ppr = pprRepository.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	soilErosionRepository.save(entity);
+    }
 	
 }

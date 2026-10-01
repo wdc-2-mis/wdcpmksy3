@@ -56,6 +56,8 @@ public interface PPRSoilErosionRepository extends JpaRepository<PPRSoilErosion, 
 	List<Integer> findErosionTypeIdsByPprId(@Param("pprId") Integer pprId);
     
     List<PPRSoilErosion> findByPprPprIdAndStatus(Integer pprId, Character status);
+    
+    List<PPRSoilErosion> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
 	
     @Modifying
 	@Transactional

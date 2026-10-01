@@ -228,5 +228,20 @@ public class LivelihoodSummaryController {
 						}
 					return "redirect:/livelihoodSummaryPPR13";	
 		    }
+	 	 
+	 	@GetMapping("/skipLivelihoodSummaryPPR13")
+	    public String skipLivelihoodSummaryPPR13(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+	    		HttpSession session, RedirectAttributes redirectAttributes) {
+		  String userId = (String) session.getAttribute("userid");
+		  try {
+			  laser.skipLivelihoodSummaryPPR13(pprid, userId, servletRequest);
+	           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+		    } 
+		  	catch (Exception ex) {
+		        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+		    }
+	         return "redirect:/viewPPR";
+	    }
+
 
 }

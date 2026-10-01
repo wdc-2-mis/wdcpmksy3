@@ -27,6 +27,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.PprProjectLivelihoodInterventionReposit
 import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.entity.MVillage;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class LivelihoodActivityServices {
@@ -206,5 +207,17 @@ public class LivelihoodActivityServices {
 	    return livrepo.changeStatusByPprId(pprId);
 	}
 
+	public void skipLivelihoodSummaryPPR13(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprLivelihood entity = new PprLivelihood(); 
+    	MPpr ppr = mprep.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus('S'); 
+    	entity.setCreatedBy(userId); 
+    	//entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	livrepo.save(entity);
+    }
 
 }

@@ -19,5 +19,5 @@ public interface PprDisasterDetailsRepository extends JpaRepository<PprDisasterD
 	@Query("UPDATE PprDisasterDetails w SET w.status = 'D' WHERE w.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
-
+	List<PprDisasterDetails> findByPprPprIdAndStatusIn( Integer pprId, List<String> statuses);
 }

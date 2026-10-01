@@ -20,5 +20,7 @@ public interface PprLivelihoodRepository extends JpaRepository<PprLivelihood, In
 	@Transactional
 	@Query("UPDATE PprLivelihood l SET l.status = 'D' WHERE l.ppr.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+	
+	List<PprLivelihood> findByPprPprIdAndStatusIn( Integer pprId, List<Character> statuses);
 
 }

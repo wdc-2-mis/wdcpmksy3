@@ -190,4 +190,16 @@ public class PprDisasterDetailsService {
 	    return repository.changeStatusByPprId(pprId);
 	}
 	
+	public void skipFloodDroughtArea(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+		PprDisasterDetails entity = new PprDisasterDetails(); 
+    	MPpr ppr = pprRepo.getReferenceById(pprid);
+    	
+    	entity.setPpr(ppr); 
+    	entity.setStatus("S"); 
+    	entity.setCreatedBy(userId); 
+    	entity.setRequestIp( getClientIpAddr(servletRequest) ); 
+    	entity.setCreatedDate( LocalDateTime.now() ); 
+    	repository.save(entity);
+    }
 }

@@ -21,15 +21,15 @@ public class PPREmploymentGeneration {
     private MPpr pprId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vcode", nullable = false)
+    @JoinColumn(name = "vcode", nullable = true)
     private MVillage village;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mw_id", nullable = false)
+    @JoinColumn(name = "mw_id", nullable = true)
     private MicroWatershed microWatershed;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employment_type_id", nullable = false)
+    @JoinColumn(name = "employment_type_id", nullable = true)
     private MEmploymentType employmentType;
 
     @Column(name = "sc")

@@ -55,6 +55,8 @@ public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmpl
     
     List<PPREmploymentGeneration> findByPprIdPprIdAndStatus(Integer pprId, Character status);
     
+    List<PPREmploymentGeneration> findByPprIdPprIdAndStatusIn(Integer pprId, List<Character> status);
+    
     @Modifying
 	@Transactional
 	@Query("UPDATE PPREmploymentGeneration e SET e.status = 'D' WHERE e.pprId.pprId = :pprId")

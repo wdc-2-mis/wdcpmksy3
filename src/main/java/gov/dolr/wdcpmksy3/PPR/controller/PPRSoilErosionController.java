@@ -171,5 +171,17 @@ public class PPRSoilErosionController {
 	    return "redirect:/pprSoilErosion";
 	}
 	
-	
+	@GetMapping("/skipPprSoilErosion")
+    public String skipPprSoilErosion(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  soilErosionService.skipPprSoilErosion(pprid, userId, servletRequest);
+           // redirectAttributes.addFlashAttribute("success", "Records saved successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to viewPPR records: " + ex.getMessage());
+	    }
+         return "redirect:/viewPPR";
+    }
 }

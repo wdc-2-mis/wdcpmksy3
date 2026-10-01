@@ -455,19 +455,19 @@ public class PPRViewController {
         data.put("ppr10List", ppr10List);
 
         // ---- PPR-11 ----
-        List<PprDisasterDetails> ppr11List = pprDisasterDetailsRepo.findByPprPprIdAndStatus(project, "C");
+        List<PprDisasterDetails> ppr11List = pprDisasterDetailsRepo.findByPprPprIdAndStatusIn(project, statuses);
         data.put("ppr11List", ppr11List);
 
         // ---- PPR-12 ----
-        List<PPRSoilErosion> soilErosionList = soilErosionRepo.findByPprPprIdAndStatus(project, 'C');
+        List<PPRSoilErosion> soilErosionList = soilErosionRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("soilErosionList", soilErosionList);
 
         // ---- PPR-13 ----
-        List<PprLivelihood> pprLivelihoodSummaryList = pprLivelihoodRepo.findByPprPprIdAndStatus(project, 'C');
+        List<PprLivelihood> pprLivelihoodSummaryList = pprLivelihoodRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pprLivelihoodSummaryList", pprLivelihoodSummaryList);
 
         // ---- PPR-14 ----
-        List<PPREmploymentGeneration> pprEmploymentList = pprEmploymentRepo.findByPprIdPprIdAndStatus(project, 'C');
+        List<PPREmploymentGeneration> pprEmploymentList = pprEmploymentRepo.findByPprIdPprIdAndStatusIn(project, statuse);
         data.put("pprEmploymentList", pprEmploymentList);
 
         // ---- PPR-15 ----
