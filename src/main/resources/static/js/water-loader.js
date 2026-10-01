@@ -275,3 +275,186 @@
 	    }
 	);
 })();
+
+/* =========================================================
+   GLOBAL CONFIRMATION SYSTEM
+   ========================================================= */
+
+(function () {
+
+    let submitCallback = null;
+    let deleteCallback = null;
+    let completeCallback = null;
+
+
+    /* =====================================================
+       SUBMIT ALERT
+       ===================================================== */
+
+    window.submitAlert = function (message, callback) {
+
+        const modalElement =
+            document.getElementById("globalSubmitModal");
+
+        const messageElement =
+            document.getElementById("globalSubmitMessage");
+
+        if (!modalElement) {
+            console.error("Global Submit Modal not found.");
+            return;
+        }
+
+        messageElement.textContent =
+            message || "Are you sure you want to submit this form?";
+
+        submitCallback = callback || null;
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(modalElement);
+
+        modal.show();
+    };
+
+
+    /* =====================================================
+       DELETE ALERT
+       ===================================================== */
+
+    window.deleteAlert = function (message, callback) {
+
+        const modalElement =
+            document.getElementById("globalDeleteModal");
+
+        const messageElement =
+            document.getElementById("globalDeleteMessage");
+
+        if (!modalElement) {
+            console.error("Global Delete Modal not found.");
+            return;
+        }
+
+        messageElement.textContent =
+            message || "Are you sure you want to delete this record?";
+
+        deleteCallback = callback || null;
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(modalElement);
+
+        modal.show();
+    };
+
+
+  
+
+    window.completeAlert = function (message, callback) {
+
+        const modalElement =
+            document.getElementById("globalCompleteModal");
+
+        const messageElement =
+            document.getElementById("globalCompleteMessage");
+
+        if (!modalElement) {
+            console.error("Global Complete Modal not found.");
+            return;
+        }
+
+        messageElement.textContent =
+            message || "Are you sure you want to complete this form?";
+
+        completeCallback = callback || null;
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(modalElement);
+
+        modal.show();
+    };
+
+
+    /* =====================================================
+       SUBMIT CONFIRM BUTTON
+       ===================================================== */
+
+    document.addEventListener("click", function (event) {
+
+        if (event.target.closest("#globalSubmitConfirmBtn")) {
+
+            const modalElement =
+                document.getElementById("globalSubmitModal");
+
+            const modal =
+                bootstrap.Modal.getOrCreateInstance(modalElement);
+
+            modal.hide();
+
+            if (typeof submitCallback === "function") {
+
+                const callback = submitCallback;
+
+                submitCallback = null;
+
+                callback();
+            }
+        }
+
+    });
+
+
+    /* =====================================================
+       DELETE CONFIRM BUTTON
+       ===================================================== */
+
+    document.addEventListener("click", function (event) {
+
+        if (event.target.closest("#globalDeleteConfirmBtn")) {
+
+            const modalElement =
+                document.getElementById("globalDeleteModal");
+
+            const modal =
+                bootstrap.Modal.getOrCreateInstance(modalElement);
+
+            modal.hide();
+
+            if (typeof deleteCallback === "function") {
+
+                const callback = deleteCallback;
+
+                deleteCallback = null;
+
+                callback();
+            }
+        }
+ 
+    });
+ 
+
+
+
+    document.addEventListener("click", function (event) {
+
+        if (event.target.closest("#globalCompleteConfirmBtn")) {
+
+            const modalElement =
+                document.getElementById("globalCompleteModal");
+
+            const modal =
+                bootstrap.Modal.getOrCreateInstance(modalElement);
+
+            modal.hide();
+
+            if (typeof completeCallback === "function") {
+
+                const callback = completeCallback;
+
+                completeCallback = null;
+
+                callback();
+            }
+        }
+
+    });
+
+
+})();
