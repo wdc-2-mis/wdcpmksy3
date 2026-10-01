@@ -151,6 +151,8 @@
 			        return;
 			    }
 			    document.getElementById("criteriaData").value = result.join(",");
+				// Calculate total selected marks 
+				updateCriteriaTotal();
 			    bootstrap.Modal.getInstance(document.getElementById("criteriaModal")).hide();
 			});
 		    // =========================
@@ -167,6 +169,7 @@
 		            marks.innerText = "0";
 		        });
 		        criteriaData.value = "";
+				updateCriteriaTotal();
 		        bootstrap.Modal.getOrCreateInstance(criteriaModal).hide();
 		    });
 		});
@@ -437,6 +440,8 @@
 		        });
 		        // Build hidden criteria data
 		        updateEditCriteriaData();
+				// Calculate total selected marks
+				updateEditCriteriaTotal();
 		    }
 	});
 	
@@ -471,6 +476,8 @@
 	        if (checkbox) {
 	            checkbox.checked = true;
 	        }
+			// Update total 
+			updateCriteriaTotal();
 	    }
 	    // Checkbox changed
 	    if (e.target.classList.contains("criteriaCheck")) {
@@ -484,6 +491,8 @@
 	            // Reset marks
 	            row.querySelector(".marks").innerText = "0";
 	        }
+			// Update total 
+			updateCriteriaTotal();
 	    }
 		
 		//Edit Radio changed
@@ -503,6 +512,8 @@
 			            checkbox.checked = true;
 			        }
 			        updateEditCriteriaData();
+					// Update total 
+					updateEditCriteriaTotal();
 			    }
 			    //Edit Checkbox changed
 			    if (e.target.classList.contains("editCriteriaCheck")) {
@@ -517,6 +528,8 @@
 			            row.querySelector(".editMarks").innerText = "0";
 			        }
 			        updateEditCriteriaData();
+					// Update total 
+					updateEditCriteriaTotal();
 			    }
 	});
 	
@@ -760,6 +773,7 @@
 			                return;
 			            }
 			            updateEditCriteriaData();
+						updateEditCriteriaTotal();
 			            editCriteriaModal.hide();
 			        });
 			        //Edit Criteria Cancel
@@ -796,6 +810,30 @@
 			            editModal.show();
 			        });
 			    }
+				function updateCriteriaTotal() {
+				    let total = 0;
+				    document.querySelectorAll("#criteriaModal tbody tr").forEach(function(row) {
+				        const checkbox = row.querySelector(".criteriaCheck");
+				        const marksCell = row.querySelector(".marks");
+				        if (checkbox && checkbox.checked && marksCell) {
+				            const marks = parseFloat(marksCell.innerText.trim()) || 0;
+				            total += marks;
+				        }
+				    });
+				    document.getElementById("criteriaTotal").innerText = total;
+				}
+				function updateEditCriteriaTotal() {
+				    let total = 0;
+				    document.querySelectorAll("#editCriteriaModal tbody tr").forEach(function(row) {
+				        const checkbox = row.querySelector(".editCriteriaCheck");
+				        const marksCell = row.querySelector(".editMarks");
+				        if (checkbox && checkbox.checked && marksCell) {
+				            const marks = parseFloat(marksCell.innerText.trim()) || 0;
+				            total += marks;
+				        }
+				    });
+				    document.getElementById("editCriteriaTotal").innerText = total;
+				}
 			});
 			
 			document.addEventListener("DOMContentLoaded", function () {
@@ -911,7 +949,7 @@
 	                    <label class="col-md-3 fw-bold"> Weightage under the Criteria <span class="required">*</span></label>
 	                    <div class="col-md-4">
 							<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#criteriaModal">
-								Link <i class="fas fa-list"></i>
+								Total Weihtage Marks: <span id="criteriaTotal">0</span> <i class="fas fa-list"></i>
 							</button>
 							<input type="hidden" id="criteriaData" name="criteriaData">
 							<div class="field-error" data-error-for="criteriaData"></div>
@@ -1134,7 +1172,8 @@
 							<div class="row mb-3 align-items-center">
 								<label class="col-md-5 fw-bold"> Weightage under the Criteria <span class="required">*</span></label>
 								<div class="col-md-4">
-									<button type="button" class="btn btn-outline-primary btn-sm" id="editCriteriaLink">Link <i class="fas fa-list"></i> </button>
+									<button type="button" class="btn btn-outline-primary btn-sm" id="editCriteriaLink">
+										Total Weihtage Marks: <span id="editCriteriaTotal">0</span> <i class="fas fa-list"></i> </button>
 									<input type="hidden" id="editCriteriaData" name="criteriaData">
 									<div class="field-error" data-error-for="editCriteriaData"></div>
 								</div>
