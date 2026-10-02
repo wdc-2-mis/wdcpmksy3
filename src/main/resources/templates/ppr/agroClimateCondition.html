@@ -48,6 +48,159 @@
 
 	document.addEventListener("DOMContentLoaded", function () {
 		
+		const editForm = document.getElementById("editForm");
+
+				   if (!editForm) {
+				       return;
+				   }
+
+				   editForm .addEventListener("submit", function (e) {
+
+				       let isValide = true;
+
+					   
+					   const soilType1 = document.getElementById("soilType1");
+
+					   if (soilType1.value === "") {
+
+						   soilType1.classList.add("is-invalid");
+						   soilType1.classList.remove("is-valid");
+
+						   isValide = false;
+
+					   } else {
+
+						   soilType1.classList.remove("is-invalid");
+						   soilType1.classList.add("is-valid");
+					   }
+					   
+					   const croptype1 = document.getElementById("croptype1");
+
+					   if (croptype1.value === "") {
+
+						   croptype1.classList.add("is-invalid");
+						   croptype1.classList.remove("is-valid");
+
+						   isValide = false;
+
+					   } else {
+
+						   croptype1.classList.remove("is-invalid");
+						   croptype1.classList.add("is-valid");
+					   }
+				      
+				       // ==========================================
+				       // Helper function for text fields
+				       // ==========================================
+
+				       function validateTextField(element) {
+
+				           if (element.value.trim() === "") {
+
+				               element.classList.add("is-invalid");
+				               element.classList.remove("is-valid");
+
+				               isValide = false;
+
+				           } else {
+
+				               element.classList.remove("is-invalid");
+				               element.classList.add("is-valid");
+				           }
+				       }
+
+
+				       // ==========================================
+				       // Numeric / Area fields
+				       // ==========================================
+
+				       validateTextField(
+				           document.getElementById("zone1")
+				       );
+
+				       validateTextField(
+				           document.getElementById("graphy1")
+				       );
+
+				       validateTextField(
+				           document.getElementById("rainfall1")
+				       );
+
+				       validateTextField(
+				           document.getElementById("area1")
+				       );
+
+				       validateTextField(
+				           document.getElementById("farea1")
+				       );
+
+					   validateTextField(
+						   document.getElementById("soilarea1")
+					   );
+
+					   validateTextField(
+						   document.getElementById("croparea1")
+					   );
+
+
+				       // ==========================================
+				       // Stop form submission if invalid
+				       // ==========================================
+
+				       if (!isValide) {
+
+				           e.preventDefault();
+				           e.stopPropagation();
+
+				           // Scroll to first invalid field
+				           const firstInvalid =
+				               editForm.querySelector(".is-invalid");
+
+				           if (firstInvalid) {
+
+				               firstInvalid.scrollIntoView({
+				                   behavior: "smooth",
+				                   block: "center"
+				               });
+
+				               firstInvalid.focus();
+				           }
+
+				           return false;
+				       }
+
+				   });
+				   
+				   const fieldse = editForm.querySelectorAll(
+				          "input, select"
+				   );
+				   
+				   fieldse.forEach(function (field) {
+
+					field.addEventListener("change", function () {
+
+						if (field.value.trim() !== "") {
+
+							field.classList.remove("is-invalid");
+							field.classList.add("is-valid");
+
+						}
+
+					});
+
+					field.addEventListener("input", function () {
+
+						if (field.value.trim() !== "") {
+
+							field.classList.remove("is-invalid");
+							field.classList.add("is-valid");
+
+						}
+
+					});
+
+				});
+		
 		const form1 = document.getElementById("agroClimate");
 
 		   if (!form1) {
@@ -227,6 +380,8 @@
 
 		           return false;
 		       }
+			   
+			   
 
 		   });
 		   
@@ -303,8 +458,8 @@
 		    }
 		}
 		
-		const editForm = document.getElementById("editForm");
-		editForm.addEventListener("submit", function (e) {
+		const editForm1 = document.getElementById("editForm");
+		editForm.addEventListener("submit1", function (e) {
 
 				const zone = document.getElementById("zone1");
 		        const area = document.getElementById("area1");
@@ -719,7 +874,7 @@
 				               <label class="form-label">
 				                  <b>Average rainfall ( in mm preceding 5 year average )</b> <span class="required">*</span>
 				               </label>
-							   <input type="text" name="rainfall" id="rainfall" class="form-control" required>
+							   <input type="text" name="rainfall" id="rainfall" class="form-control" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')" required>
 							   <div class="invalid-feedback"> Please enter Average rainfall ( in mm preceding 5 year average )</div>
 				        </div>
 						 
@@ -823,7 +978,7 @@
 				
             </form>
 			
-			<!-- Separate form for Skip -->
+			<!-- Separate form for Skip 
 			<form id="skipForm"
 			      th:action="@{/skipAgroClimateConditionPPR10}"
 			      method="post"
@@ -835,7 +990,7 @@
 
 			    <input type="hidden" name="action" value="S">
 
-			</form>
+			</form> -->
 
         </div>
 		
@@ -878,10 +1033,19 @@
 							   
 							<td th:if="${stat.first || row[0] != agroClimateList[stat.index-1][0]}">
 								&nbsp; &nbsp;
-								<a th:if="${row[10].toString().equals('D')}" title="Delete"
+								<!--<a th:if="${row[10].toString().equals('D')}" title="Delete"
 									th:href="@{/deleteAgroClimateConditionPPR10(id=${row[0]})}" class="btn btn-danger btn-sm"
 									onclick="return confirm('Are you sure you want to delete this record?');">
 									<i class="fas fa-trash"></i>
+								</a>-->
+								
+								<a href="javascript:void(0)"
+								   class="btn btn-danger btn-sm"
+								   th:if="${row[10].toString().equals('D')}"
+								   title="Delete"
+								   th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteAgroClimateConditionPPR10?id=' + ${row[0]} + '\'; }); return false;'">
+
+								    <i class="fas fa-trash"></i>
 								</a>
 								&nbsp; &nbsp;
 							
@@ -893,11 +1057,19 @@
 									<i class="fas fa-edit"></i>
 								</button>
 								&nbsp; &nbsp;
-								<a th:if="${row[10].toString().equals('D')}" title="Complete"
+								<!--<a th:if="${row[10].toString().equals('D')}" title="Complete"
 									th:href="@{/completeAgroClimateConditionPPR10(id=${row[0]})}" class="btn btn-success btn-sm"
 									onclick="return confirm('Are you sure you want to complete this record?');">
 									<i class="fas fa-check"></i>
+								</a>-->
+								
+								<a href="javascript:void(0)" class="btn btn-success btn-sm" th:if="${row[10].toString().equals('D')}" title="Delete"
+									th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeAgroClimateConditionPPR10?id=' + ${row[0]} + '\'; }); return false;'">
+								
+									<i class="fas fa-check"></i>
 								</a>
+								
+								
 								<span th:if="${row[10].toString().equals('C')}" class="badge bg-success">
 									<i class="fas fa-check-circle"></i> Completed
 								</span>
@@ -984,12 +1156,14 @@
 											                     <b>Name of Agro-Climatic zone Cover Project Area</b><span class="required">*</span>
 											              </label>
 														  <input type="text" name="zone1" id="zone1" class="form-control">
+														  <div class="invalid-feedback"> Please enter Name of Agro-Climatic zone Cover Project Area</div>
 											        </div>
 													<div class="col-md-6">
 														<label class="form-label">
 																<b>TOPO-graphy</b> <span class="required">*</span>
 														</label>
 														<input type="text" name="graphy1" id="graphy1" class="form-control">
+														<div class="invalid-feedback"> Please enter TOPO-graphy Name</div>
 													</div>
 											       	
 													 
@@ -997,7 +1171,8 @@
 											               <label class="form-label">
 											                  <b>Average rainfall ( in mm preceding 5 year average )</b> <span class="required">*</span>
 											               </label>
-														   <input type="text" name="rainfall1" id="rainfall1" class="form-control">
+														   <input type="text" name="rainfall1" id="rainfall1" class="form-control" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
+														   <div class="invalid-feedback"> Please enter Average rainfall ( in mm preceding 5 year average )</div>
 											        </div>
 													 
 													<div class="col-md-6">
@@ -1005,6 +1180,7 @@
 																<b>Area (in ha.)</b> <span class="required">*</span>
 														</label>
 														<input type="text" name="area1" id="area1" maxlength="15" class="form-control"  oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
+														<div class="invalid-feedback"> Please enter Area (in ha.)</div>
 													</div>
 													
 													<div class="col-md-6">
@@ -1012,7 +1188,9 @@
 													 			<b>Forest Area (in ha.)</b> <span class="required">*</span>
 													 		</label>
 													 		<input type="text" name="farea1" id="farea1" maxlength="15" class="form-control"  oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
-													</div>
+															<div class="invalid-feedback"> Please enter Forest Area (in ha.)</div>
+
+														</div>
 													<div class="col-md-6"> 		</div>				 
 													 	
 											</div>
@@ -1043,9 +1221,11 @@
 																			</option>
 																		</th:block>
 																</select>
+																<div class="invalid-feedback"> Please select Soil Types</div>
 															</div>
 															<div class="col-md-3">
 																<input type="text" name="soilarea1" id="soilarea1" maxlength="15" class="form-control" style="height:40px; width: 200px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
+																<div class="invalid-feedback"> Please enter Soil Area in (ha.)</div>
 															</div>
 														</div>
 														
@@ -1075,9 +1255,11 @@
 																				</option>
 																		</th:block>
 																</select>
+																<div class="invalid-feedback"> Please select Crop Name</div>
 															</div>
 															<div class="col-md-3">
 																<input type="text" name="croparea1" id="croparea1" maxlength="15" class="form-control" style="height:40px; width: 200px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
+																<div class="invalid-feedback"> Please enter Crop Area(ha.)</div>
 															</div>
 														</div>
 							
