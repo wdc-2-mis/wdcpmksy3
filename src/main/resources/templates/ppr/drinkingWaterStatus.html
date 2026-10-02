@@ -45,8 +45,214 @@
 
 
 <script>
+	
+	function validateWaterQuality(input) {
+
+	    const errorElement = document.getElementById(input.id + 'Error');
+	    const value = parseFloat(input.value);
+
+	    errorElement.textContent = '';
+
+	    if (input.value !== '' && value > 12) {
+	        errorElement.textContent = 'No. of month in a year should not be more than 12. ';
+	        input.value = '';
+	        input.focus();
+	    }
+	}
 
 	document.addEventListener("DOMContentLoaded", function () {
+		
+		const forme = document.getElementById("editForm");
+
+		   if (!forme) {
+		       return;
+		   }
+
+		   forme.addEventListener("submit", function (e) {
+
+		       let isValide = true;
+
+		       // ==========================================
+		       // village
+		       // ==========================================
+
+		       const village1 = document.getElementById("village1");
+
+		       if (village1.value === "") {
+
+		           village1.classList.add("is-invalid");
+		           village1.classList.remove("is-valid");
+
+		           isValide = false;
+
+		       } else {
+
+		           village1.classList.remove("is-invalid");
+		           village1.classList.add("is-valid");
+		       }
+			   
+			   
+			   const watershed1 = document.getElementById("watershed1");
+
+			   if (watershed1.value === "") {
+
+				   watershed1.classList.add("is-invalid");
+				   watershed1.classList.remove("is-valid");
+
+				   isValide = false;
+
+			   } else {
+
+				   watershed1.classList.remove("is-invalid");
+				   watershed1.classList.add("is-valid");
+			   }
+			   
+			   const preQualityId1 = document.querySelector('input[name="preQualityId1"]:checked');
+
+			   const schemeError =
+				   document.getElementById("schemeError");
+
+			   if (!preQualityId1) {
+
+				   schemeError.style.display = "block";
+
+				   isValide = false;
+
+			   } else {
+
+				   schemeError.style.display = "none";
+			   }
+			   
+			   const postQualityId1 = document.querySelector('input[name="postQualityId1"]:checked');
+
+			   const schemeError1 =
+				   document.getElementById("schemeError1");
+
+			   if (!postQualityId1) {
+
+				   schemeError1.style.display = "block";
+
+				   isValide = false;
+
+			   } else {
+
+				   schemeError1.style.display = "none";
+			   }
+		       // ==========================================
+		       // Helper function for text fields
+		       // ==========================================
+
+		       function validateTextField(element) {
+
+		           if (element.value.trim() === "") {
+
+		               element.classList.add("is-invalid");
+		               element.classList.remove("is-valid");
+
+		               isValide = false;
+
+		           } else {
+
+		               element.classList.remove("is-invalid");
+		               element.classList.add("is-valid");
+		           }
+		       }
+
+
+		       // ==========================================
+		       // Numeric / Area fields
+		       // ==========================================
+			   
+		       validateTextField(
+		           document.getElementById("preQualityWater1")
+		       );
+
+		       validateTextField(
+		           document.getElementById("postQualityWater1")
+		       );
+
+		       // ==========================================
+		       // Stop form submission if invalid
+		       // ==========================================
+
+		       if (!isValide) {
+
+		           e.preventDefault();
+		           e.stopPropagation();
+
+		           // Scroll to first invalid field
+		           const firstInvalid1 =
+		               forme.querySelector(".is-invalid");
+
+		           if (firstInvalid1) {
+
+		               firstInvalid1.scrollIntoView({
+		                   behavior: "smooth",
+		                   block: "center"
+		               });
+
+		               firstInvalid1.focus();
+		           }
+
+		           return false;
+		       }
+
+		   });
+		   
+		   const fieldse = forme.querySelectorAll(
+		          "input, select"
+		   );
+		   
+		   fieldse.forEach(function (field) {
+
+			field.addEventListener("change", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+			field.addEventListener("input", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+			
+			document.querySelectorAll('input[name="preQualityId1"]')
+				   .forEach(function (radio) {
+
+					   radio.addEventListener("change", function () {
+
+						   document.getElementById(
+							   "schemeError"
+						   ).style.display = "none";
+
+					   });
+
+				   });
+				   document.querySelectorAll('input[name="postQualityId1"]')
+				   .forEach(function (radio) {
+
+					   radio.addEventListener("change", function () {
+
+						   document.getElementById(
+							   "schemeError1"
+						   ).style.display = "none";
+
+					   });
+
+				   });	   
+
+		});		
 		
 		
 				const form1 = document.getElementById("drinkingWater");
@@ -386,144 +592,33 @@
 		
 		
 		
-		function openEditModal(button) {
+		   function openEditModal(button) {
 
-		    if (confirm('Are you sure you want to edit this record?')) {
+		       if (!confirm('Are you sure you want to edit this record?')) {
+		           return false;
+		       }
 
-		        const id = button.getAttribute('data-id');
-		        console.log("Edit ID:", id);
-		        const modalElement = document.getElementById('editModal');
-		        const modal = new bootstrap.Modal(modalElement);
-		        modal.show();
+		       const id = button.getAttribute('data-id');
 
-		    } 
-			else {
-				modal.hide();
-		        return false;
-		    }
-		}
+		       console.log("Edit ID:", id);
+
+		       const modalElement =
+		           document.getElementById('editModal');
+
+		       const modal =
+		           bootstrap.Modal.getOrCreateInstance(modalElement);
+
+		       modal.show();
+
+		       return true;
+		   }
 		
-		const editForm = document.getElementById("editForm");
-		editForm.addEventListener("submit", function (e) {
-
-			const village = document.getElementsByName("village1")[0];
-			const watershed = document.getElementsByName("watershed1")[0];
-			const preQualityWater = document.getElementById("preQualityWater1");
-			const postQualityWater = document.getElementById("postQualityWater1");
-			const preQualityId = document.querySelector('input[name="preQualityId1"]:checked');
-			const postQualityId = document.querySelector('input[name="postQualityId1"]:checked');
-
-			if (village.value.trim() === "") {
-				alert("Please select Village.");
-				village.focus();
-				e.preventDefault();
-				return;
-			}
-			if (watershed.value.trim() === "") {
-				alert("Please select  Name of Watershed.");
-				watershed.focus();
-				e.preventDefault();
-				return;
-			}
-			if (preQualityWater.value.trim() === "") {
-				alert("Please enter Pre-Project Availability of Drinking Water (No. of month in a year)  ");
-				preQualityWater.focus();
-				e.preventDefault();
-				return;
-			}
-
-			if (postQualityWater.value.trim() === "") {
-				alert("Please enter Post-Project Expected Availability of Water (No. of month in a year) ");
-				postQualityWater.focus();
-				e.preventDefault();
-				return;
-			}
-			if (!preQualityId) {
-				alert("Please select Pre-Project Quality of Water");
-				e.preventDefault();
-				return;
-			}
-
-			if (!postQualityId) {
-				alert("Please select Post-Project Quality of Water");
-				e.preventDefault();
-				return;
-			}	
-
-		});
-
-	    const form = document.getElementById("drinkingWater");
-
-	    form.addEventListener("submit1", function (e) {
-
-			const district = document.getElementsByName("district")[0];  
-	        const project = document.getElementsByName("project")[0]; 
-			const village = document.getElementsByName("village")[0]; 
-			const watershed = document.getElementsByName("watershed")[0];
-	        const preQualityWater = document.getElementById("preQualityWater");
-	        const postQualityWater = document.getElementById("postQualityWater");
-			const preQualityId = document.querySelector('input[name="preQualityId"]:checked');
-			const postQualityId = document.querySelector('input[name="postQualityId"]:checked');
-			
-			if (district.value.trim() === "") {
-			     alert("Please select District.");
-			     district.focus();
-			     e.preventDefault();
-			     return false;
-			}
-			
-	        if (project.value.trim() === "") {
-	             alert("Please select Project.");
-	             project.focus();
-	             e.preventDefault();
-	             return;
-	        }
-			if (village.value.trim() === "") {
-				 alert("Please select Village.");
-				 village.focus();
-				 e.preventDefault();
-				 return;
-			}
-	        if (watershed.value.trim() === "") {
-	            alert("Please select  Name of Watershed.");
-	            watershed.focus();
-	            e.preventDefault();
-	            return;
-	        }
-			if (preQualityWater.value.trim() === "") {
-				alert("Please enter Pre-Project Availability of Drinking Water (No. of month in a year)  ");
-				preQualityWater.focus();
-				e.preventDefault();
-				return;
-			}
-			
-			if (postQualityWater.value.trim() === "") {
-				alert("Please enter Post-Project Expected Availability of Water (No. of month in a year) ");
-				postQualityWater.focus();
-				e.preventDefault();
-				return;
-			}
-			if (!preQualityId) {
-				alert("Please select Pre-Project Quality of Water");
-				e.preventDefault();
-				return;
-			}
-			
-			if (!postQualityId) {
-				alert("Please select Post-Project Quality of Water");
-				e.preventDefault();
-				return;
-			}
-			
-
-	    });
-
 		document.getElementById("district").addEventListener("change", function () {
 
 		    let districtId = this.value;
 		    let project = document.getElementById("project");
 			
-		    // Clear existing options
+		//    alert('kdy');
 		    project.innerHTML = '<option value="">--Select Project--</option>';
 		    if (districtId === "") {
 		        return;
@@ -727,9 +822,10 @@
 							<label class="form-label">
 									Availability of Water (No. of month in a year) 
 							</label>
-							<input type="text" name="preQualityWater" id="preQualityWater" class="form-control" 
-							style="height:40px; width: 300px;" oninput="validateInteger(this,2)"  >
+							<input type="text" name="preQualityWater" id="preQualityWater" class="form-control" style="height:40px; width: 300px;" 
+							oninput="validateInteger(this,2)"  	min="0" max="12" step="any" onblur="validateWaterQuality(this)">
 							<div class="invalid-feedback">Please enter Availability of Water (No. of month in a year) .</div>
+							<small id="preQualityWaterError" class="text-danger"></small>
 						
 						</div>
 				       	
@@ -774,9 +870,9 @@
 								Expected Availability of Water (No. of month in a year)
 							</label>
 							<input type="text" name="postQualityWater" id="postQualityWater" class="form-control" style="height:40px; width: 300px;"
-								oninput="validateInteger(this,2)">
+								oninput="validateInteger(this,2)" 	min="0" max="12" step="any" onblur="validateWaterQuality(this)">
 								<div class="invalid-feedback">Please enter Expected Availability of Water (No. of month in a year)</div>
-						
+								<small id="postQualityWaterError" class="text-danger"></small>
 						</div>
 						<div class="col-md-6">
 						    <label class="form-label">
@@ -819,7 +915,7 @@
 				
             </form>
 			
-			<!-- Separate form for Skip -->
+			<!-- Separate form for Skip 
 			<form id="skipForm"
 			      th:action="@{/skipDrinkingWaterStatus}"
 			      method="post"
@@ -831,7 +927,7 @@
 
 			    <input type="hidden" name="action" value="skip">
 
-			</form>
+			</form>-->
 
         </div>
 		
@@ -863,60 +959,127 @@
 			           </thead>
 			           <tbody>
 
-			               <tr th:each="rec : ${records}">
-							
-							<td th:if="${rec.status.toString().equals('D')}">
-								&nbsp; &nbsp;
-								<a title="Delete" th:href="@{/deleteDrinkingWaterStatus(id=${rec.pprWaterId})}" class="btn btn-danger btn-sm"
-									onclick="return confirm('Are you sure you want to delete this record?');">
-									<i class="fas fa-trash"></i>
-								</a>
-								&nbsp; &nbsp;
-							
-								<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn"
-									th:attr="data-id=${rec.pprWaterId}, data-district=${rec.ppr.district.distName}, data-premon=${rec.preWaterAvailabilityMonths},
-																										data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, data-watershedid=${rec.microWatershed.mwId}, data-villid=${rec.village.vcode}, data-postmon=${rec.postWaterAvailabilityMonths},
-																										data-preid=${rec.preWaterQuality.waterQualityId}, data-postid=${rec.postWaterQuality.waterQualityId}" data-bs-toggle="modal" data-bs-target="#editModal">
-									<i class="fas fa-edit"></i>
-								</button>
-							
-								&nbsp; &nbsp;
-								<a title="Complete" th:href="@{/completeDrinkingWaterStatus(id=${rec.pprWaterId})}" class="btn btn-success btn-sm"
-									onclick="return confirm('Are you sure you want to complete this record?');">
-									<i class="fas fa-check"></i>
-								</a>
-							
-							</td>
-							<td th:if="${rec.status.toString().equals('C')}">
-							
-								<span class="badge bg-success">
-									<i class="fas fa-check-circle"></i> Completed
-								</span>
-								&nbsp; &nbsp;
-								<a th:href="@{/pprCropOutcomes}" class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
-							
-									Next <i class="fas fa-arrow-right"></i>
-							
-								</a>
-							
-							</td>
-							
-								<td th:text="${rec.ppr.projectName}"></td>
-								<td th:text="${rec.village.villageName}"></td>
-								<td th:text="${rec.microWatershed.mwName}"></td>
-								<td th:text="${rec.preWaterAvailabilityMonths}"></td>
-								<td th:text="${rec.preWaterQuality.waterQualityType}"></td>
-								<td th:text="${rec.postWaterAvailabilityMonths}"></td>
-								<td th:text="${rec.postWaterQuality.waterQualityType}"></td>
-								
-							   
-			                   
-			               </tr>
-			               <tr th:if="${#lists.isEmpty(records)}">
-			                   <td colspan="8" class="text-center text-muted">
-			                       Data Not Found
-			                   </td>
-			               </tr>
+						<th:block th:each="rec : ${records}">
+
+						    <!-- NORMAL RECORD -->
+						    <tr th:if="${rec.status != null and rec.status.toString() != 'S'}">
+
+						        <td>
+
+						            <!-- Draft actions -->
+						            <th:block th:if="${rec.status.toString() == 'D'}">
+
+						              <!--  <a title="Delete"
+						                   th:href="@{/deleteDrinkingWaterStatus(id=${rec.pprWaterId})}"
+						                   class="btn btn-danger btn-sm"
+						                   onclick="return confirm('Are you sure you want to delete this record?');">
+
+						                    <i class="fas fa-trash"></i>
+						                </a>-->
+										
+										<a href="javascript:void(0)" class="btn btn-danger btn-sm"  title="Delete"
+											th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteDrinkingWaterStatus?id=' + ${rec.pprWaterId} + '\'; }); return false;'">
+										
+											<i class="fas fa-trash"></i>
+										</a>
+
+						                <button type="button"
+						                        title="Edit"
+						                        class="btn btn-primary btn-sm editBtn"
+						                        th:attr="
+						                            data-id=${rec.pprWaterId},
+						                            data-district=${rec.ppr.district.distName},
+						                            data-premon=${rec.preWaterAvailabilityMonths},
+						                            data-project=${rec.ppr.projectName},
+						                            data-projectid=${rec.ppr.pprId},
+						                            data-watershedid=${rec.microWatershed.mwId},
+						                            data-villid=${rec.village.vcode},
+						                            data-postmon=${rec.postWaterAvailabilityMonths},
+						                            data-preid=${rec.preWaterQuality.waterQualityId},
+						                            data-postid=${rec.postWaterQuality.waterQualityId}"
+						                        data-bs-toggle="modal"
+						                        data-bs-target="#editModal">
+
+						                    <i class="fas fa-edit"></i>
+						                </button>
+
+						              <!--  <a title="Complete"
+						                   th:href="@{/completeDrinkingWaterStatus(id=${rec.pprWaterId})}"
+						                   class="btn btn-success btn-sm"
+						                   onclick="return confirm('Are you sure you want to complete this record?');">
+
+						                    <i class="fas fa-check"></i>
+						                </a>-->
+										
+										<a href="javascript:void(0)" class="btn btn-success btn-sm"  title="Complete"
+											th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeDrinkingWaterStatus?id=' + ${rec.pprWaterId} + '\'; }); return false;'">
+										
+											<i class="fas fa-check"></i>
+										</a>
+
+						            </th:block>
+
+
+						            <!-- Completed actions -->
+						            <th:block th:if="${rec.status.toString() == 'C'}">
+
+						                <span class="badge bg-success">
+						                    <i class="fas fa-check-circle"></i>
+						                    Completed
+						                </span>
+
+						                <a th:href="@{/pprCropOutcomes}"
+						                   class="btn btn-primary btn-sm ms-2"
+						                   title="Go to Next Form">
+
+						                    Next
+						                    <i class="fas fa-arrow-right"></i>
+
+						                </a>
+
+						            </th:block>
+									
+									<th:block th:if="${rec.status.toString() == 'S'}">
+									
+									<span class="badge bg-warning text-dark">
+										<i class="fas fa-forward"></i>
+										Skipped
+									</span>
+									
+									</th:block>
+
+						        </td>
+
+						        <td th:text="${rec.ppr.projectName}"></td>
+
+						        <td th:text="${rec.village.villageName}"></td>
+
+						        <td th:text="${rec.microWatershed.mwName}"></td>
+
+						        <td th:text="${rec.preWaterAvailabilityMonths}"></td>
+
+						        <td th:text="${rec.preWaterQuality.waterQualityType}"></td>
+
+						        <td th:text="${rec.postWaterAvailabilityMonths}"></td>
+
+						        <td th:text="${rec.postWaterQuality.waterQualityType}"></td>
+
+						    </tr>
+
+
+						    <!-- SKIPPED RECORD 
+						    <tr th:if="${rec.status != null and rec.status.toString() == 'S'}">
+
+						        <td colspan="8"
+						            class="text-center text-warning">
+
+						            This PPR Entry has been skipped.
+
+						        </td>
+
+						    </tr>-->
+
+						</th:block>
 
 			           </tbody>
 
@@ -963,6 +1126,7 @@
 									<select id="watershed1" name="watershed1" class="form-select">
 										<option value="">--Select Micro Watershed--</option>
 									</select>
+									<div class="invalid-feedback">Please select a Micro Watershed.</div>
 								</div>
 								<div class="col-md-6">
 									<label class="form-label">
@@ -971,6 +1135,7 @@
 									<select id="village1" name="village1" class="form-select">
 										<option value="">--Select Village--</option>
 									</select>
+									<div class="invalid-feedback">Please select a Village.</div>
 								</div>
 							
 								<div class="col-md-12">
@@ -985,9 +1150,10 @@
 									<label class="form-label">
 										Availability of Water (No. of month in a year)
 									</label>
-									<input type="text" name="preQualityWater1" id="preQualityWater1" class="form-control"
-										style="height:40px; width: 300px;" oninput="validateInteger(this,2)" min="1" max="12">
-							
+									<input type="text" name="preQualityWater1" id="preQualityWater1" class="form-control" style="height:40px; width: 300px;" 
+									oninput="validateInteger(this,2)" min="0" max="12" step="any" onblur="validateWaterQuality(this)">
+									<div class="invalid-feedback">Please enter Availability of Water (No. of month in a year) .</div>
+									<small id="preQualityWater1Error" class="text-danger"></small>
 								</div>
 							
 							
@@ -1005,6 +1171,12 @@
 												th:text="${quality.waterQualityType}">
 											</label>
 										</div>
+										<div id="schemeError"
+											 class="text-danger small mt-1"
+											style="display:none;">
+											 Please select Pre-Project Quality of Water.
+										</div>
+
 									</div>
 								</div>
 							
@@ -1020,9 +1192,10 @@
 									<label class="form-label">
 										Expected Availability of Water (No. of month in a year)
 									</label>
-									<input type="text" name="postQualityWater1" id="postQualityWater1" class="form-control"
-										style="height:40px; width: 300px;" oninput="validateInteger(this,2)" >
-							
+									<input type="text" name="postQualityWater1" id="postQualityWater1" class="form-control" style="height:40px; width: 300px;" 
+									oninput="validateInteger(this,2)" min="0" max="12" step="any" onblur="validateWaterQuality(this)">
+									<div class="invalid-feedback">Please enter Expected Availability of Water (No. of month in a year)</div>
+									<small id="postQualityWater1Error" class="text-danger"></small>
 								</div>
 								<div class="col-md-6">
 									<label class="form-label">
@@ -1037,6 +1210,9 @@
 											<label class="form-check-label" th:for="'postQuality1_' + ${quality.waterQualityId}"
 												th:text="${quality.waterQualityType}">
 											</label>
+										</div>
+										<div id="schemeError1" class="text-danger small mt-1" style="display:none;">
+											Please select Post-Project Quality of Water.
 										</div>
 									</div>
 								</div>

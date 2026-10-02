@@ -1049,9 +1049,7 @@
 								</a>
 								&nbsp; &nbsp;
 							
-								<!--	<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${row[0]}" data-bs-toggle="modal" data-bs-target="#editModal">
-														   											<i class="fas fa-edit"></i>
-														   									</button>-->
+								
 								<button type="button" th:if="${row[10].toString().equals('D')}" title="Edit" class="btn btn-primary btn-sm editBtn"
 									th:data-id="${row[0]}" data-bs-toggle="modal" data-bs-target="#editModal">
 									<i class="fas fa-edit"></i>
@@ -1063,12 +1061,16 @@
 									<i class="fas fa-check"></i>
 								</a>-->
 								
-								<a href="javascript:void(0)" class="btn btn-success btn-sm" th:if="${row[10].toString().equals('D')}" title="Delete"
+								<a href="javascript:void(0)" class="btn btn-success btn-sm" th:if="${row[10].toString().equals('D')}" title="Complete"
 									th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeAgroClimateConditionPPR10?id=' + ${row[0]} + '\'; }); return false;'">
 								
 									<i class="fas fa-check"></i>
 								</a>
 								
+								<span th:if="${row[10].toString().equals('S')}" class="badge bg-warning text-dark">
+									<i class="fas fa-forward"></i>
+									Skipped
+								</span>
 								
 								<span th:if="${row[10].toString().equals('C')}" class="badge bg-success">
 									<i class="fas fa-check-circle"></i> Completed

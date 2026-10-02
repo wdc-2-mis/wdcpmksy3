@@ -64,6 +64,379 @@
 		fromDate.setAttribute("max", today); 
 		toDate.setAttribute("max", today);
 		
+		const form1 = document.getElementById("pendinguc");
+
+		if (!form1) {
+			return;
+		}
+
+		form1.addEventListener("submit", function (e) {
+
+			let isValid = true;
+
+			// ==========================================
+			// District
+			// ==========================================
+
+			const district = document.getElementById("district");
+
+			if (district.value === "") {
+
+				district.classList.add("is-invalid");
+				district.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				district.classList.remove("is-invalid");
+				district.classList.add("is-valid");
+			}
+
+			// ==========================================
+			// Project
+			// ==========================================
+
+			const project = document.getElementById("project");
+
+			if (project.value === "") {
+
+				project.classList.add("is-invalid");
+				project.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				project.classList.remove("is-invalid");
+				project.classList.add("is-valid");
+			}
+
+			const fyear = document.getElementById("fyear");
+
+			if (fyear.value === "") {
+
+				fyear.classList.add("is-invalid");
+				fyear.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				fyear.classList.remove("is-invalid");
+				fyear.classList.add("is-valid");
+			}
+			
+			const dueDate = document.getElementById("dueDate");
+
+			if (dueDate.value === "") {
+
+				dueDate.classList.add("is-invalid");
+				dueDate.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				dueDate.classList.remove("is-invalid");
+				dueDate.classList.add("is-valid");
+			}
+			
+			const ucDate = document.getElementById("ucDate");
+
+			if (ucDate.value === "") {
+
+				ucDate.classList.add("is-invalid");
+				ucDate.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				ucDate.classList.remove("is-invalid");
+				ucDate.classList.add("is-valid");
+			}
+			
+			const fromDate = document.getElementById("fromDate");
+
+			if (fromDate.value === "") {
+
+				fromDate.classList.add("is-invalid");
+				fromDate.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				fromDate.classList.remove("is-invalid");
+				fromDate.classList.add("is-valid");
+			}
+			
+			const toDate = document.getElementById("toDate");
+
+			if (toDate.value === "") {
+
+				toDate.classList.add("is-invalid");
+				toDate.classList.remove("is-valid");
+
+				isValid = false;
+
+			} else {
+
+				toDate.classList.remove("is-invalid");
+				toDate.classList.add("is-valid");
+			}
+
+			// ==========================================
+			// Helper function for text fields
+			// ==========================================
+
+			function validateTextField(element) {
+
+				if (element.value.trim() === "") {
+
+					element.classList.add("is-invalid");
+					element.classList.remove("is-valid");
+
+					isValid = false;
+
+				} else {
+
+					element.classList.remove("is-invalid");
+					element.classList.add("is-valid");
+				}
+			}
+			// ==========================================
+			// Numeric / Area fields
+			// ==========================================
+
+			validateTextField(document.getElementById("installment"));
+			validateTextField(document.getElementById("released"));
+			validateTextField(document.getElementById("utilized"));
+			validateTextField(document.getElementById("ucamount"));
+			validateTextField(document.getElementById("ducamount"));
+			validateTextField(document.getElementById("reasion"));
+			validateTextField(document.getElementById("pucamount"));
+			// ==========================================
+			// Stop form submission if invalid
+			// ==========================================
+
+			if (!isValid) {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				// Scroll to first invalid field
+				const firstInvalid =
+					form1.querySelector(".is-invalid");
+
+				if (firstInvalid) {
+
+					firstInvalid.scrollIntoView({
+						behavior: "smooth",
+						block: "center"
+					});
+
+					firstInvalid.focus();
+				}
+
+				return false;
+			}
+
+		});
+
+		const fields = form1.querySelectorAll(
+			"input, select"
+		);
+
+		fields.forEach(function (field) {
+
+			field.addEventListener("change", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+			field.addEventListener("input", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+		});
+		
+		
+
+		const forme = document.getElementById("editForm");
+
+		if (!forme) {
+			return;
+		}
+
+		forme.addEventListener("submit", function (e) {
+
+			let isValide = true;
+
+			const dueDate1 = document.getElementById("dueDate1");
+
+			if (dueDate1.value === "") {
+
+				dueDate1.classList.add("is-invalid");
+				dueDate1.classList.remove("is-valid");
+
+				isValide = false;
+
+			} else {
+
+				dueDate1.classList.remove("is-invalid");
+				dueDate1.classList.add("is-valid");
+			}
+			
+			const ucDate1 = document.getElementById("ucDate1");
+
+			if (ucDate1.value === "") {
+
+				ucDate1.classList.add("is-invalid");
+				ucDate1.classList.remove("is-valid");
+
+				isValide = false;
+
+			} else {
+
+				ucDate1.classList.remove("is-invalid");
+				ucDate1.classList.add("is-valid");
+			}
+			
+			const fromDate1 = document.getElementById("fromDate1");
+
+			if (fromDate1.value === "") {
+
+				fromDate1.classList.add("is-invalid");
+				fromDate1.classList.remove("is-valid");
+
+				isValide = false;
+
+			} else {
+
+				fromDate1.classList.remove("is-invalid");
+				fromDate1.classList.add("is-valid");
+			}
+			
+			const toDate1 = document.getElementById("toDate1");
+
+			if (toDate1.value === "") {
+
+				toDate1.classList.add("is-invalid");
+				toDate1.classList.remove("is-valid");
+
+				isValide = false;
+
+			} else {
+
+				toDate1.classList.remove("is-invalid");
+				toDate1.classList.add("is-valid");
+			}
+
+			// ==========================================
+			// Helper function for text fields
+			// ==========================================
+
+			function validateTextField(element) {
+
+				if (element.value.trim() === "") {
+
+					element.classList.add("is-invalid");
+					element.classList.remove("is-valid");
+
+					isValide = false;
+
+				} else {
+
+					element.classList.remove("is-invalid");
+					element.classList.add("is-valid");
+				}
+			}
+			// ==========================================
+			// Numeric / Area fields
+			// ==========================================
+
+			validateTextField(document.getElementById("installment1"));
+			validateTextField(document.getElementById("released1"));
+			validateTextField(document.getElementById("utilized1"));
+			validateTextField(document.getElementById("ucamount1"));
+			validateTextField(document.getElementById("ducamount1"));
+			validateTextField(document.getElementById("reasion1"));
+			validateTextField(document.getElementById("pucamount1"));
+			// ==========================================
+			// Stop form submission if invalid
+			// ==========================================
+
+			if (!isValide) {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				// Scroll to first invalid field
+				const firstInvalid1 =
+					forme.querySelector(".is-invalid");
+
+				if (firstInvalid1) {
+
+					firstInvalid1.scrollIntoView({
+						behavior: "smooth",
+						block: "center"
+					});
+
+					firstInvalid1.focus();
+				}
+
+				return false;
+			}
+
+		});
+
+		const fieldse = forme.querySelectorAll(
+			"input, select"
+		);
+
+		fieldse.forEach(function (field) {
+
+			field.addEventListener("change", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+			field.addEventListener("input", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+		});
+		
+		
+		
 			var editModal = document.getElementById('editModal');
 		   	editModal.addEventListener('show.bs.modal', function (event) {
 		       var button = event.relatedTarget;
@@ -125,201 +498,6 @@
 		    }
 		}
 		
-		const editForm = document.getElementById("editForm");
-		editForm.addEventListener("submit", function (e) {
-
-			const installment = document.getElementById("installment1");
-			const released = document.getElementById("released1");
-			const utilized = document.getElementById("utilized1");
-			const dueDate = document.getElementById("dueDate1");
-			const ucamount = document.getElementById("ucamount1");
-			const ucDate = document.getElementById("ucDate1");
-			const ducamount = document.getElementById("ducamount1");
-			const reasion = document.getElementById("reasion1");
-			const fromDate = document.getElementById("fromDate1");
-			const toDate = document.getElementById("toDate1");
-			const pucamount = document.getElementById("pucamount1");
-
-			if (installment.value.trim() === "") {
-				alert("Please enter Installment No.");
-				installment.focus();
-				e.preventDefault();
-				return;
-			}
-			if (released.value.trim() === "") {
-				alert("Please enter Amount Released (Rs. in Lakh) ");
-				released.focus();
-				e.preventDefault();
-				return;
-			}
-
-			if (utilized.value.trim() === "") {
-				alert("Please enter Amount Utilized (Rs. in Lakh) ");
-				utilized.focus();
-				e.preventDefault();
-				return;
-			}
-			if (dueDate.value.trim() === "") {
-				alert("Please enter Submission of UC Due Date ");
-				dueDate.focus();
-				e.preventDefault();
-				return;
-			}
-
-			if (ucamount.value.trim() === "") {
-				alert("Please enter Submission of UC Amount (Rs in Lakh)  ");
-				ucamount.focus();
-				e.preventDefault();
-				return;
-			}
-			if (ucDate.value.trim() === "") {
-				alert("Please enter Date of Submission of UC ");
-				ucDate.focus();
-				e.preventDefault();
-				return;
-			}
-			if (ducamount.value.trim() === "") {
-				alert("Please enter Date of Submission of UC Amount (Rs in Lakh) ");
-				ducamount.focus();
-				e.preventDefault();
-				return;
-			}
-			if (reasion.value.trim() === "") {
-				alert("Please enter Reasion of not Submitting  ");
-				reasion.focus();
-				e.preventDefault();
-				return;
-			}
-			if (fromDate.value.trim() === "") {
-				alert("Please enter Period of pending UC Form Date");
-				fromDate.focus();
-				e.preventDefault();
-				return;
-			}
-			if (toDate.value.trim() === "") {
-				alert("Please enter Period of pending UC To Date ");
-				toDate.focus();
-				e.preventDefault();
-				return;
-			}
-			if (pucamount.value.trim() === "") {
-				alert("Please enter Pending UC`s Amount (Rs in Lakh) ");
-				pucamount.focus();
-				e.preventDefault();
-				return;
-			}		
-
-		});
-
-	    const form = document.getElementById("drinkingWater");
-
-	    form.addEventListener("submit", function (e) {
-
-			const district = document.getElementsByName("district")[0];  
-	        const project = document.getElementsByName("project")[0]; 
-			const fyear = document.getElementsByName("fyear")[0]; 
-	        const installment = document.getElementById("installment");
-	        const released = document.getElementById("released");
-			const utilized = document.getElementById("utilized");
-			const dueDate = document.getElementById("dueDate");
-			const ucamount = document.getElementById("ucamount");
-			const ucDate = document.getElementById("ucDate");
-			const ducamount = document.getElementById("ducamount");
-			const reasion = document.getElementById("reasion");
-			const fromDate = document.getElementById("fromDate");
-			const toDate = document.getElementById("toDate");
-			const pucamount = document.getElementById("pucamount");
-			
-			if (district.value.trim() === "") {
-			     alert("Please select District.");
-			     district.focus();
-			     e.preventDefault();
-			     return false;
-			}
-			
-	        if (project.value.trim() === "") {
-	             alert("Please select Project.");
-	             project.focus();
-	             e.preventDefault();
-	             return;
-	        }
-			if (fyear.value.trim() === "") {
-				 alert("Please select Financial Year.");
-				 fyear.focus();
-				 e.preventDefault();
-				 return;
-			}
-	        if (installment.value.trim() === "") {
-	            alert("Please enter Installment No.");
-	            installment.focus();
-	            e.preventDefault();
-	            return;
-	        }
-			if (released.value.trim() === "") {
-				alert("Please enter Amount Released (Rs. in Lakh) ");
-				released.focus();
-				e.preventDefault();
-				return;
-			}
-			
-			if (utilized.value.trim() === "") {
-				alert("Please enter Amount Utilized (Rs. in Lakh) ");
-				utilized.focus();
-				e.preventDefault();
-				return;
-			}
-			if (dueDate.value.trim() === "") {
-				alert("Please enter Submission of UC Due Date ");
-				dueDate.focus();
-				e.preventDefault();
-				return;
-			}
-			
-			if (ucamount.value.trim() === "") {
-				alert("Please enter Submission of UC Amount (Rs in Lakh)  ");
-				ucamount.focus();
-				e.preventDefault();
-				return;
-			}
-			if (ucDate.value.trim() === "") {
-				alert("Please enter Date of Submission of UC ");
-				ucDate.focus();
-				e.preventDefault();
-				return;
-			}
-			if (ducamount.value.trim() === "") {
-				alert("Please enter Date of Submission of UC Amount (Rs in Lakh) ");
-				ducamount.focus();
-				e.preventDefault();
-				return;
-			}
-			if (reasion.value.trim() === "") {
-				alert("Please enter Reasion of not Submitting  ");
-				reasion.focus();
-				e.preventDefault();
-				return;
-			}
-			if (fromDate.value.trim() === "") {
-				alert("Please enter Period of pending UC Form Date");
-				fromDate.focus();
-				e.preventDefault();
-				return;
-			}
-			if (toDate.value.trim() === "") {
-				alert("Please enter Period of pending UC To Date ");
-				toDate.focus();
-				e.preventDefault();
-				return;
-			}
-			if (pucamount.value.trim() === "") {
-				alert("Please enter Pending UC`s Amount (Rs in Lakh) ");
-				pucamount.focus();
-				e.preventDefault();
-				return;
-			}					
-
-	    });
-
 		document.getElementById("district").addEventListener("change", function () {
 
 		    let districtId = this.value;
@@ -431,7 +609,7 @@
 		</div>-->
         <div class="card-body">
 
-             <form id="drinkingWater" th:action="@{/savePendingUCPPR19}" method="post">
+             <form id="pendinguc" th:action="@{/savePendingUCPPR19}" method="post" novalidate>
 				
 				<div class="row g-4">
 					
@@ -445,7 +623,7 @@
 									<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
 								</th:block>
 							</select>
-
+							<div class="invalid-feedback">Please select a District.</div>
 				       	</div>
 						
 						<div class="col-md-6">
@@ -455,6 +633,7 @@
 							<select id="project" name="project" class="form-select" required>
 								<option value="">--Select Project--</option>
 							</select>
+							<div class="invalid-feedback">Please select a Project.</div>
 						</div>
 				        <div class="col-md-6">
 							<label class="form-label">
@@ -466,6 +645,7 @@
 									<option th:value="${year.finYrCd}" th:text="${year.finYrDesc}"> </option>
 								</th:block>
 							</select>
+							<div class="invalid-feedback">Please select a Year.</div>
 				        </div>
 						<div class="col-md-6">
 							<label class="form-label">
@@ -473,6 +653,7 @@
 							</label>
 							<input type="text" name="installment" id="installment" class="form-control" style="height:40px; width: 300px;" 
 									oninput="this.value=this.value.replace(/[^0-9]/g,'')"  required >
+									<div class="invalid-feedback">Please enter Installment No.</div>
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">
@@ -480,6 +661,7 @@
 							</label>
 							<input type="text" name="released" id="released" class="form-control" style="height:40px; width: 300px;" 
 									oninput="validateDecimal(this,11,5)" required >
+									<div class="invalid-feedback">Please enter Amount Released (Rs. in Lakh)</div>
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">
@@ -487,6 +669,7 @@
 							</label>
 							<input type="text" name="utilized" id="utilized" class="form-control" style="height:40px; width: 300px;" 
 							  oninput="validateDecimal(this,11,5)" required>
+							  <div class="invalid-feedback">Please enter Amount Utilized (Rs. in Lakh)</div>
 						</div>
 						
 						<div class="col-md-12">
@@ -505,6 +688,7 @@
 							<div class="d-flex align-items-center gap-4">
 								<input type="date" name="dueDate" id="dueDate" class="form-control" min="2026-01-01" style="height:40px; width: 300px;"
 											onkeydown="return false;" required>
+							<div class="invalid-feedback">Please select  Submission of UC Due Date </div>
 							</div>
 							
 						</div>
@@ -518,6 +702,7 @@
 						    <div class="d-flex align-items-center gap-4">
 								<input type="text" name="ucamount" id="ucamount" class="form-control" required
 									style="height:40px; width: 300px;" oninput="validateDecimal(this,11,5)">
+								<div class="invalid-feedback">Please enter Submission of UC Amount (Rs. in Lakh)</div>	
 						    </div>
 						</div>
 						
@@ -536,6 +721,7 @@
 							<div class="d-flex align-items-center gap-4">
 								<input type="date" name="ucDate" id="ucDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
 									style="height:40px; width: 300px;">
+									<div class="invalid-feedback">Please select Date of Submission of UC Date</div>	
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -546,6 +732,7 @@
 							<div class="d-flex align-items-center gap-4">
 								<input type="text" name="ducamount" id="ducamount" class="form-control" style="height:40px; width: 300px;" required
 									oninput="validateDecimal(this,11,5)">
+									<div class="invalid-feedback">Please enter Date of Submission of UC Amount (Rs. in Lakh)</div>	
 							</div>
 						</div>
 						
@@ -554,7 +741,7 @@
 								Reasion of not Submitting
 							</label>
 							<textarea name="reasion" id="reasion" class="form-control" rows="2" required></textarea>
-						
+							<div class="invalid-feedback">Please enter Reasion of not Submitting</div>
 						</div>
 						<div class="col-md-12">
 						
@@ -568,11 +755,14 @@
 							<label class="form-label">
 								Period of pending UC 
 							</label>
-							<div class="d-flex align-items-center gap-4">
+							<div class="d-flex align-items-center gap-6">
 								<input type="date" name="fromDate" id="fromDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
-									style="height:40px; width: 300px;"> &nbsp; To &nbsp;
+									style="height:40px; width: 300px;"> 
+								<div class="invalid-feedback">Please select Period of pending UC from Date</div>
+									&nbsp; To &nbsp;
 								<input type="date" name="toDate" id="toDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
 									style="height:40px; width: 300px;">
+									<div class="invalid-feedback">Please select Period of pending UC To Date</div>
 							</div>
 							
 						</div>
@@ -584,6 +774,7 @@
 							<div class="d-flex align-items-center gap-4">
 								<input type="text" name="pucamount" id="pucamount" class="form-control" style="height:40px; width: 300px;"
 									oninput="validateDecimal(this,11,5)">
+									<div class="invalid-feedback">Please enter Pending UC Amount (Rs in Lakh)</div>
 							</div>
 						</div>
 						 	
@@ -603,7 +794,7 @@
 						
 				
             </form>
-			<form id="skipForm"
+			<!--<form id="skipForm"
 			      th:action="@{/skipPendingUCPPR19}"
 			      method="post"
 			      style="display:none;">
@@ -614,7 +805,7 @@
 
 			    <input type="hidden" name="action" value="S">
 
-			</form>
+			</form>-->
 
         </div>
 		
@@ -629,6 +820,7 @@
 			           <thead class="table-primary">
 			               <tr>
 			                   <!--<th>S.No.</th>-->
+							   <th rowspan="2" style="width: 200px;">Action</th>
 			                   <th rowspan="2">Project Name</th>
 							   <th rowspan="2">Financial Year</th>
 			                   <th rowspan="2">Installment No.</th>
@@ -637,7 +829,7 @@
 			                   <th colspan="2">Submission of UC</th>
 			                   <th colspan="3">Date of Submission of UC</th>
 							   <th colspan="2">Pending UC`s</th>
-							   <th rowspan="2" style="width: 200px;">Action</th>
+							  
 			               </tr>
 							<tr>
 								<th> Due Date </th>
@@ -653,8 +845,67 @@
 			           <tbody>
 
 			               <tr th:each="rec : ${records}">
+							
+							<td th:if="${rec.status.toString().equals('D')}">
+								&nbsp; &nbsp;
+								<!--<a title="Delete" th:href="@{/deletePendingUCPPR19(id=${rec.pprPendingUcId})}" class="btn btn-danger btn-sm"
+									onclick="return confirm('Are you sure you want to delete this record?');">
+									<i class="fas fa-trash"></i>
+								</a>-->
+								
+								<a href="javascript:void(0)" class="btn btn-danger btn-sm" title="Delete"
+									th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deletePendingUCPPR19?id=' + ${rec.pprPendingUcId} + '\'; }); return false;'">
+								
+									<i class="fas fa-trash"></i>
+								</a>
+								&nbsp; &nbsp;
+							
+								<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn"
+									th:attr="data-id=${rec.pprPendingUcId}, data-district=${rec.ppr.district.distName}, data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, 
+																						data-finyr=${rec.finYear.finYrDesc}, data-finyrid=${rec.finYear.finYrCd}, data-install=${rec.installmentNo}, data-released=${rec.releasedAmount}, data-utilized=${rec.utilizedAmount}, data-dueDate=${rec.dueDate}, data-ucAmount=${rec.ucAmount},
+																									data-submissionDate=${rec.ucSubmissionDate}, data-submissionAmt=${rec.ucSubmissionAmt}, data-reason=${rec.reasonNotSubmitted}, data-start=${rec.pendingStart}, data-end=${rec.pendingEnd}, data-penamt=${rec.pendingAmount}"
+									data-bs-toggle="modal" data-bs-target="#editModal">
+									<i class="fas fa-edit"></i>
+								</button>
+							
+								&nbsp; &nbsp;
+								<!--<a title="Complete" th:href="@{/completePendingUCPPR19(id=${rec.pprPendingUcId})}" class="btn btn-success btn-sm"
+									onclick="return confirm('Are you sure you want to complete this record?');">
+									<i class="fas fa-check"></i>
+								</a>-->
+								
+								<a href="javascript:void(0)" class="btn btn-success btn-sm" title="Complete"
+									th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completePendingUCPPR19?id=' + ${rec.pprPendingUcId} + '\'; }); return false;'">
+								
+									<i class="fas fa-check"></i>
+								</a>
+							
+							</td>
+							<td th:if="${rec.status.toString().equals('C')}">
+							
+								<span class="badge bg-success">
+									<i class="fas fa-check-circle"></i> Completed
+								</span>
+							
+								&nbsp; &nbsp;
+								<a th:href="@{/unspentBalancePPR20}" class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
+							
+									Next <i class="fas fa-arrow-right"></i>
+							
+								</a>
+							
+							</td>
+							<td th:if="${rec.status.toString().equals('S')}">
+							
+								<span class="badge bg-warning text-dark">
+									<i class="fas fa-forward"></i>
+									Skipped
+								</span>
+							
+							</td>
+							
 								<td th:text="${rec.ppr.projectName}"></td>
-								<td th:text="${rec.finYear.finYrDesc}"></td>
+								<td th:text="${rec.finYear != null ? rec.finYear.finYrDesc : ''}"></td>
 								<td th:text="${rec.installmentNo}"></td>
 								<td th:text="${rec.releasedAmount}"></td>
 								<td th:text="${rec.utilizedAmount}"></td>
@@ -666,42 +917,7 @@
 								<td ><span th:text="${#temporals.format(rec.pendingStart, 'dd/MM/yyyy')}" /> &nbsp; To &nbsp;<span th:text="${#temporals.format(rec.pendingEnd, 'dd/MM/yyyy')}" /></td>
 								<td th:text="${rec.pendingAmount}"></td>
 								
-							   <td th:if="${rec.status.toString().equals('D')}">
-							   		&nbsp; &nbsp; 
-							   		<a title="Delete" th:href="@{/deletePendingUCPPR19(id=${rec.pprPendingUcId})}"
-							   			class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-							   			<i class="fas fa-trash"></i>
-							   		</a>
-							   		&nbsp; &nbsp; 
-												
-									<button type="button" title="Edit"  class="btn btn-primary btn-sm editBtn" 	th:attr="data-id=${rec.pprPendingUcId}, data-district=${rec.ppr.district.distName}, data-project=${rec.ppr.projectName}, data-projectid=${rec.ppr.pprId}, 
-									data-finyr=${rec.finYear.finYrDesc}, data-finyrid=${rec.finYear.finYrCd}, data-install=${rec.installmentNo}, data-released=${rec.releasedAmount}, data-utilized=${rec.utilizedAmount}, data-dueDate=${rec.dueDate}, data-ucAmount=${rec.ucAmount},
-												data-submissionDate=${rec.ucSubmissionDate}, data-submissionAmt=${rec.ucSubmissionAmt}, data-reason=${rec.reasonNotSubmitted}, data-start=${rec.pendingStart}, data-end=${rec.pendingEnd}, data-penamt=${rec.pendingAmount}"  
-												 data-bs-toggle="modal"   data-bs-target="#editModal" >
-									    <i class="fas fa-edit"></i>
-									</button>
-									
-							   		&nbsp; &nbsp; 
-							   		<a  title="Complete" th:href="@{/completePendingUCPPR19(id=${rec.pprPendingUcId})}"
-							   			class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-							   			<i class="fas fa-check"></i>
-							   		</a>
-							   		
-							   	</td>
-							   	<td th:if="${rec.status.toString().equals('C')}">
-									
-									<span class="badge bg-success">
-											<i class="fas fa-check-circle"></i> Completed
-									</span>
-									
-									&nbsp; &nbsp;
-									<a th:href="@{/unspentBalancePPR20}" class="btn btn-primary btn-sm ms-2 next-btn" title="Go to Next Form">
-									
-										Next <i class="fas fa-arrow-right"></i>
-									
-									</a>
-									
-								</td>
+							 
 			                   
 			               </tr>
 			               <tr th:if="${#lists.isEmpty(records)}">
@@ -760,6 +976,7 @@
 									</label>
 									<input type="text" name="installment1" id="installment1" class="form-control" style="height:40px; width: 300px;"
 										oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+										<div class="invalid-feedback">Please enter Installment No.</div>
 								</div>
 								<div class="col-md-6">
 									<label class="form-label">
@@ -767,6 +984,7 @@
 									</label>
 									<input type="text" name="released1" id="released1" class="form-control" style="height:40px; width: 300px;"
 										oninput="validateDecimal(this,11,5)">
+										<div class="invalid-feedback">Please enter Amount Released (Rs. in Lakh)</div>
 								</div>
 								<div class="col-md-6">
 									<label class="form-label">
@@ -774,6 +992,7 @@
 									</label>
 									<input type="text" name="utilized1" id="utilized1" class="form-control" style="height:40px; width: 300px;"
 										oninput="validateDecimal(this,11,5)">
+										<div class="invalid-feedback">Please enter Amount Utilized (Rs. in Lakh)</div>
 								</div>
 							
 								<div class="col-md-12">
@@ -792,6 +1011,7 @@
 									<div class="d-flex align-items-center gap-4">
 										<input type="date" name="dueDate1" id="dueDate1" class="form-control" min="2026-01-01"
 											style="height:40px; width: 300px;">
+											<div class="invalid-feedback">Please select  Submission of UC Due Date </div>
 									</div>
 							
 								</div>
@@ -805,6 +1025,7 @@
 									<div class="d-flex align-items-center gap-4">
 										<input type="text" name="ucamount1" id="ucamount1" class="form-control" style="height:40px; width: 300px;"
 											oninput="validateDecimal(this,11,5)">
+											<div class="invalid-feedback">Please enter Submission of UC Amount (Rs. in Lakh)</div>	
 									</div>
 								</div>
 							
@@ -823,6 +1044,7 @@
 									<div class="d-flex align-items-center gap-4">
 										<input type="date" name="ucDate1" id="ucDate1" class="form-control" min="2026-01-01"
 											style="height:40px; width: 300px;">
+											<div class="invalid-feedback">Please select Date of Submission of UC Date</div>	
 									</div>
 								</div>
 								<div class="col-md-6">
@@ -833,6 +1055,7 @@
 									<div class="d-flex align-items-center gap-4">
 										<input type="text" name="ducamount1" id="ducamount1" class="form-control" style="height:40px; width: 300px;"
 											oninput="validateDecimal(this,11,5)">
+											<div class="invalid-feedback">Please enter Date of Submission of UC Amount (Rs. in Lakh)</div>
 									</div>
 								</div>
 							
@@ -841,7 +1064,7 @@
 										Reasion of not Submitting
 									</label>
 									<textarea name="reasion1" id="reasion1" class="form-control" rows="2"></textarea>
-							
+									<div class="invalid-feedback">Please enter Reasion of not Submitting</div>
 								</div>
 								<div class="col-md-12">
 							
@@ -857,9 +1080,13 @@
 									</label>
 									<div class="d-flex align-items-center gap-4">
 										<input type="date" name="fromDate1" id="fromDate1" class="form-control" min="2026-01-01"
-											style="height:40px; width: 300px;"> &nbsp; To &nbsp;
+											style="height:40px; width: 300px;"> 
+											<div class="invalid-feedback">Please select Period of pending UC from Date</div>
+
+											&nbsp; To &nbsp;
 										<input type="date" name="toDate1" id="toDate1" class="form-control" min="2026-01-01"
 											style="height:40px; width: 300px;">
+											<div class="invalid-feedback">Please select Period of pending UC To Date</div>
 									</div>
 							
 								</div>
@@ -871,6 +1098,7 @@
 									<div class="d-flex align-items-center gap-4">
 										<input type="text" name="pucamount1" id="pucamount1" class="form-control" style="height:40px; width: 300px;"
 											oninput="validateDecimal(this,11,5)">
+											<div class="invalid-feedback">Please enter Pending UC Amount (Rs in Lakh)</div>
 									</div>
 								</div>
 							

@@ -55,12 +55,13 @@ public class DrinkingWaterController {
         	serv.changeStatusByPprId(pprid);
         }
         
-        boolean exists=false;
-        exists=repository.existsByPpr_InstitutionalStructure_StCodeAndStatus(stcode, "C");
-        model.addAttribute("existssl", exists);
-		if (!exists) {
-	        model.addAttribute( "error1", "Please complete the Average ground water table depth in Project Area");
-	    }
+		/*
+		 * boolean exists=false;
+		 * exists=repository.existsByPpr_InstitutionalStructure_StCodeAndStatus(stcode,
+		 * "C"); model.addAttribute("existssl", exists); if (!exists) {
+		 * model.addAttribute( "error1",
+		 * "Please complete the Average ground water table depth in Project Area"); }
+		 */
         
         List<MWaterQuality> waterQualityList =wtrqua.findAll();
         model.addAttribute("waterQualityList", waterQualityList);
