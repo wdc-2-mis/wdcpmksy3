@@ -803,6 +803,7 @@
 			            });
 			            //Restore hidden criteria data
 			            updateEditCriteriaData();
+						updateEditCriteriaTotal();
 			            editCriteriaModal.hide();
 			        });
 			        //When criteria modal closes, reopen edit modal
@@ -810,30 +811,6 @@
 			            editModal.show();
 			        });
 			    }
-				function updateCriteriaTotal() {
-				    let total = 0;
-				    document.querySelectorAll("#criteriaModal tbody tr").forEach(function(row) {
-				        const checkbox = row.querySelector(".criteriaCheck");
-				        const marksCell = row.querySelector(".marks");
-				        if (checkbox && checkbox.checked && marksCell) {
-				            const marks = parseFloat(marksCell.innerText.trim()) || 0;
-				            total += marks;
-				        }
-				    });
-				    document.getElementById("criteriaTotal").innerText = total;
-				}
-				function updateEditCriteriaTotal() {
-				    let total = 0;
-				    document.querySelectorAll("#editCriteriaModal tbody tr").forEach(function(row) {
-				        const checkbox = row.querySelector(".editCriteriaCheck");
-				        const marksCell = row.querySelector(".editMarks");
-				        if (checkbox && checkbox.checked && marksCell) {
-				            const marks = parseFloat(marksCell.innerText.trim()) || 0;
-				            total += marks;
-				        }
-				    });
-				    document.getElementById("editCriteriaTotal").innerText = total;
-				}
 			});
 			
 			document.addEventListener("DOMContentLoaded", function () {
@@ -853,6 +830,31 @@
 			        });
 			    }
 			});
+			
+			function updateCriteriaTotal() {
+					let total = 0;
+					document.querySelectorAll("#criteriaModal tbody tr").forEach(function (row) {
+						const checkbox = row.querySelector(".criteriaCheck");
+						const marksCell = row.querySelector(".marks");
+						if (checkbox && checkbox.checked && marksCell) {
+							const marks = parseFloat(marksCell.innerText.trim()) || 0;
+							total += marks;
+						}
+					});
+					document.getElementById("criteriaTotal").innerText = total;
+				}
+				function updateEditCriteriaTotal() {
+					let total = 0;
+					document.querySelectorAll("#editCriteriaModal tbody tr").forEach(function (row) {
+						const checkbox = row.querySelector(".editCriteriaCheck");
+						const marksCell = row.querySelector(".editMarks");
+						if (checkbox && checkbox.checked && marksCell) {
+							const marks = parseFloat(marksCell.innerText.trim()) || 0;
+							total += marks;
+						}
+					});
+					document.getElementById("editCriteriaTotal").innerText = total;
+				}
 		
 </script>
 	
@@ -949,7 +951,7 @@
 	                    <label class="col-md-3 fw-bold"> Weightage under the Criteria <span class="required">*</span></label>
 	                    <div class="col-md-4">
 							<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#criteriaModal">
-								Total Weihtage Marks: <span id="criteriaTotal">0</span> <i class="fas fa-list"></i>
+								Total Marks: <span id="criteriaTotal">0</span> 
 							</button>
 							<input type="hidden" id="criteriaData" name="criteriaData">
 							<div class="field-error" data-error-for="criteriaData"></div>
@@ -1000,10 +1002,10 @@
 		            <td th:text="${data.projectType.projectType}"></td>
 		            <td th:text="${data.proposedCost}"></td>
 					<td>
-						<div class="col-md-6">
+						<div class="col-md-8">
 							<button type="button" class="btn btn-primary btn-sm viewBtn" th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
 								data-bs-target="#viewCriteriaModal">
-								Link <i class="fas fa-list"></i>
+								Total Marks: <span th:text="${data.details != null ? #aggregates.sum(data.details.![scoredMarks]) : 0}"> 0 </span>
 							</button>
 						</div>
 					</td>
@@ -1173,7 +1175,7 @@
 								<label class="col-md-5 fw-bold"> Weightage under the Criteria <span class="required">*</span></label>
 								<div class="col-md-4">
 									<button type="button" class="btn btn-outline-primary btn-sm" id="editCriteriaLink">
-										Total Weihtage Marks: <span id="editCriteriaTotal">0</span> <i class="fas fa-list"></i> </button>
+										Total Marks: <span id="editCriteriaTotal">0</span> </button>
 									<input type="hidden" id="editCriteriaData" name="criteriaData">
 									<div class="field-error" data-error-for="editCriteriaData"></div>
 								</div>
