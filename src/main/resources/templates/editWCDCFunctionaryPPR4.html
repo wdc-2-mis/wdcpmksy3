@@ -1,640 +1,2370 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 
 <head>
+
+```
 <meta charset="UTF-8">
+
 <title>Update District Functionaries PPR4B</title>
 
-<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
 <style>
-	.required{
-	    color:red;
-	}
 
-	body{
-	    background:#f8f9fa;
-	}
+    .required {
+        color: red;
+    }
 
-	.card{
-	    border-radius:0;
-	}
+    body {
+        background: #f8f9fa;
+    }
 
-	.table th,.table td{
-	    vertical-align:middle;
-	    text-align:center;
-	}
+    .card {
+        border-radius: 0;
+    }
 
-	.form-control,
-	.form-select{
-	    border-radius:0;
-	}
+    .table th,
+    .table td {
+        vertical-align: middle;
+        text-align: center;
+    }
 
-	.heading{
-	    font-size:22px;
-	    font-weight:bold;
-	    text-align:center;
-	    margin-bottom:25px;
-	}
+    .form-control,
+    .form-select {
+        border-radius: 0;
+    }
 
-	label{
-	    font-weight:600;
-	}	
+    .heading {
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    label {
+        font-weight: 600;
+    }
+
+    /* Main field error */
+    .field-error {
+        color: red;
+        font-size: 13px;
+        margin-top: 4px;
+        display: none;
+    }
+
+    /* Experience field error */
+    .row-field-error {
+        color: red;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    /* Year error */
+    .year-error {
+        color: red;
+        font-size: 12px;
+        margin-top: 3px;
+        display: none;
+    }
+
+    /* Day error */
+    .day-error {
+        color: red;
+        font-size: 12px;
+        margin-top: 3px;
+        display: none;
+    }
+
+    .is-invalid-custom {
+        border: 1px solid red !important;
+    }
+
+    textarea.is-invalid-custom,
+    select.is-invalid-custom,
+    input.is-invalid-custom {
+        border-color: red !important;
+    }
+
 </style>
 
 
 <script>
 
-	document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-	    const form = document.getElementById("wcdcFunctionaries");
+        const form =
+            document.getElementById("wcdcFunctionaries");
 
-	    form.addEventListener("submit", function (e) {
+        if (!form) {
+            return;
+        }
 
-			const district = document.getElementsByName("district")[0];  
-	        const fname = document.getElementById("fname");
-			const lname = document.getElementById("fname");
-	        const designation = document.getElementById("designation");
-	        const qualification = document.getElementById("qualification");
-	        const workallocation = document.getElementById("workallocation");
 
-	        const slr = document.getElementById("slr");
-	        const slnr = document.getElementById("slnr");
-	        const dlr = document.getElementById("dlr");
-	        const dlnr = document.getElementById("dlnr");
+        /* =========================================================
+           SHOW MAIN FIELD ERROR
+        ========================================================= */
 
-			if (district.value.trim() === "") {
-			            alert("Please select District.");
-			            district.focus();
-			            e.preventDefault();
-			            return false;
-			        }
-	        // fName
-	        if (fname.value.trim() === "") {
-	            alert("Please enter First Name.");
-	            fname.focus();
-	            e.preventDefault();
-	            return;
-	        }
-			
-			// fName
-			//if (lname.value.trim() === "") {
-			//	alert("Please enter Last Name.");
-			//	lname.focus();
-			//	e.preventDefault();
-			//	return;
-			//}
+        function showError(field, message) {
 
-	        // Designation
-	        if (designation.value === "") {
-	            alert("Please select Designation.");
-	            designation.focus();
-	            e.preventDefault();
-	            return;
-	        }
+            if (!field) {
+                return;
+            }
 
-	        // Qualification
-	        if (qualification.value === "") {
-	            alert("Please select Qualification.");
-	            qualification.focus();
-	            e.preventDefault();
-	            return;
-	        }
+            field.classList.add("is-invalid-custom");
 
-	        // Work Allocation
-	        if (workallocation.value.trim() === "") {
-	            alert("Please enter Work Allocation.");
-	            workallocation.focus();
-	            e.preventDefault();
-	            return;
-	        }
+            let errorDiv =
+                document.getElementById(field.id + "Error");
 
-	        // Amount Validation (Only Number and 2 Decimal Places)
-	        function validateAmount(field, message) {
+            if (!errorDiv) {
 
-	            const value = field.value.trim();
+                errorDiv =
+                    document.createElement("div");
 
-	            if (value === "") {
-	                alert(message);
-	                field.focus();
-	                e.preventDefault();
-	                return false;
-	            }
+                errorDiv.id =
+                    field.id + "Error";
 
-	            if (!/^\d+(\.\d{1,2})?$/.test(value)) {
-	                alert(message + " must be a valid number with up to 2 decimal places.");
-	                field.focus();
-	                e.preventDefault();
-	                return false;
-	            }
+                errorDiv.className =
+                    "field-error";
 
-	            return true;
-	        }
+                field.parentNode.appendChild(errorDiv);
+            }
 
-	        if (!validateAmount(slr, "Please Enter Recurring Budget of Watershed Cell")) return;
-	        if (!validateAmount(slnr, "Please Enter Non-Recurring Budget of Watershed Cell")) return;
-	        if (!validateAmount(dlr, "Please Enter Recurring Funding Expected from DoLR")) return;
-	        if (!validateAmount(dlnr, "Please Enter Non-Recurring Funding Expected from DoLR")) return;
+            errorDiv.textContent =
+                message;
 
-	        // Experience Table Validation
-	        const rows = document.querySelectorAll("#experienceTable tr");
+            errorDiv.style.display =
+                "block";
+        }
 
-	        for (let i = 0; i < rows.length; i++) {
 
-	            const office = rows[i].querySelector("input[name='officename[]']");
-	            const address = rows[i].querySelector("input[name='address[]']");
-	            const year = rows[i].querySelector("input[name='yr[]']");
-	            const day = rows[i].querySelector("input[name='day[]']");
-	            const work = rows[i].querySelector("textarea[name='workdetail[]']");
+        /* =========================================================
+           CLEAR MAIN FIELD ERROR
+        ========================================================= */
 
-	            if (office.value.trim() === "") {
-	                alert("Please enter Office Name in Row " + (i + 1));
-	                office.focus();
-	                e.preventDefault();
-	                return;
-	            }
+        function clearError(field) {
 
-	            if (address.value.trim() === "") {
-	                alert("Please enter Address in Row " + (i + 1));
-	                address.focus();
-	                e.preventDefault();
-	                return;
-	            }
+            if (!field) {
+                return;
+            }
 
-	            if (year.value.trim() === "") {
-	                alert("Please enter Experience Year in Row " + (i + 1));
-	                year.focus();
-	                e.preventDefault();
-	                return;
-	            }
+            field.classList.remove(
+                "is-invalid-custom"
+            );
 
-	            if (!/^\d+$/.test(year.value.trim())) {
-	                alert("Experience Year must be numeric in Row " + (i + 1));
-	                year.focus();
-	                e.preventDefault();
-	                return;
-	            }
-				if (parseInt(year.value, 10) > 30) {
-					alert("Experience Year cannot be greater than 30 in Row " + (i + 1));
-					year.focus();
-					e.preventDefault();
-					return;
-				}
-	            if (day.value.trim() === "") {
-	                alert("Please enter Experience Day in Row " + (i + 1));
-	                day.focus();
-	                e.preventDefault();
-	                return;
-	            }
+            const errorDiv =
+                document.getElementById(
+                    field.id + "Error"
+                );
 
-	            if (!/^\d+$/.test(day.value.trim())) {
-	                alert("Experience Day must be numeric in Row " + (i + 1));
-	                day.focus();
-	                e.preventDefault();
-	                return;
-	            }
-				if (parseInt(day.value, 10) > 364) {
-					alert("Experience Day cannot be greater than 364 in Row " + (i + 1));
-					day.focus();
-					e.preventDefault();
-					return;
-				}
-	            if (work.value.trim() === "") {
-	                alert("Please enter Work Details in Row " + (i + 1));
-	                work.focus();
-	                e.preventDefault();
-	                return;
-	            }
-	        }
+            if (errorDiv) {
 
-	    });
+                errorDiv.textContent =
+                    "";
 
-	    // Restrict input while typing (Budget Fields)
-	    const amountFields = ["slr", "slnr", "dlr", "dlnr"];
+                errorDiv.style.display =
+                    "none";
+            }
+        }
 
-	    amountFields.forEach(function(id) {
 
-	        document.getElementById(id).addEventListener("input", function() {
+        /* =========================================================
+           SHOW EXPERIENCE ERROR
+        ========================================================= */
 
-	            this.value = this.value
-	                .replace(/[^0-9.]/g, '')         // allow only digits and dot
-	                .replace(/(\..*)\./g, '$1');     // only one dot
+        function showRowError(field, message) {
 
-	            const match = this.value.match(/^\d+(\.\d{0,2})?/);
+            if (!field) {
+                return;
+            }
 
-	            if (match) {
-	                this.value = match[0];
-	            } else {
-	                this.value = "";
-	            }
+            field.classList.add(
+                "is-invalid-custom"
+            );
 
-	        });
+            let errorDiv =
+                field.parentNode.querySelector(
+                    ".row-field-error"
+                );
 
-	    });
+            if (!errorDiv) {
 
-	});
+                errorDiv =
+                    document.createElement("div");
 
-document.addEventListener("click", function (e) {
+                errorDiv.className =
+                    "row-field-error";
 
-    // Add Row
-    if (e.target.classList.contains("addRow")) {
+                field.parentNode.appendChild(
+                    errorDiv
+                );
+            }
 
-        const currentRow = e.target.closest("tr");
-        const newRow = currentRow.cloneNode(true);
+            errorDiv.textContent =
+                message;
 
-        // Clear input values
-        newRow.querySelectorAll("input, textarea").forEach(function (el) {
-            el.value = "";
-        });
+            errorDiv.style.display =
+                "block";
+        }
 
-        // Replace + button with × button
-        newRow.querySelector("td:last-child").innerHTML =
-            '<button type="button" class="btn btn-danger btn-sm removeRow">×</button>';
 
-        // Insert AFTER the original row
-        currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
-    }
+        /* =========================================================
+           CLEAR EXPERIENCE ERROR
+        ========================================================= */
 
-    // Remove Row
-    if (e.target.classList.contains("removeRow")) {
-        e.target.closest("tr").remove();
-    }
+        function clearRowError(field) {
 
-});
+            if (!field) {
+                return;
+            }
+
+            field.classList.remove(
+                "is-invalid-custom"
+            );
+
+            const errorDiv =
+                field.parentNode.querySelector(
+                    ".row-field-error"
+                );
+
+            if (errorDiv) {
+
+                errorDiv.textContent =
+                    "";
+
+                errorDiv.style.display =
+                    "none";
+            }
+        }
+
+
+        /* =========================================================
+           SHOW YEAR ERROR
+        ========================================================= */
+
+        function showYearError(field, message) {
+
+            if (!field) {
+                return;
+            }
+
+            field.classList.add(
+                "is-invalid-custom"
+            );
+
+            const wrapper =
+                field.parentNode;
+
+            const errorDiv =
+                wrapper.querySelector(
+                    ".year-error"
+                );
+
+            if (errorDiv) {
+
+                errorDiv.textContent =
+                    message;
+
+                errorDiv.style.display =
+                    "block";
+            }
+        }
+
+
+        /* =========================================================
+           CLEAR YEAR ERROR
+        ========================================================= */
+
+        function clearYearError(field) {
+
+            if (!field) {
+                return;
+            }
+
+            field.classList.remove(
+                "is-invalid-custom"
+            );
+
+            const wrapper =
+                field.parentNode;
+
+            const errorDiv =
+                wrapper.querySelector(
+                    ".year-error"
+                );
+
+            if (errorDiv) {
+
+                errorDiv.textContent =
+                    "";
+
+                errorDiv.style.display =
+                    "none";
+            }
+        }
+
+
+        /* =========================================================
+           SHOW DAY ERROR
+        ========================================================= */
+
+        function showDayError(field, message) {
+
+            if (!field) {
+                return;
+            }
+
+            field.classList.add(
+                "is-invalid-custom"
+            );
+
+            const wrapper =
+                field.parentNode;
+
+            const errorDiv =
+                wrapper.querySelector(
+                    ".day-error"
+                );
+
+            if (errorDiv) {
+
+                errorDiv.textContent =
+                    message;
+
+                errorDiv.style.display =
+                    "block";
+            }
+        }
+
+
+        /* =========================================================
+           CLEAR DAY ERROR
+        ========================================================= */
+
+        function clearDayError(field) {
+
+            if (!field) {
+                return;
+            }
+
+            field.classList.remove(
+                "is-invalid-custom"
+            );
+
+            const wrapper =
+                field.parentNode;
+
+            const errorDiv =
+                wrapper.querySelector(
+                    ".day-error"
+                );
+
+            if (errorDiv) {
+
+                errorDiv.textContent =
+                    "";
+
+                errorDiv.style.display =
+                    "none";
+            }
+        }
+
+
+        /* =========================================================
+           CLEAR ALL ERRORS
+        ========================================================= */
+
+        function clearAllErrors() {
+
+            form.querySelectorAll(
+                ".field-error"
+            ).forEach(function (div) {
+
+                div.textContent =
+                    "";
+
+                div.style.display =
+                    "none";
+
+            });
+
+
+            form.querySelectorAll(
+                ".year-error"
+            ).forEach(function (div) {
+
+                div.textContent =
+                    "";
+
+                div.style.display =
+                    "none";
+
+            });
+
+
+            form.querySelectorAll(
+                ".day-error"
+            ).forEach(function (div) {
+
+                div.textContent =
+                    "";
+
+                div.style.display =
+                    "none";
+
+            });
+
+
+            form.querySelectorAll(
+                ".row-field-error"
+            ).forEach(function (div) {
+
+                div.remove();
+
+            });
+
+
+            form.querySelectorAll(
+                ".is-invalid-custom"
+            ).forEach(function (field) {
+
+                field.classList.remove(
+                    "is-invalid-custom"
+                );
+
+            });
+
+        }
+
+
+        /* =========================================================
+           FORM SUBMIT VALIDATION
+        ========================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (e) {
+
+                e.preventDefault();
+
+                clearAllErrors();
+
+                let isValid = true;
+
+                let firstInvalidField = null;
+
+
+                /* =================================================
+                   DISTRICT
+                ================================================= */
+
+                const district =
+                    document.getElementById(
+                        "district"
+                    );
+
+                if (!district ||
+                    district.value.trim() === "") {
+
+                    showError(
+                        district,
+                        "Please select District."
+                    );
+
+                    if (!firstInvalidField) {
+                        firstInvalidField =
+                            district;
+                    }
+
+                    isValid = false;
+                }
+
+
+                /* =================================================
+                   FIRST NAME
+                ================================================= */
+
+                const fname =
+                    document.getElementById(
+                        "fname"
+                    );
+
+                if (!fname ||
+                    fname.value.trim() === "") {
+
+                    showError(
+                        fname,
+                        "Please enter First Name."
+                    );
+
+                    if (!firstInvalidField) {
+                        firstInvalidField =
+                            fname;
+                    }
+
+                    isValid = false;
+                }
+
+
+                /* =================================================
+                   LAST NAME - OPTIONAL
+                ================================================= */
+
+                const lname =
+                    document.getElementById(
+                        "lname"
+                    );
+
+                if (lname &&
+                    lname.value.trim() !== "") {
+
+                    clearError(lname);
+                }
+
+
+                /* =================================================
+                   DESIGNATION
+                ================================================= */
+
+                const designation =
+                    document.getElementById(
+                        "designation"
+                    );
+
+                if (!designation ||
+                    designation.value.trim() === "") {
+
+                    showError(
+                        designation,
+                        "Please select Designation."
+                    );
+
+                    if (!firstInvalidField) {
+                        firstInvalidField =
+                            designation;
+                    }
+
+                    isValid = false;
+                }
+
+
+                /* =================================================
+                   QUALIFICATION
+                ================================================= */
+
+                const qualification =
+                    document.getElementById(
+                        "qualification"
+                    );
+
+                if (!qualification ||
+                    qualification.value.trim() === "") {
+
+                    showError(
+                        qualification,
+                        "Please select Qualification."
+                    );
+
+                    if (!firstInvalidField) {
+                        firstInvalidField =
+                            qualification;
+                    }
+
+                    isValid = false;
+                }
+
+
+                /* =================================================
+                   WORK ALLOCATION
+                ================================================= */
+
+                const workallocation =
+                    document.getElementById(
+                        "workallocation"
+                    );
+
+                if (!workallocation ||
+                    workallocation.value.trim() === "") {
+
+                    showError(
+                        workallocation,
+                        "Please enter Work Allocation."
+                    );
+
+                    if (!firstInvalidField) {
+                        firstInvalidField =
+                            workallocation;
+                    }
+
+                    isValid = false;
+                }
+
+
+                /* =================================================
+                   AMOUNT VALIDATION
+                ================================================= */
+
+                function validateAmount(
+                    field,
+                    message
+                ) {
+
+                    if (!field) {
+                        return true;
+                    }
+
+                    const value =
+                        field.value.trim();
+
+
+                    if (value === "") {
+
+                        showError(
+                            field,
+                            message
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                field;
+                        }
+
+                        return false;
+                    }
+
+
+                    if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+
+                        showError(
+                            field,
+                            message +
+                            " must be a valid number with maximum 2 decimal places."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                field;
+                        }
+
+                        return false;
+                    }
+
+
+                    return true;
+                }
+
+
+                const slr =
+                    document.getElementById(
+                        "slr"
+                    );
+
+                const slnr =
+                    document.getElementById(
+                        "slnr"
+                    );
+
+                const dlr =
+                    document.getElementById(
+                        "dlr"
+                    );
+
+                const dlnr =
+                    document.getElementById(
+                        "dlnr"
+                    );
+
+
+                if (!validateAmount(
+                    slr,
+                    "Please enter Recurring Budget of Watershed Cell"
+                )) {
+
+                    isValid = false;
+                }
+
+
+                if (!validateAmount(
+                    slnr,
+                    "Please enter Non-Recurring Budget of Watershed Cell"
+                )) {
+
+                    isValid = false;
+                }
+
+
+                if (!validateAmount(
+                    dlr,
+                    "Please enter Recurring Funding Expected from DoLR"
+                )) {
+
+                    isValid = false;
+                }
+
+
+                if (!validateAmount(
+                    dlnr,
+                    "Please enter Non-Recurring Funding Expected from DoLR"
+                )) {
+
+                    isValid = false;
+                }
+
+
+                /* =================================================
+                   EXPERIENCE TABLE
+                ================================================= */
+
+                const rows =
+                    document.querySelectorAll(
+                        "#experienceTable tr"
+                    );
+
+
+                if (rows.length === 0) {
+
+                    isValid = false;
+
+                }
+
+
+                rows.forEach(function (
+                    row,
+                    index
+                ) {
+
+                    const office =
+                        row.querySelector(
+                            "input[name='officename[]']"
+                        );
+
+                    const address =
+                        row.querySelector(
+                            "input[name='address[]']"
+                        );
+
+                    const year =
+                        row.querySelector(
+                            "input[name='yr[]']"
+                        );
+
+                    const day =
+                        row.querySelector(
+                            "input[name='day[]']"
+                        );
+
+                    const work =
+                        row.querySelector(
+                            "textarea[name='workdetail[]']"
+                        );
+
+
+                    const rowNumber =
+                        index + 1;
+
+
+                    /* =============================================
+                       OFFICE
+                    ============================================= */
+
+                    if (!office ||
+                        office.value.trim() === "") {
+
+                        showRowError(
+                            office,
+                            "Please enter Office Name in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                office;
+                        }
+
+                        isValid = false;
+
+                    } else {
+
+                        clearRowError(
+                            office
+                        );
+                    }
+
+
+                    /* =============================================
+                       ADDRESS
+                    ============================================= */
+
+                    if (!address ||
+                        address.value.trim() === "") {
+
+                        showRowError(
+                            address,
+                            "Please enter Address in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                address;
+                        }
+
+                        isValid = false;
+
+                    } else {
+
+                        clearRowError(
+                            address
+                        );
+                    }
+
+
+                    /* =============================================
+                       YEAR
+                    ============================================= */
+
+                    if (!year ||
+                        year.value.trim() === "") {
+
+                        showYearError(
+                            year,
+                            "Please enter Experience Year in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                year;
+                        }
+
+                        isValid = false;
+
+                    } else if (
+                        !/^\d+$/.test(
+                            year.value.trim()
+                        )
+                    ) {
+
+                        showYearError(
+                            year,
+                            "Experience Year must be numeric in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                year;
+                        }
+
+                        isValid = false;
+
+                    } else if (
+                        parseInt(
+                            year.value.trim(),
+                            10
+                        ) > 30
+                    ) {
+
+                        showYearError(
+                            year,
+                            "Experience Year cannot be greater than 30 in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                year;
+                        }
+
+                        isValid = false;
+
+                    } else {
+
+                        clearYearError(
+                            year
+                        );
+                    }
+
+
+                    /* =============================================
+                       DAY
+                    ============================================= */
+
+                    if (!day ||
+                        day.value.trim() === "") {
+
+                        showDayError(
+                            day,
+                            "Please enter Experience Day in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                day;
+                        }
+
+                        isValid = false;
+
+                    } else if (
+                        !/^\d+$/.test(
+                            day.value.trim()
+                        )
+                    ) {
+
+                        showDayError(
+                            day,
+                            "Experience Day must be numeric in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                day;
+                        }
+
+                        isValid = false;
+
+                    } else if (
+                        parseInt(
+                            day.value.trim(),
+                            10
+                        ) > 364
+                    ) {
+
+                        showDayError(
+                            day,
+                            "Experience Day cannot be greater than 364 in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                day;
+                        }
+
+                        isValid = false;
+
+                    } else {
+
+                        clearDayError(
+                            day
+                        );
+                    }
+
+
+                    /* =============================================
+                       WORK DETAILS
+                    ============================================= */
+
+                    if (!work ||
+                        work.value.trim() === "") {
+
+                        showRowError(
+                            work,
+                            "Please enter Work Details in Row " +
+                            rowNumber +
+                            "."
+                        );
+
+                        if (!firstInvalidField) {
+                            firstInvalidField =
+                                work;
+                        }
+
+                        isValid = false;
+
+                    } else {
+
+                        clearRowError(
+                            work
+                        );
+                    }
+
+                });
+
+
+                /* =================================================
+                   FOCUS FIRST INVALID FIELD
+                ================================================= */
+
+                if (!isValid) {
+
+                    if (firstInvalidField) {
+
+                        firstInvalidField.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+
+                        firstInvalidField.focus();
+                    }
+
+                    return false;
+                }
+
+
+                /* =================================================
+                   VALID - SUBMIT
+                ================================================= */
+
+                form.submit();
+
+            }
+        );
+
+
+        /* =========================================================
+           BUDGET INPUT RESTRICTION
+        ========================================================= */
+
+        const amountFields =
+            [
+                "slr",
+                "slnr",
+                "dlr",
+                "dlnr"
+            ];
+
+
+        amountFields.forEach(
+            function (id) {
+
+                const field =
+                    document.getElementById(
+                        id
+                    );
+
+                if (!field) {
+                    return;
+                }
+
+
+                field.addEventListener(
+                    "input",
+                    function () {
+
+                        this.value =
+                            this.value
+                                .replace(
+                                    /[^0-9.]/g,
+                                    ""
+                                )
+                                .replace(
+                                    /(\..*)\./g,
+                                    "$1"
+                                );
+
+
+                        const match =
+                            this.value.match(
+                                /^\d+(\.\d{0,2})?/
+                            );
+
+
+                        if (match) {
+
+                            this.value =
+                                match[0];
+
+                        } else {
+
+                            this.value =
+                                "";
+                        }
+
+
+                        clearError(
+                            this
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =========================================================
+           CLEAR MAIN FIELD ERROR
+        ========================================================= */
+
+        [
+            "district",
+            "fname",
+            "lname",
+            "designation",
+            "qualification",
+            "workallocation"
+        ].forEach(
+            function (id) {
+
+                const field =
+                    document.getElementById(
+                        id
+                    );
+
+                if (!field) {
+                    return;
+                }
+
+
+                field.addEventListener(
+                    "input",
+                    function () {
+
+                        clearError(
+                            this
+                        );
+
+                    }
+                );
+
+
+                field.addEventListener(
+                    "change",
+                    function () {
+
+                        clearError(
+                            this
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =========================================================
+           CLEAR EXPERIENCE ERRORS WHILE TYPING
+        ========================================================= */
+
+        form.addEventListener(
+            "input",
+            function (e) {
+
+
+                /* OFFICE / ADDRESS / WORK */
+
+                if (
+                    e.target.matches(
+                        "input[name='officename[]'], " +
+                        "input[name='address[]'], " +
+                        "textarea[name='workdetail[]']"
+                    )
+                ) {
+
+                    clearRowError(
+                        e.target
+                    );
+                }
+
+
+                /* YEAR */
+
+                if (
+                    e.target.matches(
+                        "input[name='yr[]']"
+                    )
+                ) {
+
+                    clearYearError(
+                        e.target
+                    );
+                }
+
+
+                /* DAY */
+
+                if (
+                    e.target.matches(
+                        "input[name='day[]']"
+                    )
+                ) {
+
+                    clearDayError(
+                        e.target
+                    );
+                }
+
+            }
+        );
+
+    });
+
+
+    /* =============================================================
+       ADD / REMOVE EXPERIENCE ROW
+    ============================================================= */
+
+    document.addEventListener(
+        "click",
+        function (e) {
+
+
+            /* =====================================================
+               ADD ROW
+            ===================================================== */
+
+            if (
+                e.target.classList.contains(
+                    "addRow"
+                )
+            ) {
+
+                const currentRow =
+                    e.target.closest(
+                        "tr"
+                    );
+
+
+                const newRow =
+                    currentRow.cloneNode(
+                        true
+                    );
+
+
+                /* CLEAR INPUT VALUES */
+
+                newRow.querySelectorAll(
+                    "input, textarea"
+                ).forEach(
+                    function (el) {
+
+                        el.value =
+                            "";
+
+                        el.classList.remove(
+                            "is-invalid-custom"
+                        );
+
+                    }
+                );
+
+
+                /* CLEAR VALIDATION MESSAGES */
+
+                newRow.querySelectorAll(
+                    ".field-error, " +
+                    ".year-error, " +
+                    ".day-error"
+                ).forEach(
+                    function (el) {
+
+                        el.textContent =
+                            "";
+
+                        el.style.display =
+                            "none";
+
+                    }
+                );
+
+
+                /* REMOVE DYNAMIC ERRORS */
+
+                newRow.querySelectorAll(
+                    ".row-field-error"
+                ).forEach(
+                    function (el) {
+
+                        el.remove();
+
+                    }
+                );
+
+
+                /* CHANGE BUTTON */
+
+                const actionCell =
+                    newRow.querySelector(
+                        "td:last-child"
+                    );
+
+
+                actionCell.innerHTML =
+                    '<button type="button" ' +
+                    'class="btn btn-danger btn-sm removeRow">' +
+                    '×' +
+                    '</button>';
+
+
+                /* INSERT AFTER CURRENT ROW */
+
+                currentRow.parentNode.insertBefore(
+                    newRow,
+                    currentRow.nextSibling
+                );
+
+            }
+
+
+            /* =====================================================
+               REMOVE ROW
+            ===================================================== */
+
+            if (
+                e.target.classList.contains(
+                    "removeRow"
+                )
+            ) {
+
+                const rows =
+                    document.querySelectorAll(
+                        "#experienceTable tr"
+                    );
+
+
+                /* Keep at least one row */
+
+                if (rows.length <= 1) {
+                    return;
+                }
+
+
+                e.target
+                    .closest("tr")
+                    .remove();
+
+            }
+
+        }
+    );
 
 </script>
+```
 
 </head>
 
 <body>
 
-
-
-
-
 <div layout:fragment="content">
 
 
-    <div class="card shadow-sm border-0">
+<div class="card shadow-sm border-0">
 
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">
-               Update the Details of Watershed Cell Functionaries at District Level (PPR4B)
-            </h4>
-        </div>
-		
-		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-			<span th:text="${success}"></span>
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
-		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-		    <span th:text="${error}"></span>
-		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
 
-        <div class="card-body">
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
 
-             <form id="wcdcFunctionaries" th:action="@{/UpdateWCDCFunctionariesPPR4B}" method="post">
-				<input type="hidden" name="pprwcdcFunId" th:value="${functionary.pprWcdcFunId}">
-				<div class="row g-4">
-						<div class="col-md-6">
-							<label class="form-label">
-								   <b> District </b><span class="required">*</span>
-							</label>
-							<select id="district" name="district" class="form-select" >
-									<option value="">--Select District--</option>
-									<th:block th:each="dist : ${distList}">
-											<option th:value="${dist.dcode}" th:text="${dist.distName}" th:selected="${dist.dcode==functionary.wcdcDetails.dcode}"></option>
-									</th:block>
-							</select>
-						</div>
-						
-						<div class="col-md-6">
-							<label class="form-label">
-								   <b> First Name</b><span class="required">*</span>
-							</label>
-							<input type="text" name="fname" id="fname" th:value="${functionary.firstName}" class="form-control">
-						</div>
-						
-						<div class="col-md-6">
-							<label class="form-label">
-								   <b>Last Name</b>
-							</label>
-							<input type="text" name="lname" id="lname" th:value="${functionary.lastName}" class="form-control">
-						</div>
-						
-						<div class="col-md-6">
-							<label class="form-label">
-								   <b>Designation</b> <span class="required">*</span>
-							</label>
-							<select class="form-select" name="designation" id="designation" >
-									<option value="">--Select Designation--</option>
-									<th:block th:each="des : ${designationList}">
-										<option th:value="${des.designationId}"
-												th:text="${des.designationName}" th:selected="${des.designationId==functionary.designation.designationId}">
-										</option>
-									</th:block>
-							</select>
-						</div>
-						
-						<div class="col-md-6">
-							<label class="form-label">
-								   <b>Qualification</b> <span class="required">*</span>
-							</label>
-							<select class="form-select" name="qualification" id="qualification">
-									<option value="">--Select Qualification--</option>
-									<th:block th:each="qua : ${qualificationList}">
-										<option th:value="${qua.qualificationId}"
-												th:text="${qua.qualificationName}" th:selected="${qua.qualificationId==functionary.qualification.qualificationId}">
-										</option>
-									</th:block>
-							 </select>
-						</div>
-						
-						<div class="col-md-6">
-							<label class="form-label">
-								   <b>Work Allocation</b> <span class="required">*</span>
-							</label>
-							<textarea name="workallocation" id="workallocation" th:text="${functionary.workAllocation}" class="form-control" rows="2"></textarea>
-						</div>
-						
-				</div>
-				
-				<!--
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>District </label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-									<select id="district" name="district" class="form-select" >
-											<option value="">--Select District--</option>
-											<th:block th:each="dist : ${distList}">
-												<option th:value="${dist.dcode}" th:text="${dist.distName}" th:selected="${dist.dcode==functionary.wcdcDetails.dcode}"></option>
-											</th:block>
-									</select>
-								</div>
-							</div>
+    <div class="card-header bg-primary text-white">
 
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>First Name</label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-								<input type="text" name="fname" id="fname" th:value="${functionary.firstName}" class="form-control">
-								</div>
-							</div>
-							<div class="row mb-3">
-									<div class="col-md-3">
-											<label>Last Name</label>
-									</div>
-									<div class="col-md-5">
-											<input type="text" name="lname" id="lname" th:value="${functionary.lastName}" class="form-control">
-									</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>Designation</label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-									<select class="form-select" name="designation" id="designation" >
-										<option value="">--Select Designation--</option>
-										<th:block th:each="des : ${designationList}">
-										        <option th:value="${des.designationId}"
-										                th:text="${des.designationName}" th:selected="${des.designationId==functionary.designation.designationId}">
-										        </option>
-										 </th:block>
-									</select>
-								</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>Qualification</label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-									<select class="form-select" name="qualification" id="qualification">
-										<option value="">--Select Qualification--</option>
-										<th:block th:each="qua : ${qualificationList}">
-											<option th:value="${qua.qualificationId}"
-												th:text="${qua.qualificationName}" th:selected="${qua.qualificationId==functionary.qualification.qualificationId}">
-											</option>
-										</th:block>
-									</select>
-								</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-									<label>Work Allocation</label><span class="required">*</span>
-								</div>
-								<div class="col-md-5">
-									<textarea name="workallocation" id="workallocation" th:text="${functionary.workAllocation}" class="form-control" rows="3"></textarea>
-									<input type="text" name="workallocation" id="workallocation" class="form-control">
-								</div>
-							</div>
-							
-							-->
-							
-							
-							<div class="row mb-3">
-								<div class="col-md-3">
-								<label>Monthly Remuneration (Rs.)</label>
-								</div>
-								<div class="col-md-3">
-								<label class="mb-1">Recurring</label>
-								
-								</div>
-								<div class="col-md-3">
-								<label class="mb-1">Non-Recurring</label>
-								
-								</div>
-							</div>
-							<div class="row mb-3">
-								<div class="col-md-3">
-									Total Budget of Watershed Cell<span class="required">*</span>
-								</div>
-								<div class="col-md-3">
-									<input type="text" name="slr" id="slr" maxlength="11" th:value="${functionary.totalBudgetRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-								</div>
-								<div class="col-md-3">
-									<input type="text" name="slnr" id="slnr" maxlength="11" th:value="${functionary.totalBudgetNonRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-								</div>
-							</div>
-							<div class="row mb-4">
-								<div class="col-md-3">
-									Funding Expected from DoLR <span class="required">*</span>
-								</div>
-								<div class="col-md-3">
-								<input type="text" name="dlr" id="dlr" maxlength="11" th:value="${functionary.dolrFundRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-								</div>
-								<div class="col-md-3">
-								<input type="text" name="dlnr" id="dlnr" maxlength="11" th:value="${functionary.dolrFundNonRecurring}" style="height:40px; width: 120px;" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-								</div>
-							</div>
-							
-							<hr>
-							<h4 class="mb-3">
-								Experience Details<span class="required">*</span>
-							</h4>
-						<table class="table table-bordered">
-							<thead class="table-light">
-								<tr>
-									<th width="15%">Office Name</th>
-									<th width="25%">Address</th>
-									<th width="20%">Experience in No. of Years and Days</th>
-									<th width="30%">Work Details</th>
-									<th width="10%">Action</th>
-								</tr>
-							</thead>
-						
-							<tbody id="experienceTable">
-							<tr th:each="exp, iterStat : ${experiences}">
-							    <td><input type="text" name="officename[]" th:value="${exp.officeName}" class="form-control"></td>
+        <h4 class="mb-0">
 
-							    <td><input type="text" name="address[]" th:value="${exp.address}" class="form-control"></td>
+            Update the Details of Watershed Cell Functionaries
+            at District Level (PPR4B)
 
-							    <td>
-							        <input type="text" name="yr[]" th:value="${exp.workExpYrs}" class="form-control d-inline-block" maxlength="2" minlength="1" max="30"
-											style="width:80px;" placeholder="Year" oninput="this.value=this.value.replace(/[^0-9]/g,'')" >
-
-							        <input type="text" name="day[]" th:value="${exp.workExpDays}" class="form-control d-inline-block ms-2" maxlength="3" minlength="1" max="364"
-							               style="width:80px;" placeholder="Day" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-							    </td>
-
-							    <td>
-							        <textarea name="workdetail[]" class="form-control" rows="3" th:text="${exp.workDetails}" ></textarea>
-							    </td>
-
-								<td>
-									<!-- First Row -->
-									<button th:if="${iterStat.first}" type="button" class="btn btn-success btn-sm addRow">
-										+
-									</button>
-											
-									<!-- Remaining Rows -->
-									<button th:unless="${iterStat.first}" type="button" class="btn btn-danger btn-sm removeRow">
-										×
-									</button>
-								</td>
-							</tr>
-							
-							<!-- Existing rows -->
-							<tr th:each="exp, iterStat : ${experiences}">
-								<!-- same code as above -->
-							</tr>
-							
-							</tbody>
-							
-						</table>
-
-						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning">
-							      <i class="fas fa-save"></i>
-							      Update
-							</button>
-							<!--<button class="btn btn-primary">
-								Submit
-							</button>-->
-						</div>
-				
-            </form>
-
-        </div>
-		
-		<div class="table-responsive mt-4"
-		     th:if="${#lists.size(functionariesList) > 0}">
-			 <h4>
-			 <b> <centre> List of Added Watershed Cell Functionaries at the District Level (PPR-4B)</centre>  </b>
-			</h4>
-			<br/>
-		<table class="table table-bordered table-striped" style="min-width:2000px;">
-
-		    <thead class="table-primary">
-		    <tr>
-				<th class="table-primary">Sl. No.</th>
-				<th class="table-primary">District Name</th>
-		        <th class="table-primary">First Name</th>
-				<th class="table-primary">Last Name</th>
-		        <th class="table-primary">Designation</th>
-		        <th class="table-primary">Qualification</th>
-		        <th class="table-primary">Work Allocation</th>
-				
-		        <th class="table-primary">Budget of Watershed Cell (R)</th>
-		        <th class="table-primary">Budget of Watershed Cell (NR)</th>
-		        <th class="table-primary">DoLR Funding (R)</th>
-		        <th class="table-primary">DoLR Funding(NR)</th>
-				
-		        <th class="table-primary">Office</th>
-		        <th class="table-primary">Address</th>
-		        <th class="table-primary">Year</th>
-		        <th class="table-primary">Day</th>
-		        <th class="table-primary">Work Details</th>
-				<th class="table-primary" style="width: 200px;">Action</th>
-		    </tr>
-		    </thead>
-
-		    <tbody th:with="sr=0">
-
-		    <tr th:each="row, stat : ${functionariesList}">
-				
-				 <td th:text="${row[20]}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[19] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}"></td>
-
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[10] : ''}"></td>
-				 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[11] : ''}"></td>
-
-		         <td th:text="${row[14]}"></td>
-		         <td th:text="${row[15]}"></td>
-		         <td th:text="${row[16]}"></td>
-		         <td th:text="${row[17]}"></td>
-		         <td th:text="${row[18]}"></td>
-				
-				 <td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
-						&nbsp; &nbsp; 
-						<a th:if="${row[12].toString().equals('D')}" title="Delete"
-							th:href="@{/deleteWCDCFunctionariesPPR4B(id=${row[0]})}"
-							class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-							 <i class="fas fa-trash"></i>
-						</a>
-						&nbsp; &nbsp; 
-						<a th:if="${row[12].toString().equals('D')}" title="Edit"
-							th:href="@{/editWCDCFunctionariesPPR4B(id=${row[0]})}"
-							class="btn btn-primary btn-sm"
-							onclick="return confirm('Are you sure you want to edit this record?');">
-							 <i class="fas fa-edit"></i>
-						</a>
-						&nbsp; &nbsp; 
-						<a th:if="${row[12].toString().equals('D')}" title="Complete"
-							th:href="@{/completeWCDCFunctionariesPPR4B(id=${row[0]})}"
-							class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-							 <i class="fas fa-check"></i>
-						</a>	
-						<span th:if="${row[12].toString().equals('C')}"
-						      class="badge bg-success">
-						    <i class="fas fa-check-circle"></i> Completed
-						</span>
-				</td>
-				<td th:unless="${stat.first || row[0] != functionariesList[stat.index-1][0]}"></td>
-		    </tr>
-
-		    </tbody>
-
-		</table>
-
-		</div>
-		
-		
-		
+        </h4>
 
     </div>
+
+
+    <!-- SUCCESS -->
+
+    <div th:if="${success}"
+         class="alert alert-success alert-dismissible fade show"
+         role="alert">
+
+        <span th:text="${success}"></span>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div th:if="${error}"
+         class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+
+        <span th:text="${error}"></span>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+        <!-- =====================================================
+             FORM
+        ====================================================== -->
+
+        <form id="wcdcFunctionaries"
+              th:action="@{/UpdateWCDCFunctionariesPPR4B}"
+              method="post">
+
+
+            <!-- ID -->
+
+            <input type="hidden"
+                   name="pprwcdcFunId"
+                   th:value="${functionary.pprWcdcFunId}">
+				   
+				   <input type="hidden"
+				                     name="action"
+				                     id="action"
+				                     value="D">
+
+
+            <!-- =================================================
+                 BASIC DETAILS
+            ================================================== -->
+
+            <div class="row g-4">
+
+
+                <!-- DISTRICT -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        <b>District</b>
+
+                        <span class="required">*</span>
+
+                    </label>
+
+
+                    <select id="district"
+                            name="district"
+                            class="form-select">
+
+                        <option value="">
+                            --Select District--
+                        </option>
+
+
+                        <th:block
+                                th:each="dist : ${distList}">
+
+                            <option
+                                th:value="${dist.dcode}"
+                                th:text="${dist.distName}"
+                                th:selected="${dist.dcode == functionary.wcdcDetails.dcode}">
+                            </option>
+
+                        </th:block>
+
+                    </select>
+
+
+                    <div id="districtError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+
+                <!-- FIRST NAME -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        <b>First Name</b>
+
+                        <span class="required">*</span>
+
+                    </label>
+
+
+                    <input type="text"
+                           name="fname"
+                           id="fname"
+                           th:value="${functionary.firstName}"
+                           class="form-control">
+
+
+                    <div id="fnameError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+
+                <!-- LAST NAME -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        <b>Last Name</b>
+
+                    </label>
+
+
+                    <input type="text"
+                           name="lname"
+                           id="lname"
+                           th:value="${functionary.lastName}"
+                           class="form-control">
+
+
+                    <div id="lnameError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+
+                <!-- DESIGNATION -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        <b>Designation</b>
+
+                        <span class="required">*</span>
+
+                    </label>
+
+
+                    <select class="form-select"
+                            name="designation"
+                            id="designation">
+
+                        <option value="">
+                            --Select Designation--
+                        </option>
+
+
+                        <th:block
+                                th:each="des : ${designationList}">
+
+                            <option
+                                th:value="${des.designationId}"
+                                th:text="${des.designationName}"
+                                th:selected="${des.designationId == functionary.designation.designationId}">
+                            </option>
+
+                        </th:block>
+
+                    </select>
+
+
+                    <div id="designationError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+
+                <!-- QUALIFICATION -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        <b>Qualification</b>
+
+                        <span class="required">*</span>
+
+                    </label>
+
+
+                    <select class="form-select"
+                            name="qualification"
+                            id="qualification">
+
+                        <option value="">
+                            --Select Qualification--
+                        </option>
+
+
+                        <th:block
+                                th:each="qua : ${qualificationList}">
+
+                            <option
+                                th:value="${qua.qualificationId}"
+                                th:text="${qua.qualificationName}"
+                                th:selected="${qua.qualificationId == functionary.qualification.qualificationId}">
+                            </option>
+
+                        </th:block>
+
+                    </select>
+
+
+                    <div id="qualificationError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+
+                <!-- WORK ALLOCATION -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        <b>Work Allocation</b>
+
+                        <span class="required">*</span>
+
+                    </label>
+
+
+                    <textarea
+                        name="workallocation"
+                        id="workallocation"
+                        class="form-control"
+                        rows="2"
+                        th:text="${functionary.workAllocation}"></textarea>
+
+
+                    <div id="workallocationError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 MONTHLY REMUNERATION
+            ================================================== -->
+
+            <div class="row mb-3 mt-4">
+
+                <div class="col-md-3">
+
+                    <label>
+                        Monthly Remuneration (Rs.)
+                    </label>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label class="mb-1">
+                        Recurring
+                    </label>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label class="mb-1">
+                        Non-Recurring
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 WATERSHED CELL BUDGET
+            ================================================== -->
+
+            <div class="row mb-3">
+
+                <div class="col-md-3">
+
+                    Total Budget of Watershed Cell
+
+                    <span class="required">*</span>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <input type="text"
+                           name="slr"
+                           id="slr"
+                           maxlength="11"
+                           th:value="${functionary.totalBudgetRecurring}"
+                           style="height:40px; width:120px;">
+
+
+                    <div id="slrError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <input type="text"
+                           name="slnr"
+                           id="slnr"
+                           maxlength="11"
+                           th:value="${functionary.totalBudgetNonRecurring}"
+                           style="height:40px; width:120px;">
+
+
+                    <div id="slnrError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 DOLR FUNDING
+            ================================================== -->
+
+            <div class="row mb-4">
+
+                <div class="col-md-3">
+
+                    Funding Expected from DoLR
+
+                    <span class="required">*</span>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <input type="text"
+                           name="dlr"
+                           id="dlr"
+                           maxlength="11"
+                           th:value="${functionary.dolrFundRecurring}"
+                           style="height:40px; width:120px;">
+
+
+                    <div id="dlrError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <input type="text"
+                           name="dlnr"
+                           id="dlnr"
+                           maxlength="11"
+                           th:value="${functionary.dolrFundNonRecurring}"
+                           style="height:40px; width:120px;">
+
+
+                    <div id="dlnrError"
+                         class="field-error">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <hr>
+
+
+            <!-- =================================================
+                 EXPERIENCE
+            ================================================== -->
+
+            <h4 class="mb-3">
+
+                Experience Details
+
+                <span class="required">*</span>
+
+            </h4>
+
+
+            <table class="table table-bordered">
+
+                <thead class="table-light">
+
+                <tr>
+
+                    <th width="15%">
+                        Office Name
+                    </th>
+
+                    <th width="25%">
+                        Address
+                    </th>
+
+                    <th width="20%">
+                        Experience in No. of Years and Days
+                    </th>
+
+                    <th width="30%">
+                        Work Details
+                    </th>
+
+                    <th width="10%">
+                        Action
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody id="experienceTable">
+
+
+                <!-- =================================================
+                     EXISTING EXPERIENCE ROWS
+
+                     IMPORTANT:
+                     Only ONE th:each is used here.
+                ================================================== -->
+
+                <tr th:each="exp, iterStat : ${experiences}">
+
+
+                    <!-- OFFICE -->
+
+                    <td>
+
+                        <input type="text"
+                               name="officename[]"
+                               th:value="${exp.officeName}"
+                               class="form-control">
+
+                    </td>
+
+
+                    <!-- ADDRESS -->
+
+                    <td>
+
+                        <input type="text"
+                               name="address[]"
+                               th:value="${exp.address}"
+                               class="form-control">
+
+                    </td>
+
+
+                    <!-- YEAR / DAY -->
+
+                    <td>
+
+
+                        <!-- YEAR -->
+
+                        <div>
+
+                            <input type="text"
+                                   name="yr[]"
+                                   th:value="${exp.workExpYrs}"
+                                   class="form-control"
+                                   maxlength="2"
+                                   minlength="1"
+                                   style="width:80px;"
+                                   placeholder="Year"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+
+                            <div class="year-error">
+                            </div>
+
+                        </div>
+
+
+                        <!-- DAY -->
+
+                        <div class="mt-2">
+
+                            <input type="text"
+                                   name="day[]"
+                                   th:value="${exp.workExpDays}"
+                                   class="form-control"
+                                   maxlength="3"
+                                   minlength="1"
+                                   style="width:80px;"
+                                   placeholder="Day"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+
+                            <div class="day-error">
+                            </div>
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- WORK DETAILS -->
+
+                    <td>
+
+                        <textarea
+                            name="workdetail[]"
+                            class="form-control"
+                            rows="3"
+                            th:text="${exp.workDetails}"></textarea>
+
+                    </td>
+
+
+                    <!-- ACTION -->
+
+                    <td>
+
+
+                        <!-- FIRST ROW -->
+
+                        <button
+                            th:if="${iterStat.first}"
+                            type="button"
+                            class="btn btn-success btn-sm addRow">
+
+                            +
+
+                        </button>
+
+
+                        <!-- REMAINING ROWS -->
+
+                        <button
+                            th:unless="${iterStat.first}"
+                            type="button"
+                            class="btn btn-danger btn-sm removeRow">
+
+                            ×
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =================================================
+                     FALLBACK ROW IF NO EXPERIENCE RECORD EXISTS
+                ================================================== -->
+
+                <tr th:if="${#lists.isEmpty(experiences)}">
+
+
+                    <!-- OFFICE -->
+
+                    <td>
+
+                        <input type="text"
+                               name="officename[]"
+                               class="form-control">
+
+                    </td>
+
+
+                    <!-- ADDRESS -->
+
+                    <td>
+
+                        <input type="text"
+                               name="address[]"
+                               class="form-control">
+
+                    </td>
+
+
+                    <!-- YEAR -->
+
+                    <td>
+
+                        <div>
+
+                            <input type="text"
+                                   name="yr[]"
+                                   class="form-control"
+                                   maxlength="2"
+                                   minlength="1"
+                                   style="width:80px;"
+                                   placeholder="Year"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+                            <div class="year-error">
+                            </div>
+
+                        </div>
+
+
+                        <!-- DAY -->
+
+                        <div class="mt-2">
+
+                            <input type="text"
+                                   name="day[]"
+                                   class="form-control"
+                                   maxlength="3"
+                                   minlength="1"
+                                   style="width:80px;"
+                                   placeholder="Day"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+                            <div class="day-error">
+                            </div>
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- WORK -->
+
+                    <td>
+
+                        <textarea
+                            name="workdetail[]"
+                            class="form-control"
+                            rows="3"></textarea>
+
+                    </td>
+
+
+                    <!-- ACTION -->
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="btn btn-success btn-sm addRow">
+
+                            +
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+                </tbody>
+
+            </table>
+
+
+            <!-- =================================================
+                 UPDATE BUTTON
+            ================================================== -->
+
+            <div class="text-center mt-4">
+
+                <button
+                    type="submit"
+                    class="btn btn-warning">
+
+                    <i class="fas fa-save"></i>
+
+                    Update
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================================================
+         EXISTING RECORDS
+    ========================================================== -->
+
+    <div class="table-responsive mt-4"
+         th:if="${#lists.size(functionariesList) > 0}">
+
+
+        <h4>
+
+            <b>
+
+                <center>
+
+                    List of Added Watershed Cell Functionaries
+                    at the District Level (PPR-4B)
+
+                </center>
+
+            </b>
+
+        </h4>
+
+
+        <br/>
+
+
+        <table class="table table-bordered table-striped"
+               style="min-width:2000px;">
+
+
+            <thead class="table-primary">
+
+            <tr>
+
+                <th>Sl. No.</th>
+
+                <th>District Name</th>
+
+                <th>First Name</th>
+
+                <th>Last Name</th>
+
+                <th>Designation</th>
+
+                <th>Qualification</th>
+
+                <th>Work Allocation</th>
+
+                <th>Budget of Watershed Cell (R)</th>
+
+                <th>Budget of Watershed Cell (NR)</th>
+
+                <th>DoLR Funding (R)</th>
+
+                <th>DoLR Funding(NR)</th>
+
+                <th>Office</th>
+
+                <th>Address</th>
+
+                <th>Year</th>
+
+                <th>Day</th>
+
+                <th>Work Details</th>
+
+                <th style="width:200px;">
+                    Action
+                </th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            <tr th:each="row, stat : ${functionariesList}">
+
+
+                <!-- SL NO -->
+
+                <td th:text="${row[20]}">
+                </td>
+
+
+                <!-- DISTRICT -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[19] : ''}">
+                </td>
+
+
+                <!-- FIRST NAME -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}">
+                </td>
+
+
+                <!-- LAST NAME -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}">
+                </td>
+
+
+                <!-- DESIGNATION -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}">
+                </td>
+
+
+                <!-- QUALIFICATION -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}">
+                </td>
+
+
+                <!-- WORK ALLOCATION -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}">
+                </td>
+
+
+                <!-- SL RECURRING -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}">
+                </td>
+
+
+                <!-- SL NON RECURRING -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}">
+                </td>
+
+
+                <!-- DOLR RECURRING -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[10] : ''}">
+                </td>
+
+
+                <!-- DOLR NON RECURRING -->
+
+                <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[11] : ''}">
+                </td>
+
+
+                <!-- OFFICE -->
+
+                <td th:text="${row[14]}">
+                </td>
+
+
+                <!-- ADDRESS -->
+
+                <td th:text="${row[15]}">
+                </td>
+
+
+                <!-- YEAR -->
+
+                <td th:text="${row[16]}">
+                </td>
+
+
+                <!-- DAY -->
+
+                <td th:text="${row[17]}">
+                </td>
+
+
+                <!-- WORK DETAILS -->
+
+                <td th:text="${row[18]}">
+                </td>
+
+
+                <!-- ACTION -->
+
+                <td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
+
+                    &nbsp;&nbsp;
+
+
+                    <!-- DELETE -->
+
+					<!--   <a th:if="${row[12] != null and row[12].toString().equals('D')}" title="Delete"
+					            th:href="@{/deleteWCDCFunctionariesPPR4B(id=${row[0]})}"
+					            class="btn btn-danger btn-sm"
+					            onclick="return confirm('Are you sure you want to delete this record?');">
+								 <i class="fas fa-trash"></i>
+
+					          </a>-->
+									<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[12] != null and row[12].toString().equals('D')}"
+										title="Delete"
+										th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteWCDCFunctionariesPPR4B?id=' + ${row[0]} + '\'; }); return false;'">
+									
+										<i class="fas fa-trash"></i>
+									</a>
+									
+									
+									&nbsp;&nbsp;
+									
+									
+									<!-- EDIT -->
+									
+									<a th:if="${row[12] != null and row[12].toString().equals('D')}" title="Edit"
+										th:href="@{/editWCDCFunctionariesPPR4B(id=${row[0]})}" class="btn btn-primary btn-sm"
+										onclick="return confirm('Are you sure you want to edit this record?');">
+									
+										<i class="fas fa-edit"></i>
+									
+									</a>
+									
+									
+									&nbsp;&nbsp;
+									
+									
+									<!-- COMPLETE -->
+									
+									<!--  <a th:if="${row[12] != null and row[12].toString().equals('D')}"
+														                      title="Complete"
+														                      th:href="@{/completeWCDCFunctionariesPPR4B(id=${row[0]})}"
+														                      class="btn btn-success btn-sm"
+														                      onclick="return confirm('Are you sure you want to complete this record?');">
+									
+														                       <i class="fas fa-check"></i>
+									
+														                   </a>-->
+									
+									<a href="javascript:void(0)" class="btn btn-success btn-sm"
+										th:if="${row[12] != null and row[12].toString().equals('D')}" title="Complete"
+										th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeWCDCFunctionariesPPR4B?id=' + ${row[0]} + '\'; }); return false;'">
+									
+										<i class="fas fa-check"></i>
+									</a>
+
+
+                    <!-- COMPLETED -->
+
+                    <span
+                        th:if="${row[12] != null and row[12].toString().equals('C')}"
+                        class="badge bg-success">
+
+                        <i class="fas fa-check-circle"></i>
+
+                        Completed
+
+                    </span>
+
+                </td>
+
+
+                <!-- EMPTY ACTION FOR SAME GROUP -->
+
+                <td
+                    th:unless="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
+                </td>
+
+
+            </tr>
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+</div>
 
 </div>
 
 </body>
+
 </html>
