@@ -298,7 +298,7 @@ public class PPR1Controller {
             redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
             e.printStackTrace();
         }
-        return "ppr1";
+        return "redirect:/institutionalStructurePPR1";
     }
     
     private void deleteFile(String filePath) {
@@ -346,7 +346,7 @@ public class PPR1Controller {
 		        redirectAttributes.addFlashAttribute("error", "Unable to complete record.");
 		    }
        
-        return "ppr1";
+		 	return "redirect:/institutionalStructurePPR1";
     }
     
     @GetMapping("/editInstitutionalStructurePPR1")

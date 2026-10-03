@@ -47,6 +47,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	if (formedit) {
 
 	    const slnaType1 = document.getElementById("slnaType1");
+		const notificationFile1 = document.getElementById("notificationFile1");
+		const mouFile1 = document.getElementById("mouFile1");
 
 	    if (slnaType1) {
 
@@ -77,6 +79,33 @@ document.addEventListener("DOMContentLoaded", function () {
 	                slnaType1.classList.remove("is-invalid");
 	                slnaType1.classList.add("is-valid");
 	            }
+				
+				if (!notificationDate1.value.trim()) {
+
+					event.preventDefault();
+
+					notificationDate1.classList.add("is-invalid");
+					notificationDate1.classList.remove("is-valid");
+
+					notificationDate1.focus();
+				} else {
+
+					notificationDate1.classList.remove("is-invalid");
+					notificationDate1.classList.add("is-valid");
+				}
+				if (!mouDate1.value.trim()) {
+
+					event.preventDefault();
+
+					mouDate1.classList.add("is-invalid");
+					mouDate1.classList.remove("is-valid");
+
+					mouDate1.focus();
+				} else {
+
+					mouDate1.classList.remove("is-invalid");
+					mouDate1.classList.add("is-valid");
+				}
 
 	        });
 	    }
@@ -486,7 +515,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         </div>
 		
-						<div class="table-responsive" th:if="${#lists.size(ppr1List) > 0}">
+						<div class="table-responsive" >
 		                    <table class="table table-bordered">
 								<h4>
 								      <b> <centre> List of Institutional Structure </centre>  </b>
@@ -533,11 +562,19 @@ document.addEventListener("DOMContentLoaded", function () {
 									</td>
 									
 									<td>
-										<a th:if="${user[8].toString().equals('D')}" title="Delete"
+										<!--<a th:if="${user[8].toString().equals('D')}" title="Delete"
 										   th:href="@{/deleteInstitutionalStructurePPR1(id=${user[0]})}"
 										   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
 										     <i class="fas fa-trash"></i>
+										</a>-->
+										
+										<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${user[8].toString().equals('D')}" title="Delete"
+											th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteInstitutionalStructurePPR1?id=' + ${user[0]} + '\'; }); return false;'">
+										
+											<i class="fas fa-trash"></i>
 										</a>
+										
+										
 										&nbsp; &nbsp; 
 										<!--<a th:if="${user[8].toString().equals('D')}" title="Edit"
 										   th:href="@{/editInstitutionalStructurePPR1(id=${user[0]})}"
@@ -551,11 +588,18 @@ document.addEventListener("DOMContentLoaded", function () {
 											<i class="fas fa-edit"></i>
 										</button>
 										&nbsp; &nbsp; 
-									    <a th:if="${user[8].toString().equals('D')}" title="Complete"
+									   <!-- <a th:if="${user[8].toString().equals('D')}" title="Complete"
 										th:href="@{/completeInstitutionalStructurePPR1(id=${user[0]})}"
 									            class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
 									         <i class="fas fa-check"></i>
 									     </a>
+										 -->
+										<a href="javascript:void(0)" class="btn btn-success btn-sm" th:if="${user[8].toString().equals('D')}" title="Complete"
+											th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeInstitutionalStructurePPR1?id=' + ${user[0]} + '\'; }); return false;'">
+										
+											<i class="fas fa-check"></i>
+										</a>
+										 
 										 <span th:if="${user[8].toString().equals('C')}"
 										 				class="badge bg-success">
 										 		<i class="fas fa-check-circle"></i> Completed
@@ -602,6 +646,7 @@ document.addEventListener("DOMContentLoaded", function () {
 														<b> Date of Notification </b>
 													</label>
 													<input type="date" class="form-control" name="notificationDate1" id="notificationDate1" min="2026-01-01" onkeydown="return false;" required>
+													<div class="invalid-feedback">Please select Date of Notification</div>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
@@ -616,6 +661,7 @@ document.addEventListener("DOMContentLoaded", function () {
 														<b> Date of MoU with DoLR </b> 
 													</label>
 													<input type="date" class="form-control" name="mouDate1" id="mouDate1" min="2026-01-01"  onkeydown="return false;" required>
+													<div class="invalid-feedback">Please select Date of MoU with DoLR</div>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">

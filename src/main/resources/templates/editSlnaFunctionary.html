@@ -4,673 +4,1895 @@
       layout:decorate="~{layout/layout}">
 
 <head>
-<meta charset="UTF-8">
-<title>update slna Functionaries PPR3</title>
 
-<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
-<style>
-	.required{
-	    color:red;
-	}
+    <meta charset="UTF-8">
 
-	body{
-	    background:#f8f9fa;
-	}
+    <title>Update SLNA Functionaries PPR3</title>
 
-	.card{
-	    border-radius:0;
-	}
+    <style>
 
-	.table th,.table td{
-	    vertical-align:middle;
-	    text-align:center;
-	}
+        .required {
+            color: red;
+        }
 
-	.form-control,
-	.form-select{
-	    border-radius:0;
-	}
+        body {
+            background: #f8f9fa;
+        }
 
-	.heading{
-	    font-size:22px;
-	    font-weight:bold;
-	    text-align:center;
-	    margin-bottom:25px;
-	}
+        .card {
+            border-radius: 0;
+        }
 
-	label{
-	    font-weight:600;
-	}	
-</style>
+        .table th,
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 0;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        .field-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .row-field-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+    </style>
 
 
-<script>
+    <script>
 
-	document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
 
-	    const form = document.getElementById("slnaFunctionaries");
+            const form =
+                document.getElementById("slnaFunctionaries");
 
-	    form.addEventListener("submit", function (e) {
 
-			const level = document.querySelector('input[name="level"]:checked');
-	        const name = document.getElementById("fname");
-	        const designation = document.getElementById("designation");
-	        const qualification = document.getElementById("qualification");
-	        const workallocation = document.getElementById("workallocation");
+            /* =====================================================
+               COMMON ERROR FUNCTIONS
+            ===================================================== */
 
-	        const slr = document.getElementById("slr");
-	        const slnr = document.getElementById("slnr");
-	        const dlr = document.getElementById("dlr");
-	        const dlnr = document.getElementById("dlnr");
+            function showError(element, message) {
 
-			if (!level) {
-				alert("Please select Functionaries Working for.");
-				e.preventDefault();
-				return;
-			}
-	        // Name
-	        if (name.value.trim() === "") {
-	            alert("Please enter first Name.");
-	            name.focus();
-	            e.preventDefault();
-	            return;
-	        }
+                const errorDiv =
+                    document.getElementById(element.id + "Error");
 
-	        // Designation
-	        if (designation.value === "") {
-	            alert("Please select Designation.");
-	            designation.focus();
-	            e.preventDefault();
-	            return;
-	        }
+                if (errorDiv) {
 
-	        // Qualification
-	        if (qualification.value === "") {
-	            alert("Please select Qualification.");
-	            qualification.focus();
-	            e.preventDefault();
-	            return;
-	        }
+                    errorDiv.textContent = message;
+                    errorDiv.style.display = "block";
+                }
 
-	        // Work Allocation
-	        if (workallocation.value.trim() === "") {
-	            alert("Please enter Work Allocation.");
-	            workallocation.focus();
-	            e.preventDefault();
-	            return;
-	        }
+                element.classList.add("is-invalid");
+            }
 
-	        // Amount Validation (Only Number and 2 Decimal Places)
-	        function validateAmount(field, message) {
 
-	            const value = field.value.trim();
+            function clearError(element) {
 
-	            if (value === "") {
-	                alert(message);
-	                field.focus();
-	                e.preventDefault();
-	                return false;
-	            }
+                const errorDiv =
+                    document.getElementById(element.id + "Error");
 
-	            if (!/^\d+(\.\d{1,2})?$/.test(value)) {
-	                alert(message + " must be a valid number with up to 2 decimal places.");
-	                field.focus();
-	                e.preventDefault();
-	                return false;
-	            }
+                if (errorDiv) {
 
-	            return true;
-	        }
+                    errorDiv.textContent = "";
+                    errorDiv.style.display = "none";
+                }
 
-	        if (!validateAmount(slr, "Please Enter Recurring Budget of SLNA")) return;
-	        if (!validateAmount(slnr, "Please Enter Non-Recurring Budget of SLNA")) return;
-	        if (!validateAmount(dlr, "Please Enter Recurring Funding Expected from DoLR")) return;
-	        if (!validateAmount(dlnr, "Please Enter Non-Recurring Funding Expected from DoLR")) return;
+                element.classList.remove("is-invalid");
+            }
 
-	        // Experience Table Validation
-	        const rows = document.querySelectorAll("#experienceTable tr");
 
-	        for (let i = 0; i < rows.length; i++) {
+            function clearAllErrors() {
 
-	            const office = rows[i].querySelector("input[name='officename[]']");
-	            const address = rows[i].querySelector("input[name='address[]']");
-	            const year = rows[i].querySelector("input[name='yr[]']");
-	            const day = rows[i].querySelector("input[name='day[]']");
-	            const work = rows[i].querySelector("textarea[name='workdetail[]']");
+                document.querySelectorAll(".field-error")
+                    .forEach(function (div) {
 
-	            if (office.value.trim() === "") {
-	                alert("Please enter Office Name in Row " + (i + 1));
-	                office.focus();
-	                e.preventDefault();
-	                return;
-	            }
+                        div.textContent = "";
+                        div.style.display = "none";
 
-	            if (address.value.trim() === "") {
-	                alert("Please enter Address in Row " + (i + 1));
-	                address.focus();
-	                e.preventDefault();
-	                return;
-	            }
+                    });
 
-	            if (year.value.trim() === "") {
-	                alert("Please enter Experience Year in Row " + (i + 1));
-	                year.focus();
-	                e.preventDefault();
-	                return;
-	            }
 
-	            if (!/^\d+$/.test(year.value.trim())) {
-	                alert("Experience Year must be numeric in Row " + (i + 1));
-	                year.focus();
-	                e.preventDefault();
-	                return;
-	            }
-				if (parseInt(year.value, 10) > 30) {
-				    alert("Experience Year cannot be greater than 30 in Row " + (i + 1));
-				    year.focus();
-				    e.preventDefault();
-				    return;
-				}
+                document.querySelectorAll(".row-field-error")
+                    .forEach(function (div) {
 
-	            if (day.value.trim() === "") {
-	                alert("Please enter Experience Day in Row " + (i + 1));
-	                day.focus();
-	                e.preventDefault();
-	                return;
-	            }
+                        div.remove();
 
-	            if (!/^\d+$/.test(day.value.trim())) {
-	                alert("Experience Day must be numeric in Row " + (i + 1));
-	                day.focus();
-	                e.preventDefault();
-	                return;
-	            }
-				if (parseInt(day.value, 10) > 364) {
-				    alert("Experience Day cannot be greater than 364 in Row " + (i + 1));
-				    day.focus();
-				    e.preventDefault();
-				    return;
-				}
+                    });
 
-	            if (work.value.trim() === "") {
-	                alert("Please enter Work Details in Row " + (i + 1));
-	                work.focus();
-	                e.preventDefault();
-	                return;
-	            }
-	        }
 
-	    });
+                document.querySelectorAll(".is-invalid")
+                    .forEach(function (element) {
 
-	    // Restrict input while typing (Budget Fields)
-	    const amountFields = ["slr", "slnr", "dlr", "dlnr"];
+                        element.classList.remove("is-invalid");
 
-	    amountFields.forEach(function(id) {
+                    });
 
-	        document.getElementById(id).addEventListener("input", function() {
+            }
 
-	            this.value = this.value
-	                .replace(/[^0-9.]/g, '')         // allow only digits and dot
-	                .replace(/(\..*)\./g, '$1');     // only one dot
 
-	            const match = this.value.match(/^\d+(\.\d{0,2})?/);
+            /* =====================================================
+               ROW ERROR
+            ===================================================== */
 
-	            if (match) {
-	                this.value = match[0];
-	            } else {
-	                this.value = "";
-	            }
+            function showRowError(element, message) {
 
-	        });
+                let errorDiv =
+                    element.parentElement.querySelector(
+                        ".row-field-error"
+                    );
 
-	    });
 
-	});
+                if (!errorDiv) {
 
-document.addEventListener("click", function (e) {
+                    errorDiv =
+                        document.createElement("div");
 
-    // Add Row
-    if (e.target.classList.contains("addRow")) {
+                    errorDiv.className =
+                        "row-field-error text-danger small mt-1";
 
-        const currentRow = e.target.closest("tr");
-        const newRow = currentRow.cloneNode(true);
+                    element.parentElement.appendChild(errorDiv);
 
-        // Clear input values
-        newRow.querySelectorAll("input, textarea").forEach(function (el) {
-            el.value = "";
+                }
+
+
+                errorDiv.textContent = message;
+
+                element.classList.add("is-invalid");
+            }
+
+
+            /* =====================================================
+               FORM SUBMIT VALIDATION
+            ===================================================== */
+
+            form.addEventListener("submit", function (e) {
+
+                e.preventDefault();
+
+                clearAllErrors();
+
+                let valid = true;
+
+
+                /* =================================================
+                   FUNCTIONARIES WORKING FOR
+                ================================================= */
+
+                const level =
+                    document.querySelector(
+                        'input[name="level"]:checked'
+                    );
+
+                const levelError =
+                    document.getElementById("levelError");
+
+
+                if (!level) {
+
+                    levelError.textContent =
+                        "Please select Functionaries Working for.";
+
+                    levelError.style.display = "block";
+
+                    valid = false;
+                }
+
+
+                /* =================================================
+                   FIRST NAME
+                ================================================= */
+
+                const name =
+                    document.getElementById("fname");
+
+
+                if (name.value.trim() === "") {
+
+                    showError(
+                        name,
+                        "Please enter First Name."
+                    );
+
+                    if (valid) {
+                        name.focus();
+                    }
+
+                    valid = false;
+                }
+
+
+                /* =================================================
+                   DESIGNATION
+                ================================================= */
+
+                const designation =
+                    document.getElementById("designation");
+
+
+                if (designation.value === "") {
+
+                    showError(
+                        designation,
+                        "Please select Designation."
+                    );
+
+                    if (valid) {
+                        designation.focus();
+                    }
+
+                    valid = false;
+                }
+
+
+                /* =================================================
+                   QUALIFICATION
+                ================================================= */
+
+                const qualification =
+                    document.getElementById("qualification");
+
+
+                if (qualification.value === "") {
+
+                    showError(
+                        qualification,
+                        "Please select Qualification."
+                    );
+
+                    if (valid) {
+                        qualification.focus();
+                    }
+
+                    valid = false;
+                }
+
+
+                /* =================================================
+                   WORK ALLOCATION
+                ================================================= */
+
+                const workallocation =
+                    document.getElementById("workallocation");
+
+
+                if (workallocation.value.trim() === "") {
+
+                    showError(
+                        workallocation,
+                        "Please enter Work Allocation."
+                    );
+
+                    if (valid) {
+                        workallocation.focus();
+                    }
+
+                    valid = false;
+                }
+
+
+                /* =================================================
+                   BUDGET VALIDATION
+                ================================================= */
+
+                const slr =
+                    document.getElementById("slr");
+
+                const slnr =
+                    document.getElementById("slnr");
+
+                const dlr =
+                    document.getElementById("dlr");
+
+                const dlnr =
+                    document.getElementById("dlnr");
+
+
+                function validateAmount(field, message) {
+
+                    const value =
+                        field.value.trim();
+
+
+                    if (value === "") {
+
+                        showError(
+                            field,
+                            message
+                        );
+
+                        if (valid) {
+                            field.focus();
+                        }
+
+                        valid = false;
+
+                        return;
+                    }
+
+
+                    if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+
+                        showError(
+                            field,
+                            message +
+                            " must be a valid number with up to 2 decimal places."
+                        );
+
+                        if (valid) {
+                            field.focus();
+                        }
+
+                        valid = false;
+                    }
+
+                }
+
+
+                validateAmount(
+                    slr,
+                    "Please enter Recurring Budget of SLNA."
+                );
+
+
+                validateAmount(
+                    slnr,
+                    "Please enter Non-Recurring Budget of SLNA."
+                );
+
+
+                validateAmount(
+                    dlr,
+                    "Please enter Recurring Funding Expected from DoLR."
+                );
+
+
+                validateAmount(
+                    dlnr,
+                    "Please enter Non-Recurring Funding Expected from DoLR."
+                );
+
+
+                /* =================================================
+                   EXPERIENCE TABLE
+                ================================================= */
+
+                const rows =
+                    document.querySelectorAll(
+                        "#experienceTable tr"
+                    );
+
+
+                rows.forEach(function (row, index) {
+
+                    const rowNo = index + 1;
+
+
+                    const office =
+                        row.querySelector(
+                            "input[name='officename[]']"
+                        );
+
+
+                    const address =
+                        row.querySelector(
+                            "input[name='address[]']"
+                        );
+
+
+                    const year =
+                        row.querySelector(
+                            "input[name='yr[]']"
+                        );
+
+
+                    const day =
+                        row.querySelector(
+                            "input[name='day[]']"
+                        );
+
+
+                    const work =
+                        row.querySelector(
+                            "textarea[name='workdetail[]']"
+                        );
+
+
+                    /* ---------------------------------------------
+                       OFFICE NAME
+                    --------------------------------------------- */
+
+                    if (
+                        office &&
+                        office.value.trim() === ""
+                    ) {
+
+                        showRowError(
+                            office,
+                            "Please enter Office Name in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            office.focus();
+                        }
+
+                        valid = false;
+                    }
+
+
+                    /* ---------------------------------------------
+                       ADDRESS
+                    --------------------------------------------- */
+
+                    if (
+                        address &&
+                        address.value.trim() === ""
+                    ) {
+
+                        showRowError(
+                            address,
+                            "Please enter Address in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            address.focus();
+                        }
+
+                        valid = false;
+                    }
+
+
+                    /* ---------------------------------------------
+                       EXPERIENCE YEAR
+                    --------------------------------------------- */
+
+                    if (
+                        year &&
+                        year.value.trim() === ""
+                    ) {
+
+                        showRowError(
+                            year,
+                            "Please enter Experience Year in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            year.focus();
+                        }
+
+                        valid = false;
+
+                    } else if (
+                        year &&
+                        !/^\d+$/.test(
+                            year.value.trim()
+                        )
+                    ) {
+
+                        showRowError(
+                            year,
+                            "Experience Year must be numeric in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            year.focus();
+                        }
+
+                        valid = false;
+
+                    } else if (
+                        year &&
+                        parseInt(year.value, 10) > 30
+                    ) {
+
+                        showRowError(
+                            year,
+                            "Experience Year cannot be greater than 30 in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            year.focus();
+                        }
+
+                        valid = false;
+                    }
+
+
+                    /* ---------------------------------------------
+                       EXPERIENCE DAY
+                    --------------------------------------------- */
+
+                    if (
+                        day &&
+                        day.value.trim() === ""
+                    ) {
+
+                        showRowError(
+                            day,
+                            "Please enter Experience Day in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            day.focus();
+                        }
+
+                        valid = false;
+
+                    } else if (
+                        day &&
+                        !/^\d+$/.test(
+                            day.value.trim()
+                        )
+                    ) {
+
+                        showRowError(
+                            day,
+                            "Experience Day must be numeric in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            day.focus();
+                        }
+
+                        valid = false;
+
+                    } else if (
+                        day &&
+                        parseInt(day.value, 10) > 364
+                    ) {
+
+                        showRowError(
+                            day,
+                            "Experience Day cannot be greater than 364 in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            day.focus();
+                        }
+
+                        valid = false;
+                    }
+
+
+                    /* ---------------------------------------------
+                       WORK DETAILS
+                    --------------------------------------------- */
+
+                    if (
+                        work &&
+                        work.value.trim() === ""
+                    ) {
+
+                        showRowError(
+                            work,
+                            "Please enter Work Details in Row "
+                            + rowNo + "."
+                        );
+
+                        if (valid) {
+                            work.focus();
+                        }
+
+                        valid = false;
+                    }
+
+                });
+
+
+                /* =================================================
+                   FINAL SUBMIT
+                ================================================= */
+
+                if (valid) {
+
+                    form.submit();
+
+                }
+
+            });
+
+
+            /* =====================================================
+               CLEAR ERROR WHILE TYPING
+            ===================================================== */
+
+            document.addEventListener(
+                "input",
+                function (e) {
+
+                    if (
+                        e.target.matches(
+                            "#fname, #workallocation, #slr, #slnr, #dlr, #dlnr"
+                        )
+                    ) {
+
+                        clearError(e.target);
+                    }
+
+
+                    if (
+                        e.target.matches(
+                            "input[name='officename[]'], " +
+                            "input[name='address[]'], " +
+                            "input[name='yr[]'], " +
+                            "input[name='day[]'], " +
+                            "textarea[name='workdetail[]']"
+                        )
+                    ) {
+
+                        const errorDiv =
+                            e.target.parentElement.querySelector(
+                                ".row-field-error"
+                            );
+
+
+                        if (errorDiv) {
+
+                            errorDiv.textContent = "";
+                            errorDiv.remove();
+
+                        }
+
+                        e.target.classList.remove(
+                            "is-invalid"
+                        );
+                    }
+
+                }
+            );
+
+
+            /* =====================================================
+               SELECT ERROR CLEAR
+            ===================================================== */
+
+            document
+                .getElementById("designation")
+                .addEventListener(
+                    "change",
+                    function () {
+
+                        clearError(this);
+
+                    }
+                );
+
+
+            document
+                .getElementById("qualification")
+                .addEventListener(
+                    "change",
+                    function () {
+
+                        clearError(this);
+
+                    }
+                );
+
+
+            /* =====================================================
+               RADIO ERROR CLEAR
+            ===================================================== */
+
+            document
+                .querySelectorAll(
+                    'input[name="level"]'
+                )
+                .forEach(function (radio) {
+
+                    radio.addEventListener(
+                        "change",
+                        function () {
+
+                            const error =
+                                document.getElementById(
+                                    "levelError"
+                                );
+
+                            error.textContent = "";
+                            error.style.display = "none";
+
+                        }
+                    );
+
+                });
+
+
+            /* =====================================================
+               BUDGET INPUT RESTRICTION
+               ONLY NUMBER + ONE DOT + MAX 2 DECIMAL
+            ===================================================== */
+
+            const amountFields = [
+                "slr",
+                "slnr",
+                "dlr",
+                "dlnr"
+            ];
+
+
+            amountFields.forEach(function (id) {
+
+                const field =
+                    document.getElementById(id);
+
+
+                field.addEventListener(
+                    "input",
+                    function () {
+
+                        this.value =
+                            this.value
+                                .replace(
+                                    /[^0-9.]/g,
+                                    ""
+                                )
+                                .replace(
+                                    /(\..*)\./g,
+                                    "$1"
+                                );
+
+
+                        const match =
+                            this.value.match(
+                                /^\d+(\.\d{0,2})?/
+                            );
+
+
+                        if (match) {
+
+                            this.value =
+                                match[0];
+
+                        } else {
+
+                            this.value = "";
+
+                        }
+
+                    }
+                );
+
+            });
+
+
+            /* =====================================================
+               EXPERIENCE YEAR / DAY INPUT
+            ===================================================== */
+
+            document.addEventListener(
+                "input",
+                function (e) {
+
+
+                    /* YEAR */
+
+                    if (
+                        e.target.matches(
+                            "input[name='yr[]']"
+                        )
+                    ) {
+
+                        e.target.value =
+                            e.target.value.replace(
+                                /[^0-9]/g,
+                                ""
+                            );
+
+
+                        if (
+                            e.target.value !== "" &&
+                            parseInt(
+                                e.target.value,
+                                10
+                            ) > 30
+                        ) {
+
+                            e.target.value = "30";
+
+                        }
+
+                    }
+
+
+                    /* DAY */
+
+                    if (
+                        e.target.matches(
+                            "input[name='day[]']"
+                        )
+                    ) {
+
+                        e.target.value =
+                            e.target.value.replace(
+                                /[^0-9]/g,
+                                ""
+                            );
+
+
+                        if (
+                            e.target.value !== "" &&
+                            parseInt(
+                                e.target.value,
+                                10
+                            ) > 364
+                        ) {
+
+                            e.target.value = "364";
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+            /* =====================================================
+               ADD / REMOVE EXPERIENCE ROW
+            ===================================================== */
+
+            document.addEventListener(
+                "click",
+                function (e) {
+
+
+                    /* ---------------------------------------------
+                       ADD ROW
+                    --------------------------------------------- */
+
+                    if (
+                        e.target.classList.contains(
+                            "addRow"
+                        )
+                    ) {
+
+                        const currentRow =
+                            e.target.closest("tr");
+
+
+                        const newRow =
+                            currentRow.cloneNode(true);
+
+
+                        /* Clear input values */
+
+                        newRow
+                            .querySelectorAll(
+                                "input, textarea"
+                            )
+                            .forEach(function (el) {
+
+                                el.value = "";
+
+                                el.classList.remove(
+                                    "is-invalid"
+                                );
+
+                            });
+
+
+                        /* Remove validation messages */
+
+                        newRow
+                            .querySelectorAll(
+                                ".row-field-error"
+                            )
+                            .forEach(function (el) {
+
+                                el.remove();
+
+                            });
+
+
+                        /* Replace + with - */
+
+                        newRow
+                            .querySelector(
+                                "td:last-child"
+                            )
+                            .innerHTML =
+                                '<button type="button" ' +
+                                'class="btn btn-danger btn-sm removeRow">' +
+                                '×' +
+                                '</button>';
+
+
+                        /* Insert after current row */
+
+                        currentRow.parentNode.insertBefore(
+                            newRow,
+                            currentRow.nextSibling
+                        );
+
+                    }
+
+
+                    /* ---------------------------------------------
+                       REMOVE ROW
+                    --------------------------------------------- */
+
+                    if (
+                        e.target.classList.contains(
+                            "removeRow"
+                        )
+                    ) {
+
+                        e.target
+                            .closest("tr")
+                            .remove();
+
+                    }
+
+                }
+            );
+
         });
 
-        // Replace + button with × button
-        newRow.querySelector("td:last-child").innerHTML =
-            '<button type="button" class="btn btn-danger btn-sm removeRow">×</button>';
-
-        // Insert AFTER the original row
-        currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
-    }
-
-    // Remove Row
-    if (e.target.classList.contains("removeRow")) {
-        e.target.closest("tr").remove();
-    }
-
-});
-
-</script>
+    </script>
 
 </head>
 
+
 <body>
-
-
-
-
 
 <div layout:fragment="content">
 
-
     <div class="card shadow-sm border-0">
 
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
         <div class="card-header bg-primary text-white">
+
             <h4 class="mb-0">
-              Update Functionaries of SLNA
+                Update Functionaries of SLNA
             </h4>
+
         </div>
-		
-		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-			<span th:text="${success}"></span>
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
-		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-		    <span th:text="${error}"></span>
-		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
+
+
+        <!-- =====================================================
+             SUCCESS MESSAGE
+        ====================================================== -->
+
+        <div th:if="${success}"
+             class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            <span th:text="${success}"></span>
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+
+
+        <!-- =====================================================
+             ERROR MESSAGE
+        ====================================================== -->
+
+        <div th:if="${error}"
+             class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            <span th:text="${error}"></span>
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+
 
         <div class="card-body">
 
-			<form id="slnaFunctionaries" th:action="@{/updateSLNAFunctionariesPPR3}" method="post">
-				<input type="hidden" name="pprSlnaFunId" th:value="${functionary.pprSlnaFunId}">
-				
-									<div class="row g-4">
-									
-										<div class="col-md-6">
-											<label class="form-label">
-												  <b> Functionaries Working for </b><span class="required">*</span>
-											</label>
-											<br/>
-											<input type="radio" id="SLNA" name="level" value="SLNA" th:checked="${functionary.level == 'SLNA'}">
-											<label for="SLNA">SLNA</label> &nbsp;&nbsp;
-											<input type="radio" id="SLDC" name="level" value="SLDC" th:checked="${functionary.level == 'SLDC'}">
-											<label for="SLDC">SLDC</label> &nbsp;&nbsp;
-											<input type="radio" id="both" name="level" value="Both" th:checked="${functionary.level == 'Both'}">
-											<label for="both">Both</label>
-										</div>
-										
-										<div class="col-md-6">
-											<label class="form-label">
-												  <b> First Name</b><span class="required">*</span>
-											</label>
-											<input type="text" name="fname" id="fname" th:value="${functionary.slnaFunFname}" class="form-control">
-										</div>
-										
-										<div class="col-md-6">
-											<label class="form-label">
-												   <b>Last Name</b>
-											</label>
-											<input type="text" name="lname" id="lname" th:value="${functionary.slnaFunLname}" class="form-control">
-										</div>
-										
-										<div class="col-md-6">
-											<label class="form-label">
-												  	<b>Designation</b> <span class="required">*</span>
-											</label>
-											<select class="form-select" name="designation" id="designation">
-													<option value="">--Select Designation--</option>
-													<option th:each="des:${designationList}" th:value="${des.designationId}"
-															th:text="${des.designationName}" th:selected="${des.designationId==functionary.designationId}">
-													</option>
-											</select>
-										</div>
-										
-										<div class="col-md-6">
-											<label class="form-label">
-												   <b>Qualification</b> <span class="required">*</span>
-											</label>
-											<select class="form-select" name="qualification" id="qualification">
-													<option value="">--Select Qualification--</option>
-													<option th:each="qua:${qualificationList}" th:value="${qua.qualificationId}"
-															th:text="${qua.qualificationName}" th:selected="${qua.qualificationId==functionary.qualificationId}">
-													</option>
-											</select>
-										</div>
-										<div class="col-md-6">
-											<label class="form-label">
-												   <b>Work Allocation</b> <span class="required">*</span>
-											</label>
-											<textarea name="workallocation" id="workallocation" class="form-control" rows="2"
-														th:text="${functionary.workAllocation}">
-											</textarea>
-										</div>
-								</div>
-				
-				
-				
-				<!--
-				
-				<div class="row mb-3">
-					<div class="col-md-3">
-						<label>Functionaries Working for</label><span class="required">*</span>
-					</div>
-					<div class="col-md-5">
-						<input type="radio"
-						          id="SLNA"
-						          name="level"
-						          value="SLNA"
-						          th:checked="${functionary.level == 'SLNA'}">
-						   <label for="SLNA">SLNA</label> &nbsp;&nbsp;
+            <!-- =================================================
+                 FORM
+            ================================================== -->
 
-						   <input type="radio"
-						          id="SLDC"
-						          name="level"
-						          value="SLDC"
-						          th:checked="${functionary.level == 'SLDC'}">
-						   <label for="SLDC">SLDC</label> &nbsp;&nbsp;
+            <form id="slnaFunctionaries"
+                  th:action="@{/updateSLNAFunctionariesPPR3}"
+                  method="post">
 
-						   <input type="radio"
-						          id="both"
-						          name="level"
-						          value="Both"
-						          th:checked="${functionary.level == 'Both'}">
-						   <label for="both">Both</label>
-					</div>
-				</div>
-			
-				<div class="row mb-3">
-					<div class="col-md-3">
-						<label>First Name</label><span class="required">*</span>
-					</div>
-					<div class="col-md-5">
-						<input type="text" name="fname" id="fname" th:value="${functionary.slnaFunFname}" class="form-control">
-					</div>
-				</div>
-				<div class="row mb-3">
-					<div class="col-md-3">
-						<label>Last Name</label>
-					</div>
-					<div class="col-md-5">
-						<input type="text" name="lname" id="lname" th:value="${functionary.slnaFunLname}" class="form-control">
-					</div>
-				</div>
-				<div class="row mb-3">
-					<div class="col-md-3">
-						<label>Designation</label><span class="required">*</span>
-					</div>
-					<div class="col-md-5">
-						<select class="form-select" name="designation" id="designation">
-							<option value="">--Select Designation--</option>
-							<option th:each="des:${designationList}" th:value="${des.designationId}"
-								th:text="${des.designationName}" th:selected="${des.designationId==functionary.designationId}">
-							</option>
-						</select>
-					</div>
-				</div>
-				<div class="row mb-3">
-					<div class="col-md-3">
-						<label>Qualification</label><span class="required">*</span>
-					</div>
-					<div class="col-md-5">
-						<select class="form-select" name="qualification" id="qualification">
-							<option value="">--Select Qualification--</option>
-							<option th:each="qua:${qualificationList}" th:value="${qua.qualificationId}"
-								th:text="${qua.qualificationName}"
-								th:selected="${qua.qualificationId==functionary.qualificationId}">
-							</option>
-						</select>
-					</div>
-				</div>
-				<div class="row mb-3">
-					<div class="col-md-3">
-						<label>Work Allocation</label><span class="required">*</span>
-					</div>
-					<div class="col-md-5">
-						<textarea name="workallocation" id="workallocation" class="form-control" rows="3"
-							th:text="${functionary.workAllocation}"></textarea>
-						<input type="text" name="workallocation" id="workallocation" class="form-control">
-					</div>
-				</div>
-				-->
-				
-				
-				
-				<div class="row mb-3">
-					<div class="col-md-3">
-						<label>Monthly Remuneration (Rs.)</label>
-					</div>
-					<div class="col-md-3">
-						<label class="mb-1">Recurring</label>
-			
-					</div>
-					<div class="col-md-3">
-						<label class="mb-1">Non-Recurring</label>
-			
-					</div>
-				</div>
-				<div class="row mb-3">
-					<div class="col-md-3">
-						Total Budget of SLNA<span class="required">*</span>
-					</div>
-					<div class="col-md-3">
-						<input type="text" name="slr" id="slr" maxlength="11" th:value="${functionary.totBudgetSlnaRecurring}"
-							style="height:40px; width: 120px;"
-							oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-					</div>
-					<div class="col-md-3">
-						<input type="text" name="slnr" id="slnr" maxlength="11" th:value="${functionary.totBudgetSlnaNonRecurring}"
-							style="height:40px; width: 120px;"
-							oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-					</div>
-				</div>
-				<div class="row mb-4">
-					<div class="col-md-3">
-						Funding Expected from DoLR <span class="required">*</span>
-					</div>
-					<div class="col-md-3">
-						<input type="text" name="dlr" id="dlr" maxlength="11" th:value="${functionary.dolrFundRecurring}"
-							style="height:40px; width: 120px;"
-							oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-					</div>
-					<div class="col-md-3">
-						<input type="text" name="dlnr" id="dlnr" maxlength="11" th:value="${functionary.dolrFundNonRecurring}"
-							style="height:40px; width: 120px;"
-							oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,2}).*$/,'$1')">
-					</div>
-				</div>
-			
-				<hr>
-				<h4 class="mb-3">
-					Experience Details<span class="required">*</span>
-				</h4>
-				<table class="table table-bordered">
-					<thead class="table-light">
-						<tr>
-							<th width="15%">Office Name</th>
-							<th width="25%">Address</th>
-							<th width="20%">Experience in No. of Years and Days</th>
-							<th width="30%">Work Details</th>
-							<th width="10%">Action</th>
-						</tr>
-					</thead>
-			
-					<tbody id="experienceTable">
-			
-						<tr th:each="exp, iterStat : ${experiences}">
-			
-							<td>
-								<input type="text" name="officename[]" class="form-control" th:value="${exp.officeName}">
-							</td>
-			
-							<td>
-								<input type="text" name="address[]" class="form-control" th:value="${exp.address}">
-							</td>
-			
-							<td>
-								<input type="text" maxlength="2" minlength="1" max="30" name="yr[]"
-									oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="form-control d-inline-block"
-									style="width:80px;" th:value="${exp.workExpYrs}">
-			
-								<input type="text" maxlength="3" minlength="1" max="364" name="day[]"
-									oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="form-control d-inline-block ms-2"
-									style="width:80px;" th:value="${exp.workExpDays}">
-							</td>
-			
-							<td>
-								<textarea name="workdetail[]" class="form-control" rows="3" th:text="${exp.workDetails}"></textarea>
-							</td>
-			
-							<td>
-								<!-- First Row -->
-								<button th:if="${iterStat.first}" type="button" class="btn btn-success btn-sm addRow">
-									+
-								</button>
-			
-								<!-- Remaining Rows -->
-								<button th:unless="${iterStat.first}" type="button" class="btn btn-danger btn-sm removeRow">
-									×
-								</button>
-							</td>
-			
-						</tr>
-			
-						<tr th:if="${#lists.isEmpty(experiences)}">
-							<td><input type="text" name="officename[]" class="form-control"></td>
-							<td><input type="text" name="address[]" class="form-control"></td>
-							<td>
-								<input type="text" name="yr[]" class="form-control d-inline-block" style="width:80px;">
-								<input type="text" name="day[]" class="form-control d-inline-block ms-2" style="width:80px;">
-							</td>
-							<td>
-								<textarea name="workdetail[]" class="form-control" rows="3"></textarea>
-							</td>
-							<td>
-								<button type="button" class="btn btn-success btn-sm addRow">+</button>
-							</td>
-						</tr>
-			
-						<!-- Existing rows -->
-						<tr th:each="exp, iterStat : ${experiences}">
-							<!-- same code as above -->
-						</tr>
-			
-			
-					</tbody>
-			
-				</table>
-			
+                <input type="hidden"
+                       name="pprSlnaFunId"
+                       th:value="${functionary.pprSlnaFunId}">
+					   
+					<input type="hidden" name="action" id="action" value="D">
+
+
+                <!-- =============================================
+                     BASIC DETAILS
+                ============================================== -->
+
+                <div class="row g-4">
+
+
+                    <!-- FUNCTIONARIES WORKING FOR -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            <b>Functionaries Working for</b>
+
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <br>
+
+
+                        <input type="radio"
+                               id="SLNA"
+                               name="level"
+                               value="SLNA"
+                               th:checked="${functionary.level == 'SLNA'}">
+
+                        <label for="SLNA">
+                            SLNA
+                        </label>
+
+                        &nbsp;&nbsp;
+
+
+                        <input type="radio"
+                               id="SLDC"
+                               name="level"
+                               value="SLDC"
+                               th:checked="${functionary.level == 'SLDC'}">
+
+                        <label for="SLDC">
+                            SLDC
+                        </label>
+
+                        &nbsp;&nbsp;
+
+
+                        <input type="radio"
+                               id="both"
+                               name="level"
+                               value="Both"
+                               th:checked="${functionary.level == 'Both'}">
+
+                        <label for="both">
+                            Both
+                        </label>
+
+
+                        <div id="levelError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+
+                    <!-- FIRST NAME -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            <b>First Name</b>
+
+                            <span class="required">*</span>
+
+                        </label>
+
+
+                        <input type="text"
+                               name="fname"
+                               id="fname"
+                               th:value="${functionary.slnaFunFname}"
+                               class="form-control">
+
+
+                        <div id="fnameError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+
+                    <!-- LAST NAME -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            <b>Last Name</b>
+
+                        </label>
+
+
+                        <input type="text"
+                               name="lname"
+                               id="lname"
+                               th:value="${functionary.slnaFunLname}"
+                               class="form-control">
+
+                    </div>
+
+
+                    <!-- DESIGNATION -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            <b>Designation</b>
+
+                            <span class="required">*</span>
+
+                        </label>
+
+
+                        <select class="form-select"
+                                name="designation"
+                                id="designation">
+
+                            <option value="">
+                                --Select Designation--
+                            </option>
+
+
+                            <option th:each="des : ${designationList}"
+                                    th:value="${des.designationId}"
+                                    th:text="${des.designationName}"
+                                    th:selected="${des.designationId == functionary.designationId}">
+                            </option>
+
+                        </select>
+
+
+                        <div id="designationError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+
+                    <!-- QUALIFICATION -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            <b>Qualification</b>
+
+                            <span class="required">*</span>
+
+                        </label>
+
+
+                        <select class="form-select"
+                                name="qualification"
+                                id="qualification">
+
+                            <option value="">
+                                --Select Qualification--
+                            </option>
+
+
+                            <option th:each="qua : ${qualificationList}"
+                                    th:value="${qua.qualificationId}"
+                                    th:text="${qua.qualificationName}"
+                                    th:selected="${qua.qualificationId == functionary.qualificationId}">
+                            </option>
+
+                        </select>
+
+
+                        <div id="qualificationError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+
+                    <!-- WORK ALLOCATION -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            <b>Work Allocation</b>
+
+                            <span class="required">*</span>
+
+                        </label>
+
+
+                        <textarea name="workallocation"
+                                  id="workallocation"
+                                  class="form-control"
+                                  rows="2"
+                                  th:text="${functionary.workAllocation}">
+                        </textarea>
+
+
+                        <div id="workallocationError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <hr class="my-4">
+
+
+                <!-- =================================================
+                     MONTHLY REMUNERATION
+                ================================================== -->
+
+                <div class="row mb-3">
+
+                    <div class="col-md-3">
+
+                        <label>
+                            Monthly Remuneration (Rs.)
+                        </label>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="mb-1">
+                            Recurring
+                        </label>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="mb-1">
+                            Non-Recurring
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     SLNA BUDGET
+                ================================================== -->
+
+                <div class="row mb-3">
+
+                    <div class="col-md-3">
+
+                        Total Budget of SLNA
+
+                        <span class="required">*</span>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <input type="text"
+                               name="slr"
+                               id="slr"
+                               maxlength="11"
+                               th:value="${functionary.totBudgetSlnaRecurring}"
+                               style="height:40px;width:120px;">
+
+
+                        <div id="slrError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <input type="text"
+                               name="slnr"
+                               id="slnr"
+                               maxlength="11"
+                               th:value="${functionary.totBudgetSlnaNonRecurring}"
+                               style="height:40px;width:120px;">
+
+
+                        <div id="slnrError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     DOLR FUND
+                ================================================== -->
+
+                <div class="row mb-4">
+
+                    <div class="col-md-3">
+
+                        Funding Expected from DoLR
+
+                        <span class="required">*</span>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <input type="text"
+                               name="dlr"
+                               id="dlr"
+                               maxlength="11"
+                               th:value="${functionary.dolrFundRecurring}"
+                               style="height:40px;width:120px;">
+
+
+                        <div id="dlrError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <input type="text"
+                               name="dlnr"
+                               id="dlnr"
+                               maxlength="11"
+                               th:value="${functionary.dolrFundNonRecurring}"
+                               style="height:40px;width:120px;">
+
+
+                        <div id="dlnrError"
+                             class="field-error text-danger small mt-1">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <hr>
+
+
+                <!-- =================================================
+                     EXPERIENCE DETAILS
+                ================================================== -->
+
+                <h4 class="mb-3">
+
+                    Experience Details
+
+                    <span class="required">*</span>
+
+                </h4>
+
+
+                <table class="table table-bordered">
+
+                    <thead class="table-light">
+
+                    <tr>
+
+                        <th width="15%">
+                            Office Name
+                        </th>
+
+                        <th width="25%">
+                            Address
+                        </th>
+
+                        <th width="20%">
+                            Experience in No. of Years and Days
+                        </th>
+
+                        <th width="30%">
+                            Work Details
+                        </th>
+
+                        <th width="10%">
+                            Action
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody id="experienceTable">
+
+
+                    <!-- =================================================
+                         EXISTING EXPERIENCE RECORDS
+                    ================================================== -->
+
+                    <tr th:each="exp, iterStat : ${experiences}">
+
+
+                        <!-- OFFICE -->
+
+                        <td>
+
+                            <input type="text"
+                                   name="officename[]"
+                                   class="form-control"
+                                   th:value="${exp.officeName}">
+
+                        </td>
+
+
+                        <!-- ADDRESS -->
+
+                        <td>
+
+                            <input type="text"
+                                   name="address[]"
+                                   class="form-control"
+                                   th:value="${exp.address}">
+
+                        </td>
+
+
+                        <!-- YEAR / DAY -->
+
+                        <td>
+
+                            <input type="text"
+                                   maxlength="2"
+                                   minlength="1"
+                                   name="yr[]"
+                                   class="form-control d-inline-block"
+                                   style="width:80px;"
+                                   th:value="${exp.workExpYrs}"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+
+                            <input type="text"
+                                   maxlength="3"
+                                   minlength="1"
+                                   name="day[]"
+                                   class="form-control d-inline-block ms-2"
+                                   style="width:80px;"
+                                   th:value="${exp.workExpDays}"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+                        </td>
+
+
+                        <!-- WORK DETAILS -->
+
+                        <td>
+
+                            <textarea name="workdetail[]"
+                                      class="form-control"
+                                      rows="3"
+                                      th:text="${exp.workDetails}">
+                            </textarea>
+
+                        </td>
+
+
+                        <!-- ACTION -->
+
+                        <td>
+
+                            <button th:if="${iterStat.first}"
+                                    type="button"
+                                    class="btn btn-success btn-sm addRow">
+
+                                +
+
+                            </button>
+
+
+                            <button th:unless="${iterStat.first}"
+                                    type="button"
+                                    class="btn btn-danger btn-sm removeRow">
+
+                                ×
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- =================================================
+                         NO EXISTING RECORD
+                    ================================================== -->
+
+                    <tr th:if="${#lists.isEmpty(experiences)}">
+
+
+                        <td>
+
+                            <input type="text"
+                                   name="officename[]"
+                                   class="form-control">
+
+                        </td>
+
+
+                        <td>
+
+                            <input type="text"
+                                   name="address[]"
+                                   class="form-control">
+
+                        </td>
+
+
+                        <td>
+
+                            <input type="text"
+                                   maxlength="2"
+                                   name="yr[]"
+                                   class="form-control d-inline-block"
+                                   style="width:80px;"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+
+                            <input type="text"
+                                   maxlength="3"
+                                   name="day[]"
+                                   class="form-control d-inline-block ms-2"
+                                   style="width:80px;"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+                        </td>
+
+
+                        <td>
+
+                            <textarea name="workdetail[]"
+                                      class="form-control"
+                                      rows="3">
+                            </textarea>
+
+                        </td>
+
+
+                        <td>
+
+                            <button type="button"
+                                    class="btn btn-success btn-sm addRow">
+
+                                +
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    </tbody>
+
+                </table>
+
+
+                <!-- =================================================
+                     UPDATE BUTTON
+                ================================================== -->
+
 				<div class="text-center mt-4">
-					<button type="submit" name="action" value="D" class="btn btn-warning">
-						<i class="fas fa-save"></i>
-						Update
-					</button>
-					<!--<button class="btn btn-primary">
-											Submit
-										</button>-->
+
+				    <button type="submit"
+				            class="btn btn-warning">
+
+				        <i class="fas fa-save"></i>
+				        Update
+
+				    </button>
+
 				</div>
-			
-			</form>
+
+
+            </form>
 
         </div>
-		
-		<div class="table-responsive mt-4"
-		     th:if="${#lists.size(functionariesList) > 0}">
-			 <h4>
-			 <b> <centre> List of Added  Functionaries of SLNA </centre>  </b>
-			</h4>
-			<br/>
-		<table class="table table-bordered table-striped" style="min-width:2000px;">
 
-		    <thead class="table-primary">
-		    <tr>
-				<th class="table-primary">Functionaries Work for</th>
-				<th class="table-primary">First Name</th>
-				<th class="table-primary">Last Name</th>
-		        <th class="table-primary">Designation</th>
-		        <th class="table-primary">Qualification</th>
-		        <th class="table-primary">Work Allocation</th>
-				
-		        <th class="table-primary">SLNA Budget (R)</th>
-		        <th class="table-primary">SLNA Budget (NR)</th>
-		        <th class="table-primary">DoLR (R)</th>
-		        <th class="table-primary">DoLR (NR)</th>
-				
-		        <th class="table-primary">Office</th>
-		        <th class="table-primary">Address</th>
-		        <th class="table-primary">Year</th>
-		        <th class="table-primary">Day</th>
-		        <th class="table-primary">Work Details</th>
-				<th class="table-primary" style="width: 200px;" >Action</th>
-		    </tr>
-		    </thead>
 
-		    <tbody>
+        <!-- =====================================================
+             FUNCTIONARIES LIST
+        ====================================================== -->
 
-		    <tr th:each="row, stat : ${functionariesList}">
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[18] : ''}"></td>
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}"></td>
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[17] : ''}"></td>
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[3] : ''}"></td>
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}"></td>
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}"></td>
+        <div class="table-responsive mt-4"
+             th:if="${#lists.size(functionariesList) > 0}">
 
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}"></td>
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}"></td>
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}"></td>
-				<td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}"></td>
 
-		        <td th:text="${row[12]}"></td>
-		        <td th:text="${row[13]}"></td>
-		        <td th:text="${row[14]}"></td>
-		        <td th:text="${row[15]}"></td>
-		        <td th:text="${row[16]}"></td>
-				
-				<td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
-					
-						<a th:if="${row[10].toString().equals('D')}" title="Delete"
-							th:href="@{/deleteSLNAFunctionariesPPR3(id=${row[0]})}"
-							class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-							 <i class="fas fa-trash"></i>
+            <h4 class="text-center">
+
+                <b>
+                    List of Added Functionaries of SLNA
+                </b>
+
+            </h4>
+
+
+            <br>
+
+
+            <table class="table table-bordered table-striped"
+                   style="min-width:2000px;">
+
+
+                <thead class="table-primary">
+
+                <tr>
+
+                    <th>Functionaries Work for</th>
+
+                    <th>First Name</th>
+
+                    <th>Last Name</th>
+
+                    <th>Designation</th>
+
+                    <th>Qualification</th>
+
+                    <th>Work Allocation</th>
+
+                    <th>SLNA Budget (R)</th>
+
+                    <th>SLNA Budget (NR)</th>
+
+                    <th>DoLR (R)</th>
+
+                    <th>DoLR (NR)</th>
+
+                    <th>Office</th>
+
+                    <th>Address</th>
+
+                    <th>Year</th>
+
+                    <th>Day</th>
+
+                    <th>Work Details</th>
+
+                    <th style="width:200px;">
+                        Action
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                <tr th:each="row, stat : ${functionariesList}">
+
+
+                    <!-- FUNCTIONARIES WORK -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[18] : ''}">
+                    </td>
+
+
+                    <!-- FIRST NAME -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}">
+                    </td>
+
+
+                    <!-- LAST NAME -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[17] : ''}">
+                    </td>
+
+
+                    <!-- DESIGNATION -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[3] : ''}">
+                    </td>
+
+
+                    <!-- QUALIFICATION -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}">
+                    </td>
+
+
+                    <!-- WORK ALLOCATION -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}">
+                    </td>
+
+
+                    <!-- SLNA RECURRING -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}">
+                    </td>
+
+
+                    <!-- SLNA NON RECURRING -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}">
+                    </td>
+
+
+                    <!-- DOLR RECURRING -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}">
+                    </td>
+
+
+                    <!-- DOLR NON RECURRING -->
+
+                    <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}">
+                    </td>
+
+
+                    <!-- OFFICE -->
+
+                    <td th:text="${row[12]}">
+                    </td>
+
+
+                    <!-- ADDRESS -->
+
+                    <td th:text="${row[13]}">
+                    </td>
+
+
+                    <!-- YEAR -->
+
+                    <td th:text="${row[14]}">
+                    </td>
+
+
+                    <!-- DAY -->
+
+                    <td th:text="${row[15]}">
+                    </td>
+
+
+                    <!-- WORK DETAILS -->
+
+                    <td th:text="${row[16]}">
+                    </td>
+
+
+                    <!-- ACTION -->
+
+                    <td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
+
+
+                        <!-- DELETE 
+
+                        <a th:if="${row[10] != null and row[10].toString().equals('D')}"
+                           title="Delete"
+                           th:href="@{/deleteSLNAFunctionariesPPR3(id=${row[0]})}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Are you sure you want to delete this record?');">
+
+                            <i class="fas fa-trash"></i>
+
+                        </a> -->
+
+						<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[10].toString().equals('D')}" title="Delete"
+							th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteSLNAFunctionariesPPR3?id=' + ${row[0]} + '\'; }); return false;'">
+						
+							<i class="fas fa-trash"></i>
 						</a>
-						&nbsp; &nbsp; 
-						<a th:if="${row[10].toString().equals('D')}" title="Edit"
-							th:href="@{/editSLNAFunctionariesPPR3(id=${row[0]})}"
-							class="btn btn-primary btn-sm"
-							onclick="return confirm('Are you sure you want to edit this record?');">
-							 <i class="fas fa-edit"></i>
+
+                        &nbsp;&nbsp;
+
+
+                        <!-- EDIT -->
+
+                        <a th:if="${row[10] != null and row[10].toString().equals('D')}"
+                           title="Edit"
+                           th:href="@{/editSLNAFunctionariesPPR3(id=${row[0]})}"
+                           class="btn btn-primary btn-sm"
+                           onclick="return confirm('Are you sure you want to edit this record?');">
+
+                            <i class="fas fa-edit"></i>
+
+                        </a>
+
+
+                        &nbsp;&nbsp;
+
+
+                        <!-- COMPLETE -->
+
+                       <!-- <a th:if="${row[10] != null and row[10].toString().equals('D')}"
+                           title="Complete"
+                           th:href="@{/completeSLNAFunctionariesPPR3(id=${row[0]})}"
+                           class="btn btn-success btn-sm"
+                           onclick="return confirm('Are you sure you want to complete this record?');">
+
+                            <i class="fas fa-check"></i>
+
+                        </a>-->
+						
+						<a href="javascript:void(0)" class="btn btn-success btn-sm" th:if="${row[10].toString().equals('D')}" title="Complete"
+							th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeSLNAFunctionariesPPR3?id=' + ${row[0]} + '\'; }); return false;'">
+						
+							<i class="fas fa-check"></i>
 						</a>
-						&nbsp; &nbsp; 
-						<a th:if="${row[10].toString().equals('D')}" title="Complete"
-							th:href="@{/completeSLNAFunctionariesPPR3(id=${row[0]})}"
-							class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-							 <i class="fas fa-check"></i>
-						</a>
-						<span th:if="${row[10].toString().equals('C')}"
-								class="badge bg-success">
-								<i class="fas fa-check-circle"></i> Completed
-						</span>		
-				</td>
-				<td th:unless="${stat.first || row[0] != functionariesList[stat.index-1][0]}"></td>
-		    </tr>
 
-		    </tbody>
 
-		</table>
 
-		</div>
-		
-		
-		
+                        <!-- COMPLETED -->
+
+                        <span th:if="${row[10] != null and row[10].toString().equals('C')}"
+                              class="badge bg-success">
+
+                            <i class="fas fa-check-circle"></i>
+
+                            Completed
+
+                        </span>
+
+
+                    </td>
+
+
+                    <!-- EMPTY ACTION FOR CHILD ROWS -->
+
+                    <td th:unless="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
+                    </td>
+
+
+                </tr>
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
 
     </div>
 
 </div>
 
 </body>
+
 </html>
