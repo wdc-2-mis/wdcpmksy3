@@ -13,6 +13,108 @@
 		</style>
 		<script th:inline="javascript">
 			document.addEventListener("DOMContentLoaded", function () {
+				 
+				const formk = document.getElementById("approveForm"); 
+				
+				formk.addEventListener("submit", function (event) { 
+					let isValid = true; 
+					/* * Clear previous error messages */ 
+					document.querySelectorAll("#approveForm .text-danger").
+					forEach(function (div) { div.innerHTML = ""; }); 
+					
+					/* * Remove previous invalid class */ 
+					document.querySelectorAll("#approveForm .form-control").
+					forEach(function (input) { input.classList.remove("is-invalid"); }); 
+					
+					/* * District Name */ 
+					const distname = document.getElementById("distname"); 
+					if (distname.value.trim() === "") { 
+						document.getElementById("distnameError").innerHTML = "Please enter District Name."; 
+						distname.classList.add("is-invalid"); 
+						isValid = false; 
+					} 
+					/* * Project Name */ 
+					const pprname = document.getElementById("pprname"); 
+					if (pprname.value.trim() === "") { 
+						document.getElementById("pprnameError").innerHTML = "Please enter Project Name."; 
+						pprname.classList.add("is-invalid"); 
+						isValid = false; 
+					} 
+					/* * Sanction Date */ 
+					const sanctiondt = document.getElementById("sanctiondt"); 
+					if (sanctiondt.value.trim() === "") { 
+						document.getElementById("sanctiondtError").innerHTML = "Please select Sanction Date."; 
+						sanctiondt.classList.add("is-invalid"); 
+						isValid = false; 
+					} 
+					/* * Proposed Area */ 
+					const areap = document.getElementById("areap"); 
+					if (areap.value.trim() === "") { 
+						document.getElementById("areapError").innerHTML = "Please enter Sanction Proposed Area."; 
+						areap.classList.add("is-invalid"); 
+						isValid = false; 
+					} 
+					/* * Total Cost */ 
+					const cost = document.getElementById("cost"); 
+					if (cost.value.trim() === "") { 
+						document.getElementById("costError").innerHTML = "Please enter Sanction Total Cost."; 
+						cost.classList.add("is-invalid"); 
+						isValid = false; 
+					} 
+					/* * Central Share */ 
+					const central = document.getElementById("central"); 
+					if (central.value.trim() === "") { 
+						document.getElementById("centralError").innerHTML = "Please enter Central Share."; 
+						central.classList.add("is-invalid"); 
+						isValid = false; 
+					} 
+					/* * State Share */ 
+					const states = document.getElementById("states"); 
+					if (states.value.trim() === "") { 
+						document.getElementById("statesError").innerHTML = "Please enter State Share."; 
+						states.classList.add("is-invalid"); 
+						isValid = false; 
+					} 
+					/* * Stop form submission if any field is blank */ 
+					if (!isValid) { 
+						event.preventDefault(); 
+						/* * Focus first invalid field */ 
+						const firstInvalid = formk.querySelector(".is-invalid"); 
+						if (firstInvalid) { 
+							firstInvalid.focus(); 
+						} 
+					} 
+				}); 
+				/* * Remove error immediately when user enters/selects value */ 
+				const fields = [ "distname", "pprname", "sanctiondt", "areap", "cost", "central", "states" ]; 
+				fields.forEach(function (id) { 
+					const field = document.getElementById(id); 
+					const error = document.getElementById(id + "Error"); 
+					field.addEventListener("input", function () { 
+						if (field.value.trim() !== "") { 
+							field.classList.remove("is-invalid"); 
+							error.innerHTML = ""; 
+						} 
+					}); 
+					field.addEventListener("change", function () { 
+						if (field.value.trim() !== "") { 
+							field.classList.remove("is-invalid"); 
+							error.innerHTML = ""; 
+						} 
+					}); 
+				}); 
+			});
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			document.addEventListener("DOMContentLoaded", function () {
 				
 				    const sanctiondt = document.getElementsByName("sanctiondt")[0];
 				    sanctiondt.setAttribute("min", "2026-01-01");
@@ -139,7 +241,7 @@
 					
 					
 					
-				});
+	});
 				
 				function openRemarksModal(element, action) {
 						const tranId = element.getAttribute("data-tranid");
@@ -409,7 +511,7 @@
 								<button class="btn-close" data-bs-dismiss="modal"></button>
 							</div>
 							<div class="modal-body">
-								<form id="approveForm" th:action="@{/approvePprReqForAprov}" method="post">
+								<form id="approveForm" th:action="@{/approvePprReqForAprov}" method="post" novalidate>
 									<input type="hidden" id="pprid" name="pprid">
 									<!-- Member Details -->
 									<div class="row g-4">
@@ -419,7 +521,7 @@
 												<b> District Name</b><span class="required">*</span>
 											</label>
 											<input type="text" name="distname" id="distname" class="form-control" readonly>
-										
+											<div id="distnameError" class="text-danger small mt-1"></div>
 										</div>
 																	
 										<div class="col-md-6">
@@ -427,7 +529,7 @@
 												<b> Project Name</b><span class="required">*</span>
 											</label>
 											<input type="text" name="pprname" id="pprname" class="form-control" readonly >
-										
+											<div id="pprnameError" class="text-danger small mt-1"></div>
 										</div>
 										
 										<div class="col-md-6">
@@ -435,25 +537,25 @@
 												<b> Sanction Date </b><span class="required">*</span>
 											</label>
 											<input type="date" class="form-control" name="sanctiondt"  id="sanctiondt"  min="2026-01-01"  required onkeydown="return false;">
-											<div class="invalid-feedback">Please select Sanction Date</div>
+											<div id="sanctiondtError" class="text-danger small mt-1"></div>
 											
 										</div>
 																	
 										<div class="col-md-6">
 											<label class="form-label">
-												<b> Proposed Area Sanction (in Ha.) </b><span class="required">*</span>
+												<b> Sanction Proposed Area (in Ha.) </b><span class="required">*</span>
 											</label>
 											<input type="text" name="areap" id="areap" class="form-control" style="height:40px; width: 300px;"												oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,5}).*$/,'$1')" required>
-												<div class="invalid-feedback">Please enter Proposed Area</div>
+												<div id="areapError" class="text-danger small mt-1"></div>
 										</div>
 				
 										<div class="col-md-6">
 											<label class="form-label">
-												<b> Total Cost Sanction (Rs in Lakh)</b><span class="required">*</span>
+												<b> Sanction Total Cost (Rs in Lakh)</b><span class="required">*</span>
 											</label>
 											<input type="text" name="cost" id="cost" class="form-control" style="height:40px; width: 300px;"
 												oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,5}).*$/,'$1')" required>
-				
+												<div id="costError" class="text-danger small mt-1"></div>
 										</div>
 										<div class="col-md-6">
 											<label class="form-label">
@@ -461,14 +563,15 @@
 											</label>
 											<input type="text" name="central" id="central" class="form-control" style="height:40px; width: 300px;"
 												oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,5}).*$/,'$1')" required>
-				
+												<div id="centralError" class="text-danger small mt-1"></div>
 										</div>
 										<div class="col-md-6">
 											<label class="form-label">
 												<b>State Share (Rs in Lakh)</b><span class="required">*</span>
 											</label>
-											<input type="text" name="state" id="state" class="form-control" style="height:40px; width: 300px;"
+											<input type="text" name="states" id="states" class="form-control" style="height:40px; width: 300px;"
 												oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,5}).*$/,'$1')" required>
+												<div id="statesError" class="text-danger small mt-1"></div>
 										</div>
 										
 									</div>

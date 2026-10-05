@@ -213,7 +213,7 @@ public class PprDolrApprovalController {
 	    		@RequestParam BigDecimal areap,
 	    		@RequestParam BigDecimal cost,
 	    		@RequestParam BigDecimal central,
-	    		@RequestParam BigDecimal state,
+	    		@RequestParam BigDecimal states,
 	            RedirectAttributes redirectAttributes) {
 	   
 				Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
@@ -226,7 +226,7 @@ public class PprDolrApprovalController {
 				            return "redirect:/login";
 				     }
 					boolean save=false;
-					save=pprTransactionServ.approveSlnaReqFromDolr(pprid, areap, cost, central, state, regid,
+					save=pprTransactionServ.approveSlnaReqFromDolr(pprid, areap, cost, central, states, regid,
 							 userid, CommonFunctions.getClientIpAddr(request), sanctiondt);
 					
 					if(save)
