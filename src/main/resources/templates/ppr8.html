@@ -919,9 +919,9 @@ document.getElementById("proposedAreaOthers")
 
 								<td th:text="${area.ppr.projectName}"></td>
 
-								<td th:text="${area.block.blockName}"></td>
+								<td th:text="${area.block != null ? area.block.blockName : ''}"></td>
 
-								<td th:text="${area.scheme.schemeName}"></td>
+								<td th:text="${area.scheme != null ? area.scheme.schemeName: ''}"></td>
 
 								<td th:text="${area.projSanctionedNo}"></td>
 

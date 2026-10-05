@@ -458,3 +458,79 @@
 
 
 })();
+
+function latestAlert(message) {
+
+    // Create modal only once
+    let modal = document.getElementById("latestAlertModal");
+
+    if (!modal) {
+
+        const modalHtml = `
+            <div class="modal fade"
+                 id="latestAlertModal"
+                 tabindex="-1"
+                 aria-hidden="true">
+
+                <div class="modal-dialog modal-dialog-centered">
+
+                    <div class="modal-content latest-alert-modal">
+
+                        <div class="modal-header latest-alert-header">
+
+                            <div class="latest-alert-title">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Alert</span>
+                            </div>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close">
+                            </button>
+
+                        </div>
+
+                        <div class="modal-body latest-alert-body">
+
+                            <div class="latest-alert-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+
+                            <div class="latest-alert-message"
+                                 id="latestAlertMessage">
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer latest-alert-footer">
+
+                            <button type="button"
+                                    class="btn latest-alert-ok"
+                                    data-bs-dismiss="modal">
+                                OK
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML("beforeend", modalHtml);
+
+        modal = document.getElementById("latestAlertModal");
+    }
+
+    // Set message
+    document.getElementById("latestAlertMessage").textContent = message;
+
+    // Show Bootstrap modal
+    const alertModal =
+        bootstrap.Modal.getOrCreateInstance(modal);
+
+    alertModal.show();
+}
