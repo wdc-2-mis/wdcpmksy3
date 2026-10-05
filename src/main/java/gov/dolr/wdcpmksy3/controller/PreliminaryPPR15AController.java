@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PPRMigrationDetails;
 import gov.dolr.wdcpmksy3.PPR.entity.PprMicroWatershed;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PPRMigrationDetailsRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRLandPatternAreaService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRMigrationDetailsService;
@@ -40,38 +43,44 @@ public class PreliminaryPPR15AController {
 	@Autowired
 	private VillageService villageService;
 	
-	
 	@Autowired
 	private PPRMigrationDetailsService migrationDetailsService;
-
 	
 	@Autowired
 	private PPRMigrationDetailsRepository pprMigrationDetailsRepository;
 	
+	@Autowired
+	private MPprRepository mPprRepo;
+	
+	@Autowired
+	private MicroWatershedRepository microWatershedRepo;
 	
 	@GetMapping("/preliminaryPPR15")
-	public String preliminaryPPR15(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) {
+	public String preliminaryPPR15(@RequestParam(required = false) Integer dcode, HttpSession session, Model model, 
+			@RequestParam(required = false) Integer pprid, @RequestParam(required = false) Integer project) {
 
-		 String statename = session.getAttribute("statename").toString();
-
-	    Integer stcode = Integer.parseInt(
-	            session.getAttribute("stcode").toString()
-	    );
+		String statename = session.getAttribute("statename").toString();
+	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 	    if (pprid != null) {
 	    	migrationDetailsService.changeStatusByPprId(pprid);
         }
-		
+	    if(dcode != null){
+			model.addAttribute("selectedDistrict", dcode);
+	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
+	        if(!pprList.isEmpty()){
+	        	model.addAttribute("pprList", pprList);
+	        	if(project != null) {
+	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
+	        		model.addAttribute("pprId", project);
+	        		model.addAttribute("draftList", pprMigrationDetailsRepository.getMigrationDetailsByProject(ppr.getPprId()));
+		            model.addAttribute("project", ppr.getProjectName());
+		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
+		            model.addAttribute("villageList",villageService.getVillagesByProject(ppr.getPprId()));
+	        	}
+	        }
+	    }
 	    model.addAttribute("statename", statename);
-
-	    model.addAttribute(
-	            "distList",
-	            districtService.getPPRDistrictsByState(stcode)
-	    );
-
-	    model.addAttribute("projectList", new ArrayList<>());
-	    model.addAttribute("watershedList", new ArrayList<>());
-	    model.addAttribute("villageList", new ArrayList<>());
-	    model.addAttribute("draftList", new ArrayList<>());
+	    model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
 
 	    return "ppr15";
 	}

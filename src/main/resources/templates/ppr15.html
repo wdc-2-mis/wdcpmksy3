@@ -32,154 +32,71 @@
 
 		document.addEventListener("DOMContentLoaded", function () {
 
-			/* ==========================================================
-			   Load Project according to District
-			========================================================== */
-			document.getElementById("district").addEventListener("change", function () {
-
-				let districtId = this.value;
-				let project = document.getElementById("project");
-
-				// Clear existing options
-				project.innerHTML = '<option value="">--Select Project--</option>';
-
-				// Also clear watershed and village
-				document.getElementById("watershed").innerHTML =
-					'<option value="">--Select Watershed--</option>';
-
-				document.getElementById("village").innerHTML =
-					'<option value="">--Select Village--</option>';
-
-				if (districtId === "") {
-					return;
+			const district = document.getElementById("district");
+			const project = document.getElementById("project");
+			district.addEventListener("change", function () {
+				if (this.value) {
+					window.location.href = "/preliminaryPPR15?dcode=" + this.value;
+				} else {
+					window.location.href = "/preliminaryPPR15";
 				}
-
-				fetch('/getProjectsByDistrictPPR10?dcode=' + districtId)
-					.then(response => response.json())
-					.then(data => {
-
-						data.forEach(function (item) {
-
-							let option = document.createElement("option");
-
-							option.value = item.id;          // PPR ID
-							option.textContent = item.name;  // Project Name
-
-							project.appendChild(option);
-						});
-
-					})
-					.catch(error => {
-						console.error("Error:", error);
-					});
-
 			});
-
-
-			/* ==========================================================
-			   Load Watershed according to Project
-			========================================================== */
-			document.getElementById("project").addEventListener("change", function () {
-
-				let projectId = this.value;
-
-				loadDraftsPPR15(projectId);
-
-				let watershed = document.getElementById("watershed");
-				let village = document.getElementById("village");
-
-				watershed.innerHTML = '<option value="">--Select Watershed--</option>';
-				village.innerHTML = '<option value="">--Select Village--</option>';
-
-				if (projectId === "") return;
-
-				// Watershed
-				fetch('/getMicroWatershedsByProject1?pprId=' + projectId)
-					.then(res => res.json())
-					.then(data => {
-						data.forEach(item => {
-							watershed.innerHTML +=
-								`<option value="${item.id}">${item.name}</option>`;
-						});
-					});
-
-				// Village
-				fetch('/getVillagesByProject1?pprId=' + projectId)
-					.then(res => res.json())
-					.then(data => {
-						data.forEach(item => {
-							village.innerHTML +=
-								`<option value="${item.id}">${item.name}</option>`;
-						});
-					});
-
+			project.addEventListener("change", function () {
+				if (this.value) {
+					window.location.href = "/preliminaryPPR15?dcode=" + district.value + "&&project=" + this.value;
+				} else {
+					window.location.href = "/preliminaryPPR15";
+				}
 			});
-
-
 
 			document.getElementById("ppr15Form").addEventListener("submit", function (event) {
-
 				event.preventDefault();
-
 				// ========= Dropdown Validation =========
 				if (document.getElementById("district").value === "") {
 					alert("Please select District");
 					document.getElementById("district").focus();
 					return;
 				}
-
 				if (document.getElementById("project").value === "") {
 					alert("Please select Project");
 					document.getElementById("project").focus();
 					return;
 				}
-
 				if (document.getElementById("watershed").value === "") {
 					alert("Please select Watershed");
 					document.getElementById("watershed").focus();
 					return;
 				}
-
 				if (document.getElementById("village").value === "") {
 					alert("Please select Village");
 					document.getElementById("village").focus();
 					return;
 				}
-
 				const form = this;
-
 				const pprId = document.getElementById("project").value;
-
 				fetch(form.getAttribute("action"), {
 					method: "POST",
 					body: new FormData(form)
 				})
 					.then(async response => {
-
 						const responseText = await response.text();
-
 						console.log("STATUS:", response.status);
 						console.log("URL:", response.url);
 						console.log("RESPONSE:", responseText);
-
 						if (!response.ok) {
 							throw new Error(
 								"Server returned status " + response.status
 							);
 						}
-
 						return responseText;
 					})
 					.then(() => {
-
 						console.log("Draft saved successfully");
-
 						/*
 						 * Reload the draft table.
 						 * This will show both old records and the newly saved record.
 						 */
-						loadDraftsPPR15(pprId);
-
+						//loadDraftsPPR15(pprId);
 						/*
 						 * Clear only the input fields.
 						 * Do not clear the table.
@@ -188,38 +105,25 @@
 						document.getElementById("daysMigrating").value = "";
 						document.getElementById("migrationReason").value = "";
 						document.getElementById("expectedReduction").value = "";
-
 					})
 					.catch(error => {
-
 						console.error("SAVE ERROR:", error);
-
 						alert("Error while saving draft.");
-
 					});
-
 			});
 		});
 
-
-
 		function loadDraftsPPR15(pprId) {
-
 			const tableBody = document.getElementById("draftTableBody");
 			tableBody.innerHTML = "";
-
 			if (!pprId) {
 				return;
 			}
-
 			fetch('/getDraftsPPR15?pprId=' + pprId)
 				.then(response => response.json())
 				.then(data => {
-
 					data.forEach(function (item) {
-
 						const row = document.createElement("tr");
-
 						row.innerHTML = `
 	                    <td>${item.dist_name}</td>
 	                    <td>${item.project_name}</td>
@@ -229,22 +133,12 @@
 	                    <td>${item.migration_days_per_year}</td>
 	                    <td>${item.migration_reason}</td>
 	                    <td>${item.expected_reduction_migrating_people}</td>
-
 	                    <td class="text-center">
-
-	                        ${item.status === 'D'
-								?
-
-								`
-
-	                            <a href="/deletePreliminaryPPR15?id=${item.ppr_migration_id}"
-	                               class="btn btn-danger btn-sm"
+	                        ${item.status === 'D' ? `<a href="/deletePreliminaryPPR15?id=${item.ppr_migration_id}" class="btn btn-danger btn-sm"
 	                               onclick="return confirm('Are you sure you want to delete this record?')">
 	                                <i class="fas fa-trash"></i>
 	                            </a>
-
 	                            &nbsp;
-
 	                            <button type="button"
 	                                    class="btn btn-primary btn-sm ppr15-edit-btn"
 	                                    title="Edit"
@@ -254,37 +148,22 @@
 	                                    data-pprid="${item.ppr_id}"
 	                                    data-watershedname="${item.mw_name}"
 	                                    data-mwid="${item.mw_id}"
-	                                    data-villagename="${item.village_name}"
-	                                    data-vcode="${item.vcode}"
-	                                    data-people="${item.migrating_people_count}"
+	                                    data-villagename="${item.tem.vcode}"
+	                                    data-people="${village_name}"
+	                                    data-vcode="${iitem.migrating_people_count}"
 	                                    data-days="${item.migration_days_per_year}"
 	                                    data-reason="${item.migration_reason}"
 	                                    data-reduction="${item.expected_reduction_migrating_people}">
 	                                <i class="fas fa-edit"></i>
 	                            </button>
-
 	                            &nbsp;
-
 	                            <a href="/completePreliminaryPPR15?id=${item.ppr_migration_id}"
 	                               class="btn btn-success btn-sm"
 	                               onclick="return confirm('Are you sure you want to complete this record?')">
 	                                <i class="fas fa-check"></i>
 	                            </a>
-
-	                            `
-
-								:
-
-								`
-
-	                            <span class="badge bg-success">
-	                                <i class="fas fa-check-circle"></i>
-	                                Data Completed
-	                            </span>
-
-	                            `
+	                            ` : `<span class="badge bg-success"> <i class="fas fa-check-circle"></i> Data Completed </span> `
 							}
-
 	                    </td>
 	                `;
 
@@ -302,74 +181,29 @@
 			   PPR15 : Edit Popup Function
 			   ========================================================== */
 
-		document.addEventListener("click", function (e) {
-
-			const btn = e.target.closest(".ppr15-edit-btn");
-
-			document.getElementById("editPpr15Id").value = btn.dataset.id;
-
-			console.log("Clicked PPR15 Edit Button:", btn);
-
-			if (!btn) {
-				return;
-			}
-
-			// Hidden Record ID
-			document.getElementById("editPpr15Id").value =
-				btn.dataset.id;
-			console.log("PPR ID =", btn.dataset.id);
-			// District
-			document.getElementById("editPpr15DistrictName").value =
-				btn.dataset.districtname;
-
-			document.getElementById("editPpr15District").value =
-				btn.dataset.dcode;
-
-			// Project
-			document.getElementById("editPpr15ProjectName").value =
-				btn.dataset.projectname;
-
-			document.getElementById("editPpr15Project").value =
-				btn.dataset.pprid;
-
-			// Watershed
-			document.getElementById("editPpr15WatershedName").value =
-				btn.dataset.watershedname;
-
-			document.getElementById("editPpr15Watershed").value =
-				btn.dataset.mwid;
-
-			// Village
-			document.getElementById("editPpr15VillageName").value =
-				btn.dataset.villagename;
-
-			document.getElementById("editPpr15Village").value =
-				btn.dataset.vcode;
-
-			// No. of People Migrating
-			document.getElementById("editMigratingPeopleCount").value =
-				btn.dataset.people;
-
-			// No. of Days Migrating
-			document.getElementById("editMigrationDaysPerYear").value =
-				btn.dataset.days;
-
-			// Major Reason for Migration
-			document.getElementById("editMigrationReason").value =
-				btn.dataset.reason;
-
-			// Expected Reduction
-			document.getElementById("editExpectedReduction").value =
-				btn.dataset.reduction;
-
-			// Open PPR15 Edit Modal
-			new bootstrap.Modal(
-				document.getElementById("editModalPPR15")
-			).show();
-
-		});
-
-
+		//document.addEventListener("click", function (e) {
+			//const btn = e.target.closest(".ppr15-edit-btn");
+			//document.getElementById("editPpr15Id").value = btn.dataset.id;
+			//console.log("Clicked PPR15 Edit Button:", btn);
+			//if (!btn) {
+			//	return;
+			//}
+			//document.getElementById("editPpr15Id").value =btn.dataset.id;
+			//console.log("PPR ID =", btn.dataset.id);
+			//document.getElementById("editPpr15DistrictName").value =btn.dataset.districtname;
+		//	document.getElementById("editPpr15District").value = btn.dataset.dcode;
+		//	document.getElementById("editPpr15ProjectName").value = btn.dataset.projectname;
+		//	document.getElementById("editPpr15Project").value = btn.dataset.pprid;
+		//	document.getElementById("editPpr15WatershedName").value = btn.dataset.watershedname;
+		//	document.getElementById("editPpr15Watershed").value = btn.dataset.mwid;
+		//	document.getElementById("editPpr15VillageName").value = btn.dataset.villagename;
+		//	document.getElementById("editPpr15Village").value = btn.dataset.vcode;
+		//	document.getElementById("editMigratingPeopleCount").value = btn.dataset.people;
+		//	document.getElementById("editMigrationDaysPerYear").value = btn.dataset.days;
+		//	document.getElementById("editMigrationReason").value = btn.dataset.reason;
+		//	document.getElementById("editExpectedReduction").value = btn.dataset.reduction;
+		//	new bootstrap.Modal(document.getElementById("editModalPPR15")).show();
+		//});
 
 
 	</script>
@@ -417,8 +251,9 @@
 							<div class="col-md-4">
 								<select id="district" name="district" class="form-control form-control-sm" required>
 									<option value="">--Select District--</option>
-									<th:block th:each="dist : ${distList}">
-										<option th:value="${dist.dcode}" th:text="${dist.distName}">
+									<th:block th:each="d : ${distList}">
+										<option th:value="${d.dcode}" th:text="${d.distName}"
+										th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"></option>
 										</option>
 									</th:block>
 								</select>
@@ -433,6 +268,8 @@
 							<div class="col-md-4">
 								<select id="project" name="pprId" class="form-control form-control-sm" required>
 								    <option value="">--Select Project--</option>
+									<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
+										th:selected="${pprId != null and pprId == p.pprId}"> </option>
 								</select>
 							</div>
 
@@ -443,6 +280,7 @@
 							<div class="col-md-4">
 								<select id="watershed" name="watershedId" class="form-control form-control-sm" required>
 								    <option value="">--Select Micro Watershed--</option>
+									<option th:each="mw : ${microWatershedList}" th:value="${mw.mwId}" th:text="${mw.mwName}"></option>
 								</select>
 							</div>
 						</div>
@@ -455,6 +293,7 @@
 							<div class="col-md-4">
 								<select id="village" name="villageId" class="form-control form-control-sm" required>
 								    <option value="">--Select Village--</option>
+									<option th:each="v : ${villageList}" th:value="${v.vcode}" th:text="${v.villageName}"></option>
 								</select>
 							</div>
 						</div>
