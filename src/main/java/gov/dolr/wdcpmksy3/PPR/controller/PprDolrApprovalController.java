@@ -209,6 +209,7 @@ public class PprDolrApprovalController {
 	 @PostMapping("/approvePprReqForAprov")
 	 public String approvePprReqForAprov(HttpSession session, Model model, HttpServletRequest request,
 	    		@RequestParam Integer pprid,
+	    		@RequestParam java.time.LocalDate sanctiondt,
 	    		@RequestParam BigDecimal areap,
 	    		@RequestParam BigDecimal cost,
 	    		@RequestParam BigDecimal central,
@@ -226,7 +227,7 @@ public class PprDolrApprovalController {
 				     }
 					boolean save=false;
 					save=pprTransactionServ.approveSlnaReqFromDolr(pprid, areap, cost, central, state, regid,
-							 userid, CommonFunctions.getClientIpAddr(request));
+							 userid, CommonFunctions.getClientIpAddr(request), sanctiondt);
 					
 					if(save)
 						redirectAttributes.addFlashAttribute( "success", "PPR Request Approved Successfully.");

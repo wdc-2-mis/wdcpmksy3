@@ -1,6 +1,7 @@
 package gov.dolr.wdcpmksy3.PPR.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,7 @@ public class PprTransactionService {
 	}
 	
 	public boolean approveSlnaReqFromDolr(Integer pprId, BigDecimal areap, BigDecimal cost, BigDecimal central,
-			BigDecimal state, Integer regid, String userid, String ip) {
+			BigDecimal state, Integer regid, String userid, String ip, LocalDate sanctiondt) {
 		
 		boolean status=false;
 		
@@ -110,6 +111,7 @@ public class PprTransactionService {
 			MSanction san=new MSanction();
 			
 			san.setPpr(mp);
+			san.setSanctionDate(sanctiondt);
 			san.setAreaProposed(areap);
 			san.setTotCost(cost);
 			san.setCentralShareAmt(central);

@@ -2,6 +2,7 @@ package gov.dolr.wdcpmksy3.PPR.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -16,6 +17,9 @@ public class MSanction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ppr_id", nullable = false)
     private MPpr ppr;
+    
+    @Column(name="sanction_date")
+    private LocalDate sanctionDate;
 
     @Column(name = "area_proposed", precision = 20, scale = 5)
     private BigDecimal areaProposed;
@@ -58,7 +62,15 @@ public class MSanction {
         this.ppr = ppr;
     }
 
-    public BigDecimal getAreaProposed() {
+    public LocalDate getSanctionDate() {
+		return sanctionDate;
+	}
+
+	public void setSanctionDate(LocalDate sanctionDate) {
+		this.sanctionDate = sanctionDate;
+	}
+
+	public BigDecimal getAreaProposed() {
         return areaProposed;
     }
 
