@@ -1,120 +1,657 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 
 <head>
+
 <meta charset="UTF-8">
+
 <title>List of Rejected PPR</title>
 
-<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
 <style>
-	.required{
-	    color:red;
-	}
 
-	body{
-	    background:#f8f9fa;
-	}
+    .required {
+        color: red;
+    }
 
-	.card{
-	    border-radius:0;
-	}
+    body {
+        background: #f8f9fa;
+    }
 
-	.table th,.table td{
-	    vertical-align:middle;
-	    text-align:center;
-	}
+    .card {
+        border-radius: 0;
+    }
 
-	.form-control,
-	.form-select{
-	    border-radius:0;
-	}
+    .table th,
+    .table td {
+        vertical-align: middle;
+        text-align: center;
+    }
 
-	.heading{
-	    font-size:22px;
-	    font-weight:bold;
-	    text-align:center;
-	    margin-bottom:25px;
-	}
+    .form-control,
+    .form-select {
+        border-radius: 0;
+    }
 
-	label{
-	    font-weight:600;
-	}	
+    .heading {
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    label {
+        font-weight: 600;
+    }
+
+    .transaction-error {
+        display: none;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
 </style>
-
-
 
 
 </head>
 
 <body>
 
-
-
-
-
 <div layout:fragment="content">
 
 
-    <div class="card shadow-sm border-0">
+<!-- ========================================================= -->
+<!-- PPR LIST -->
+<!-- ========================================================= -->
 
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">
-               List of Back Forward PPR
-            </h4>
-        </div>
-		
-		<div class="table-responsive mt-4" >
-			
-			<table class="table table-bordered table-striped" style="min-width:1200px;">
+<div class="card shadow-sm border-0">
 
-			           <thead class="table-primary">
-			               <tr>
-			                   <th>S.No.</th>
-			                   <th>District Name</th>
-							   <th>project Name</th>
-			                   <th>Financial Year</th>
-							   <th>Remarks</th>
-							   <th>Action</th>
-			               </tr>
-			           </thead>
-			           <tbody>
+    <div class="card-header bg-primary text-white">
 
-			               <tr th:each="rec, iterStat  : ${records}">
-								<td th:text="${iterStat.count}"></td>
-								<td>
-								    <span th:if="${iterStat.index == 0 or rec.ppr.district.dcode != records[iterStat.index - 1].ppr.district.dcode}"
-								             th:text="${rec.ppr.district.distName}">
-								    </span>
-								</td>
-								<!--<td th:text="${rec.ppr.district.distName}"></td>-->
-								<td th:text="${rec.ppr.projectName}"></td>
-								<td th:text="${rec.ppr.finYear.finYrDesc}"></td>
-								<td th:text="${rec.remarks}"></td>
-							    <td>
-									<a th:href="@{/modifyPprTransaction(tranxId=${rec.ppr.pprId})}"
-									   class="btn btn-primary btn-sm" onclick="return confirm('Do you want to Modify Rejected PPR.');">
-									    Modify PPR
-									</a>
-							   	</td>
-			               </tr>
-			               <tr th:if="${#lists.isEmpty(records)}">
-			                   <td colspan="6" class="text-center text-muted">
-			                       Data Not Found
-			                   </td>
-			               </tr>
-
-			           </tbody>
-
-			       </table>
-		</div>
+        <h4 class="mb-0">
+            List of Back Forward PPR
+        </h4>
 
     </div>
+
+
+    <div class="table-responsive mt-4">
+
+        <table class="table table-bordered table-striped"
+               style="min-width:1200px;">
+
+            <thead class="table-primary">
+
+                <tr>
+
+                    <th>S.No.</th>
+
+                    <th>District Name</th>
+
+                    <th>Project Name</th>
+
+                    <th>Financial Year</th>
+
+                    <th>View Movement</th>
+
+                    <th>Remarks</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                <tr th:each="rec, iterStat : ${records}">
+
+                    <!-- S.No. -->
+
+                    <td th:text="${iterStat.count}">
+                        1
+                    </td>
+
+
+                    <!-- District Name -->
+
+                    <td>
+
+                        <span
+                            th:if="${iterStat.index == 0 or
+                                    rec.ppr.district.dcode !=
+                                    records[iterStat.index - 1].ppr.district.dcode}"
+                            th:text="${rec.ppr.district.distName}">
+                        </span>
+
+                    </td>
+
+
+                    <!-- Project Name -->
+
+                    <td th:text="${rec.ppr.projectName}">
+                    </td>
+
+
+                    <!-- Financial Year -->
+
+                    <td th:text="${rec.ppr.finYear.finYrDesc}">
+                    </td>
+
+
+                    <!-- View Movement -->
+
+                    <td>
+
+						<a href="javascript:void(0);"
+						   class="btn btn-sm btn-info"
+						   th:attr="data-ppr-id=${rec.ppr.pprId}, data-ppr-name=${rec.ppr.projectName}"
+						   onclick="showTransactionHistory(this);">
+						    View
+						</a>
+						
+                    </td>
+
+
+                    <!-- Remarks -->
+
+                    <td th:text="${rec.remarks}">
+                    </td>
+
+
+                    <!-- Action -->
+
+                    <td>
+
+                        <a th:href="@{/modifyPprTransaction(tranxId=${rec.ppr.pprId})}"
+                           class="btn btn-primary btn-sm"
+                           onclick="return confirm('Do you want to Modify Rejected PPR.');">
+
+                            Modify PPR
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- No Records -->
+
+                <tr th:if="${#lists.isEmpty(records)}">
+
+                    <td colspan="7"
+                        class="text-center text-muted">
+
+                        Data Not Found
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- TRANSACTION HISTORY MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal fade"
+     id="transactionModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    PPR Transaction History
+					<span id="transactionPprName"
+					          class="text-primary"></span>
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div id="transactionLoading"
+                     class="text-center"
+                     style="display:none;">
+
+                    <div class="spinner-border"
+                         role="status">
+                    </div>
+
+                    <div class="mt-2">
+                        Loading transaction history...
+                    </div>
+
+                </div>
+
+
+                <div id="transactionNoData"
+                     class="alert alert-warning"
+                     style="display:none;">
+                </div>
+
+
+                <div id="transactionError"
+                     class="alert alert-danger"
+                     style="display:none;">
+                </div>
+
+
+                <div id="transactionTableDiv"
+                     class="table-responsive"
+                     style="display:none;">
+
+
+					   <table class="table table-bordered table-striped"
+					                style="min-width:1200px;">
+
+					      <thead class="table-primary">
+
+                            <tr>
+                                <th>S.No.</th>
+                                <th>Sent From</th>
+                                <th>Sent To</th>
+                                <th>Action</th>
+                                <th>Remarks</th>
+                                <th>Sent On</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="transactionTableBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- JAVASCRIPT - MUST BE INSIDE layout:fragment="content" -->
+<!-- ========================================================= -->
+
+<script>
+
+
+
+	function showTransactionHistory(button) {
+
+	    const pprId = button.getAttribute("data-ppr-id");
+		const pprName = button.getAttribute("data-ppr-name");
+
+	    console.log("PPR ID =", pprId);
+
+	    const modalElement =
+	        document.getElementById("transactionModal");
+
+	    const loading =
+	        document.getElementById("transactionLoading");
+
+	    const noData =
+	        document.getElementById("transactionNoData");
+
+	    const errorDiv =
+	        document.getElementById("transactionError");
+
+	    const tableDiv =
+	        document.getElementById("transactionTableDiv");
+
+	    const tbody =
+	        document.getElementById("transactionTableBody");
+
+	    const pprIdDiv =
+	        document.getElementById("transactionPprId");
+
+
+	    if (!pprId) {
+	        alert("PPR ID not found.");
+	        return;
+	    }
+
+
+	    // Clear previous data
+
+	    tbody.innerHTML = "";
+
+	    loading.style.display = "block";
+	    noData.style.display = "none";
+	    errorDiv.style.display = "none";
+	    tableDiv.style.display = "none";
+
+
+	    if (pprIdDiv) {
+	        pprIdDiv.innerText = pprId;
+	    }
+		const pprNameDiv = document.getElementById("transactionPprName");
+
+		if (pprNameDiv) {
+		    pprNameDiv.innerText = pprName;
+		}
+
+	    // Show modal
+
+	    const modal =
+	        bootstrap.Modal.getOrCreateInstance(modalElement);
+
+	    modal.show();
+
+
+		const url =
+		    "[[@{/getPprTransaction}]]?pprId="
+		    + encodeURIComponent(pprId);
+
+
+	    console.log("Calling:", url);
+
+
+	    fetch(url, {
+	        method: "GET",
+	        headers: {
+	            "Accept": "application/json"
+	        }
+	    })
+
+	    .then(function(response) {
+
+	        return response.text().then(function(text) {
+
+	            console.log("HTTP STATUS:", response.status);
+
+	            console.log("SERVER RESPONSE:", text);
+
+
+	            if (!response.ok) {
+
+	                let message = text;
+
+	                try {
+
+	                    const errorJson =
+	                        JSON.parse(text);
+
+	                    if (errorJson.message) {
+	                        message = errorJson.message;
+	                    }
+
+	                } catch (e) {
+	                    // Response is not JSON
+	                }
+
+	                throw new Error(message);
+	            }
+
+
+	            // Empty response
+
+	            if (!text || text.trim() === "") {
+	                return [];
+	            }
+
+
+	            // Parse JSON
+
+	            try {
+
+	                return JSON.parse(text);
+
+	            } catch (e) {
+
+	                console.error(
+	                    "Invalid JSON returned by server:",
+	                    text
+	                );
+
+	                throw new Error(
+	                    "Server did not return valid JSON."
+	                );
+	            }
+
+	        });
+
+	    })
+
+
+	    .then(function(data) {
+
+	        console.log("Transaction data:", data);
+
+	        loading.style.display = "none";
+
+
+	        if (!Array.isArray(data) || data.length === 0) {
+
+	            noData.style.display = "block";
+
+	            noData.innerText =
+	                "No transaction history found.";
+
+	            return;
+	        }
+
+
+	        tbody.innerHTML = "";
+
+
+	        data.forEach(function(transaction, index) {
+
+	            const tr =
+	                document.createElement("tr");
+
+
+	            // S.No.
+
+	            const tdSr =
+	                document.createElement("td");
+
+	            tdSr.innerText =
+	                index + 1;
+
+	            tr.appendChild(tdSr);
+
+
+	            // Sent From
+
+	            const tdFrom =
+	                document.createElement("td");
+
+	            tdFrom.innerText =
+	                safeValue(transaction.sentFrom);
+
+	            tr.appendChild(tdFrom);
+
+
+	            // Sent To
+
+	            const tdTo =
+	                document.createElement("td");
+
+	            tdTo.innerText =
+	                safeValue(transaction.sentTo);
+
+	            tr.appendChild(tdTo);
+
+
+	            // Action
+
+	            const tdAction =
+	                document.createElement("td");
+
+	            tdAction.innerText =
+	                getActionText(transaction.action);
+
+	            tr.appendChild(tdAction);
+
+
+	            // Remarks
+
+	            const tdRemarks =
+	                document.createElement("td");
+
+	            tdRemarks.innerText =
+	                safeValue(transaction.remarks);
+
+	            tr.appendChild(tdRemarks);
+
+
+	            // Sent On
+
+	            const tdSentOn =
+	                document.createElement("td");
+
+	            tdSentOn.innerText =
+	                formatDateTime(transaction.senton);
+
+	            tr.appendChild(tdSentOn);
+
+
+	            tbody.appendChild(tr);
+
+	        });
+
+
+	        tableDiv.style.display = "block";
+
+	    })
+
+
+	    .catch(function(error) {
+
+	        console.error(
+	            "Transaction History Error:",
+	            error
+	        );
+
+	        loading.style.display = "none";
+
+	        tableDiv.style.display = "none";
+
+	        noData.style.display = "none";
+
+	        errorDiv.style.display = "block";
+
+	        errorDiv.innerText =
+	            "Unable to load transaction history.\n\n"
+	            + error.message;
+
+	    });
+
+	}
+
+
+
+	function safeValue(value) {
+
+	    if (
+	        value === null ||
+	        value === undefined ||
+	        value === ""
+	    ) {
+	        return "-";
+	    }
+
+	    return value;
+
+	}
+
+
+
+	function getActionText(action) {
+
+	    if (
+	        action === null ||
+	        action === undefined ||
+	        action === ""
+	    ) {
+	        return "-";
+	    }
+
+
+	    switch (action.toString()) {
+
+	        case "F":
+	            return "Forwarded";
+
+	        case "R":
+	            return "Reject";
+
+	        case "A":
+	            return "Approved";
+
+	        case "B":
+	            return "Back Forwarded";
+
+	        default:
+	            return action.toString();
+	    }
+
+	}
+
+
+
+	function formatDateTime(value) {
+
+	    if (!value) {
+	        return "-";
+	    }
+
+
+	    const date =
+	        new Date(value);
+
+
+	    if (isNaN(date.getTime())) {
+	        return value;
+	    }
+
+
+	    return date.toLocaleString("en-IN", {
+
+	        day: "2-digit",
+	        month: "2-digit",
+	        year: "numeric",
+
+	        hour: "2-digit",
+	        minute: "2-digit"
+
+	    });
+
+	}
+
 	
-			
+
+</script>
 
 </div>
 
 </body>
+
 </html>

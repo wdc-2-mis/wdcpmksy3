@@ -32,4 +32,8 @@ public interface PprTransactionRepository extends JpaRepository<PprTransaction, 
     @Query("select t from PprTransaction t where t.ppr.district.state.stCode= case when 0 = :stCode then t.ppr.district.state.stCode else :stCode end "
     		+ "and t.senton =(select max(t2.senton) from PprTransaction t2  where t2.ppr.pprId = t.ppr.pprId) order by t.senton desc")
     List<PprTransaction> findPprTransactionByStCode(Integer stCode);
+    
+    List<PprTransaction> findByPprPprIdOrderBySentonDesc(Integer pprId);
+    
+    
 }
