@@ -23,6 +23,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.PPRSoilErosionRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprLivelihoodRepository;
 import gov.dolr.wdcpmksy3.PPR.service.LivelihoodActivityServices;
 import gov.dolr.wdcpmksy3.PPR.service.LivelihoodInterventionServices;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.entity.MBlock;
 import gov.dolr.wdcpmksy3.repository.MBlockRepository;
@@ -51,6 +52,10 @@ public class LivelihoodSummaryController {
 	@Autowired
     private PPRSoilErosionRepository soil;
 	
+
+	@Autowired
+	private PprAreaCoverService pprAreaService;
+	
 	@GetMapping("/livelihoodSummaryPPR13")
     public String livelihoodSummaryPPR13(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -70,10 +75,10 @@ public class LivelihoodSummaryController {
         model.addAttribute("LivelihoodActList", laser.getAllLivelihoodActivity());
         model.addAttribute("LivelihoodInvList", liser.getAllLivelihoodIntervention());
         boolean exists=false;
-        exists=soil.existsByStCodeAndStatusC(stcode);
+        exists=pprAreaService.isPprCompleted(stcode);
         model.addAttribute("existssl", exists);
 		if (!exists) {
-	        model.addAttribute( "error1", "Please complete the PPR Soil Erosion Details.");
+	        model.addAttribute( "error1", "Please complete the Preliminary Project Report");
 	    }
         
         return "ppr/livelihoodSummary";

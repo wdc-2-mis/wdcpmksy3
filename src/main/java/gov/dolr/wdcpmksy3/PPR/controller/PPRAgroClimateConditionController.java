@@ -27,6 +27,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.PPR.service.CropTypeServices;
 import gov.dolr.wdcpmksy3.PPR.service.MPprService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRAgroClimateConditionServices;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.PPR.service.SoilTypeServices;
 import gov.dolr.wdcpmksy3.PPR.service.VillageService;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
@@ -66,6 +67,9 @@ public class PPRAgroClimateConditionController {
     @Autowired
     private PPRLandPatternAreaRepository landrep;
     
+    @Autowired
+	private PprAreaCoverService pprAreaService;
+    
 	@GetMapping("/agroClimateConditionPPR10")
     public String agroClimateConditionPPR10(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -98,11 +102,12 @@ public class PPRAgroClimateConditionController {
             previousId = currentId;
         }
         boolean exists=false;
-        exists=landrep.existsByPprId_InstitutionalStructure_StCodeAndStatus(stcode, 'C');
+        exists=pprAreaService.isPprCompleted(stcode);
         model.addAttribute("existssl", exists);
 		if (!exists) {
-	        model.addAttribute( "error1", "Please complete the PPR Land Pattern Area.");
+	        model.addAttribute( "error1", "Please complete the Preliminary Project Report");
 	    }
+		
         model.addAttribute("agroClimateList", finalList);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("villageList", villrepo.getVillagesByState(stcode));

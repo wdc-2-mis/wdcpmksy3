@@ -16,6 +16,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprLivelihood;
 import gov.dolr.wdcpmksy3.PPR.repository.PprLivelihoodRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWaterOutcomeRepository;
 import gov.dolr.wdcpmksy3.PPR.service.DrinkingWaterServices;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.repository.MWaterQualityRepository;
 import gov.dolr.wdcpmksy3.repository.PprDrinkingWaterRepository;
@@ -41,6 +42,9 @@ public class DrinkingWaterController {
 	@Autowired
     private PprWaterOutcomeRepository repository;
 	
+	@Autowired
+	private PprAreaCoverService pprAreaService;
+	
 	@GetMapping("/drinkingWaterStatus")
     public String drinkingWaterStatus(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -55,13 +59,12 @@ public class DrinkingWaterController {
         	serv.changeStatusByPprId(pprid);
         }
         
-		/*
-		 * boolean exists=false;
-		 * exists=repository.existsByPpr_InstitutionalStructure_StCodeAndStatus(stcode,
-		 * "C"); model.addAttribute("existssl", exists); if (!exists) {
-		 * model.addAttribute( "error1",
-		 * "Please complete the Average ground water table depth in Project Area"); }
-		 */
+        boolean exists=false;
+        exists=pprAreaService.isPprCompleted(stcode);
+        model.addAttribute("existssl", exists);
+		if (!exists) {
+	        model.addAttribute( "error1", "Please complete the Preliminary Project Report");
+	    }
         
         List<MWaterQuality> waterQualityList =wtrqua.findAll();
         model.addAttribute("waterQualityList", waterQualityList);
