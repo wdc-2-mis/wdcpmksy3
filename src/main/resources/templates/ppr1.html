@@ -374,6 +374,136 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+let mouBlobUrl = null;
+
+function clearMouFrame() {
+
+    const frame = document.getElementById("mouFrame");
+
+    frame.removeAttribute("src");
+    frame.classList.add("d-none");
+
+    if (mouBlobUrl) {
+        URL.revokeObjectURL(mouBlobUrl);
+        mouBlobUrl = null;
+    }
+}
+
+function openMouPdf(id, type) {
+
+    const frame = document.getElementById("mouFrame");
+    const msg = document.getElementById("mouMsg");
+    const dl = document.getElementById("mouDownload");
+
+    // Clear previous PDF
+    clearMouFrame();
+
+    // Show loading message
+    msg.textContent = "Loading PDF...";
+    msg.classList.remove("d-none");
+
+    // Build URL according to controller
+    const pdfUrl =
+        "/viewPdfInstitutionalStructure"
+        + "?id=" + encodeURIComponent(id)
+        + "&type=" + encodeURIComponent(type);
+
+    // Download URL
+    const downloadUrl =
+        "/viewPdfInstitutionalStructure"
+        + "?id=" + encodeURIComponent(id)
+        + "&type=" + encodeURIComponent(type)
+        + "&download=true";
+
+    // Set download link
+    dl.href = downloadUrl;
+
+    // Open modal
+    bootstrap.Modal
+        .getOrCreateInstance(document.getElementById("mouModal"))
+        .show();
+
+    // Fetch PDF
+    fetch(pdfUrl)
+        .then(function (response) {
+
+            if (!response.ok) {
+                throw new Error("HTTP " + response.status);
+            }
+
+            return response.blob();
+        })
+        .then(function (blob) {
+
+            // Check that response is actually PDF
+            if (blob.type !== "application/pdf") {
+                throw new Error("Response is not a PDF");
+            }
+
+            // Create temporary blob URL
+            mouBlobUrl = URL.createObjectURL(blob);
+
+            // Display PDF
+            frame.src = mouBlobUrl;
+            frame.classList.remove("d-none");
+
+            // Hide loading message
+            msg.classList.add("d-none");
+        })
+        .catch(function (error) {
+
+            console.error("PDF loading error:", error);
+
+            frame.classList.add("d-none");
+
+            msg.textContent = "Unable to load the PDF.";
+            msg.classList.remove("d-none");
+        });
+}
+
+
+// Handle Notification / MoU View buttons
+document.addEventListener("click", function (e) {
+
+    const link = e.target.closest(".viewMouBtn");
+
+    if (!link) {
+        return;
+    }
+
+    e.preventDefault();
+
+    const id = link.getAttribute("data-id");
+    const type = link.getAttribute("data-type");
+
+    console.log("PDF ID:", id);
+    console.log("PDF Type:", type);
+
+    if (!id || !type) {
+        console.error("Missing PDF id or type");
+        return;
+    }
+
+    openMouPdf(id, type);
+});
+
+
+// Clear PDF when modal is closed
+document.addEventListener("DOMContentLoaded", function () {
+
+    const modal = document.getElementById("mouModal");
+
+    if (modal) {
+
+        modal.addEventListener(
+            "hidden.bs.modal",
+            function () {
+                clearMouFrame();
+            }
+        );
+    }
+});
+
 </script>
 
 </head>
@@ -386,6 +516,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <div layout:fragment="content">
 
+			<!-- ===================== View file Modal ====================== -->
+	<div class="modal fade" id="mouModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered">
+			<div class="modal-content">
+
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title">PDF Document</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+				</div>
+
+				<div class="modal-body p-0" style="height:75vh;">
+					<div id="mouMsg" class="text-center p-4">Loading PDF...</div>
+					<iframe id="mouFrame" class="d-none" style="width:100%;height:100%;border:0;"></iframe>
+				</div>
+
+				<div class="modal-footer">
+					<a id="mouDownload" href="#" class="btn btn-success">
+						<i class="fas fa-download"></i> Download
+					</a>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
 
     <div class="card shadow-sm border-0">
 
@@ -542,24 +697,33 @@ document.addEventListener("DOMContentLoaded", function () {
 									
 		                            <td th:text="${user[3]}"></td>
 									<td th:text="${user[4]}"></td>
-									<td>
-										<!--<a th:href="@{/viewPdf(path=${user[5]})}" target="_blank">
+								<!--	<td>
+										<a th:href="@{/viewPdf(path=${user[5]})}" target="_blank">
 										        View Uploaded
-										</a>-->
+										</a>
+										
 										
 										<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]},type='notification')}" target="_blank">
 										    View Uploaded
 										</a>
 										
+									</td> -->
+									
+									<td>
+										<a href="#" class="viewMouBtn" th:attr="data-id=${user[0]}, data-type='notification'">View </a>
 									</td>
 
 									<td th:text="${user[6]}"></td>
-
+									
 									<td>
-										<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]},type='mou')}" target="_blank">
+										<a href="#" class="viewMouBtn" th:attr="data-id=${user[0]}, data-type='mou'">View </a>
+									</td>
+
+									<!--<td>
+										<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]}, type='mou')}" target="_blank">
 												View Uploaded
 										</a>
-									</td>
+									</td>-->
 									
 									<td>
 										<!--<a th:if="${user[8].toString().equals('D')}" title="Delete"

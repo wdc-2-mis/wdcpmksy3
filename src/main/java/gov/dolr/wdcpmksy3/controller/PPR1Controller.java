@@ -16,8 +16,10 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+
 import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -215,7 +217,7 @@ public class PPR1Controller {
     				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(resource);
     }
     
-    @GetMapping("/viewPdfInstitutionalStructure")
+    @GetMapping("/viewPdfInstitutionalStructure1")
     public ResponseEntity<Resource> viewPdf(@RequestParam Long id,
                         @RequestParam String type) throws IOException {
 
@@ -1024,6 +1026,120 @@ public class PPR1Controller {
 		}
 
         return "redirect:/wcdcFunctionariesPPR4B";	
+    }
+    
+    @GetMapping("/viewPdfInstitutionalStructure")
+    public ResponseEntity<Resource> viewPdfInstitutionalStructure(
+            @RequestParam Integer id,
+            @RequestParam String type,
+            @RequestParam(required = false, defaultValue = "false") boolean download) {
+
+        InstitutionalStructure data =
+        		repository.findById(id.longValue())
+                        .orElseThrow(() ->
+                                new RuntimeException("Record not found"));
+
+        String filePath;
+
+        if ("notification".equalsIgnoreCase(type)) {
+
+            filePath = data.getNotificationFile();
+
+        } else if ("mou".equalsIgnoreCase(type)) {
+
+            filePath = data.getMouFile();
+
+        } else {
+
+            throw new RuntimeException("Invalid PDF type");
+        }
+
+        Path path = Paths.get(filePath);
+
+        if (!Files.exists(path)) {
+
+            throw new RuntimeException("PDF file not found");
+        }
+
+        Resource resource = new FileSystemResource(path);
+
+        String disposition =
+                download ? "attachment" : "inline";
+     // local
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + path.getFileName() + "\"")
+                .body(resource);
+        
+        
+        // server
+       // return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
+        //        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=/"" + path.getFileName() + "/"").body(resource);
+    }
+    
+    @GetMapping("/viewPdfInstitutionalStructure3")
+    public ResponseEntity<Resource> viewPdfInstitutionalStructure3(
+            @RequestParam Integer id,
+            @RequestParam String type,
+            @RequestParam(required = false, defaultValue = "false") boolean download) {
+
+        InstitutionalStructure data =
+                repository.findById(id.longValue())
+                        .orElseThrow(() ->
+                                new RuntimeException("Record not found"));
+
+        String filePath;
+
+        if ("notification".equalsIgnoreCase(type)) {
+
+            filePath = data.getNotificationFile();
+
+        } else if ("mou".equalsIgnoreCase(type)) {
+
+            filePath = data.getMouFile();
+
+        } else {
+
+            throw new RuntimeException("Invalid PDF type");
+        }
+
+        if (filePath == null || filePath.trim().isEmpty()) {
+            throw new RuntimeException("PDF path is empty");
+        }
+
+        Path path = Paths.get(filePath);
+
+        if (!Files.exists(path) || !Files.isRegularFile(path)) {
+
+            throw new RuntimeException(
+                    "PDF file not found: " + filePath
+            );
+        }
+
+        Resource resource =
+                new FileSystemResource(path);
+
+        String disposition =
+                download ? "attachment" : "inline";
+
+        try {
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .contentLength(resource.contentLength())
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            disposition
+                                    + "; filename=\""
+                                    + path.getFileName()
+                                    + "\""
+                    )
+                    .body(resource);
+
+        } 
+        catch (IOException e) {
+
+            throw new RuntimeException("Unable to read PDF file", e );
+        }
     }
 
 }
