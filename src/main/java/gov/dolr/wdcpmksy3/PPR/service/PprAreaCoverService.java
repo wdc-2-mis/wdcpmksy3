@@ -426,5 +426,12 @@ public class PprAreaCoverService {
 	            .orElse(null);
 	}
 
+
+	public boolean isPprCompleted(Integer stcode) {
+
+	    return pprRepo
+	            .existsByDistrict_State_StCodeAndStatus(stcode, "C");
+	}
+
 	
 }

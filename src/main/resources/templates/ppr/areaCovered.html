@@ -232,11 +232,13 @@
                 </div>	
 				
 				<div class="text-center mt-4">
-								<button type="submit" name="action"  value="D"  class="btn btn-warning">
+								<button type="submit" name="action"  value="D"  class="btn btn-warning" th:disabled="${!pprCompleted}">
 								      <i class="fas fa-save"></i>
 								      Save as Draft
 								</button>
 							</div>
+							
+							
 							
 							<div class="text-end mt-2"
      id="nextBtnContainer"

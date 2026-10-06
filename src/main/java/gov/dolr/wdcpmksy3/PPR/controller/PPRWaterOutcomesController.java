@@ -110,9 +110,15 @@ public class PPRWaterOutcomesController {
 	        map.put("id", o.getPprWaterOutcomeId());
 	        map.put("district", o.getPpr().getDistrict().getDistName());
 	        map.put("project", o.getPpr().getProjectName());
-	        map.put("watershed", o.getMicroWatershed().getMwName());
-	        map.put("village", o.getVillage().getVillageName());
-	        map.put("sourceId", o.getWaterSource().getWaterSourceId());
+	        map.put("watershed", 
+	        	    o.getMicroWatershed() != null ? o.getMicroWatershed().getMwName() : "");
+
+	        	map.put("village", 
+	        	    o.getVillage() != null ? o.getVillage().getVillageName() : "");
+
+	        	map.put("sourceId", 
+	        	    o.getWaterSource() != null ? String.valueOf(o.getWaterSource().getWaterSourceId()) : "");
+
 	        map.put("source", o.getWaterSource().getSourceName());
 	        map.put("preProject", o.getPreProjectLevel());
 	        map.put("postProject", o.getPostProjectLevel());

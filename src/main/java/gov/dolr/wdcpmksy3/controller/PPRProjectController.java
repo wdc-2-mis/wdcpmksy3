@@ -71,7 +71,7 @@ public class PPRProjectController {
 	    if (!institutionalStructureCompleted) {
 	        model.addAttribute(
 	            "error",
-	            "Please complete the Institutional Structure before entering Preliminary Project Report (PPR1) details."
+	            "Please complete the Institutional Structure before entering Preliminary Project Report details."
 	        );
 	    }
 

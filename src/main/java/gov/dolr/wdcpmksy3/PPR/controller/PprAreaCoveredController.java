@@ -36,8 +36,12 @@ public class PprAreaCoveredController {
 	private PprAreaCoverService pprAreaService;
 	
 	@GetMapping({"/areaCoveredUnderWP", "/areaCoveredUnderWP/{dcode}/{proj_id}"})
-	public String areaCoveredUnderWP(HttpSession session, Model model, @PathVariable(required = false) Integer dcode, @PathVariable(name = "proj_id", required = false) Integer projId,
-	 @RequestParam(required = false) Integer pprid) {
+	public String areaCoveredUnderWP(
+	        HttpSession session,
+	        Model model,
+	        @PathVariable(required = false) Integer dcode,
+	        @PathVariable(name = "proj_id", required = false) Integer projId,
+	        @RequestParam(required = false) Integer pprid) {
 
 	    Object userid = session.getAttribute("userid");
 
@@ -45,21 +49,39 @@ public class PprAreaCoveredController {
 	        return "redirect:/login";
 	    }
 
-	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+	    Integer stcode =
+	            Integer.parseInt(session.getAttribute("stcode").toString());
 
 	    Integer selectedPprId = projId != null
 	            ? projId
 	            : pprid;
 
+   boolean pprCompleted =
+	            pprAreaService.isPprCompleted(stcode);
+   
+   model.addAttribute("pprCompleted",
+		   pprCompleted);
 
-	    if (selectedPprId != null) {
-	        pprAreaService.changeStatusByPprId(selectedPprId);
+	    if (!pprCompleted) {
+
+	        model.addAttribute(
+	                "error",
+	                "Please complete the Preliminary Project Report First before entering Area covered under the watershed programme."
+	        );
+
+	    } else {
+
+	        if (selectedPprId != null) {
+	            pprAreaService.changeStatusByPprId(selectedPprId);
+	        }
 	    }
+
 
 	    model.addAttribute(
 	            "distList",
 	            districtService.getPPRDistrictsByState(stcode)
 	    );
+
 
 	    model.addAttribute(
 	            "schemeList",
@@ -67,6 +89,7 @@ public class PprAreaCoveredController {
 	                    .stream()
 	                    .limit(6)
 	    );
+
 
 	    List<CoveredAreaDTO> records =
 	            pprAreaService.getSchemeAreasByState(stcode);
@@ -78,6 +101,9 @@ public class PprAreaCoveredController {
 	    model.addAttribute("selectedDcode", dcode);
 
 	    model.addAttribute("selectedPprId", selectedPprId);
+
+	    // Useful for Thymeleaf
+	    model.addAttribute("pprCompleted", pprCompleted);
 
 
 	    return "ppr/areaCovered";
