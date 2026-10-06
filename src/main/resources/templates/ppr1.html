@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	    return true;
 	}
 
-	    function validateSameFile(changedInput, otherInput) {
+	    function validateSameFile1(changedInput, otherInput) {
 
 	        if (changedInput.files.length === 0 || otherInput.files.length === 0)
 	            return;
@@ -264,6 +264,45 @@ document.addEventListener("DOMContentLoaded", function () {
 	            changedInput.value = "";
 	        }
 	    }
+		
+		function validateSameFile(changedInput, otherInput) {
+
+		    // Clear previous messages
+		    document.getElementById("notificationFileError").style.display = "none";
+		    document.getElementById("notificationFileError").innerText = "";
+
+		    document.getElementById("mouFileError").style.display = "none";
+		    document.getElementById("mouFileError").innerText = "";
+
+		    if (changedInput.files.length === 0 || otherInput.files.length === 0) {
+		        return;
+		    }
+
+		    const file1 = changedInput.files[0];
+		    const file2 = otherInput.files[0];
+
+		    if (
+		        file1.name.toLowerCase() === file2.name.toLowerCase() &&
+		        file1.size === file2.size
+		    ) {
+
+		        const errorDiv =
+		            changedInput.id === "notificationFile"
+		                ? document.getElementById("notificationFileError")
+		                : document.getElementById("mouFileError");
+
+		        errorDiv.innerText =
+		            "Notification PDF and MoU PDF cannot be the same file.";
+
+		        errorDiv.style.display = "block";
+
+		        // Remove selected file
+		        changedInput.value = "";
+
+		        // Focus the field
+		        changedInput.focus();
+		    }
+		}
 
 	    notificationFile.addEventListener("change", function () {
 	        if (validatePDF(this)) {
@@ -542,7 +581,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			<div class="modal-content">
 
 				<div class="modal-header bg-primary text-white">
-					<h5 class="modal-title">PDF Document</h5>
+					<h5 class="modal-title">View Document</h5>
 					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 				</div>
 
@@ -816,14 +855,14 @@ document.addEventListener("DOMContentLoaded", function () {
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> Type of SLNA </b>
+														<b> Type of SLNA </b><span class="required">*</span>
 													</label>
 													<input type="text" class="form-control" name="slnaType1" id="slnaType1" placeholder="Enter Type of SLNA" required>
 													<div class="invalid-feedback">Please enter type of SLNA</div>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> Date of Notification </b>
+														<b> Date of Notification </b><span class="required">*</span>
 													</label>
 													<input type="date" class="form-control" name="notificationDate1" id="notificationDate1" min="2026-01-01" onkeydown="return false;" required>
 													<div class="invalid-feedback">Please select Date of Notification</div>
@@ -840,7 +879,7 @@ document.addEventListener("DOMContentLoaded", function () {
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
-														<b> Date of MoU with DoLR </b> 
+														<b> Date of MoU with DoLR </b> <span class="required">*</span>
 													</label>
 													<input type="date" class="form-control" name="mouDate1" id="mouDate1" min="2026-01-01"  onkeydown="return false;" required>
 													<div class="invalid-feedback">Please select Date of MoU with DoLR</div>
