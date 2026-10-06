@@ -190,6 +190,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function validatePDF(input) {
 
+	    const errorDiv = document.getElementById(input.id + "Error");
+
+	    // Clear previous error
+	    errorDiv.textContent = "";
+
+	    // No file selected
 	    if (input.files.length === 0) {
 	        return true;
 	    }
@@ -197,31 +203,45 @@ document.addEventListener("DOMContentLoaded", function () {
 	    const file = input.files[0];
 	    const fileName = file.name;
 
-	    // Check file name - special symbols are not allowed
-	    // Allowed: A-Z, a-z, 0-9, underscore (_), hyphen (-), and .pdf
+	    // File name validation
+	    // Allowed: letters, numbers, underscore, hyphen and .pdf
 	    const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
 
 	    if (!fileNamePattern.test(fileName)) {
-	        alert("File name should contain only letters, numbers, underscore (_) or hyphen (-).");
+
+	        errorDiv.textContent =
+	            "File name should contain only letters, numbers, underscore (_) or hyphen (-).";
+
 	        input.value = "";
+	        input.focus();
+
 	        return false;
 	    }
 
-	    // Check PDF type
+	    // PDF validation
 	    if (file.type !== "application/pdf" &&
 	        !fileName.toLowerCase().endsWith(".pdf")) {
 
-	        alert("Only PDF files are allowed.");
+	        errorDiv.textContent =
+	            "Only PDF files are allowed.";
+
 	        input.value = "";
+	        input.focus();
+
 	        return false;
 	    }
 
-	    // Check file size - maximum 5 MB
+	    // Maximum 5 MB
 	    const maxSize = 5 * 1024 * 1024;
 
 	    if (file.size > maxSize) {
-	        alert("PDF file size must not be more than 5 MB.");
+
+	        errorDiv.textContent =
+	            "PDF file size must not be more than 5 MB.";
+
 	        input.value = "";
+	        input.focus();
+
 	        return false;
 	    }
 
@@ -698,10 +718,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		                            <td th:text="${user[3]}"></td>
 									<td th:text="${user[4]}"></td>
 								<!--	<td>
-										<a th:href="@{/viewPdf(path=${user[5]})}" target="_blank">
-										        View Uploaded
-										</a>
-										
 										
 										<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]},type='notification')}" target="_blank">
 										    View Uploaded
@@ -818,7 +834,9 @@ document.addEventListener("DOMContentLoaded", function () {
 													</label>
 													<input type="file" id="notificationFile1" name="notificationFile1" class="form-control"
 														accept=".pdf,application/pdf" required>
-													<small class="form-text text-muted">Only PDF file is allowed.</small>
+														<div class="invalid-feedback">Please select a notification PDF within 5 MB. </div>
+														<small class="form-text text-muted">Only PDF file is allowed.</small>
+														<div id="notificationFile1Error" class="text-danger mt-1"></div>
 												</div>
 												<div class="col-md-6">
 													<label class="form-label">
@@ -833,6 +851,9 @@ document.addEventListener("DOMContentLoaded", function () {
 													</label>
 													<input type="file" id="mouFile1" name="mouFile1" class="form-control" accept=".pdf,application/pdf" required>
 													<small class="form-text text-muted">Only PDF file is allowed.</small>
+													<div class="invalid-feedback">Please select a MoU PDF within 5 MB. </div>	
+													<div id="mouFile1Error" class="text-danger mt-1"></div>		   
+														
 												</div>
 											
 											</div>
