@@ -1,28 +1,31 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}">
 
 <head>
 	<meta charset="UTF-8">
-	<title>Preliminary Project Report (PPR15)</title>
+	<title>Migration Details</title>
 
 	<style>
-		.required {
-			color: red;
-		}
+	.required {
+		color: red;
+	}
 
-		.table th {
-			text-align: center;
-			vertical-align: middle;
-		}
-
-		.table td {
-			vertical-align: middle;
-		}
-
-		.form-label {
-			font-weight: 600;
-		}
+	.validation-error {
+		color: red;
+		font-size: 14px;
+		margin-top: 4px;
+	}
+				
+	.is-invalid {
+		border-color: #dc3545 !important;
+	}
+	.field-error {
+		color: red;
+		font-size: 14px;
+		margin-top: 4px;
+	}
 	</style>
 
 
@@ -48,162 +51,188 @@
 					window.location.href = "/preliminaryPPR15";
 				}
 			});
+			
+			function showFieldError(field, message) {
+				field.classList.add("is-invalid");
 
-			document.getElementById("ppr15Form").addEventListener("submit", function (event) {
+				let errorDiv = field.parentElement.querySelector(".field-error");
+
+				if (!errorDiv) {
+					errorDiv = document.createElement("div");
+					errorDiv.className = "field-error";
+					field.parentElement.appendChild(errorDiv);
+				}
+
+				errorDiv.textContent = message;
+			}
+
+			function clearFieldError(field) {
+				field.classList.remove("is-invalid");
+
+				const errorDiv = field.parentElement.querySelector(".field-error");
+
+				if (errorDiv) {
+					errorDiv.textContent = "";
+				}
+			}
+
+			function clearFormErrors(form) {
+				form.querySelectorAll(".is-invalid").forEach(function(field) {
+					field.classList.remove("is-invalid");
+				});
+
+				form.querySelectorAll(".field-error").forEach(function(error) {
+					error.textContent = "";
+				});
+			}
+
+			function validateRequiredField(field, message) {
+				if (!field.value || field.value.trim() === "") {
+					showFieldError(field, message);
+					field.focus();
+					return false;
+				}
+
+				clearFieldError(field);
+				return true;
+			}
+			function validateDaysMigrating(field) {
+				const value = field.value.trim();
+				if (value === "") {
+					showFieldError(field, "Please enter No. of days per year Migrating.");
+					field.focus();
+					return false;
+				}
+				const days = parseInt(value, 10);
+				if (days < 1 || days > 365) {
+					showFieldError(field, "No. of days per year Migrating cannot be more than 365.");
+					field.focus();
+					field.value="";
+					return false;
+				}
+				clearFieldError(field);
+				return true;
+			}
+
+			document.getElementById("ppr15Form").addEventListener("submit", function(event) {
 				event.preventDefault();
-				// ========= Dropdown Validation =========
-				if (document.getElementById("district").value === "") {
-					alert("Please select District");
-					document.getElementById("district").focus();
-					return;
-				}
-				if (document.getElementById("project").value === "") {
-					alert("Please select Project");
-					document.getElementById("project").focus();
-					return;
-				}
-				if (document.getElementById("watershed").value === "") {
-					alert("Please select Watershed");
-					document.getElementById("watershed").focus();
-					return;
-				}
-				if (document.getElementById("village").value === "") {
-					alert("Please select Village");
-					document.getElementById("village").focus();
-					return;
-				}
 				const form = this;
-				const pprId = document.getElementById("project").value;
-				fetch(form.getAttribute("action"), {
-					method: "POST",
-					body: new FormData(form)
-				})
-					.then(async response => {
-						const responseText = await response.text();
-						console.log("STATUS:", response.status);
-						console.log("URL:", response.url);
-						console.log("RESPONSE:", responseText);
-						if (!response.ok) {
-							throw new Error(
-								"Server returned status " + response.status
-							);
-						}
-						return responseText;
-					})
-					.then(() => {
-						console.log("Draft saved successfully");
-						/*
-						 * Reload the draft table.
-						 * This will show both old records and the newly saved record.
-						 */
-						//loadDraftsPPR15(pprId);
-						/*
-						 * Clear only the input fields.
-						 * Do not clear the table.
-						 */
-						document.getElementById("peopleMigrating").value = "";
-						document.getElementById("daysMigrating").value = "";
-						document.getElementById("migrationReason").value = "";
-						document.getElementById("expectedReduction").value = "";
-					})
-					.catch(error => {
-						console.error("SAVE ERROR:", error);
-						alert("Error while saving draft.");
-					});
+				clearFormErrors(form);
+				const district = document.getElementById("district");
+				const project = document.getElementById("project");
+				const watershed = document.getElementById("watershed");
+				const village = document.getElementById("village");
+				const peopleMigrating = document.getElementById("peopleMigrating");
+				const daysMigrating = document.getElementById("daysMigrating");
+				const migrationReason = document.getElementById("migrationReason");
+				const expectedReduction = document.getElementById("expectedReduction");
+				// 1. District
+				if (!validateRequiredField(district, "Please select District.")) {
+					return;
+				}
+				// 2. Project
+				if (!validateRequiredField(project, "Please select Project.")) {
+					return;
+				}
+				// 3. Micro Watershed
+				if (!validateRequiredField(watershed, "Please select Micro Watershed.")) {
+					return;
+				}
+				// 4. Village
+				if (!validateRequiredField(village, "Please select Village.")) {
+					return;
+				}
+				// 5. No. of People Migrating
+				if (!validateRequiredField(peopleMigrating, "Please enter No. of People Migrating.")) {
+					return;
+				}
+				// 6. No. of days per year Migrating
+				if (!validateDaysMigrating(daysMigrating)) {
+					return;
+				}
+				// 7. Major reason(s) for Migration
+				if (!validateRequiredField(migrationReason, "Please enter Major reason(s) for Migration.")) {
+					return;
+				}
+				// 8. Expected reduction
+				if (!validateRequiredField(expectedReduction, "Please enter Expected reduction.")) {
+					return;
+				}
+				// All validation passed
+				form.submit();
 			});
+			
+			document.getElementById("editPpr15Form").addEventListener("submit", function(event) {
+				event.preventDefault();
+				const form = this;
+				clearFormErrors(form);
+				const peopleMigrating = document.getElementById("editMigratingPeopleCount");
+				const daysMigrating = document.getElementById("editMigrationDaysPerYear");
+				const migrationReason = document.getElementById("editMigrationReason");
+				const expectedReduction = document.getElementById("editExpectedReduction");
+				// 1. No. of People Migrating
+				if (!validateRequiredField(peopleMigrating, "Please enter No. of People Migrating.")) {
+					return;
+				}
+				// 2. No. of days per year Migrating
+				if (!validateDaysMigrating(daysMigrating)) {
+					return;
+				}
+				// 3. Major reason(s) for Migration
+				if (!validateRequiredField(migrationReason, "Please enter Major reason(s) for Migration.")) {
+					return;
+				}
+				// 4. Expected reduction
+				if (!validateRequiredField(expectedReduction, "Please enter Expected reduction.")) {
+					return;
+				}
+				// All validation passed
+				form.submit();
+			});
+		
+			/* -------------------------------------------------
+			    EDIT BUTTON CLICK
+			    ------------------------------------------------- */
+			document.querySelectorAll(".editBtn").forEach(function(btn) {
+			    btn.addEventListener("click", function() {
+			        const id = this.getAttribute("data-id");
+			        console.log("Editing PPR15 ID:", id);
+			        fetch("/getDraftsPPR15?id=" + encodeURIComponent(id))
+			            .then(async response => {
+			                console.log("Response status:", response.status);
+			                console.log("Response URL:", response.url);
+			                console.log("Content-Type:", response.headers.get("content-type"));
+			                const text = await response.text();
+			                console.log("Response body:", text);
+			                if (!response.ok) {
+			                    throw new Error("HTTP error: " + response.status);
+			                }
+			                if (!text.trim().startsWith("{")) {
+			                    throw new Error("Server did not return JSON object. Response was HTML.");
+			                }
+			                return JSON.parse(text);
+			            })
+			            .then(data => {
+			                console.log("Edit data:", data);
+			                document.getElementById("editPpr15Id").value = data.pprMigrationId;
+			                document.getElementById("editPpr15DistrictName").value = data.districtName;
+			                document.getElementById("editPpr15ProjectName").value = data.projectName;
+			                document.getElementById("editPpr15WatershedName").value = data.microWatershedName;
+			                document.getElementById("editPpr15VillageName").value = data.villageName;
+			                document.getElementById("editMigratingPeopleCount").value = data.migratingPeopleCount ?? "";
+			                document.getElementById("editMigrationDaysPerYear").value = data.migrationDaysPerYear ?? "";
+			                document.getElementById("editMigrationReason").value = data.migrationReason ?? "";
+			                document.getElementById("editExpectedReduction").value = data.expectedReductionMigratingPeople ?? "";
+			            })
+			            .catch(error => {
+			                console.error("Error loading PPR15 edit details:", error);
+			            });
+			    });
+			});
+
 		});
 
-		function loadDraftsPPR15(pprId) {
-			const tableBody = document.getElementById("draftTableBody");
-			tableBody.innerHTML = "";
-			if (!pprId) {
-				return;
-			}
-			fetch('/getDraftsPPR15?pprId=' + pprId)
-				.then(response => response.json())
-				.then(data => {
-					data.forEach(function (item) {
-						const row = document.createElement("tr");
-						row.innerHTML = `
-	                    <td>${item.dist_name}</td>
-	                    <td>${item.project_name}</td>
-	                    <td>${item.mw_name ?? ""}</td>
-	                    <td>${item.village_name ?? ""}</td>
-	                    <td>${item.migrating_people_count}</td>
-	                    <td>${item.migration_days_per_year}</td>
-	                    <td>${item.migration_reason}</td>
-	                    <td>${item.expected_reduction_migrating_people}</td>
-	                    <td class="text-center">
-	                        ${item.status === 'D' ? `<a href="/deletePreliminaryPPR15?id=${item.ppr_migration_id}" class="btn btn-danger btn-sm"
-	                               onclick="return confirm('Are you sure you want to delete this record?')">
-	                                <i class="fas fa-trash"></i>
-	                            </a>
-	                            &nbsp;
-	                            <button type="button"
-	                                    class="btn btn-primary btn-sm ppr15-edit-btn"
-	                                    title="Edit"
-	                                    data-id="${item.ppr_migration_id}"
-	                                    data-districtname="${item.dist_name}"
-	                                    data-projectname="${item.project_name}"
-	                                    data-pprid="${item.ppr_id}"
-	                                    data-watershedname="${item.mw_name}"
-	                                    data-mwid="${item.mw_id}"
-	                                    data-villagename="${item.tem.vcode}"
-	                                    data-people="${village_name}"
-	                                    data-vcode="${iitem.migrating_people_count}"
-	                                    data-days="${item.migration_days_per_year}"
-	                                    data-reason="${item.migration_reason}"
-	                                    data-reduction="${item.expected_reduction_migrating_people}">
-	                                <i class="fas fa-edit"></i>
-	                            </button>
-	                            &nbsp;
-	                            <a href="/completePreliminaryPPR15?id=${item.ppr_migration_id}"
-	                               class="btn btn-success btn-sm"
-	                               onclick="return confirm('Are you sure you want to complete this record?')">
-	                                <i class="fas fa-check"></i>
-	                            </a>
-	                            ` : `<span class="badge bg-success"> <i class="fas fa-check-circle"></i> Data Completed </span> `
-							}
-	                    </td>
-	                `;
 
-						tableBody.appendChild(row);
-					});
-
-				})
-				.catch(error => {
-					console.error("Error loading PPR15 drafts:", error);
-				});
-		}
-
-
-		/* ==========================================================
-			   PPR15 : Edit Popup Function
-			   ========================================================== */
-
-		//document.addEventListener("click", function (e) {
-			//const btn = e.target.closest(".ppr15-edit-btn");
-			//document.getElementById("editPpr15Id").value = btn.dataset.id;
-			//console.log("Clicked PPR15 Edit Button:", btn);
-			//if (!btn) {
-			//	return;
-			//}
-			//document.getElementById("editPpr15Id").value =btn.dataset.id;
-			//console.log("PPR ID =", btn.dataset.id);
-			//document.getElementById("editPpr15DistrictName").value =btn.dataset.districtname;
-		//	document.getElementById("editPpr15District").value = btn.dataset.dcode;
-		//	document.getElementById("editPpr15ProjectName").value = btn.dataset.projectname;
-		//	document.getElementById("editPpr15Project").value = btn.dataset.pprid;
-		//	document.getElementById("editPpr15WatershedName").value = btn.dataset.watershedname;
-		//	document.getElementById("editPpr15Watershed").value = btn.dataset.mwid;
-		//	document.getElementById("editPpr15VillageName").value = btn.dataset.villagename;
-		//	document.getElementById("editPpr15Village").value = btn.dataset.vcode;
-		//	document.getElementById("editMigratingPeopleCount").value = btn.dataset.people;
-		//	document.getElementById("editMigrationDaysPerYear").value = btn.dataset.days;
-		//	document.getElementById("editMigrationReason").value = btn.dataset.reason;
-		//	document.getElementById("editExpectedReduction").value = btn.dataset.reduction;
-		//	new bootstrap.Modal(document.getElementById("editModalPPR15")).show();
-		//});
 
 
 	</script>
@@ -219,7 +248,7 @@
 			<div class="card shadow-sm border-0 mt-3">
 
 				<div class="card-header bg-primary text-white">
-					<h4 class="mb-0">Migration Details (PPR15)</h4>
+					<h4 class="mb-0">Migration Details</h4>
 				</div>
 
 				<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -232,18 +261,14 @@
 				</div>
 
 				<div class="card-body px-4 py-4">
-
 					<form id="ppr15Form" th:action="@{/saveDraftPPR15}" method="post" novalidate>
-
 						<div class="row mb-4">
 							<div class="col-md-2">
 								<label class="form-label fw-semibold">State Name:</label><span class="required">*</span>
 							</div>
 							<div class="col-md-4">
-								<input type="text" class="form-control form-control-sm" th:value="${statename}"
-									readonly>
+								<input type="text" class="form-control form-control-sm" th:value="${statename}" readonly>
 							</div>
-
 							<div class="col-md-2">
 								<label class="form-label fw-semibold">District Name:</label><span
 									class="required">*</span>
@@ -257,131 +282,97 @@
 										</option>
 									</th:block>
 								</select>
+								<div class="field-error"></div>
 							</div>
 						</div>
-
 						<div class="row mb-4">
 							<div class="col-md-2">
 								<label class="form-label fw-semibold">Project Name:</label><span
 									class="required">*</span>
 							</div>
 							<div class="col-md-4">
-								<select id="project" name="pprId" class="form-control form-control-sm" required>
+								<select id="project" name="pprId" class="form-control form-control-sm">
 								    <option value="">--Select Project--</option>
 									<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
 										th:selected="${pprId != null and pprId == p.pprId}"> </option>
 								</select>
+								<div class="field-error"></div>
 							</div>
-
 							<div class="col-md-2">
 								<label class="form-label fw-semibold">Micro Watershed Name:</label><span
 									class="required">*</span>
 							</div>
 							<div class="col-md-4">
-								<select id="watershed" name="watershedId" class="form-control form-control-sm" required>
+								<select id="watershed" name="watershedId" class="form-control form-control-sm">
 								    <option value="">--Select Micro Watershed--</option>
 									<option th:each="mw : ${microWatershedList}" th:value="${mw.mwId}" th:text="${mw.mwName}"></option>
 								</select>
+								<div class="field-error"></div>
 							</div>
 						</div>
-
 						<div class="row mb-4">
 							<div class="col-md-2">
 								<label class="form-label fw-semibold">Village Name:</label><span
 									class="required">*</span>
 							</div>
 							<div class="col-md-4">
-								<select id="village" name="villageId" class="form-control form-control-sm" required>
+								<select id="village" name="villageId" class="form-control form-control-sm">
 								    <option value="">--Select Village--</option>
 									<option th:each="v : ${villageList}" th:value="${v.vcode}" th:text="${v.villageName}"></option>
 								</select>
+								<div class="field-error"></div>
 							</div>
 						</div>
-
 						<!-- Row 3 -->
 						<div class="row mb-3 align-items-center">
-
 							<div class="col-md-4">
-								<label class="form-label fw-semibold">
-									No. of People Migrating
-									<span class="text-danger">*</span>
-								</label>
+								<label class="form-label fw-semibold">No. of People Migrating<span class="text-danger">*</span></label>
 							</div>
-
 							<div class="col-md-4">
-								<input type="text" class="form-control form-control-sm" id="peopleMigrating"
-									name="peopleMigrating" maxlength="10" required>
+								<input type="text" class="form-control form-control-sm" id="peopleMigrating" name="peopleMigrating" maxlength="4" 
+								inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+								<div class="field-error"></div>
 							</div>
-
 						</div>
-
 						<!-- Row 4 -->
 						<div class="row mb-3 align-items-center">
-
 							<div class="col-md-4">
-								<label class="form-label fw-semibold">
-									No. of days per year Migrating
-									<span class="text-danger">*</span>
-								</label>
+								<label class="form-label fw-semibold">No. of days per year Migrating<span class="text-danger">*</span></label>
 							</div>
-
 							<div class="col-md-4">
-								<input type="text" class="form-control form-control-sm" id="daysMigrating"
-									name="daysMigrating" maxlength="10" required>
+								<input type="text" class="form-control form-control-sm" id="daysMigrating" name="daysMigrating" maxlength="3" 
+								inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+								<div class="field-error"></div>
 							</div>
 
 						</div>
-
 						<!-- Row 5 -->
 						<div class="row mb-3 align-items-center">
-
 							<div class="col-md-4">
-								<label class="form-label fw-semibold">
-									Major reason(s) for Migration
-									<span class="text-danger">*</span>
-								</label>
+								<label class="form-label fw-semibold">Major reason(s) for Migration<span class="text-danger">*</span></label>
 							</div>
-
 							<div class="col-md-4">
-								<input type="text" class="form-control form-control-sm" id="migrationReason"
-									name="migrationReason" maxlength="255" required>
+								<input type="text" class="form-control form-control-sm" id="migrationReason" name="migrationReason" maxlength="255">
+								<div class="field-error"></div>
 							</div>
-
 						</div>
-
 						<!-- Row 6 -->
 						<div class="row mb-3 align-items-center">
-
 							<div class="col-md-4">
-								<label class="form-label fw-semibold">
-									Expected reduction in no. of Persons Migrating
-									<span class="text-danger">*</span>
-								</label>
+								<label class="form-label fw-semibold">Expected reduction in no. of Persons Migrating<span class="text-danger">*</span></label>
 							</div>
-
 							<div class="col-md-4">
-								<input type="text" class="form-control form-control-sm" id="expectedReduction"
-									name="expectedReduction" maxlength="10" required>
+								<input type="text" class="form-control form-control-sm" id="expectedReduction" name="expectedReduction" maxlength="4" 
+								inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+								<div class="field-error"></div>
 							</div>
-
 						</div>
-
-						<input type="hidden" name="action" value="D">
-
-						<div class="mt-4" style="position: relative;">
-
-						    <div class="text-center">
-						        <button type="submit" class="btn btn-warning px-4 fw-semibold">
-						            <i class="fa fa-save me-1"></i> Save as Draft
-						        </button>
-						<!---------   </div>
-
-						    <a th:href="@{/pprWaterOutcomes}" class="btn btn-outline-secondary"
-						        style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);">
-						        Skip <i class="fas fa-arrow-right"></i>
-						    </a>
-
-						</div>--------->
+						<div class="text-center mt-4">
+							<button type="submit" name="action" value="D" class="btn btn-warning">
+								<i class="fas fa-save"></i>
+								Save As Draft
+							</button>
+						</div>
 					</form>
 
 					<!-- ================= DRAFT DETAILS ================= -->
@@ -407,67 +398,50 @@
 									<th class="table-primary text-center" style="min-width:160px;">Action</th>
 								</tr>
 							</thead>
-
 							<tbody id="draftTableBody">
-
 								<tr th:each="item : ${draftList}">
-
 									<td th:text="${item.ppr.district.distName}"></td>
-
 									<td th:text="${item.ppr.projectName}"></td>
-
-									<td th:text="${item.watershed.watershedName}"></td>
-
+									<td th:text="${item.microWatershed.mwName}"></td>
 									<td th:text="${item.village.villageName}"></td>
-
-									<td th:text="${item.peopleMigrating}"></td>
-
-									<td th:text="${item.daysMigrating}"></td>
-
+									<td th:text="${item.migratingPeopleCount}"></td>
+									<td th:text="${item.migrationDaysPerYear}"></td>
 									<td th:text="${item.migrationReason}"></td>
-
-									<td th:text="${item.expectedReduction}"></td>
-
+									<td th:text="${item.expectedReductionMigratingPeople}"></td>
 									<td class="text-center">
-
 										<!-- DELETE : Only when Draft -->
-										<a th:if="${item.status.toString().equals('D')}"
-											th:href="@{/deletePreliminaryPPR15(id=${item.pprMigrationId})}"
-											class="btn btn-danger btn-sm"
-											onclick="return confirm('Are you sure you want to delete this record?')">
+										<a th:if="${item.status.toString().equals('D')}" class="btn btn-danger btn-sm"
+											th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deletePreliminaryPPR15?id=' + ${item.pprMigrationId} + '\'; }); return false;'">
 											<i class="fas fa-trash"></i>
 										</a>
-
 										&nbsp;
-
-										<!-- EDIT : Only when Draft -->
-										<button th:if="${item.status.toString().equals('D')}" type="button"
-											class="btn btn-primary btn-sm ppr15-edit-btn" title="Edit"
-											th:data-id="${item.pprMigrationId}"
-											th:data-districtname="${item.ppr.district.distName}"
-											th:data-dcode="${item.ppr.district.dcode}"
-											th:data-projectname="${item.ppr.projectName}"
-											th:data-pprid="${item.ppr.pprId}"
-											th:data-watershedname="${item.watershed.watershedName}"
-											th:data-mwid="${item.mwId}"
-											th:data-villagename="${item.village.villageName}"
-											th:data-vcode="${item.vcode}" th:data-people="${item.peopleMigrating}"
-											th:data-days="${item.daysMigrating}"
-											th:data-reason="${item.migrationReason}"
-											th:data-reduction="${item.expectedReduction}">
+<!--										<button th:if="${item.status.toString().equals('D')}" type="button"-->
+<!--											class="btn btn-primary btn-sm ppr15-edit-btn" title="Edit"-->
+<!--											th:data-id="${item.pprMigrationId}"-->
+<!--											th:data-districtname="${item.ppr.district.distName}"-->
+<!--											th:data-dcode="${item.ppr.district.dcode}"-->
+<!--											th:data-projectname="${item.ppr.projectName}"-->
+<!--											th:data-pprid="${item.ppr.pprId}"-->
+<!--											th:data-watershedname="${item.microWatershed.mwName}"-->
+<!--											th:data-mwid="${item.mwId}"-->
+<!--											th:data-villagename="${item.village.villageName}"-->
+<!--											th:data-vcode="${item.vcode}" th:data-people="${item.migratingPeopleCount}"-->
+<!--											th:data-days="${item.migrationDaysPerYear}"-->
+<!--											th:data-reason="${item.migrationReason}"-->
+<!--											th:data-reduction="${item.expectedReductionMigratingPeople}">-->
+<!--											<i class="fas fa-edit"></i>-->
+<!--										</button>-->
+										<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${item.pprMigrationId}" data-bs-toggle="modal"
+											data-bs-target="#editModal" th:if="${#strings.trim(item.status) == 'D'}">
 											<i class="fas fa-edit"></i>
 										</button>
-
 										&nbsp;
 
 										<!-- COMPLETE : Only when Draft -->
-										<a th:if="${item.status.toString().equals('D')}"
-											th:href="@{/completePreliminaryPPR15(id=${item.pprMigrationId})}"
-											class="btn btn-success btn-sm"
-											onclick="return confirm('Are you sure you want to complete this record?')">
+										<a th:if="${item.status.toString().equals('D')}" class="btn btn-success btn-sm"
+											th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completePreliminaryPPR15?id=' + ${item.pprMigrationId} + '\'; }); return false;'">
 											<i class="fas fa-check"></i>
 										</a>
-
 										<!-- COMPLETED BADGE -->
 										<span th:if="${item.status.toString().equals('C')}" class="badge bg-success">
 											<i class="fas fa-check-circle"></i> Completed
@@ -483,233 +457,94 @@
 					</div>
 					<!-- ===================== Edit Modal PPR15 ====================== -->
 
-					<div class="modal fade" id="editModalPPR15">
-
+					<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
 						<div class="modal-dialog modal-lg">
-
 							<div class="modal-content">
-
-								<!-- Modal Header -->
 								<div class="modal-header bg-primary text-white">
-
-									<h5 class="modal-title">
-										Edit Migration Details (PPR15)
-									</h5>
-
-									<button type="button" class="btn-close" data-bs-dismiss="modal">
-									</button>
-
+									<h5 class="modal-title" id="editModalLabel">Edit Migration Details</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 								</div>
-
-
-								<!-- Modal Body -->
 								<div class="modal-body">
-
 									<form id="editPpr15Form" th:action="@{/updatePPR15}" method="post">
-
-										<!-- Hidden Record ID -->
 										<input type="hidden" id="editPpr15Id" name="editPpr15Id">
-
-
-										<!-- ========================= ROW 1 ========================= -->
-
 										<div class="row mb-3">
-
-											<!-- District -->
-											<div class="col-md-2">
-
-												<label class="form-label">
-													District
-													<span class="required">*</span>
-												</label>
-
+											<div class="col-md-2 d-flex align-items-center">
+												<label>District:</label>
 											</div>
-
-											<div class="col-md-4">
-
-												<input type="text" class="form-control" id="editPpr15DistrictName"
-													readonly>
-
-												<input type="hidden" id="editPpr15District" name="dcode">
-
+											<div class="col-md-3">
+												<input type="text" id="editPpr15DistrictName" class="form-control form-control-sm" readonly>
 											</div>
-
-
-											<!-- Project -->
-											<div class="col-md-2">
-
-												<label class="form-label">
-													Project
-													<span class="required">*</span>
-												</label>
-
+											<div class="col-md-2 d-flex align-items-center">
+												<label>Project:</label>
 											</div>
-
-											<div class="col-md-4">
-
-												<input type="text" class="form-control" id="editPpr15ProjectName"
-													readonly>
-
-												<input type="hidden" id="editPpr15Project" name="pprId">
-
+											<div class="col-md-3">
+												<input type="text" id="editPpr15ProjectName" class="form-control form-control-sm" readonly>
 											</div>
-
 										</div>
-
-
-										<!-- ========================= ROW 2 ========================= -->
-
 										<div class="row mb-3">
-
-											<!-- Watershed -->
-											<div class="col-md-2">
-
-												<label class="form-label">
-													Watershed
-													<span class="required">*</span>
-												</label>
-
+											<div class="col-md-2 d-flex align-items-center">
+												<label>Watershed:</label>
 											</div>
-
-											<div class="col-md-4">
-
-												<input type="text" class="form-control" id="editPpr15WatershedName"
-													readonly>
-
-												<input type="hidden" id="editPpr15Watershed" name="mwId">
-
+											<div class="col-md-3">
+												<input type="text" id="editPpr15WatershedName" class="form-control form-control-sm" readonly>
 											</div>
-
-
-											<!-- Village -->
-											<div class="col-md-2">
-
-												<label class="form-label">
-													Village
-													<span class="required">*</span>
-												</label>
-
+											<div class="col-md-2 d-flex align-items-center">
+												<label>Village:</label>
 											</div>
-
-											<div class="col-md-4">
-
-												<input type="text" class="form-control" id="editPpr15VillageName"
-													readonly>
-
-												<input type="hidden" id="editPpr15Village" name="vcode">
-
+											<div class="col-md-3">
+												<input type="text" id="editPpr15VillageName" class="form-control form-control-sm" readonly>
 											</div>
-
 										</div>
-
-
-										<!-- ========================= ROW 3 ========================= -->
-
+										<hr>
 										<div class="row mb-3">
-
-											<!-- People Migrating -->
-											<div class="col-md-6">
-
-												<label class="form-label">
-													No. of People Migrating
-													<span class="required">*</span>
-												</label>
-
-												<input type="text" class="form-control" id="editMigratingPeopleCount"
-													name="editMigratingPeopleCount" maxlength="10"
-													oninput="validateInteger(this,10)">
-
+											<div class="col-md-6 d-flex align-items-center">
+												<label>No. of People Migrating:<span class="required">*</span></label>
 											</div>
-
-
-											<!-- Days -->
-											<div class="col-md-6">
-
-												<label class="form-label">
-													No. of days per year Migrating
-													<span class="required">*</span>
-												</label>
-
-												<input type="text" class="form-control" id="editMigrationDaysPerYear"
-													name="editMigrationDaysPerYear" maxlength="10"
-													oninput="validateInteger(this,10)">
-
+											<div class="col-md-3">
+												<input type="text" id="editMigratingPeopleCount" name="editMigratingPeopleCount" class="form-control form-control-sm" maxlength="10" autocomplete="off" oninput="validateInteger(this,10)">
+												<div class="validation-error" data-error-for="editMigratingPeopleCount"></div>
 											</div>
-
 										</div>
-
-
-										<!-- ========================= ROW 4 ========================= -->
-
 										<div class="row mb-3">
-
-											<!-- Migration Reason -->
-											<div class="col-md-6">
-
-												<label class="form-label">
-													Major reason(s) for Migration
-													<span class="required">*</span>
-												</label>
-
-												<input type="text" class="form-control" id="editMigrationReason"
-													name="editMigrationReason" maxlength="500">
-
+											<div class="col-md-6 d-flex align-items-center">
+												<label>No. of days per year Migrating:<span class="required">*</span></label>
 											</div>
-
-
-											<!-- Expected Reduction -->
-											<div class="col-md-6">
-
-												<label class="form-label">
-													Expected reduction in no. of Persons Migrating
-													<span class="required">*</span>
-												</label>
-
-												<input type="text" class="form-control" id="editExpectedReduction"
-													name="editExpectedReduction" maxlength="10"
-													oninput="validateInteger(this,10)">
-
+											<div class="col-md-3">
+												<input type="text" id="editMigrationDaysPerYear" name="editMigrationDaysPerYear" class="form-control form-control-sm" maxlength="10" autocomplete="off" oninput="validateInteger(this,10)">
+												<div class="validation-error" data-error-for="editMigrationDaysPerYear"></div>
 											</div>
-
 										</div>
-
-
-										<!-- ========================= BUTTONS ========================= -->
-
-										<div class="row mt-4">
-
-											<div class="col-12 text-center">
-
-												<button type="submit" class="btn btn-success px-4">
-
-													<i class="fa fa-save me-1"></i>
-													Update
-
-												</button>
-
-
-												<button type="button" class="btn btn-secondary px-4 ms-2"
-													data-bs-dismiss="modal">
-
-													Cancel
-
-												</button>
-
+										<div class="row mb-3">
+											<div class="col-md-6 d-flex align-items-center">
+												<label>Major reason(s) for Migration:<span class="required">*</span></label>
 											</div>
-
+											<div class="col-md-3">
+												<input type="text" id="editMigrationReason" name="editMigrationReason" class="form-control form-control-sm" maxlength="500" autocomplete="off">
+												<div class="validation-error" data-error-for="editMigrationReason"></div>
+											</div>
 										</div>
-
+										<div class="row mb-3">
+											<div class="col-md-6 d-flex align-items-center">
+												<label>Expected reduction:<span class="required">*</span></label>
+											</div>
+											<div class="col-md-3">
+												<input type="text" id="editExpectedReduction" name="editExpectedReduction" class="form-control form-control-sm" maxlength="10" autocomplete="off" oninput="validateInteger(this,10)">
+												<div class="validation-error" data-error-for="editExpectedReduction"></div>
+											</div>
+										</div>
+										<div class="text-end">
+											<button type="submit" class="btn btn-success">
+												<i class="fas fa-save"></i> Update
+											</button>
+										</div>
 									</form>
-
 								</div>
-
 							</div>
-
 						</div>
-
 					</div>
+					
+					
 				</div>
-
 			</div>
 
 		</div>

@@ -3,11 +3,15 @@ package gov.dolr.wdcpmksy3.PPR.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import gov.dolr.wdcpmksy3.entity.MVillage;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -56,6 +60,18 @@ public class PPRMigrationDetails {
 
     @Column(name = "updated_date")
     private LocalDate updatedDate;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ppr_id", insertable = false, updatable = false)
+    private MPpr ppr;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vcode", insertable = false, updatable = false)
+    private MVillage village;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mw_id", insertable = false, updatable = false)
+    private MicroWatershed microWatershed;
 
     // Getters and Setters
 
@@ -169,6 +185,30 @@ public class PPRMigrationDetails {
 
 	public void setUpdatedDate(LocalDate updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public MPpr getPpr() {
+		return ppr;
+	}
+
+	public void setPpr(MPpr ppr) {
+		this.ppr = ppr;
+	}
+
+	public MVillage getVillage() {
+		return village;
+	}
+
+	public void setVillage(MVillage village) {
+		this.village = village;
+	}
+
+	public MicroWatershed getMicroWatershed() {
+		return microWatershed;
+	}
+
+	public void setMicroWatershed(MicroWatershed microWatershed) {
+		this.microWatershed = microWatershed;
 	}
 
 

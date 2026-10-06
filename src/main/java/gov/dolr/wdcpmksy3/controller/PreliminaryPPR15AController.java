@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.dto.PprMigrationDetailsDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PPRMigrationDetails;
 import gov.dolr.wdcpmksy3.PPR.entity.PprMicroWatershed;
@@ -72,7 +73,7 @@ public class PreliminaryPPR15AController {
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	        		model.addAttribute("pprId", project);
-	        		model.addAttribute("draftList", pprMigrationDetailsRepository.getMigrationDetailsByProject(ppr.getPprId()));
+	        		model.addAttribute("draftList", pprMigrationDetailsRepository.findPPRMigrationDetailsByPprId(ppr.getPprId()));
 		            model.addAttribute("project", ppr.getProjectName());
 		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
 		            model.addAttribute("villageList",villageService.getVillagesByProject(ppr.getPprId()));
@@ -134,57 +135,37 @@ public class PreliminaryPPR15AController {
 
 	@GetMapping("/getDraftsPPR15")
 	@ResponseBody
-	public List<Map<String, Object>> getDraftsPPR15(@RequestParam Integer pprId) {
-	    return pprMigrationDetailsRepository.getMigrationDetailsByProject(pprId);
+	public PprMigrationDetailsDTO getDraftsPPR15(@RequestParam Integer id) {
+	    return migrationDetailsService.getPprMigrationDetailsById(id);
 	}
 	
 	
 	@PostMapping("/saveDraftPPR15")
-	public String saveDraftPPR15(
-	        HttpSession session,
-	        HttpServletRequest request,
-	        @RequestParam("pprId") Integer pprId,
-	        @RequestParam("villageId") Integer vcode,
-	        @RequestParam("watershedId") Integer mwId,
-	        @RequestParam("peopleMigrating") Integer migratingPeopleCount,
-	        @RequestParam("daysMigrating") Integer migrationDaysPerYear,
-	        @RequestParam("migrationReason") String migrationReason,
-	        @RequestParam("expectedReduction") Integer expectedReductionMigratingPeople) {
-		System.out.println("========== PPR15 SAVE METHOD CALLED ==========");
-
-	    System.out.println("pprId = " + pprId);
-	    System.out.println("vcode = " + vcode);
-	    System.out.println("mwId = " + mwId);
-	    System.out.println("people = " + migratingPeopleCount);
-	    System.out.println("days = " + migrationDaysPerYear);
-	    System.out.println("reason = " + migrationReason);
-	    System.out.println("expectedReduction = " + expectedReductionMigratingPeople);
-
-
+	public String saveDraftPPR15(HttpSession session, HttpServletRequest request, @RequestParam("pprId") Integer pprId, 
+			@RequestParam("villageId") Integer vcode, @RequestParam("watershedId") Integer mwId, @RequestParam("peopleMigrating") Integer migratingPeopleCount,
+	        @RequestParam("daysMigrating") Integer migrationDaysPerYear, @RequestParam("migrationReason") String migrationReason, @RequestParam("expectedReduction") Integer expectedReductionMigratingPeople,
+	        RedirectAttributes redirectAttributes) {
 	    PPRMigrationDetails entity = new PPRMigrationDetails();
-
 	    entity.setPprId(pprId);
 	    entity.setVcode(vcode);
 	    entity.setMwId(mwId);
-
 	    entity.setMigratingPeopleCount(migratingPeopleCount);
 	    entity.setMigrationDaysPerYear(migrationDaysPerYear);
 	    entity.setMigrationReason(migrationReason);
-	    entity.setExpectedReductionMigratingPeople(
-	            expectedReductionMigratingPeople);
-
+	    entity.setExpectedReductionMigratingPeople(expectedReductionMigratingPeople);
 	    entity.setStatus('D');
-
 	    entity.setRequestIp(request.getRemoteAddr());
-
 	    Object user = session.getAttribute("username");
-
 	    if (user != null) {
 	        entity.setCreatedBy(user.toString());
 	    }
-
-	    migrationDetailsService.save(entity);
-
+	    try {
+	    	migrationDetailsService.save(entity);
+			redirectAttributes.addFlashAttribute("success", "Migration Details saved successfully.");
+		}catch(Exception e) {
+	    	redirectAttributes.addFlashAttribute("error", "Unable to save Migration Details.");
+	    }
+	    
 	    return "redirect:/preliminaryPPR15";
 	}
 	

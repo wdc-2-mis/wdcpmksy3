@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PPRMigrationDetails;
 
 
@@ -80,6 +81,9 @@ public interface PPRMigrationDetailsRepository extends JpaRepository<PPRMigratio
 	@Transactional
 	@Query("UPDATE PPRMigrationDetails m SET m.status = 'D' WHERE m.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+	
+	
+	List<PPRMigrationDetails> findPPRMigrationDetailsByPprId(Integer pprId);
 	
 	
 }
