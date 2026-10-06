@@ -229,6 +229,16 @@ document.addEventListener("DOMContentLoaded", function () {
 			document.getElementById("mouModal")
 				.addEventListener("hidden.bs.modal", clearMouFrame);
 		});
+		
+		function hideMouView(input) {
+		    const viewDiv = document.getElementById("kdyp");
+
+		    if (input.files && input.files.length > 0) {
+		        viewDiv.style.display = "none";
+		    } else {
+		        viewDiv.style.display = "block";
+		    }
+		}
 	</script>
 
 </head>
@@ -409,7 +419,7 @@ Edit Functionaries of Watershed Cell (PPR4)
        th:value="${editData.mouDate}"
        onkeydown="return false;"
        required>
-
+	   
 <div class="invalid-feedback">Please select Date of MoU.</div>
 
 </div>
@@ -426,13 +436,14 @@ Edit Functionaries of Watershed Cell (PPR4)
 </div>
 
 <div class="col-md-5">
-
+<div>	
 <input type="file"
        id="MoUfile"
        name="mouFile"
        class="form-control"
-       accept=".pdf">
-
+       accept=".pdf" onchange="hideMouView(this)" > </div>
+	<div id="kdyp">   <a href="#" class="viewMouBtn" th:attr="data-id=${editData.pprWcdcId}">View MoU</a></div>	
+	   <br/>
 <div class="invalid-feedback">Please upload a valid PDF.</div>
 
 <small class="text-muted">
