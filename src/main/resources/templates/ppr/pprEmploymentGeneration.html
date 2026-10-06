@@ -22,6 +22,16 @@ let existingStatus = null;
 
 document.addEventListener("DOMContentLoaded", function() {
 
+ const formedit = document.getElementById("editForm");
+
+    formedit.addEventListener("submit", function (event) {
+        if (!formedit.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        formedit.classList.add("was-validated");
+    });
+
     const district = document.getElementById("district");
     const project = document.getElementById("project");
     const watershed = document.getElementById("watershed");
@@ -81,59 +91,64 @@ function clearDropdownValidation(field) {
      CHECK EXISTING EMPLOYMENT TYPES FOR THE VILLAGE
      ========================================================= */
     function checkExistingEmploymentTypes(pprId, vcode, mwId) {
-        if (!pprId || !vcode || !mwId) {
-            existingEmploymentTypeIds = [];
-            existingStatus = null;
-            saveBtn.disabled = false;
+    if (!pprId || !vcode || !mwId) {
+        existingEmploymentTypeIds = [];
+        existingStatus = null;
+        saveBtn.disabled = false;
+        document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
+            clearRowData(row);
+        });
+        return;
+    }
+
+    saveBtn.disabled = true;
+
+    fetch("/getEmploymentVillageStatus?pprId=" + pprId + "&vcode=" + vcode + "&mwId=" + mwId)
+        .then(response => response.json())
+        .then(data => {
+            existingStatus = data.status;
+            
             document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
                 clearRowData(row);
             });
-            return;
-        }
-
-        saveBtn.disabled = true;
-
-        fetch("/getEmploymentVillageStatus?pprId=" + pprId + "&vcode=" + vcode + "&mwId=" + mwId)
-            .then(response => response.json())
-            .then(data => {
-                existingStatus = data.status;
-                
-                document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
-                    clearRowData(row);
-                });
-                
-                if (data.status === "C") {
-                    alert("This village has already been completed. You cannot add new records.");
-                    saveBtn.disabled = true;
-                    existingEmploymentTypeIds = [];
-                } else if (data.status === "D") {
-                    if (data.records && data.records.length > 0) {
-                        existingEmploymentTypeIds = data.records.map(r => r.employmentTypeId);
-                        const allTypes = [1, 2, 3];
-                        const missingTypes = allTypes.filter(id => !existingEmploymentTypeIds.includes(id));
-                        
-                        if (missingTypes.length === 0) {
-                            alert("Draft already exists for all employment types. Please edit existing records.");
-                            saveBtn.disabled = true;
-                        } else {
-                            const typeNames = getTypeNames(missingTypes);
-                            alert("Draft exists for some employment types. You can add data for: " + typeNames);
-                            saveBtn.disabled = false;
-                        }
+            
+            if (data.status === "C") {
+                latestAlert("This village has already been completed. You cannot add new records.");
+                saveBtn.disabled = true;
+                existingEmploymentTypeIds = [];
+                // ✅ Reset village selection
+                document.getElementById("village").selectedIndex = 0;
+            } else if (data.status === "D") {
+                if (data.records && data.records.length > 0) {
+                    existingEmploymentTypeIds = data.records.map(r => r.employmentTypeId);
+                    const allTypes = [1, 2, 3];
+                    const missingTypes = allTypes.filter(id => !existingEmploymentTypeIds.includes(id));
+                    
+                    if (missingTypes.length === 0) {
+                        latestAlert("Draft already exists for all employment types. Please edit existing records.");
+                        saveBtn.disabled = true;
+                        // ✅ Reset village selection
+                        document.getElementById("village").selectedIndex = 0;
                     } else {
-                        existingEmploymentTypeIds = [];
-                        saveBtn.disabled = false;
+                        const typeNames = getTypeNames(missingTypes);
+                        latestAlert("Draft exists for some employment types. You can add data for: " + typeNames);
+                        saveBtn.disabled = true;
                     }
                 } else {
                     existingEmploymentTypeIds = [];
-                    saveBtn.disabled = false;
+                    saveBtn.disabled = true;
                 }
-            })
-            .catch(error => {
-                console.error("Village Status Check Error:", error);
-                saveBtn.disabled = true;
-            });
-    }
+            } else {
+                existingEmploymentTypeIds = [];
+                saveBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error("Village Status Check Error:", error);
+            saveBtn.disabled = true;
+        });
+}
+    
 
     /* =========================================================
      GET TYPE NAMES BY IDS
@@ -252,86 +267,297 @@ function clearDropdownValidation(field) {
         checkExistingEmploymentTypes(pprId, vcode, mwId);
     });
 
-    /* =========================================================
-     FORM SUBMIT VALIDATION
-     ========================================================= */
-    if (form) {
-        form.addEventListener("submit", function(e) {
-            // Check required dropdowns
-            const requiredFields = form.querySelectorAll("select[required]");
-            
-            for (const field of requiredFields) {
-                if (field.value.trim() === "") {
-                    e.preventDefault();
-                    let fieldName = field.id.charAt(0).toUpperCase() + field.id.slice(1);
-                    alert("Please select " + fieldName);
-                    field.focus();
+   /* =========================================================
+   FORM SUBMIT VALIDATION
+   ========================================================= */
+
+if (form) {
+
+    form.addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+       /* =========================================================
+   VALIDATE EMPLOYMENT ROW
+   ========================================================= */
+
+function validateFields(row) {
+
+    const scInput = row.querySelector('input[name$=".sc"]');
+    const stInput = row.querySelector('input[name$=".st"]');
+    const othersInput = row.querySelector('input[name$=".others"]');
+    const womenInput = row.querySelector('input[name$=".women"]');
+
+    let isValid = true;
+
+    const fields = [
+        scInput,
+        stInput,
+        othersInput,
+        womenInput
+    ];
+
+    fields.forEach(function(field) {
+
+        if (!field) {
+            return;
+        }
+
+        field.classList.remove("is-invalid");
+
+        const oldFeedback =
+            field.parentElement.querySelector(".invalid-feedback");
+
+        if (oldFeedback) {
+            oldFeedback.remove();
+        }
+    });
+
+
+    /* =====================================================
+       CHECK ENTERED VALUES
+       ===================================================== */
+
+    fields.forEach(function(field) {
+
+        if (!field) {
+            return;
+        }
+
+        const value = field.value.trim();
+
+        /*
+         * Empty fields are allowed because the user only
+         * needs to enter data in at least one field/row.
+         */
+
+        if (value !== "") {
+
+            if (!/^\d+$/.test(value)) {
+
+                field.classList.add("is-invalid");
+
+                const feedback =
+                    document.createElement("div");
+
+                feedback.className = "invalid-feedback";
+
+                feedback.textContent =
+                    "Please enter a valid number.";
+
+                field.parentElement.appendChild(feedback);
+
+                isValid = false;
+            }
+        }
+    });
+
+    return isValid;
+}
+
+        const requiredFields = form.querySelectorAll("select[required]");
+
+        requiredFields.forEach(function(field) {
+
+            field.classList.remove("is-invalid");
+            field.classList.remove("is-valid");
+
+        });
+
+
+        /* =====================================================
+           VALIDATE REQUIRED DROPDOWNS
+           ===================================================== */
+
+        for (const field of requiredFields) {
+
+            if (field.value.trim() === "") {
+
+                field.classList.add("is-invalid");
+
+                field.focus();
+
+                return;
+            }
+        }
+
+
+        /* =====================================================
+           VALIDATE EMPLOYMENT TABLE
+           ===================================================== */
+
+        const rows = document.querySelectorAll(
+            "#employmentEntryBody tr"
+        );
+
+        let hasValidData = false;
+
+        let duplicateTypesEntered = [];
+
+        let rowsToClear = [];
+
+
+        for (const row of rows) {
+
+            const typeIdInput =
+                row.querySelector(
+                    'input[name$=".employmentTypeId"]'
+                );
+
+            if (!typeIdInput) {
+                continue;
+            }
+
+
+            const typeId =
+                parseInt(typeIdInput.value);
+
+
+            const sc =
+                parseInt(
+                    row.querySelector(
+                        'input[name$=".sc"]'
+                    ).value
+                ) || 0;
+
+
+            const st =
+                parseInt(
+                    row.querySelector(
+                        'input[name$=".st"]'
+                    ).value
+                ) || 0;
+
+
+            const others =
+                parseInt(
+                    row.querySelector(
+                        'input[name$=".others"]'
+                    ).value
+                ) || 0;
+
+
+            const women =
+                parseInt(
+                    row.querySelector(
+                        'input[name$=".women"]'
+                    ).value
+                ) || 0;
+
+
+            const hasData =
+                sc > 0 ||
+                st > 0 ||
+                others > 0 ||
+                women > 0;
+
+
+            if (hasData) {
+
+                const isValid =
+                    validateFields(row);
+
+                if (!isValid) {
+
                     return;
                 }
-            }
 
-            // Validate each row with data
-            const rows = document.querySelectorAll("#employmentEntryBody tr");
-            let hasValidData = false;
-            let duplicateTypesEntered = [];
-            let rowsToClear = [];
 
-            for (const row of rows) {
-                const typeIdInput = row.querySelector('input[name$=".employmentTypeId"]');
-                if (!typeIdInput) continue;
-                
-                const typeId = parseInt(typeIdInput.value);
-                const sc = parseInt(row.querySelector('input[name$=".sc"]').value) || 0;
-                const st = parseInt(row.querySelector('input[name$=".st"]').value) || 0;
-                const others = parseInt(row.querySelector('input[name$=".others"]').value) || 0;
-                const women = parseInt(row.querySelector('input[name$=".women"]').value) || 0;
-                
-                const hasData = sc > 0 || st > 0 || others > 0 || women > 0;
-                
-                if (hasData) {
-                    // Validate fields
-                    const isValid = validateFields(row);
-                    if (!isValid) {
-                        e.preventDefault();
-                        return;
-                    }
-                    
-                    hasValidData = true;
-                    
-                    if (existingEmploymentTypeIds.includes(typeId)) {
-                        duplicateTypesEntered.push({ typeId: typeId, row: row });
-                        rowsToClear.push(row);
-                    }
+                hasValidData = true;
+
+
+                if (
+                    existingEmploymentTypeIds
+                        .includes(typeId)
+                ) {
+
+                    duplicateTypesEntered.push({
+                        typeId: typeId,
+                        row: row
+                    });
+
+                    rowsToClear.push(row);
                 }
             }
+        }
 
-            rowsToClear.forEach(function(row) {
-                clearRowData(row);
-            });
 
-            if (!hasValidData) {
-                e.preventDefault();
-                alert("Please enter at least one value for SC, ST, Others, or Women.");
-                return;
-            }
+        /* =====================================================
+           CLEAR DUPLICATE ROW DATA
+           ===================================================== */
 
-            if (duplicateTypesEntered.length > 0) {
-                e.preventDefault();
-                const typeNames = duplicateTypesEntered.map(item => {
-                	
-                    const typeMap = { 
-                    		1: "Wage Employment (No. of Man-days)", 
-                    		2: "Self Employment (No. of Beneficiaries)", 
-                    		3: "Wage Employment (No. of Beneficiaries)" };
-                    
-                    return typeMap[item.typeId] || item.typeId;
-                }).join(", ");
-                alert("You cannot enter data for: " + typeNames + 
-                	". These types already have draft records. Please edit existing records instead.");
-                return;
-            }
+        rowsToClear.forEach(function(row) {
+
+            clearRowData(row);
+
         });
-    }
+
+
+        /* =====================================================
+           AT LEAST ONE VALUE REQUIRED
+           ===================================================== */
+const employmentValidation =
+    document.getElementById("employmentValidation");
+    
+        if (!hasValidData) {
+
+           employmentValidation.style.setProperty(
+        "display",
+        "block",
+        "important"
+    );
+
+    return;
+        }
+employmentValidation.style.setProperty(
+    "display",
+    "none",
+    "important"
+);
+
+        /* =====================================================
+           DUPLICATE EMPLOYMENT TYPE
+           ===================================================== */
+
+        if (duplicateTypesEntered.length > 0) {
+
+            const typeNames =
+                duplicateTypesEntered.map(function(item) {
+
+                    const typeMap = {
+
+                        1: "Wage Employment (No. of Man-days)",
+
+                        2: "Self Employment (No. of Beneficiaries)",
+
+                        3: "Wage Employment (No. of Beneficiaries)"
+
+                    };
+
+                    return typeMap[item.typeId]
+                        || item.typeId;
+
+                }).join(", ");
+
+
+            latestalert(
+                "You cannot enter data for: "
+                + typeNames
+                + ". These types already have draft records. Please edit existing records instead."
+            );
+
+            return;
+        }
+
+
+        /* =====================================================
+           ALL VALID
+           ===================================================== */
+
+        form.submit();
+
+    });
+}
 
     /* =========================================================
      LOAD EMPLOYMENT TABLE
@@ -393,11 +619,12 @@ function clearDropdownValidation(field) {
                             <td class="text-end">${total}</td>
                             <td class="text-center">
                                 ${item.status === "D" ?
-                                    `<a href="/deletePPREmployment?id=${item.ppr_employment_id}" 
-                                        class="btn btn-danger btn-sm" title="Delete"
-                                        onclick="return confirm('Are you sure you want to delete this record?');">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    `<a href="javascript:void(0)" 
+       class="btn btn-danger btn-sm"
+       onclick="deleteAlert('Are you sure you want to delete this record?', function() { window.location.href = '/deletePPREmployment?id=${item.ppr_employment_id}'; }); return false;">
+        <i class="fas fa-trash"></i>
+    </a>
+                                    
                                     &nbsp;&nbsp;
                                     <a href="javascript:void(0)" class="btn btn-primary btn-sm edit-btn"
                                         data-id="${item.ppr_employment_id}"
@@ -414,11 +641,11 @@ function clearDropdownValidation(field) {
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     &nbsp;&nbsp;
-                                    <a href="/completePPREmployment?id=${item.ppr_employment_id}" 
-                                        class="btn btn-success btn-sm" title="Complete"
-                                        onclick="return confirm('Are you sure you want to complete this record?');">
-                                        <i class="fas fa-check"></i>
-                                    </a>`
+                                    <a href="javascript:void(0)" 
+       class="btn btn-success btn-sm"
+       onclick="completeAlert('Are you sure you want to complete this record?', function() { window.location.href = '/completePPREmployment?id=${item.ppr_employment_id}'; }); return false;">
+        <i class="fas fa-check"></i>
+    </a>`
                                     :
                                     `<span class="badge bg-success">
                                         <i class="fas fa-check-circle"></i> Completed
@@ -687,6 +914,12 @@ function validateNumber(input) {
                                 </tr>
                             </tbody>
                         </table>
+                        
+                        <div id="employmentValidation"
+         class="invalid-feedback d-block"
+         style="display: none !important;">
+        Please enter data for at least one Employment Type.
+    </div>
                     </div>
 
                     <!-- Save Button -->
@@ -736,7 +969,7 @@ function validateNumber(input) {
                     </div>
 
                     <div class="modal-body">
-                        <form id="editForm" th:action="@{/updatePPREmployment}" method="post">
+                        <form id="editForm" th:action="@{/updatePPREmployment}" method="post" novalidate>
 
                             <input type="hidden" id="editId" name="ppr_employment_id">
 
@@ -782,6 +1015,9 @@ function validateNumber(input) {
                                 <div class="col-md-4">
                                     <input type="text" id="editSc" name="sc" class="form-control form-control-sm"
                                            oninput="validateNumber(this)" autocomplete="off" required >
+                                           <div class="invalid-feedback">
+            Please enter SC value.
+        </div>
                                 </div>
                             </div>
 
@@ -790,6 +1026,9 @@ function validateNumber(input) {
                                 <div class="col-md-4">
                                     <input type="text" id="editSt" name="st" class="form-control form-control-sm"
                                            oninput="validateNumber(this)" autocomplete="off" required >
+                                           <div class="invalid-feedback">
+            Please enter ST value.
+        </div>
                                 </div>
                             </div>
 
@@ -798,6 +1037,9 @@ function validateNumber(input) {
                                 <div class="col-md-4">
                                     <input type="text" id="editOthers" name="others" class="form-control form-control-sm"
                                            oninput="validateNumber(this)" autocomplete="off" required >
+                                            <div class="invalid-feedback">
+            Please enter Others value.
+        </div>
                                 </div>
                             </div>
 
@@ -806,6 +1048,9 @@ function validateNumber(input) {
                                 <div class="col-md-4">
                                     <input type="text" id="editWomen" name="women" class="form-control form-control-sm"
                                            oninput="validateNumber(this)" autocomplete="off" required >
+                                           <div class="invalid-feedback">
+            Please enter Women value.
+        </div>
                                 </div>
                             </div>
 

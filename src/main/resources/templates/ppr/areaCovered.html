@@ -232,7 +232,7 @@
                 </div>	
 				
 				<div class="text-center mt-4">
-								<button type="submit" name="action"  value="D" id="saveDraftBtn" class="btn btn-warning">
+								<button type="submit" name="action"  value="D"  class="btn btn-warning">
 								      <i class="fas fa-save"></i>
 								      Save as Draft
 								</button>
@@ -1643,42 +1643,7 @@ form.addEventListener("submit", function (event) {
 
         
         
-       submitAlert(
-    "Are you sure you want to save this form?",
-    function () {
-
-        console.log(
-            "User clicked Yes, Submit"
-        );
-
-        let actionInput =
-            form.querySelector(
-                'input[name="action"][data-global-action="true"]'
-            );
-
-        if (!actionInput) {
-
-            actionInput =
-                document.createElement("input");
-
-            actionInput.type = "hidden";
-
-            actionInput.name = "action";
-
-            actionInput.setAttribute(
-                "data-global-action",
-                "true"
-            );
-
-            form.appendChild(actionInput);
-        }
-
-        actionInput.value = "D";
-
-        form.submit();
-
-    }
-);
+       form.submit();
     });
 
 
@@ -1881,6 +1846,8 @@ if (mwSelect) {
                 if (saveDraftBtn) {
                     saveDraftBtn.disabled = true;
                 }
+                
+                mwSelect.value = "";
 
             } 
             else if (data.status === "D") {
@@ -1894,7 +1861,7 @@ if (mwSelect) {
                 if (saveDraftBtn) {
                     saveDraftBtn.disabled = true;
                 }
-
+mwSelect.value = "";
             } 
             
             else {

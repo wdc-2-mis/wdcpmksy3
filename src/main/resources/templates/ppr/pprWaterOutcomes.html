@@ -19,6 +19,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================================================
     // GET MAIN FORM FIELDS
     // =========================================================
+    
+    const formedit = document.getElementById("editForm");
+
+    formedit.addEventListener("submit", function (event) {
+        if (!formedit.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        formedit.classList.add("was-validated");
+    });
+    
 
     const district = document.getElementById("district");
     const project = document.getElementById("project");
@@ -382,27 +393,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
                             &nbsp; &nbsp;
 
-                            <a href="/completeWaterOutcome?id=${rec.id}"
-
-                               class="btn btn-sm btn-success"
-
-                               onclick="return confirm('Are you sure you want to complete this record?');">
-
-                                <i class="fas fa-check"></i>
-
-                            </a>
+                            <a href="javascript:void(0)"
+   class="btn btn-sm btn-success"
+   onclick="completeAlert('Are you sure you want to complete this record?', function() { window.location.href = '/completeWaterOutcome?id=${rec.id}'; }); return false;">
+    <i class="fas fa-check"></i>
+</a>
 
                             &nbsp; &nbsp;
 
-                            <a href="/deleteWaterOutcome?id=${rec.id}"
-
-                               class="btn btn-sm btn-danger"
-
-                               onclick="return confirm('Are you sure you want to delete this record?');">
-
-                                <i class="fas fa-trash"></i>
-
-                            </a>
+                            <a href="javascript:void(0)"
+   class="btn btn-sm btn-danger"
+   onclick="deleteAlert('Are you sure you want to delete this record?', function() { window.location.href = '/deleteWaterOutcome?id=${rec.id}'; }); return false;">
+    <i class="fas fa-trash"></i>
+</a>
 
                         `;
 
@@ -707,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // C = Completed
         if (status === "C") {
 
-            alert(
+            latestAlert(
                 "Data already completed for the selected Project, Micro Watershed and Village."
             );
 
@@ -717,7 +720,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // D = Draft
         else if (status === "D") {
 
-            alert(
+            latestAlert(
                 "Data already exists in Draft mode for the selected Project, Micro Watershed and Village."
             );
 
@@ -1219,7 +1222,7 @@ document.addEventListener("DOMContentLoaded", function () {
              
             <div class="modal-body">
 
-               <form id="editForm" th:action="@{/updateWaterOutcome}" method="post">
+               <form id="editForm" th:action="@{/updateWaterOutcome}" method="post" novalidate>
 
                     <!-- Hidden ID -->
                     <input type="hidden" id="editId" name="pprWaterOutcomeId">
@@ -1321,8 +1324,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <div class="col-md-9">
 
-        <input type="text" class="form-control" id="editPreProject" name="editPreProject" required>
-
+        <input type="text" class="form-control" id="editPreProject" name="editPreProject" oninput="validateDecimal(this, 10, 4)" required>
+ <div class="invalid-feedback">
+            Please enter Pre Project Level.
+        </div>
     </div>
 
 </div>
@@ -1331,14 +1336,17 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="row mb-3">
 
     <label class="col-md-3 fw-bold">
-        Post Project Level:
+        Expected  Post Project Level:
         <span class="required">*</span>
     </label>
 
     <div class="col-md-9">
 
-        <input type="text" class="form-control" id="editPostProject" name="editPostProject" required>
+        <input type="text" class="form-control" id="editPostProject" oninput="validateDecimal(this, 10, 4)" name="editPostProject" required>
 
+<div class="invalid-feedback">
+            Please enter Post Project Level.
+        </div>
     </div>
 
 </div>

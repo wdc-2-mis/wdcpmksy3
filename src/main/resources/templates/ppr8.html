@@ -32,6 +32,127 @@
 		
 document.addEventListener("DOMContentLoaded", function () {
 
+
+
+const block = document.getElementById("block");
+    const saveButton = document.getElementById("saveDraftBtn");
+
+    /*
+     * pprId is already available from Thymeleaf/controller.
+     *
+     * Change this if your actual model/session variable
+     * has a different name.
+     */
+   const project = document.getElementById("project");
+
+
+    if (!block) {
+        return;
+    }
+
+
+    block.addEventListener("change", function () {
+
+        const bcode = this.value;
+         const pprId = project.value;
+
+        // Nothing selected
+        if (!bcode) {
+
+            if (saveButton) {
+                saveButton.disabled = false;
+            }
+
+            return;
+        }
+
+
+        // Disable temporarily while checking
+        if (saveButton) {
+            saveButton.disabled = true;
+        }
+
+
+        fetch(
+            `/checkPPR8BlockStatus?pprId=${encodeURIComponent(pprId)}&bcode=${encodeURIComponent(bcode)}`
+        )
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Unable to check block status.");
+            }
+
+            return response.json();
+        })
+        .then(data => {
+
+            if (data.exists === true) {
+
+                // =================================================
+                // BLOCK ALREADY EXISTS
+                // =================================================
+
+                if (data.status === "D") {
+
+                    latestAlert(
+                        "This block is already available in Draft mode."
+                    );
+
+                } else if (data.status === "C") {
+
+                    latestAlert(
+                        "This block is already completed."
+                    );
+
+                } else {
+
+                    latestAlert(
+                        "This block is already present."
+                    );
+                }
+
+
+                block.value = "";
+
+    // Remove invalid state if you don't want red border
+    block.classList.remove("is-invalid");
+
+                if (saveButton) {
+                    saveButton.disabled = true;
+                }
+
+
+                // -------------------------------------------------
+                // Mark block invalid
+                // -------------------------------------------------
+
+                block.classList.add("is-invalid");
+
+            } else {
+
+                // =================================================
+                // BLOCK IS AVAILABLE
+                // =================================================
+
+                block.classList.remove("is-invalid");
+
+                if (saveButton) {
+                    saveButton.disabled = false;
+                }
+            }
+
+        })
+        .catch(error => {
+
+            console.error("Block status check failed:", error);
+
+            // Don't permanently disable the form if API fails
+            if (saveButton) {
+                saveButton.disabled = false;
+            }
+        });
+
+    });
     // =========================================================
     // CALCULATE NET BALANCE AREA FOR EDIT MODAL
     // =========================================================
@@ -151,6 +272,189 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     });
+    
+     editForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        let isValid = true;
+
+
+        /* =====================================================
+           CLEAR PREVIOUS VALIDATION
+           ===================================================== */
+
+        editForm.querySelectorAll(".is-invalid").forEach(function (field) {
+            field.classList.remove("is-invalid");
+        });
+
+
+        /* =====================================================
+           SCHEME VALIDATION
+           ===================================================== */
+
+        const scheme =
+            editForm.querySelector('input[name="scheme1"]:checked');
+
+        const schemeError =
+            document.getElementById("scheme1Error");
+
+        if (!scheme) {
+
+            isValid = false;
+
+            if (schemeError) {
+                schemeError.style.setProperty(
+                    "display",
+                    "block",
+                    "important"
+                );
+            }
+
+        } else {
+
+            if (schemeError) {
+                schemeError.style.setProperty(
+                    "display",
+                    "none",
+                    "important"
+                );
+            }
+
+        }
+
+
+        /* =====================================================
+           HELPER FUNCTION
+           ===================================================== */
+
+        function validateEditField(fieldId) {
+
+            const field = document.getElementById(fieldId);
+
+            if (!field) {
+                return;
+            }
+
+            const value = field.value.trim();
+
+            if (value === "") {
+
+                field.classList.add("is-invalid");
+
+                isValid = false;
+
+            } else {
+
+                field.classList.remove("is-invalid");
+
+            }
+
+        }
+
+
+        /* =====================================================
+           VALIDATE EDIT FIELDS
+           ===================================================== */
+
+        validateEditField("projSanctionedNo1");
+
+        validateEditField("projSanctionedArea1");
+
+        validateEditField("netArea1");
+
+        validateEditField("proposedArea1");
+
+        validateEditField("proposedAreaOthers1");
+
+
+        /* =====================================================
+           STOP IF INVALID
+           ===================================================== */
+
+        if (!isValid) {
+
+            const firstInvalid =
+                editForm.querySelector(".is-invalid");
+
+            if (firstInvalid) {
+
+                firstInvalid.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+                setTimeout(function () {
+
+                    firstInvalid.focus();
+
+                }, 300);
+
+            }
+
+            return;
+
+        }
+
+
+        /* =====================================================
+           EVERYTHING IS VALID
+           ===================================================== */
+
+        editForm.submit();
+
+    });
+
+
+    /* =========================================================
+       REMOVE FIELD ERROR WHEN USER STARTS TYPING
+       ========================================================= */
+
+    const editFields = editForm.querySelectorAll(
+        "input[type='text']"
+    );
+
+    editFields.forEach(function (field) {
+
+        field.addEventListener("input", function () {
+
+            if (field.value.trim() !== "") {
+
+                field.classList.remove("is-invalid");
+
+            }
+
+        });
+
+    });
+
+
+    /* =========================================================
+       REMOVE SCHEME ERROR WHEN USER SELECTS SCHEME
+       ========================================================= */
+
+    editForm
+        .querySelectorAll('input[name="scheme1"]')
+        .forEach(function (radio) {
+
+            radio.addEventListener("change", function () {
+
+                const schemeError =
+                    document.getElementById("scheme1Error");
+
+                if (schemeError) {
+
+                    schemeError.style.setProperty(
+                        "display",
+                        "none",
+                        "important"
+                    );
+
+                }
+
+            });
+
+        });
 
 
     // =========================================================
@@ -181,8 +485,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     form.addEventListener("submit", function (e) {
+    
+    form.querySelectorAll(".is-invalid").forEach(function (field) {
+        field.classList.remove("is-invalid");
+    });
+
+    form.querySelectorAll(".is-valid").forEach(function (field) {
+        field.classList.remove("is-valid");
+    });
+    
 
         let isValid = true;
+         let firstInvalidField = null;
+    let validationMessage = "";
 
         // ==========================================
         // District
@@ -339,6 +654,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
             return false;
         }
+        
+         submitAlert(
+    "Are you sure you want to save this form?",
+    function () {
+
+        console.log(
+            "User clicked Yes, Submit"
+        );
+
+        let actionInput =
+            form.querySelector(
+                'input[name="action"][data-global-action="true"]'
+            );
+
+        if (!actionInput) {
+
+            actionInput =
+                document.createElement("input");
+
+            actionInput.type = "hidden";
+
+            actionInput.name = "action";
+
+            actionInput.setAttribute(
+                "data-global-action",
+                "true"
+            );
+
+            form.appendChild(actionInput);
+        }
+
+        actionInput.value = "D";
+
+        form.submit();
+
+    }
+);
 
     });
 
@@ -829,7 +1181,7 @@ document.getElementById("proposedAreaOthers")
 					<!-- <input type="hidden"  name="action" value="D"> -->
 
 					<div class="text-center">
-						<button type="submit" value="D" name="action" class="btn btn-warning">
+						<button type="submit" value="D" name="action"  id="saveDraftBtn" class="btn btn-warning">
 							<i class="fa fa-save"></i> Save as Draft
 						</button>
 					</div>
@@ -901,7 +1253,7 @@ document.getElementById("proposedAreaOthers")
 									Balance Area
 								</th>
 
-								<th class="table-primary" style="min-width:120px;">
+								<th class="table-primary" style="min-width:150px;">
 									Action
 								</th>
 
@@ -938,11 +1290,19 @@ document.getElementById("proposedAreaOthers")
 								<td th:if="${area.status.toString().equals('D')}">
 
 
-									<a th:href="@{/deleteDraftPPR8(id=${area.pprProposedAreaId})}"
-										class="btn btn-danger btn-sm"
-										onclick="return confirm('Are you sure you want to delete this record?');">
-										<i class="fas fa-trash"></i>
-									</a>
+									<a href="javascript:void(0)"
+   class="btn btn-danger btn-sm"
+   th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'' 
+       + @{/deleteDraftPPR8(id=${area.pprProposedAreaId})}
+       + '\'; }); return false;'">
+
+    <i class="fas fa-trash"></i>
+</a>
+
+
+
+
+
 
 									<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn"
 										th:attr="data-id=${area.pprProposedAreaId}, data-state=${area.ppr.district.state.stName}, data-district=${area.ppr.district.distName}, 
@@ -952,17 +1312,38 @@ document.getElementById("proposedAreaOthers")
 										<i class="fas fa-edit"></i>
 									</button>
 
+			
+						<a href="javascript:void(0)"
+   class="btn btn-success btn-sm"
+   th:onclick="'completeAlert(\'Are you sure you want to complete this record?\', function() { window.location.href = \'' 
+       + @{/completeDraftPPR8(id=${area.pprProposedAreaId})}
+       + '\'; }); return false;'">
+
+    <i class="fas fa-check"></i>
+</a>
 									
-						<a th:href="@{/completeDraftPPR8(id=${area.pprProposedAreaId})}"
-										class="btn btn-success btn-sm"
-										onclick="return confirm('Are you sure you want to complete this record?');">
-										<i class="fas fa-check"></i>
-									</a>
+									
 								</td>
 								<td th:if="${area.status.toString().equals('C')}">
 									<span class="badge bg-success">
 										<i class="fas fa-check-circle"></i> Completed
 									</span>
+								</td>
+								
+								<td th:if="${area.status.toString().equals('S')}">
+									<span class="badge bg-warning text-dark">
+									<i class="fas fa-forward"></i>
+									Skipped
+								</span>
+								
+								<a href="javascript:void(0)"
+   class="btn btn-danger btn-sm"
+   th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'' 
+       + @{/deleteDraftPPR8(id=${area.pprProposedAreaId})}
+       + '\'; }); return false;'">
+
+    <i class="fas fa-trash"></i>
+</a>
 								</td>
 
 							</tr>
@@ -985,7 +1366,7 @@ document.getElementById("proposedAreaOthers")
 
 								<div class="modal-body">
 
-									<form id="editForm" th:action="@{/updateDraftPPR8}" method="post">
+									<form id="editForm" th:action="@{/updateDraftPPR8}" method="post" novalidate>
 
 										<!-- Hidden ID -->
 										<input type="hidden" id="pprProposedAreaId" name="pprProposedAreaId">
@@ -1057,22 +1438,28 @@ document.getElementById("proposedAreaOthers")
 											<div class="col-md-10">
 
 												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="scheme1"
+													<input class="form-check-input" type="radio" name="scheme1" id="scheme1DPAP"
 														value="DPAP">
 													<label class="form-check-label">DPAP</label>
 												</div>
 
 												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="scheme1"
+													<input class="form-check-input" type="radio" name="scheme1" id="scheme1DDP" 
 														value="DDP">
 													<label class="form-check-label">DDP</label>
 												</div>
 
 												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="scheme1"
+													<input class="form-check-input" type="radio" name="scheme1" id="scheme1IWDP"
 														value="IWDP">
 													<label class="form-check-label">IWDP</label>
 												</div>
+												
+												<div id="scheme1Error"
+             class="invalid-feedback d-block"
+             style="display:none !important;">
+            Please select a Type of Scheme.
+        </div>
 
 											</div>
 
@@ -1092,7 +1479,11 @@ document.getElementById("proposedAreaOthers")
 												<input type="text" class="form-control form-control-sm"
 													id="projSanctionedNo1" name="projSanctionedNo1" maxlength="10"
 													oninput="validateInteger(this,11,5)" required>
+													<div class="invalid-feedback">
+            Please enter the number of sanctioned projects.
+        </div>
 											</div>
+
 
 										</div>
 
@@ -1110,7 +1501,12 @@ document.getElementById("proposedAreaOthers")
 												<input type="text" class="form-control form-control-sm"
 													id="projSanctionedArea1" name="projSanctionedArea1" maxlength="10"
 													oninput="validateDecimal(this,11,5)" required>
+													<div class="invalid-feedback">
+            Please enter the Area of Sanctioned Projects.
+        </div>
 											</div>
+											
+											
 
 										</div>
 
@@ -1128,6 +1524,10 @@ document.getElementById("proposedAreaOthers")
 												<input type="text" class="form-control form-control-sm" id="netArea1"
 													name="netArea1" maxlength="10" oninput="validateDecimal(this, 11,5)"
 													required>
+													
+													 <div class="invalid-feedback">
+            Please enter the Net Area to be Covered.
+        </div>
 											</div>
 
 										</div>
@@ -1146,6 +1546,9 @@ document.getElementById("proposedAreaOthers")
 												<input type="text" class="form-control form-control-sm"
 													id="proposedArea1" name="proposedArea1" maxlength="10"
 													oninput="validateDecimal(this, 11,5)" required>
+													<div class="invalid-feedback">
+            Please enter the Area of Proposed Projects.
+        </div>
 											</div>
 
 										</div>
@@ -1164,6 +1567,9 @@ document.getElementById("proposedAreaOthers")
 												<input type="text" class="form-control form-control-sm"
 													id="proposedAreaOthers1" name="proposedAreaOthers1" maxlength="10"
 													oninput="validateDecimal(this, 11,5)" required>
+													<div class="invalid-feedback">
+            Please enter the Area proposed to be covered by scheme other than DoLR.
+        </div>
 											</div>
 
 										</div>
@@ -1185,7 +1591,7 @@ document.getElementById("proposedAreaOthers")
 
 										</div>
 
-
+<input type="hidden" name="updateAction" value="D">
 										<div class="text-center mt-4">
 											<button type="submit" name="updateAction" value="D" class="btn btn-warning">
 												<i class="fas fa-save"></i>

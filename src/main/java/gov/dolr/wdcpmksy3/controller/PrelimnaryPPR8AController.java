@@ -173,6 +173,47 @@ public class PrelimnaryPPR8AController {
 	}
 	
 	
+	@GetMapping("/checkPPR8BlockStatus")
+	@ResponseBody
+	public Map<String, Object> checkPPR8BlockStatus(
+	        @RequestParam Integer pprId,
+	        @RequestParam Integer bcode) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    Character status = pprProposedAreaService.getBlockStatus(pprId, bcode);
+
+	    if (status == null) {
+
+	        response.put("exists", false);
+	        response.put("status", null);
+
+	    } else if (status == 'D') {
+
+	        response.put("exists", true);
+	        response.put("status", "D");
+	        response.put("message",
+	                "This block is already available in Draft mode.");
+
+	    } else if (status == 'C') {
+
+	        response.put("exists", true);
+	        response.put("status", "C");
+	        response.put("message",
+	                "This block is already completed.");
+
+	    } else {
+
+	        response.put("exists", true);
+	        response.put("status", String.valueOf(status));
+	        response.put("message",
+	                "This block is already present.");
+	    }
+
+	    return response;
+	}
+	
+	
 	@GetMapping("/getPPR8ById")
 	@ResponseBody
 	public String editPPR8(@RequestParam Long id,

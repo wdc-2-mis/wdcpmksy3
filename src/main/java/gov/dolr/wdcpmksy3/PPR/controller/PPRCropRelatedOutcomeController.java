@@ -106,7 +106,7 @@ public class PPRCropRelatedOutcomeController {
 	        Model model) {
 
 	    List<PprCropOutcome> cropOutcomes =
-	            cropOutcomeRepo.findByDistrict(dcode);
+	            cropOutcomeRepo.findByDistrictOrderByStatus(dcode);
 
 	    model.addAttribute("cropOutcomes", cropOutcomes);
 

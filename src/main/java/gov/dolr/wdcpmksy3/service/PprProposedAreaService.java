@@ -74,4 +74,15 @@ public void skipPreliminaryPPR8(Integer pprid, String userId, HttpServletRequest
     	entity.setCreatedDate( LocalDateTime.now() ); 
     	repository.save(entity);
     }
+
+public Character getBlockStatus(Integer pprId, Integer bcode) {
+
+    return repository
+            .findTopByPpr_PprIdAndBlock_BcodeOrderByPprProposedAreaIdDesc(
+                    pprId,
+                    bcode
+            )
+            .map(PprProposedArea::getStatus)
+            .orElse(null);
+}
 }

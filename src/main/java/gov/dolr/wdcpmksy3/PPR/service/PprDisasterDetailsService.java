@@ -202,4 +202,21 @@ public class PprDisasterDetailsService {
     	entity.setCreatedDate( LocalDateTime.now() ); 
     	repository.save(entity);
     }
+
+	public List<PprDisasterDetails> findByState(Integer stcode) {
+	    return repository.findByState(stcode);
+	}
+
+	public String getVillageStatus(Integer pprId, Integer vcode) {
+
+	    List<String> statuses =
+	            repository.findStatusesByPprIdAndVillage(pprId, vcode);
+
+	    if (statuses == null || statuses.isEmpty()) {
+	        return null;
+	    }
+
+	    return statuses.get(0);
+	}
+
 }

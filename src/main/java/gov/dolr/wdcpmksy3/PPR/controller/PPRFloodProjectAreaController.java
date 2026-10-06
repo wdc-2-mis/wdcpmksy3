@@ -1,6 +1,8 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.entity.DisasterType;
@@ -81,7 +84,7 @@ public class PPRFloodProjectAreaController {
 	    model.addAttribute("villageList",
 	            villrepo.getVillagesByState(stcode));
 
-	    List<PprDisasterDetails> records = pprAreaService.findAll();
+	    List<PprDisasterDetails> records = pprAreaService.findByState(stcode);
 	    model.addAttribute("records", records);
 
 	    model.addAttribute("monthList",
@@ -139,7 +142,33 @@ public class PPRFloodProjectAreaController {
 	    return "redirect:/dtlFloodDroughtArea";
 	}
 	
-	
+	@GetMapping("/checkFloodDroughtVillage")
+	@ResponseBody
+	public Map<String, Object> checkFloodDroughtVillage(
+	        @RequestParam Integer pprId,
+	        @RequestParam Integer vcode) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    String status =
+	    		pprAreaService.getVillageStatus(
+	                    pprId,
+	                    vcode
+	            );
+
+	    if (status == null) {
+
+	        response.put("exists", false);
+	        response.put("status", null);
+
+	    } else {
+
+	        response.put("exists", true);
+	        response.put("status", status);
+	    }
+
+	    return response;
+	}
 	
 	@GetMapping("/completeFloodDrought")
 	public String completeFloodDrought(@RequestParam("id") Integer id, RedirectAttributes redirectAttributes, HttpSession session) {

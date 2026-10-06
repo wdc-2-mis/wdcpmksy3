@@ -416,13 +416,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 &nbsp; &nbsp;
     <!-- Complete -->
-    <a th:href="@{/completePPRDistrict(id=${rec.pprId})}"
+    <a href="javascript:void(0)" 
    class="btn btn-success btn-sm"
-   onclick="return confirm('Are you sure you want to complete this record?');">
-
+   th:onclick="'completeAlert(\'Are you sure you want to complete this record?\', function() { window.location.href = \'/completePPRDistrict?id=' + ${rec.pprId} + '\'; }); return false;'">
     <i class="fas fa-check"></i>
-
 </a>
+    
 
 
 

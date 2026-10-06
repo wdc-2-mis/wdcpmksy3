@@ -3,6 +3,7 @@ package gov.dolr.wdcpmksy3.repository;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,4 +27,11 @@ public interface PprProposedAreaRepository extends JpaRepository<PprProposedArea
     int changeStatusByPprId(@Param("pprId") Integer pprId);
     
     List<PprProposedArea> findByPprPprIdAndStatusIn( Integer pprId, List<Character> statuses);
+    
+    
+    Optional<PprProposedArea>
+    findTopByPpr_PprIdAndBlock_BcodeOrderByPprProposedAreaIdDesc(
+            Integer pprId,
+            Integer bcode
+    );
 }

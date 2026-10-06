@@ -20,4 +20,20 @@ public interface PprDisasterDetailsRepository extends JpaRepository<PprDisasterD
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
 	List<PprDisasterDetails> findByPprPprIdAndStatusIn( Integer pprId, List<String> statuses);
+
+	@Query("SELECT p FROM PprDisasterDetails p WHERE p.ppr.district.state.stCode = :stcode ORDER BY CASE WHEN p.status = 'D' THEN 0 ELSE 1 END, p.ppr.pprId ")
+	List<PprDisasterDetails> findByState(@Param("stcode") Integer stcode);
+
+	 @Query("""
+		        SELECT p.status
+		        FROM PprDisasterDetails p
+		        WHERE p.ppr.pprId = :pprId
+		          AND p.vcode.vcode = :vcode
+		        ORDER BY p.pprDisasterId DESC
+		    """)
+		    List<String> findStatusesByPprIdAndVillage(
+		            @Param("pprId") Integer pprId,
+		            @Param("vcode") Integer vcode
+		    );
+
 }
