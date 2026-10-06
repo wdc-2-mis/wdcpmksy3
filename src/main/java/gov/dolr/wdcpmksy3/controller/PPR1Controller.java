@@ -114,6 +114,7 @@ public class PPR1Controller {
             return "redirect:/login";
         }
         model.addAttribute("ppr1List", service.getPPR1List(stcode));
+        model.addAttribute("ppr1ListSize", service.getPPR1List(stcode).size());
 		model.addAttribute("statename", statename);
 		model.addAttribute("stcode", stcode);
         return "ppr1";
