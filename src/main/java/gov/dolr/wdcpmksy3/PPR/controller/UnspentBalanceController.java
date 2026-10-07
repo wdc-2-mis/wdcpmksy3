@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import gov.dolr.wdcpmksy3.PPR.entity.PprPendingUc;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWcdcUnspentBalanceRepository;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.PPR.service.UnspentBalanceServices;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.service.DistrictService;
@@ -34,6 +35,9 @@ public class UnspentBalanceController {
 	@Autowired
     private UnspentBalanceServices serv;
 	
+	@Autowired
+	private PprAreaCoverService pprAreaService;
+	
 	@GetMapping("/unspentBalancePPR20")
     public String pendingUCPPR19(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -47,6 +51,13 @@ public class UnspentBalanceController {
         if (pprid != null) {
         	serv.changeStatusByPprId(pprid);
         }
+        boolean exists=false;
+        exists=pprAreaService.isPprCompleted(stcode);
+        model.addAttribute("existssl", exists);
+		if (!exists) {
+	        model.addAttribute( "error1", "Please complete the Preliminary Project Report");
+	    }
+		
         List<PprWcdcUnspentBalance> records = unblance.findByPpr_District_State_StCode(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
