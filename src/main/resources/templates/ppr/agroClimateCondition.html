@@ -1097,6 +1097,12 @@
 									<i class="fas fa-check"></i>
 								</a>
 								
+								<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[10].toString().equals('S')}" title="Delete"
+									th:onclick="'deleteAlert(\'Do you want to delete this Skipped Data ?\', function() { window.location.href = \'/deleteAgroClimateConditionPPR10?id=' + ${row[0]} + '\'; }); return false;'">
+								
+									<i class="fas fa-trash"></i>
+								</a>
+								
 								<span th:if="${row[10].toString().equals('S')}" class="badge bg-warning text-dark">
 									<i class="fas fa-forward"></i>
 									Skipped
