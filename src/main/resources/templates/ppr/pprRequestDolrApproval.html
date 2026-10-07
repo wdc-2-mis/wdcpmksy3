@@ -245,14 +245,15 @@
 				
 				function openRemarksModal(element, action) {
 						const tranId = element.getAttribute("data-tranid");
+						const pprname = element.getAttribute("data-ppr");
 						document.getElementById("remarksTranId").value = tranId;
 						document.getElementById("remarksAction").value = action;
 						document.getElementById("actionRemarks").value = "";
 						document.getElementById("remarksError").innerText = "";
 						if (action === "reject") {
-							document.getElementById("remarksModalLabel").innerText = "Reject PPR Transaction Request";
+							document.getElementById("remarksModalLabel").innerText = "Reject PPR "+pprname+" Request";
 						} else {
-							document.getElementById("remarksModalLabel").innerText = "Refer Back PPR Transaction Request";
+							document.getElementById("remarksModalLabel").innerText = "Refer Back PPR "+pprname+" Request";
 						}
 						const modal = new bootstrap.Modal(document.getElementById("remarksModal"));
 						modal.show();
@@ -447,11 +448,11 @@
 				            <td th:text="${data.proposedCost}"></td>
 							<td>
 								<div class="d-flex align-items-center gap-2">
-									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}"
+									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}, data-ppr=${data.projectName}"
 										onclick="openRemarksModal(this, 'reject')" class="btn btn-danger btn-sm">
 										Reject
 									</a>
-									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}"
+									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}, data-ppr=${data.projectName}"
 										onclick="openRemarksModal(this, 'refer')" class="btn btn-primary btn-sm">
 										Refer
 									</a>
@@ -478,9 +479,9 @@
 				    </table>
 				</div>
 				<div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
+					<div class="modal-dialog modal-xl">
 						<div class="modal-content">
-							<div class="modal-header">
+							<div class="modal-header bg-primary text-white">
 								<h5 class="modal-title" id="remarksModalLabel">Enter Remarks</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
@@ -755,9 +756,9 @@
 											<td th:text="${data.projectType.projectType}"></td>
 											<td th:text="${data.proposedCost}"></td>
 											<td class="text-center">
-												<div class="col-md-6">
+												<div class="col-md-8">
 													<button type="button" class="btn btn-primary btn-sm viewCriteriaBtn" th:data-id="${data.pprProposedProjectId}">
-														Link <i class="fas fa-list"></i>
+														Total Marks: <span th:text="${data.details != null ? #aggregates.sum(data.details.![scoredMarks]) : 0}"> 0 </span>
 													</button>
 												</div>
 											</td>
