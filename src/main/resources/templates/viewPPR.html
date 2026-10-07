@@ -501,14 +501,14 @@
 						    <td th:text="${data.proposedCost}"></td>
 
 						    <td class="text-center">
-						        <div class="col-md-4">
+						        <div class="col-md-8">
 						            <button type="button"
 						                    class="btn btn-primary btn-sm viewBtn"
 						                    th:data-id="${data.pprProposedProjectId}"
 						                    data-bs-toggle="modal"
 						                    data-bs-target="#viewCriteriaModal">
 
-						                Link <i class="fas fa-list"></i>
+						                Total Marks: <span th:text="${data.details != null ? #aggregates.sum(data.details.![scoredMarks]) : 0}"> 0 </span>
 
 						            </button>
 						        </div>
