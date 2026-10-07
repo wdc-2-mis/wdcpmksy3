@@ -515,7 +515,7 @@ document.addEventListener("DOMContentLoaded", function () {
 						<div class="col-md-2">
 							<label>Type of Erosion:</label><span class="required">*</span>
 						</div>
-						<div class="col-md-3">
+						<div class="col-md-6">
 <!--							<div class="erosion-section">-->
 <!--								<th:block th:each="erosion, stat : ${erosionList}">-->
 <!--									<label class="erosion-radio"> <input type="radio" name="erosionId" th:value="${erosion.erosionId}"-->
@@ -530,8 +530,8 @@ document.addEventListener("DOMContentLoaded", function () {
 									th:value="${erosion.erosionId}" />
 								<label class="form-check-label" th:for="'erosion'+${erosion.erosionId}"
 									th:text="${erosion.categoryType}"></label>
-								<div class="validation-error" data-error-for="erosionId"></div>
 							</div>
+							<div class="validation-error" data-error-for="erosionId"></div>
 							
 						</div>
 					</div>
@@ -553,12 +553,12 @@ document.addEventListener("DOMContentLoaded", function () {
 								<tbody id="soilErosionEntryBody"></tbody>
 							</table>
 						</div>
-						<!-- SAVE -->
-						<div class="text-center mt-4">
-							<button type="submit" id="saveSoilErosionBtn" name="action" value="D" class="btn btn-warning">
-								<i class="fas fa-save"></i> Save as Draft
-							</button>
-						</div>
+					</div>
+					<!-- SAVE -->
+					<div class="text-center mt-4">
+						<button type="submit" id="saveSoilErosionBtn" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted}">
+							<i class="fas fa-save"></i> Save as Draft
+						</button>
 					</div>
 					<div class="text-end mt-2" id="nextBtnContainer" th:if="${selectedDistrict != null}">
 						<button type="button" id="nextBtn" class="btn btn-primary">
@@ -594,10 +594,18 @@ document.addEventListener("DOMContentLoaded", function () {
 						<tr th:each="data : ${soilErosionList}">
 							<td th:text="${data.ppr.district.distName}"></td>
 							<td th:text="${data.ppr.projectName}"></td>
-							<td th:text="${data.erosionType.erosion.categoryType}"></td>
-							<td th:text="${data.erosionType.erosionType}"></td>
-							<td th:text="${data.month.monthName}"></td>
-							<td th:text="${data.year.finYrDesc}"></td>
+							<td>
+								<span th:if="${data.erosionType != null}" th:text="${data.erosionType.erosion.categoryType}"></span>
+							</td>
+							<td>
+								<span th:if="${data.erosionType != null}" th:text="${data.erosionType.erosionType}"></span>
+							</td>
+							<td>
+								<span th:if="${data.month != null}" th:text="${data.month.monthName}"></span>
+							</td>
+							<td>
+								<span th:if="${data.year != null}" th:text="${data.year.finYrDesc}"></span>
+							</td>
 							<td th:text="${data.affectedArea}"></td>
 							<td th:text="${data.runoff}"></td>
 							<td th:text="${data.avgSoilLoss}"></td>
@@ -607,7 +615,7 @@ document.addEventListener("DOMContentLoaded", function () {
 										data-bs-toggle="modal" data-bs-target="#editModal" th:if="${#strings.trim(data.status) == 'D'}">
 										<i class="fas fa-edit"></i>
 									</button>
-									<a th:if="${#strings.trim(data.status) == 'D'}" class="btn btn-danger btn-sm"
+									<a th:if="${#strings.trim(data.status) != 'C'}" class="btn btn-danger btn-sm"
 										th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deletePPRSoilErosion?id=' + ${data.id} + '\'; }); return false;'">
 										<i class="fas fa-trash"></i>
 									</a>
@@ -617,6 +625,9 @@ document.addEventListener("DOMContentLoaded", function () {
 									</a>
 									<span th:if="${#strings.trim(data.status) == 'C'}" class="badge bg-success">
 										<i class="fas fa-check-circle"></i> Completed
+									</span>
+									<span th:if="${#strings.trim(data.status) == 'S'}" class="badge bg-warning text-dark">
+										<i class="fas fa-forward"></i> Skipped
 									</span>
 								</div>
 							</td>

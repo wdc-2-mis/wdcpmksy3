@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.PPR.dto.PprRequestDolrApprovalDto;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
+import gov.dolr.wdcpmksy3.PPR.entity.PPRMigrationDetails;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProposedProject;
 
 @Repository
@@ -47,5 +48,8 @@ public interface PprProposedProjectRepository extends JpaRepository<PprProposedP
 	PprRequestDolrApprovalDto getPprRequestDolrApprovalData(@Param("ppr") MPpr ppr);
 	
 	List<PprProposedProject> findByPprPprIdAndStatusIn(Integer pprId, List<Character> statuses);
+	
+	@Query("select pp from PprProposedProject pp WHERE pp.ppr.district.state.stCode = :stCode order by pp.status desc")
+	List<PprProposedProject> findPprProposedProjectBystCode(Integer stCode);
 
 }

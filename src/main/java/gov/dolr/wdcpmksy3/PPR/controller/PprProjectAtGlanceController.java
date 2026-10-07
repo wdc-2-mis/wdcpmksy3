@@ -19,6 +19,7 @@ import gov.dolr.wdcpmksy3.PPR.dto.VillageDropdownDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PprProjectGlanceService;
 import gov.dolr.wdcpmksy3.PPR.service.ProjectTypeService;
@@ -56,6 +57,9 @@ public class PprProjectAtGlanceController {
 	
 	@Autowired
 	private VillageRepository villageRepo;
+	
+	@Autowired
+	private PprProjectGlanceRepository pprProjectGlanceRepo;
 	 
 	@GetMapping("/pprProjectAtGlance")
     public String pprProjectAtGlance(@RequestParam(required = false) Integer dcode, HttpSession session, 
@@ -71,6 +75,10 @@ public class PprProjectAtGlanceController {
 		if (pprid != null) {
 			pprProjectGlanceServ.changeStatusByPprId(pprid);
         }
+		boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "C");
+        model.addAttribute("pprCompleted", pprCompleted);
+	    if (!pprCompleted) 
+	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Project at a Glance.");
 		if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
@@ -80,7 +88,6 @@ public class PprProjectAtGlanceController {
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	        		model.addAttribute("pprId", project);
-	        		model.addAttribute("pprProjectAtGlanceList", pprProjectGlanceServ.getPprProjectGlanceList(ppr));
 		            model.addAttribute("project", ppr.getProjectName());
 		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
 	        	}
@@ -89,6 +96,7 @@ public class PprProjectAtGlanceController {
 		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("state", statename);
+		model.addAttribute("pprProjectAtGlanceList", pprProjectGlanceRepo.findPprProjectGlanceBystCode(stcode));
 		
 		return "ppr/pprProjectAtGlance";
 	}

@@ -62,9 +62,17 @@ public class PreliminaryPPR15AController {
 
 		String statename = session.getAttribute("statename").toString();
 	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+	    Object userid = session.getAttribute("userid");
+        if(userid==null){
+            return "redirect:/login";
+        }
 	    if (pprid != null) {
 	    	migrationDetailsService.changeStatusByPprId(pprid);
         }
+	    boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "C");
+        model.addAttribute("pprCompleted", pprCompleted);
+	    if (!pprCompleted) 
+	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Migration Details.");
 	    if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
@@ -73,7 +81,6 @@ public class PreliminaryPPR15AController {
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	        		model.addAttribute("pprId", project);
-	        		model.addAttribute("draftList", pprMigrationDetailsRepository.findPPRMigrationDetailsByPprId(ppr.getPprId()));
 		            model.addAttribute("project", ppr.getProjectName());
 		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
 		            model.addAttribute("villageList",villageService.getVillagesByProject(ppr.getPprId()));
@@ -82,6 +89,7 @@ public class PreliminaryPPR15AController {
 	    }
 	    model.addAttribute("statename", statename);
 	    model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
+	    model.addAttribute("draftList", pprMigrationDetailsRepository.findPPRMigrationDetailsBystCode(stcode));
 
 	    return "ppr15";
 	}
@@ -170,90 +178,47 @@ public class PreliminaryPPR15AController {
 	}
 	
 	@PostMapping("/updatePPR15")
-	public String updatePPR15(
-	        HttpSession session,
-	        Model model,
-	        HttpServletRequest request,
-
-	        @RequestParam Integer editPpr15Id,
-	        @RequestParam Integer editMigratingPeopleCount,
-	        @RequestParam Integer editMigrationDaysPerYear,
-	        @RequestParam String editMigrationReason,
-	        @RequestParam Integer editExpectedReduction,
-
-	        RedirectAttributes redirectAttributes) {
-
+	public String updatePPR15(HttpSession session, Model model, HttpServletRequest request,
+	        @RequestParam Integer editPpr15Id, @RequestParam Integer editMigratingPeopleCount, @RequestParam Integer editMigrationDaysPerYear,
+	        @RequestParam String editMigrationReason, @RequestParam Integer editExpectedReduction, RedirectAttributes redirectAttributes) {
 	    String userid = (String) session.getAttribute("userid");
-
 	    if (userid != null) {
-
 	        try {
-
-	            migrationDetailsService.updatePPR15(
-	                    editPpr15Id,
-	                    editMigratingPeopleCount,
-	                    editMigrationDaysPerYear,
-	                    editMigrationReason,
-	                    editExpectedReduction,
-	                    userid,
-	                    request);
-
-	            redirectAttributes.addFlashAttribute(
-	                    "success",
-	                    "Record updated successfully.");
-
+	            migrationDetailsService.updatePPR15(editPpr15Id, editMigratingPeopleCount, editMigrationDaysPerYear, editMigrationReason, editExpectedReduction, userid, request);
+	            redirectAttributes.addFlashAttribute("success", "Record updated successfully.");
 	        } catch (Exception e) {
-
-	            redirectAttributes.addFlashAttribute(
-	                    "error",
-	                    e.getMessage());
+	            redirectAttributes.addFlashAttribute("error", "Unable to update Migration Details.");
 	        }
-
 	        return "redirect:/preliminaryPPR15";
-
 	    } else {
-
 	        return "redirect:/login";
 	    }
 	}
 	
 	@GetMapping("/deletePreliminaryPPR15")
-	public String deletePreliminaryPPR15(@RequestParam Integer id,
-	                                     RedirectAttributes redirectAttributes) {
-
-	    pprMigrationDetailsRepository.deleteById(id);
-
-	    redirectAttributes.addFlashAttribute("success",
-	            "Record Deleted Successfully.");
-
+	public String deletePreliminaryPPR15(@RequestParam Integer id, RedirectAttributes redirectAttributes) {
+		try {
+			pprMigrationDetailsRepository.deleteById(id);
+			redirectAttributes.addFlashAttribute("success", "Record Deleted Successfully.");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("error", "Unable to Delete Record.");
+		}
 	    return "redirect:/preliminaryPPR15";
 	}
 
 	
 	@GetMapping("/completePreliminaryPPR15")
-	public String completePreliminaryPPR15(@RequestParam Integer id,
-	                                       RedirectAttributes redirectAttributes,
-	                                       HttpSession session) {
-
+	public String completePreliminaryPPR15(@RequestParam Integer id, RedirectAttributes redirectAttributes, HttpSession session) {
 	    String userid = (String) session.getAttribute("userid");
-
-	    if (userid == null) {
+	    if (userid == null) 
 	        return "redirect:/login";
-	    }
-
-	    PPRMigrationDetails data =
-	            pprMigrationDetailsRepository.findById(id).orElse(null);
-
+	    PPRMigrationDetails data = pprMigrationDetailsRepository.findById(id).orElse(null);
 	    if (data != null) {
 	        data.setStatus('C');
 	        data.setUpdatedBy(userid);
 	        pprMigrationDetailsRepository.save(data);
-
-	        redirectAttributes.addFlashAttribute(
-	                "success",
-	                "Record Completed Successfully.");
+	        redirectAttributes.addFlashAttribute("success", "Record Completed Successfully.");
 	    }
-
 	    return "redirect:/preliminaryPPR15";
 	}
 	

@@ -31,6 +31,7 @@ import gov.dolr.wdcpmksy3.PPR.repository.CriteriaDetailsRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.CriteriaRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprProposedProjectRepository;
 import gov.dolr.wdcpmksy3.PPR.service.MicroWatershedService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRDistrictService;
 import gov.dolr.wdcpmksy3.PPR.service.PprProposedProjectService;
@@ -67,6 +68,9 @@ public class PprProposedProjectController {
 	@Autowired
 	private CriteriaDetailsRepository criteriaDetailsRepo;
 	
+	@Autowired
+	private PprProposedProjectRepository pprProposedProjectRepo;
+	
 	@GetMapping("/pprProposedProjectDetails")
     public String pprProposedProjectDetails(@RequestParam(required = false) Integer dcode, 
     		HttpSession session, Model model, @RequestParam(required = false) Integer pprid, @RequestParam(required = false) Integer project) {
@@ -81,6 +85,10 @@ public class PprProposedProjectController {
 		if (pprid != null) {
 			proposedProjectService.changeStatusByPprId(pprid);
         }
+		boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "C");
+        model.addAttribute("pprCompleted", pprCompleted);
+	    if (!pprCompleted) 
+	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Prioritized List of Proposed Project Details.");
 		if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
 	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
@@ -89,8 +97,7 @@ public class PprProposedProjectController {
 	            if(project != null) {
 	            	MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	 	            model.addAttribute("pprId", project);
-	 	           model.addAttribute("microWatershedList", microWatershedServ.getListOfMicroWatershedByPprId(project));
-	 	            model.addAttribute("detailsOfListOfProposedProject", proposedProjectService.getPprProposedProjectList(ppr));
+	 	            model.addAttribute("microWatershedList", microWatershedServ.getListOfMicroWatershedByPprId(project));
 	            }
 	        }
 	    }
@@ -98,6 +105,7 @@ public class PprProposedProjectController {
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("criteriaList", criteriaRepo.findAll());
 		model.addAttribute("statename", statename);
+		model.addAttribute("detailsOfListOfProposedProject", pprProposedProjectRepo.findPprProposedProjectBystCode(stcode));
 		
 		return "prioritizedListOfProposedProject";
 	}

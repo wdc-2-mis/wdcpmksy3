@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
+import gov.dolr.wdcpmksy3.PPR.entity.PPRMigrationDetails;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProjectGlance;
 
 public interface PprProjectGlanceRepository extends JpaRepository<PprProjectGlance, Integer>{
@@ -22,5 +23,8 @@ public interface PprProjectGlanceRepository extends JpaRepository<PprProjectGlan
 	int changeStatusByPprId(@Param("pprId") Integer pprId);
 	
 	List<PprProjectGlance> findByPprPprIdAndStatusIn( Integer pprId, List<Character> statuse);
+	
+	@Query("select pg from PprProjectGlance pg WHERE pg.ppr.district.state.stCode = :stCode order by pg.status desc")
+	List<PprProjectGlance> findPprProjectGlanceBystCode(Integer stCode);
 
 }

@@ -21,6 +21,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MErosionType;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PPRSoilErosion;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PPRSoilErosionRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRSoilErosionService;
 import gov.dolr.wdcpmksy3.service.DistrictService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,6 +39,9 @@ public class PPRSoilErosionController {
 	@Autowired
 	private MPprRepository mPprRepo;
 	
+	@Autowired
+	private PPRSoilErosionRepository pprSoilErosionRepo;
+	
 	@GetMapping("/pprSoilErosion")
     public String soilErosionForm(HttpSession session, Model model, @RequestParam(required = false) Integer dcode,
     		@RequestParam(required = false) Integer pprid, @RequestParam(required = false) Integer project) {
@@ -47,6 +51,10 @@ public class PPRSoilErosionController {
         if(userid==null){
             return "redirect:/login";
         }
+        boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "C");
+        model.addAttribute("pprCompleted", pprCompleted);
+	    if (!pprCompleted) 
+	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering PPR Soil Erosion Details.");
         if (pprid != null) {
         	soilErosionService.changeStatusByPprId(pprid);
         }
@@ -56,7 +64,6 @@ public class PPRSoilErosionController {
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
-	        		model.addAttribute("soilErosionList",soilErosionService.getByPprId(project));
 	        		model.addAttribute("pprId", project);
 	        	}
         	}
@@ -68,6 +75,7 @@ public class PPRSoilErosionController {
         model.addAttribute("erosionList", erosionList);
         model.addAttribute("monthList", soilErosionService.getAllMonths());
         model.addAttribute("yearList", soilErosionService.getAllYears());
+        model.addAttribute("soilErosionList",pprSoilErosionRepo.findPPRSoilErosionBystCode(stcode));
 
         return "ppr/pprSoilErosion";
     }

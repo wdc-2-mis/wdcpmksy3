@@ -82,8 +82,8 @@ public interface PPRMigrationDetailsRepository extends JpaRepository<PPRMigratio
 	@Query("UPDATE PPRMigrationDetails m SET m.status = 'D' WHERE m.pprId = :pprId")
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
-	
-	List<PPRMigrationDetails> findPPRMigrationDetailsByPprId(Integer pprId);
+	@Query("select m from PPRMigrationDetails m WHERE m.ppr.district.state.stCode = :stCode order by m.status desc")
+	List<PPRMigrationDetails> findPPRMigrationDetailsBystCode(Integer stCode);
 	
 	
 }

@@ -73,4 +73,7 @@ public interface PPRSoilErosionRepository extends JpaRepository<PPRSoilErosion, 
               AND s.status = 'C'
         """)
         boolean existsByStCodeAndStatusC(@Param("stCode") Integer stCode);
+    
+    @Query("select sr from PPRSoilErosion sr WHERE sr.ppr.district.state.stCode = :stCode order by sr.status desc")
+    List<PPRSoilErosion> findPPRSoilErosionBystCode(Integer stCode);
 }
