@@ -23,7 +23,7 @@ public interface CropOutcomeRepository extends JpaRepository<PprCropOutcome, Int
 	@Query(" SELECT p FROM PprCropOutcome p WHERE p.ppr.district.state.stCode = :stcode ORDER BY CASE WHEN p.status = 'D' THEN 0 ELSE 1 END, p.pprCropOutcomeId")
 	List<PprCropOutcome> findByStateOrderByStatus(Integer stcode);
 	
-	List<PprCropOutcome> findByPprPprIdAndStatus(Integer pprId, String status);
+	List<PprCropOutcome> findByPprPprIdAndStatus(Integer pprId, Character status);
 	
 	@Modifying
 	@Transactional

@@ -354,7 +354,7 @@ public class PprDolrApprovalController {
         data.put("pprDrinkingWaterList", pprDrinkingWaterList);
 
         // ---- PPR-18 ----
-        List<PprCropOutcome> cropOutcomes = cropOutcomeRepo.findByPprPprIdAndStatus(project, "C");
+        List<PprCropOutcome> cropOutcomes = cropOutcomeRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("cropOutcomes", cropOutcomes);
 
         // ---- PPR-19 ----
