@@ -35,5 +35,9 @@ public interface PprTransactionRepository extends JpaRepository<PprTransaction, 
     
     List<PprTransaction> findByPprPprIdOrderBySentonDesc(Integer pprId);
     
+    @Query("select count(t) > 0 from PprTransaction t where t.ppr.pprId = :pprId and t.action in ('A', 'F') and t.senton=(select max(t2.senton)"
+    		+ "from PprTransaction t2  where t2.ppr.pprId = t.ppr.pprId)  group by t.senton order by t.senton desc")
+    boolean existsActionAOrF(@Param("pprId") Integer pprId);
+    
     
 }

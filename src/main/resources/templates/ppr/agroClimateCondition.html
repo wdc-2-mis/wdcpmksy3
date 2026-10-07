@@ -45,7 +45,19 @@
 
 
 <script>
+		function setInvalid(el, msg) {
+			el.classList.add("is-invalid");
+			el.classList.remove("is-valid");
+			const fb = el.parentElement.querySelector(".invalid-feedback");
+			if (fb && msg) {
+				fb.textContent = msg;
+			}
+		}
 
+		function setValid(el) {
+			el.classList.remove("is-invalid");
+			el.classList.add("is-valid");
+		}
 	document.addEventListener("DOMContentLoaded", function () {
 		
 		const editForm = document.getElementById("editForm");
@@ -708,6 +720,24 @@
 
 		    let projectId = this.value;
 		    let village = document.getElementById("village");
+			const proj =document.getElementById("project");
+			
+			if (projectId === "") {
+				return;
+			}
+			fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(projectId))
+				.then(response => response.text())
+				.then(result => {
+					if (result === "EXISTS") {
+						this.value = "";
+						setInvalid(proj, "This PPR data already Forward/Approved. Please select a different PPR Project.");
+					} else {
+						setValid(proj);
+					}
+				})
+				.catch(error => console.error(error));
+			
+			
 
 		    village.innerHTML =
 		        '<option value="">--Select Village--</option>';

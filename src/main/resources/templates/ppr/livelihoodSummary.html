@@ -45,12 +45,22 @@
 
 
 <script>
+	
+		function setInvalid(el, msg) {
+			el.classList.add("is-invalid");
+			el.classList.remove("is-valid");
+			const fb = el.parentElement.querySelector(".invalid-feedback");
+			if (fb && msg) {
+				fb.textContent = msg;
+			}
+		}
+
+		function setValid(el) {
+			el.classList.remove("is-invalid");
+			el.classList.add("is-valid");
+		}
+			
 	document.addEventListener("DOMContentLoaded", function () {
-		
-		
-
-
-
 
 		const forme = document.getElementById("editForm");
 				       
@@ -247,20 +257,20 @@
 				           district.classList.add("is-valid");
 				       }
 					   
-					   const block = document.getElementById("block");
+				//	   const block = document.getElementById("block");
 
-					   if (block.value === "") {
+				//	   if (block.value === "") {
 
-						   block.classList.add("is-invalid");
-						   block.classList.remove("is-valid");
+				//		   block.classList.add("is-invalid");
+				//		   block.classList.remove("is-valid");
 
-						   isValid = false;
+				//		   isValid = false;
 
-					   } else {
-
-						   block.classList.remove("is-invalid");
-						   block.classList.add("is-valid");
-					   }
+				//	   } else {
+//
+				//		   block.classList.remove("is-invalid");
+					//	   block.classList.add("is-valid");
+					//   }
 					   
 				       // ==========================================
 				       // Project
@@ -456,7 +466,7 @@
 			   
 		       // Populate modal fields  reason1
 		       document.getElementById('livsamid').value = Id;
-		       document.getElementById('block1').value = block;
+		     //  document.getElementById('block1').value = block;
 		       document.getElementById('district1').value = district;
 		       document.getElementById('project1').value = project;
 			   document.getElementById('migrat1').value = migstatus;
@@ -765,6 +775,24 @@
 		    let village = document.getElementById("village");
 			let watershed = document.getElementById("watershed");
 			
+			const proj = document.getElementById("project");
+
+			if (projectId === "") {
+				return;
+			}
+			fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(projectId))
+				.then(response => response.text())
+				.then(result => {
+					if (result === "EXISTS") {
+						this.value = "";
+						setInvalid(proj, "This PPR data already Forward/Approved. Please select a different PPR Project.");
+					} else {
+						setValid(proj);
+					}
+				})
+				.catch(error => console.error(error));
+			
+			
 		    village.innerHTML ='<option value="">--Select Village--</option>';
 		    if(projectId===""){
 		        return;
@@ -931,7 +959,7 @@
 				
 				<div class="row g-4">
 					
-				        <div class="col-md-4">
+				        <div class="col-md-6">
 				             <label class="form-label">
 				                 <b> District </b><span class="required">*</span>
 				              </label>
@@ -943,7 +971,18 @@
 								</select>
 								<div class="invalid-feedback">Please select a District.</div>
 				       	</div>
-						<div class="col-md-4">
+						
+						<div class="col-md-6">
+							<label class="form-label">
+								<b> Project </b><span class="required">*</span>
+							</label>
+							<select id="project" name="project" class="form-select" required>
+								<option value="">--Select Project--</option>
+							</select>
+							<div class="invalid-feedback">Please select a Project.</div>
+						</div>
+						
+						<!--<div class="col-md-4">
 							<label class="form-label">
 								<b> Block </b><span class="required">*</span>
 							</label>
@@ -951,17 +990,9 @@
 								<option value="">--Select Block--</option>
 							</select>
 							<div class="invalid-feedback">Please select a Block.</div>
-						</div>
-						<div class="col-md-4">
-							<label class="form-label">
-								<b> Project </b><span class="required">*</span>
-							</label>
-							<select id="project" name="project" class="form-select" required>
-								<option value="">--Select Project--</option>
-							</select>	
-							<div class="invalid-feedback">Please select a Project.</div>				
-						</div>
-				        <div class="col-md-4">
+						</div>-->
+						
+				        <div class="col-md-6">
 							<label class="form-label">
 								<b> Name of Watershed </b><span class="required">*</span>
 							</label>
@@ -970,7 +1001,7 @@
 							</select>
 							<div class="invalid-feedback">Please select a Micro Watershed.</div>
 				        </div>
-						<div class="col-md-4">
+						<div class="col-md-6">
 							<label class="form-label">
 								<b> Village</b> <span class="required">*</span>
 							</label>
@@ -1208,26 +1239,27 @@
 							<!-- Member Details -->
 							<div class="row g-4">
 							
-								<div class="col-md-4">
+								<div class="col-md-6">
 									<label class="form-label">
 										<b> District </b><span class="required">*</span>
 									</label>
 									<input type="text" name="district1" id="district1" class="form-control" readonly>
 							
 								</div>
-								<div class="col-md-4">
-									<label class="form-label">
-										<b> Block </b><span class="required">*</span>
-									</label>
-									<input type="text" name="block1" id="block1" class="form-control" readonly>
-								</div>
-								<div class="col-md-4">
+								<div class="col-md-6">
 									<label class="form-label">
 										<b> Project </b><span class="required">*</span>
 									</label>
 									<input type="text" name="project1" id="project1" class="form-control" readonly>
 								</div>
-								<div class="col-md-4">
+								<!--<div class="col-md-4">
+									<label class="form-label">
+										<b> Block </b><span class="required">*</span>
+									</label>
+									<input type="text" name="block1" id="block1" class="form-control" readonly>
+								</div>-->
+								
+								<div class="col-md-6">
 									<label class="form-label">
 										<b> Name of Watershed </b><span class="required">*</span>
 									</label>
@@ -1236,7 +1268,7 @@
 									</select>
 									<div class="invalid-feedback">Please select a Micro Watershed.</div>
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-6">
 									<label class="form-label">
 										<b> Village</b> <span class="required">*</span>
 									</label>

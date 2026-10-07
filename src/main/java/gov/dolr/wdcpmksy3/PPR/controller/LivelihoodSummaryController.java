@@ -100,7 +100,7 @@ public class LivelihoodSummaryController {
 	 @PostMapping("/saveLivelihoodSummaryPPR13")
 	 public String saveLivelihoodSummaryPPR13(HttpSession session, Model model, HttpServletRequest request,
 	    		@RequestParam Integer district,
-	    		@RequestParam Integer block,
+	    	//	@RequestParam Integer block,
 	    		@RequestParam Integer project,
 	    		@RequestParam Integer village,
 	    		@RequestParam List<Integer> livact,
@@ -113,6 +113,7 @@ public class LivelihoodSummaryController {
 	   
 				Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 				String userid=(String)session.getAttribute("userid");
+				Integer block=0;
 				try {
 					
 					 if(userid==null){
