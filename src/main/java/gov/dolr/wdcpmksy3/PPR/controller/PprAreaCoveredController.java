@@ -66,7 +66,7 @@ public class PprAreaCoveredController {
 
 	        model.addAttribute(
 	                "error",
-	                "Please complete the Preliminary Project Report First before entering Area covered under the watershed programme."
+	                "Please complete the Preliminary Project Report First."
 	        );
 
 	    } else {

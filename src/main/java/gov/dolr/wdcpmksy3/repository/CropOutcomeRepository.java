@@ -20,7 +20,8 @@ public interface CropOutcomeRepository extends JpaRepository<PprCropOutcome, Int
 	@Query(" SELECT p FROM PprCropOutcome p WHERE p.ppr.district.dcode = :dcode ORDER BY CASE WHEN p.status = 'D' THEN 0 ELSE 1 END, p.pprCropOutcomeId")
 	List<PprCropOutcome> findByDistrictOrderByStatus(Integer dcode);
 	
-	
+	@Query(" SELECT p FROM PprCropOutcome p WHERE p.ppr.district.state.stCode = :stcode ORDER BY CASE WHEN p.status = 'D' THEN 0 ELSE 1 END, p.pprCropOutcomeId")
+	List<PprCropOutcome> findByStateOrderByStatus(Integer stcode);
 	
 	List<PprCropOutcome> findByPprPprIdAndStatus(Integer pprId, String status);
 	
@@ -32,5 +33,18 @@ public interface CropOutcomeRepository extends JpaRepository<PprCropOutcome, Int
 	boolean existsByPpr_InstitutionalStructure_StCodeAndStatus(Integer stCode, String status);
 	
 	List<PprCropOutcome> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
+
+	@Query("""
+		    SELECT c.status
+		    FROM PprCropOutcome c
+		    WHERE c.ppr.pprId = :pprId
+		      AND c.ppr.district.dcode = :dcode
+		      AND c.season.seasonId = :seasonId
+		    ORDER BY c.pprCropOutcomeId DESC
+		""")
+		List<Character> findStatusByDistrictProjectSeason(
+		        @Param("dcode") Integer dcode,
+		        @Param("pprId") Integer pprId,
+		        @Param("seasonId") Integer seasonId);
 
 }

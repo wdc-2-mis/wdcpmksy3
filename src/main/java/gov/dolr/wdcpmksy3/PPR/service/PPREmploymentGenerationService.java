@@ -319,4 +319,9 @@ public class PPREmploymentGenerationService {
     	entity.setCreatedDate( LocalDateTime.now() ); 
     	repository.save(entity);
     }
+
+
+	public List<Map<String, Object>> getEmploymentGenerationByState(Integer stcode) {
+		return repository.getEmploymentGenerationByState(stcode);
+	}
 }

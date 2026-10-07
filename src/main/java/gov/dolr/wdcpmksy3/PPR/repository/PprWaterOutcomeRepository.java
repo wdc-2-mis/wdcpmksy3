@@ -61,6 +61,23 @@ public interface PprWaterOutcomeRepository extends JpaRepository<PprWaterOutcome
 	            Integer watershedId,
 	            Integer vcode
 	    );
+
+	 @Query("""
+			    SELECT o
+			    FROM PprWaterOutcome o
+			    JOIN FETCH o.ppr p
+			    JOIN FETCH p.district d
+			    JOIN FETCH o.microWatershed mw
+			    JOIN FETCH o.village v
+			    JOIN FETCH o.waterSource ws
+			    WHERE d.state.stCode = :stcode
+			    ORDER BY CASE
+			        WHEN o.status = 'D' THEN 0
+			        WHEN o.status = 'C' THEN 1
+			        ELSE 2
+			    END
+			""")
+			List<PprWaterOutcome> findByState(Integer stcode);
 	
 	
 

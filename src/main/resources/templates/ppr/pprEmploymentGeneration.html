@@ -168,19 +168,19 @@ function clearDropdownValidation(field) {
     district.addEventListener("change", function() {
         let districtId = this.value;
         
-        if (districtId !== "") {
-            loadEmploymentTable(districtId);
-        } else {
-            document.getElementById("employmentListDiv").style.display = "none";
-        }
+        loadEmploymentTable(districtId);
 
-        project.innerHTML = '<option value="">--Select Project--</option>';
-        watershed.innerHTML = '<option value="">--Select Micro Watershed--</option>';
-        village.innerHTML = '<option value="">--Select Village--</option>';
+    project.innerHTML = '<option value="">--Select Project--</option>';
 
-        if (districtId === "") {
-            return;
-        }
+    watershed.innerHTML = '<option value="">--Select Micro Watershed--</option>';
+
+    village.innerHTML = '<option value="">--Select Village--</option>';
+
+    if (districtId === "") {
+
+        return;
+
+    }
 
         fetch("/getProjectsByDistrictEmployment?dcode=" + districtId)
             .then(response => response.json())
@@ -550,130 +550,273 @@ employmentValidation.style.setProperty(
         }
 
 
-        /* =====================================================
-           ALL VALID
-           ===================================================== */
 
         form.submit();
 
     });
 }
 
-    /* =========================================================
-     LOAD EMPLOYMENT TABLE
-     ========================================================= */
     function loadEmploymentTable(dcode) {
-        const tableDiv = document.getElementById("employmentListDiv");
-        const tableBody = document.getElementById("employmentTableBody");
 
-        tableBody.innerHTML = "";
+    const tableDiv =
+        document.getElementById("employmentListDiv");
 
-        if (!dcode) {
-            tableDiv.style.display = "none";
-            return;
-        }
+    const tableBody =
+        document.getElementById("employmentTableBody");
 
-        fetch("/getEmploymentGenerationByDistrict?dcode=" + dcode)
-            .then(response => response.json())
-            .then(data => {
-                if (!data || data.length === 0) {
-                    tableDiv.style.display = "none";
-                    return;
-                }
+    tableBody.innerHTML = "";
 
-                tableDiv.style.display = "block";
-                let rows = "";
-                let previousDistrict = "";
-                let previousProject = "";
-                let previousWatershed = "";
-                let previousVillage = "";
+    let url = "/getEmploymentGenerationByDistrict";
 
-                data.forEach(function(item) {
-                    const district = item.dist_name;
-                    const project = item.project_name;
-                    const watershed = item.mw_name;
-                    const village = item.village_name;
-
-                    const showDistrict = district !== previousDistrict;
-                    const showProject = showDistrict || project !== previousProject;
-                    const showWatershed = showProject || watershed !== previousWatershed;
-                    const showVillage = showWatershed || village !== previousVillage;
-
-                    const sc = parseInt(item.sc) || 0;
-                    const st = parseInt(item.st) || 0;
-                    const others = parseInt(item.others) || 0;
-                    const women = parseInt(item.women) || 0;
-                    const total = sc + st + others + women;
-
-                    rows += `
-                        <tr>
-                            <td>${showDistrict ? district : ""}</td>
-                            <td>${showProject ? project : ""}</td>
-                            <td>${showWatershed ? watershed : ""}</td>
-                            <td>${showVillage ? village : ""}</td>
-                            <td>${item.employment_type_name}</td>
-                            <td class="text-end">${sc}</td>
-                            <td class="text-end">${st}</td>
-                            <td class="text-end">${others}</td>
-                            <td class="text-end">${women}</td>
-                            <td class="text-end">${total}</td>
-                            <td class="text-center">
-                                ${item.status === "D" ?
-                                    `<a href="javascript:void(0)" 
-       class="btn btn-danger btn-sm"
-       onclick="deleteAlert('Are you sure you want to delete this record?', function() { window.location.href = '/deletePPREmployment?id=${item.ppr_employment_id}'; }); return false;">
-        <i class="fas fa-trash"></i>
-    </a>
-                                    
-                                    &nbsp;&nbsp;
-                                    <a href="javascript:void(0)" class="btn btn-primary btn-sm edit-btn"
-                                        data-id="${item.ppr_employment_id}"
-                                        data-district="${district}"
-                                        data-project="${project}"
-                                        data-watershed="${watershed}"
-                                        data-village="${village}"
-                                        data-type="${item.employment_type_name}"
-                                        data-sc="${sc}"
-                                        data-st="${st}"
-                                        data-others="${others}"
-                                        data-women="${women}"
-                                        title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    &nbsp;&nbsp;
-                                    <a href="javascript:void(0)" 
-       class="btn btn-success btn-sm"
-       onclick="completeAlert('Are you sure you want to complete this record?', function() { window.location.href = '/completePPREmployment?id=${item.ppr_employment_id}'; }); return false;">
-        <i class="fas fa-check"></i>
-    </a>`
-                                    :
-                                    `<span class="badge bg-success">
-                                        <i class="fas fa-check-circle"></i> Completed
-                                    </span>`
-                                }
-                            </td>
-                        </tr>
-                    `;
-
-                    previousDistrict = district;
-                    previousProject = project;
-                    previousWatershed = watershed;
-                    previousVillage = village;
-                });
-
-                tableBody.innerHTML = rows;
-            })
-            .catch(error => {
-                console.error("Error loading employment:", error);
-                tableDiv.style.display = "block";
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="11" class="text-center text-danger">Unable to load records.</td>
-                    </tr>
-                `;
-            });
+    // District selected
+    if (dcode) {
+        url += "?dcode=" + encodeURIComponent(dcode);
     }
 
+    fetch(url)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            if (!data || data.length === 0) {
+
+                tableDiv.style.display = "none";
+                return;
+            }
+
+            tableDiv.style.display = "block";
+
+            let rows = "";
+
+            let previousDistrict = "";
+            let previousProject = "";
+            let previousWatershed = "";
+            let previousVillage = "";
+
+            data.forEach(function(item) {
+
+                const district =
+                    item.dist_name || "";
+
+                const project =
+                    item.project_name || "";
+
+                const watershed =
+                    item.mw_name || "";
+
+                const village =
+                    item.village_name || "";
+
+                const showDistrict =
+                    district !== previousDistrict;
+
+                const showProject =
+                    showDistrict ||
+                    project !== previousProject;
+
+                const showWatershed =
+                    showProject ||
+                    watershed !== previousWatershed;
+
+                const showVillage =
+                    showWatershed ||
+                    village !== previousVillage;
+
+                const sc =
+                    parseInt(item.sc) || 0;
+
+                const st =
+                    parseInt(item.st) || 0;
+
+                const others =
+                    parseInt(item.others) || 0;
+
+                const women =
+                    parseInt(item.women) || 0;
+
+                const total =
+                    sc + st + others + women;
+
+                rows += `
+
+                    <tr>
+
+                        <td>
+                            ${showDistrict ? district : ""}
+                        </td>
+
+                        <td>
+                            ${showProject ? project : ""}
+                        </td>
+
+                        <td>
+                            ${showWatershed ? watershed : ""}
+                        </td>
+
+                        <td>
+                            ${showVillage ? village : ""}
+                        </td>
+
+                        <td>
+                            ${item.employment_type_name || ""}
+                        </td>
+
+                        <td class="text-end">
+                            ${sc}
+                        </td>
+
+                        <td class="text-end">
+                            ${st}
+                        </td>
+
+                        <td class="text-end">
+                            ${others}
+                        </td>
+
+                        <td class="text-end">
+                            ${women}
+                        </td>
+
+                        <td class="text-end">
+                            ${total}
+                        </td>
+
+                        <td class="text-center">
+
+                            ${item.status === "D" ?
+
+                                `
+
+                                <a href="javascript:void(0)"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="deleteAlert(
+                                       'Are you sure you want to delete this record?',
+                                       function() {
+                                           window.location.href =
+                                           '/deletePPREmployment?id=${item.ppr_employment_id}';
+                                       }
+                                   ); return false;">
+
+                                    <i class="fas fa-trash"></i>
+
+                                </a>
+
+                                &nbsp;&nbsp;
+
+                                <a href="javascript:void(0)"
+                                   class="btn btn-primary btn-sm edit-btn"
+
+                                   data-id="${item.ppr_employment_id}"
+
+                                   data-district="${district}"
+
+                                   data-project="${project}"
+
+                                   data-watershed="${watershed}"
+
+                                   data-village="${village}"
+
+                                   data-type="${item.employment_type_name}"
+
+                                   data-sc="${sc}"
+
+                                   data-st="${st}"
+
+                                   data-others="${others}"
+
+                                   data-women="${women}"
+
+                                   title="Edit">
+
+                                    <i class="fas fa-edit"></i>
+
+                                </a>
+
+                                &nbsp;&nbsp;
+
+                                <a href="javascript:void(0)"
+                                   class="btn btn-success btn-sm"
+
+                                   onclick="completeAlert(
+                                       'Are you sure you want to complete this record?',
+                                       function() {
+                                           window.location.href =
+                                           '/completePPREmployment?id=${item.ppr_employment_id}';
+                                       }
+                                   ); return false;">
+
+                                    <i class="fas fa-check"></i>
+
+                                </a>
+
+                                `
+
+                                :
+
+                                `
+
+                                <span class="badge bg-success">
+
+                                    <i class="fas fa-check-circle"></i>
+                                    Completed
+
+                                </span>
+
+                                `
+
+                            }
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                previousDistrict =
+                    district;
+
+                previousProject =
+                    project;
+
+                previousWatershed =
+                    watershed;
+
+                previousVillage =
+                    village;
+
+            });
+
+            tableBody.innerHTML = rows;
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Error loading employment:",
+                error
+            );
+
+            tableDiv.style.display = "block";
+
+            tableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="11"
+                        class="text-center text-danger">
+
+                        Unable to load records.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+}
     /* =========================================================
      EDIT BUTTON CLICK
      ========================================================= */
@@ -722,6 +865,8 @@ employmentValidation.style.setProperty(
             }
         }
     });
+    
+    loadEmploymentTable("");
 
 });
 
@@ -747,6 +892,7 @@ function validateNumber(input) {
 
             <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
                 <span th:text="${error}"></span>
+                <a th:if="${pprCompleted != null and !pprCompleted}" th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3"> Go to Preliminary Project Report </a>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
@@ -924,7 +1070,7 @@ function validateNumber(input) {
 
                     <!-- Save Button -->
                     <div class="text-center mt-4">
-                        <button type="submit" id="saveBtn" class="btn btn-warning">
+                        <button type="submit" id="saveBtn" class="btn btn-warning" th:disabled="${!pprCompleted}">
                             <i class="fas fa-save"></i> Save as Draft
                         </button>
                     </div>

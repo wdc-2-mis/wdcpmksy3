@@ -5,7 +5,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>Details of Flood and Drought in Project Area (PPR-11)</title>
+<title>Details of Flood and Drought in Project Area</title>
 <style>
 	.required{
 	    color:red;
@@ -21,7 +21,7 @@
 
 	        <div class="card-header bg-primary text-white">
 	            <h4 class="mb-0">
-	               Details of Flood and Drought in Project Area (PPR-11)
+	               Details of Flood and Drought in Project Area
 	            </h4> 	
 	        </div>
 	        
@@ -32,8 +32,11 @@
 		
 		   <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
 		    <span th:text="${error}"></span>
+		    <a th:if="${pprCompleted != null and !pprCompleted}" th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3"> Go to Preliminary Project Report </a>
 		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		   </div>
+		   
+		   
 	        <div th:if="${saveMessage}" class="alert alert-success" th:text="${saveMessage}"></div>
 	        <div class="card-body">
 
@@ -250,7 +253,7 @@
 
 <!-- Save Button -->
 <div class="text-center mt-4">
-    <button type="submit" name="action" value="D" class="btn btn-warning">
+    <button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted}">
         <i class="fas fa-save"></i> Save As Draft
     </button>
 </div>

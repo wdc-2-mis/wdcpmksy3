@@ -3,6 +3,7 @@ package gov.dolr.wdcpmksy3.PPR.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -269,5 +270,16 @@ public class PprCropOutcomeService {
     	pprCropOutcomeRepo.save(entity);
     }
 
+	public List<Character> findStatusByDistrictProjectSeason(
+	        Integer dcode,
+	        Integer pprId,
+	        Integer seasonId) {
+
+	    return pprCropOutcomeRepo.findStatusByDistrictProjectSeason(
+	            dcode,
+	            pprId,
+	            seasonId
+	    );
+	}
 	
 }

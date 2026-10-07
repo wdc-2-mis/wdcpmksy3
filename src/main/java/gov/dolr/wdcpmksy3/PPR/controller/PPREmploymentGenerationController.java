@@ -24,6 +24,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PPREmploymentGeneration;
 import gov.dolr.wdcpmksy3.PPR.service.MEmploymentTypeService;
 import gov.dolr.wdcpmksy3.PPR.service.MPprService;
 import gov.dolr.wdcpmksy3.PPR.service.PPREmploymentGenerationService;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.PPR.service.VillageService;
 import gov.dolr.wdcpmksy3.entity.MVillage;
 import gov.dolr.wdcpmksy3.service.DistrictService;
@@ -48,7 +49,8 @@ public class PPREmploymentGenerationController {
     @Autowired
     private MEmploymentTypeService employmentTypeService;
     
-    
+    @Autowired
+	private PprAreaCoverService pprAreaService;
     
 
     @GetMapping("/pprEmploymentGeneration")
@@ -66,7 +68,22 @@ public class PPREmploymentGenerationController {
         
         List<MEmploymentType> employmentTypes = employmentTypeService.getAllEmploymentTypes();
         model.addAttribute("employmentTypeList", employmentTypes);
+        
 
+        boolean pprCompleted =
+	            pprAreaService.isPprCompleted(stcode);
+   
+   model.addAttribute("pprCompleted",
+		   pprCompleted);
+
+	    if (!pprCompleted) {
+
+	        model.addAttribute(
+	                "error",
+	                "Please complete the Preliminary Project Report First."
+	        );
+
+	    }
         return "ppr/pprEmploymentGeneration";
     }
 
@@ -147,8 +164,24 @@ public class PPREmploymentGenerationController {
 
     @GetMapping("/getEmploymentGenerationByDistrict")
     @ResponseBody
-    public List<Map<String, Object>> getEmploymentGenerationByDistrict(@RequestParam Integer dcode) {
-        return employmentService.getEmploymentGenerationByDistrict(dcode);
+    public List<Map<String, Object>> getEmploymentGenerationByDistrict(
+            @RequestParam(required = false) Integer dcode,
+            HttpSession session) {
+
+        Object userid = session.getAttribute("userid");
+
+        if (userid == null) {
+            return List.of();
+        }
+
+        Integer stcode =
+                Integer.parseInt(session.getAttribute("stcode").toString());
+
+        if (dcode != null) {
+            return employmentService.getEmploymentGenerationByDistrict(dcode);
+        }
+
+        return employmentService.getEmploymentGenerationByState(stcode);
     }
 
     @PostMapping("/savePPREmployment")

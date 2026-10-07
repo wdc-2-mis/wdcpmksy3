@@ -196,4 +196,11 @@ public class PprWaterOutcomeService {
 	}
 
 	
+	@Transactional()
+	public List<PprWaterOutcome> findByState(Integer stcode) {
+		// TODO Auto-generated method stub
+		return repository.findByState(stcode);
+	}
+
+	
 }

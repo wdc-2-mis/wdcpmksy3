@@ -21,6 +21,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MScheme;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.entity.MBlock;
 import gov.dolr.wdcpmksy3.entity.MVillage;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
@@ -58,6 +59,9 @@ public class PrelimnaryPPR8AController {
 	@Autowired
 	private MSchemeRepository schemeRepository;
 	
+	@Autowired
+	private PprAreaCoverService pprAreaService;
+	
 	@GetMapping("/preliminaryPPR8")
     public String preliminaryPPR8(HttpSession session, Model model, @RequestParam(required = false) Integer pprid){
 
@@ -72,14 +76,27 @@ public class PrelimnaryPPR8AController {
 		String statename = (String) session.getAttribute("statename");
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 
-       
+		boolean pprCompleted =
+	            pprAreaService.isPprCompleted(stcode);
+   
+   model.addAttribute("pprCompleted",
+		   pprCompleted);
+
+	    if (!pprCompleted) {
+
+	        model.addAttribute(
+	                "error",
+	                "Please complete the Preliminary Project Report First."
+	        );
+	    }
+	        
         model.addAttribute("stateName",statename);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         
         model.addAttribute("projectList",new ArrayList<>());
         model.addAttribute("blockList",new ArrayList<>());
         model.addAttribute("draftList", pprprep.findBycreatedBy(userid));
-     //   System.out.println("kdy"+pprprep.findBycreatedBy(userid).size());
+    
        
 
         return "ppr8";

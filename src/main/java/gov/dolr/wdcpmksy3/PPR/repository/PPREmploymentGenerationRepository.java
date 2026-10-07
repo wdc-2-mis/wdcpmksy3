@@ -60,6 +60,41 @@ public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmpl
     @Modifying
 	@Transactional
 	@Query("UPDATE PPREmploymentGeneration e SET e.status = 'D' WHERE e.pprId.pprId = :pprId")
-	int changeStatusByPprId(@Param("pprId") Integer pprId);	
+	int changeStatusByPprId(@Param("pprId") Integer pprId);
+
+
+    @Query(value = """
+    	    SELECT
+    	        e.ppr_employment_id,
+    	        d.dist_name,
+    	        p.project_name,
+    	        mw.mw_name,
+    	        v.village_name,
+    	        et.employment_type_id,
+    	        et.employment_type_name,
+    	        e.sc,
+    	        e.st,
+    	        e.others,
+    	        e.women,
+    	        (COALESCE(e.sc,0) + COALESCE(e.st,0) + COALESCE(e.others,0)) AS total,
+    	        e.status
+    	    FROM ppr_employment_generation e
+    	    JOIN m_ppr p ON e.ppr_id = p.ppr_id
+    	    JOIN m_district d ON p.dcode = d.dcode
+    	    JOIN m_state s ON d.st_code = s.st_code
+    	    JOIN m_micro_watershed mw ON e.mw_id = mw.mw_id
+    	    JOIN m_village v ON e.vcode = v.vcode
+    	    JOIN m_employment_type et ON e.employment_type_id = et.employment_type_id
+    	    WHERE s.st_code = :stcode
+    	    ORDER BY
+    	        CASE WHEN e.status = 'D' THEN 0 ELSE 1 END,
+    	        d.dist_name,
+    	        p.project_name,
+    	        mw.mw_name,
+    	        v.village_name,
+    	        et.employment_type_id
+    	    """, nativeQuery = true)
+    	List<Map<String,Object>> getEmploymentGenerationByState(
+    	        @Param("stcode") Integer stcode);	
 	
 }

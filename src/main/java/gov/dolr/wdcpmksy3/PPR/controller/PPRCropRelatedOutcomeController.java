@@ -1,7 +1,9 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import gov.dolr.wdcpmksy3.PPR.entity.PprCropOutcome;
 import gov.dolr.wdcpmksy3.PPR.repository.MSeasonRepo;
 import gov.dolr.wdcpmksy3.PPR.service.CropTypeServices;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.PPR.service.PprCropOutcomeService;
 import gov.dolr.wdcpmksy3.repository.CropOutcomeRepository;
 import gov.dolr.wdcpmksy3.service.DistrictService;
@@ -41,6 +44,9 @@ public class PPRCropRelatedOutcomeController {
 	@Autowired
 	private PprCropOutcomeService outcomeService;
 	
+	@Autowired
+	private PprAreaCoverService pprAreaService;
+	
 	@GetMapping("/pprCropOutcomes")
 	public String pprCropOutcomes(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
 	{
@@ -57,7 +63,58 @@ public class PPRCropRelatedOutcomeController {
         model.addAttribute("mseason", mseasonRepo.findAll());
         model.addAttribute("cropTypeList", cropser.getAllCropTypeDetails());
         
+        List<PprCropOutcome> cropOutcomes =
+	            cropOutcomeRepo.findByStateOrderByStatus(stcode);
+
+        boolean pprCompleted =
+	            pprAreaService.isPprCompleted(stcode);
+   
+   model.addAttribute("pprCompleted",
+		   pprCompleted);
+
+	    if (!pprCompleted) {
+
+	        model.addAttribute(
+	                "error",
+	                "Please complete the Preliminary Project Report First."
+	        );
+
+	    }
+	    model.addAttribute("cropOutcomes", cropOutcomes);
+        
         return "ppr/pprCropOutcomes";
+	}
+	
+	@GetMapping("/checkCropOutcomeSeason")
+	@ResponseBody
+	public Map<String, Object> checkCropOutcomeSeason(
+	        @RequestParam Integer dcode,
+	        @RequestParam Integer pprId,
+	        @RequestParam Integer seasonId) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    List<Character> statuses =
+	            outcomeService.findStatusByDistrictProjectSeason(
+	                    dcode,
+	                    pprId,
+	                    seasonId
+	            );
+
+	    if (statuses == null || statuses.isEmpty()) {
+
+	        response.put("exists", false);
+	        response.put("status", null);
+
+	    } else {
+
+	        Character status = statuses.get(0);
+
+	        response.put("exists", true);
+	        response.put("status", status);
+	    }
+
+	    return response;
 	}
 	
 	@GetMapping("/getUsedCropsByPpr")

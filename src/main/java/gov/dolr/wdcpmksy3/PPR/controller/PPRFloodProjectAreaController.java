@@ -19,6 +19,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprDisasterDetails;
 import gov.dolr.wdcpmksy3.PPR.repository.DisasterTypeRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRSoilErosionService;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.PPR.service.PprDisasterDetailsService;
 import gov.dolr.wdcpmksy3.PPR.service.VillageService;
 import gov.dolr.wdcpmksy3.controller.HomeController;
@@ -48,6 +49,9 @@ public class PPRFloodProjectAreaController {
 	
 	@Autowired
 	private VillageRepository villrepo;
+	
+	@Autowired
+	private PprAreaCoverService pprArea;
 	
 	private final HomeController homeController;
 
@@ -96,6 +100,22 @@ public class PPRFloodProjectAreaController {
 	    // Send selected values to Thymeleaf/JavaScript
 	    model.addAttribute("selectedDcode", dcode);
 	    model.addAttribute("selectedPprId", pprid);
+	    
+	    
+	    boolean pprCompleted =
+	    		pprArea.isPprCompleted(stcode);
+   
+   model.addAttribute("pprCompleted",
+		   pprCompleted);
+
+	    if (!pprCompleted) {
+
+	        model.addAttribute(
+	                "error",
+	                "Please complete the Preliminary Project Report First."
+	        );
+
+	    }
 
 	    return "ppr/floodDroughtArea";
 	}

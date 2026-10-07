@@ -41,6 +41,9 @@
 		
 		   <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
 		    <span th:text="${error}"></span>
+		    
+		    <a th:if="${pprCompleted != null and !pprCompleted}" th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3"> Go to Preliminary Project Report </a>
+		    
 		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		   </div>
 	        <div th:if="${saveMessage}" class="alert alert-success" th:text="${saveMessage}"></div>

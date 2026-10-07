@@ -926,11 +926,14 @@ document.getElementById("proposedAreaOthers")
 
 				<span th:text="${error}"></span>
 
+<a th:if="${pprCompleted != null and !pprCompleted}" th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3"> Go to Preliminary Project Report </a>
 				<button type="button" class="btn-close" data-bs-dismiss="alert">
 
 				</button>
 
 			</div>
+			
+			
 
 			<div class="card-body px-4 py-4">
 
@@ -1178,7 +1181,7 @@ document.getElementById("proposedAreaOthers")
 					<!-- <input type="hidden"  name="action" value="D"> -->
 
 					<div class="text-center">
-						<button type="submit" value="D" name="action"  id="saveDraftBtn" class="btn btn-warning">
+						<button type="submit" value="D" name="action"  id="saveDraftBtn" class="btn btn-warning" th:disabled="${!pprCompleted}">
 							<i class="fa fa-save"></i> Save as Draft
 						</button>
 					</div>

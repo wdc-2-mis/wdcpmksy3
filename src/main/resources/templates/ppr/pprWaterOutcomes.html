@@ -143,122 +143,45 @@ document.addEventListener("DOMContentLoaded", function () {
     // DISTRICT CHANGE
     // =========================================================
 
-    district.addEventListener("change", function () {
+    // =========================================================
+// LOAD WATER OUTCOME RECORDS
+// =========================================================
 
-        const districtId = this.value;
+function loadWaterOutcomeRecords(districtId) {
 
+    console.log(
+        "Loading water outcome records. District:",
+        districtId || "ALL STATE"
+    );
 
-        // Clear district error
-        validateTextField(this);
+    recordsTableBody.innerHTML = "";
 
+    recordsDiv.style.display = "none";
 
-        // Reset dependent dropdowns
+    let url = "/getWaterOutcomesByDistrict";
 
-        project.innerHTML =
-            '<option value="">--Select Project--</option>';
+   
+    if (districtId) {
 
-        watershed.innerHTML =
-            '<option value="">--Select Micro Watershed--</option>';
+        url += "?dcode=" + encodeURIComponent(districtId);
 
-        village.innerHTML =
-            '<option value="">--Select Village--</option>';
+    }
 
+    fetch(url)
 
-        // Clear their previous validation errors
+        .then(response => {
 
-        project.classList.remove("is-invalid");
-        watershed.classList.remove("is-invalid");
-        village.classList.remove("is-invalid");
+            if (!response.ok) {
 
+                throw new Error(
+                    "Records API failed: " + response.status
+                );
 
-        const projectFeedback =
-            project.parentElement.querySelector(".invalid-feedback");
+            }
 
-        const watershedFeedback =
-            watershed.parentElement.querySelector(".invalid-feedback");
-
-        const villageFeedback =
-            village.parentElement.querySelector(".invalid-feedback");
-
-
-        if (projectFeedback) {
-            projectFeedback.style.display = "none";
-        }
-
-        if (watershedFeedback) {
-            watershedFeedback.style.display = "none";
-        }
-
-        if (villageFeedback) {
-            villageFeedback.style.display = "none";
-        }
-
-
-        // Clear records
-
-        recordsTableBody.innerHTML = "";
-
-        recordsDiv.style.display = "none";
-
-
-        if (districtId === "") {
-            return;
-        }
-
-
-        // =====================================================
-        // LOAD PROJECTS
-        // =====================================================
-
-        fetch(
-            "/getProjectsByDistrictLandPattern?dcode=" +
-            districtId
-        )
-
-        .then(response => response.json())
-
-        .then(data => {
-
-            data.forEach(function (item) {
-
-                const option =
-                    document.createElement("option");
-
-                option.value = item.id;
-                option.textContent = item.name;
-
-                project.appendChild(option);
-
-            });
+            return response.text();
 
         })
-
-        .catch(error => {
-
-            console.error(
-                "Project Loading Error :",
-                error
-            );
-
-        });
-
-
-        // =====================================================
-        // LOAD EXISTING RECORDS
-        // =====================================================
-
-        console.log(
-            "Calling getWaterOutcomesByDistrict with dcode:",
-            districtId
-        );
-
-
-        fetch(
-            "/getWaterOutcomesByDistrict?dcode=" +
-            districtId
-        )
-
-        .then(response => response.text())
 
         .then(text => {
 
@@ -267,9 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 text
             );
 
-
             let data;
-
 
             try {
 
@@ -287,9 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-
             recordsTableBody.innerHTML = "";
-
 
             // =================================================
             // LOGIN / SESSION ERROR
@@ -301,18 +220,12 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
 
                 recordsTableBody.innerHTML = `
-
                     <tr>
-
-                        <td colspan="9"
+                        <td colspan="10"
                             class="text-center text-danger">
-
                             ${data[0].error}
-
                         </td>
-
                     </tr>
-
                 `;
 
                 recordsDiv.style.display = "block";
@@ -328,18 +241,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.length === 0) {
 
                 recordsTableBody.innerHTML = `
-
                     <tr>
-
-                        <td colspan="9"
+                        <td colspan="10"
                             class="text-center text-danger">
-
                             No data found
-
                         </td>
-
                     </tr>
-
                 `;
 
             }
@@ -354,61 +261,78 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     let actionHtml = "";
 
-
                     if (rec.status === "D") {
 
                         actionHtml = `
 
                             <button type="button"
+                                    class="btn btn-sm btn-primary editBtn"
 
-                                class="btn btn-sm btn-primary editBtn"
+                                    data-id="${rec.id}"
 
-                                data-id="${rec.id}"
+                                    data-district="${rec.district || ''}"
 
-                                data-district="${rec.district || ''}"
+                                    data-project="${rec.project || ''}"
 
-                                data-project="${rec.project || ''}"
+                                    data-watershed="${rec.watershed || ''}"
 
-                                data-watershed="${rec.watershed || ''}"
+                                    data-village="${rec.village || ''}"
 
-                                data-village="${rec.village || ''}"
+                                    data-source-id="${rec.sourceId || ''}"
 
-                                data-source-id="${rec.sourceId || ''}"
+                                    data-source="${rec.source || ''}"
 
-                                data-source="${rec.source || ''}"
+                                    data-pre-project="${rec.preProject || ''}"
 
-                                data-pre-project="${rec.preProject || ''}"
+                                    data-post-project="${rec.postProject || ''}"
 
-                                data-post-project="${rec.postProject || ''}"
+                                    data-remarks="${rec.remarks || ''}"
 
-                                data-remarks="${rec.remarks || ''}"
+                                    data-bs-toggle="modal"
 
-                                data-bs-toggle="modal"
-
-                                data-bs-target="#editModal">
+                                    data-bs-target="#editModal">
 
                                 <i class="fas fa-edit"></i>
 
                             </button>
 
-                            &nbsp; &nbsp;
+                            &nbsp;&nbsp;
 
                             <a href="javascript:void(0)"
-   class="btn btn-sm btn-success"
-   onclick="completeAlert('Are you sure you want to complete this record?', function() { window.location.href = '/completeWaterOutcome?id=${rec.id}'; }); return false;">
-    <i class="fas fa-check"></i>
-</a>
 
-                            &nbsp; &nbsp;
+                               class="btn btn-sm btn-success"
+
+                               onclick="completeAlert(
+                                   'Are you sure you want to complete this record?',
+                                   function() {
+                                       window.location.href =
+                                       '/completeWaterOutcome?id=${rec.id}';
+                                   }
+                               ); return false;">
+
+                                <i class="fas fa-check"></i>
+
+                            </a>
+
+                            &nbsp;&nbsp;
 
                             <a href="javascript:void(0)"
-   class="btn btn-sm btn-danger"
-   onclick="deleteAlert('Are you sure you want to delete this record?', function() { window.location.href = '/deleteWaterOutcome?id=${rec.id}'; }); return false;">
-    <i class="fas fa-trash"></i>
-</a>
+
+                               class="btn btn-sm btn-danger"
+
+                               onclick="deleteAlert(
+                                   'Are you sure you want to delete this record?',
+                                   function() {
+                                       window.location.href =
+                                       '/deleteWaterOutcome?id=${rec.id}';
+                                   }
+                               ); return false;">
+
+                                <i class="fas fa-trash"></i>
+
+                            </a>
 
                         `;
-
                     }
 
                     else {
@@ -422,9 +346,12 @@ document.addEventListener("DOMContentLoaded", function () {
                             </span>
 
                         `;
-
                     }
 
+
+                    // =================================================
+                    // TABLE ROW
+                    // =================================================
 
                     recordsTableBody.innerHTML += `
 
@@ -432,17 +359,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
                             <td>${index + 1}</td>
 
-                            <td>${rec.project}</td>
+                            <td>${rec.district || ""}</td>
 
-                            <td>${rec.watershed}</td>
+                            <td>${rec.project || ""}</td>
 
-                            <td>${rec.village}</td>
+                            <td>${rec.watershed || ""}</td>
 
-                            <td>${rec.source}</td>
+                            <td>${rec.village || ""}</td>
 
-                            <td>${rec.preProject}</td>
+                            <td>${rec.source || ""}</td>
 
-                            <td>${rec.postProject}</td>
+                            <td>${rec.preProject || ""}</td>
+
+                            <td>${rec.postProject || ""}</td>
 
                             <td>${rec.remarks || ""}</td>
 
@@ -451,16 +380,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         </tr>
 
                     `;
-
                 });
-
             }
-
 
             recordsDiv.style.display = "block";
 
         })
-
 
         .catch(error => {
 
@@ -469,12 +394,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 error
             );
 
-
             recordsTableBody.innerHTML = `
 
                 <tr>
 
-                    <td colspan="9"
+                    <td colspan="10"
                         class="text-center text-danger">
 
                         Unable to load records
@@ -485,12 +409,131 @@ document.addEventListener("DOMContentLoaded", function () {
 
             `;
 
-
             recordsDiv.style.display = "block";
 
         });
+}
+
+
+// =========================================================
+// DISTRICT CHANGE
+// =========================================================
+
+district.addEventListener("change", function () {
+
+    const districtId = this.value;
+
+    // Validate selected district
+    validateTextField(this);
+
+
+    // =========================================================
+    // RESET DEPENDENT DROPDOWNS
+    // =========================================================
+
+    project.innerHTML =
+        '<option value="">--Select Project--</option>';
+
+    watershed.innerHTML =
+        '<option value="">--Select Micro Watershed--</option>';
+
+    village.innerHTML =
+        '<option value="">--Select Village--</option>';
+
+
+    // =========================================================
+    // CLEAR VALIDATION ERRORS
+    // =========================================================
+
+    project.classList.remove("is-invalid");
+
+    watershed.classList.remove("is-invalid");
+
+    village.classList.remove("is-invalid");
+
+
+    const projectFeedback =
+        project.parentElement.querySelector(".invalid-feedback");
+
+    const watershedFeedback =
+        watershed.parentElement.querySelector(".invalid-feedback");
+
+    const villageFeedback =
+        village.parentElement.querySelector(".invalid-feedback");
+
+
+    if (projectFeedback) {
+        projectFeedback.style.display = "none";
+    }
+
+    if (watershedFeedback) {
+        watershedFeedback.style.display = "none";
+    }
+
+    if (villageFeedback) {
+        villageFeedback.style.display = "none";
+    }
+
+
+    // =========================================================
+    // LOAD RECORDS
+    // =========================================================
+
+    // Empty district = ALL STATE RECORDS
+    // Selected district = ONLY DISTRICT RECORDS
+
+    loadWaterOutcomeRecords(districtId);
+
+
+    // =========================================================
+    // IF NO DISTRICT SELECTED
+    // =========================================================
+
+    if (districtId === "") {
+
+        return;
+
+    }
+
+
+    // =========================================================
+    // LOAD PROJECTS
+    // =========================================================
+
+    fetch(
+        "/getProjectsByDistrictLandPattern?dcode=" +
+        encodeURIComponent(districtId)
+    )
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        data.forEach(function (item) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = item.id;
+
+            option.textContent = item.name;
+
+            project.appendChild(option);
+
+        });
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Project Loading Error:",
+            error
+        );
 
     });
+
+});
 
 
     // =========================================================
@@ -974,7 +1017,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-
+loadWaterOutcomeRecords("");
 });
 </script>
 
@@ -988,7 +1031,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		<div class="card shadow-sm border-0">
 
 			<div class="card-header bg-primary text-white">
-				<h4 class="mb-0">Average ground water table depth in Project Area (PPR-16)</h4>
+				<h4 class="mb-0">Average ground water table depth in Project Area</h4>
 			</div>
 		
 
@@ -1001,6 +1044,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		<div th:if="${error}"
 			class="alert alert-danger alert-dismissible fade show" role="alert">
 			<span th:text="${error}"></span>
+			<a th:if="${pprCompleted != null and !pprCompleted}" th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3"> Go to Preliminary Project Report </a>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
@@ -1169,7 +1213,7 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
 </div>
 				<div class="text-center mt-4">
-						<button type="submit" id="saveDraftButton" name="action" value="D" class="btn btn-warning"><i class="fas fa-save"></i> Save as Draft
+						<button type="submit" id="saveDraftButton" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted}"><i class="fas fa-save"></i> Save as Draft
 						</button>
 						
 					</div>		
@@ -1183,6 +1227,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <thead class="table-light">
             <tr>
                 <th class="table-primary">S.No</th>
+                <th class="table-primary">District</th>
                 <th class="table-primary">Project</th>
                 <th class="table-primary">Watershed</th>
                 <th class="table-primary">Village</th>
