@@ -125,6 +125,8 @@ public class PprProjectGlanceService {
 	    dto.setPprProjectGlanceId(entity.getPprProjectGlanceId());
 	    dto.setPprId(entity.getPpr().getPprId());
 	    dto.setMwId(entity.getMicroWatershed().getMwId());
+	    dto.setBlock(entity.getVillages().get(0).getVillage().getGramPanchayat().getBlock().getBlockName());
+	    dto.setProject(entity.getPpr().getProjectName());
 	    dto.setProjectType(entity.getProjectType().getProjectTypeId());
 	    dto.setSelectionReason(entity.getSelectionReason());
 	    dto.setProjectArea(entity.getProjectArea());
@@ -133,7 +135,9 @@ public class PprProjectGlanceService {
 	    dto.setPiaName(entity.getPia().getPiaName());
 	    dto.setAddress(entity.getPia().getAddress());
 	    dto.setComments(entity.getComments());
-
+	    
+	    
+	    
 	    List<Integer> villageIds = entity.getVillages().stream().map(pv -> pv.getVillage().getVcode()).toList();
 	    dto.setVillages(villageIds);
 

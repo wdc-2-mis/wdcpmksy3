@@ -9,6 +9,8 @@ public class PprProjectAtGlanceDTO {
     private Integer pprId;
     private Integer mwId;
     private Integer projectType;
+    private String block;
+    private String project;
     private List<Integer> villages;
     private String selectionReason;
     private BigDecimal projectArea;
@@ -43,6 +45,18 @@ public class PprProjectAtGlanceDTO {
 	}
 	public void setProjectType(Integer projectType) {
 		this.projectType = projectType;
+	}
+	public String getBlock() {
+		return block;
+	}
+	public void setBlock(String block) {
+		this.block = block;
+	}
+	public String getProject() {
+		return project;
+	}
+	public void setProject(String project) {
+		this.project = project;
 	}
 	public List<Integer> getVillages() {
 		return villages;

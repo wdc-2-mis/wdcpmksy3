@@ -875,9 +875,9 @@
 			</div>
 			<div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
 				<i class="fas fa-exclamation-triangle me-2"></i>
-				<strong>Action Required:</strong>
+				<strong th:if="${!pprCompleted}">Action Required:</strong>
 				<span th:text="${error}"></span>
-				<a th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3">
+				<a th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3" th:if="${!pprCompleted}">
 					Go to Preliminary Project Report
 				</a>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>

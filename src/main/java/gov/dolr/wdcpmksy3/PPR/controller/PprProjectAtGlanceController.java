@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.dto.GPDropdownDTO;
+import gov.dolr.wdcpmksy3.PPR.dto.MicroWatershedDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.PprProjectAtGlanceDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.VillageDetailsDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.VillageDropdownDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
+import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
@@ -99,6 +101,13 @@ public class PprProjectAtGlanceController {
 		model.addAttribute("pprProjectAtGlanceList", pprProjectGlanceRepo.findPprProjectGlanceBystCode(stcode));
 		
 		return "ppr/pprProjectAtGlance";
+	}
+	
+	@GetMapping("/getMWListbyPprId")
+	@ResponseBody
+	public List<MicroWatershedDTO> getMWListbyPprId(@RequestParam Integer pprId) {
+		List<MicroWatershed> list = microWatershedRepo.getListOfMicroWatershedbyMwIds(pprId); 
+	    return list.stream().map(mw -> new MicroWatershedDTO(mw.getMwId(), mw.getMwCode())).toList();
 	}
 	
 	@GetMapping("/getGPlistbyBlock")

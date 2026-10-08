@@ -183,6 +183,8 @@
 	                    // Basic values
 	                    document.getElementById("editPprProjectGlanceId").value = data.pprProjectGlanceId;
 	                    document.getElementById("editPprId").value = data.pprId;
+						document.getElementById("editProject").value = data.project;
+						document.getElementById("editBlock").value = data.block;
 	                    document.getElementById("editSelectionReason").value = data.selectionReason;
 	                    document.getElementById("editProjectArea").value = data.projectArea;
 	                    document.getElementById("editProposedArea").value = data.proposedArea;
@@ -190,12 +192,13 @@
 	                    document.getElementById("editPiaName").value = data.piaName;
 	                    document.getElementById("editAddress").value = data.address;
 	                    document.getElementById("editComments").value = data.comments;
-	                  
-	                    document.getElementById("editMicroWatershed").value = data.mwId;
 	                    // Project Type
 	                    document.querySelectorAll(".editProjectType").forEach(function (radio) {
 	                            radio.checked = String(radio.value) === String(data.projectType);
 	                        });
+							
+						//Load Microwatershed
+						loadMicrowatershed(data);	
 	                    // Load GP and villages
 	                    loadEditVillages(data);
 	                })
@@ -205,6 +208,36 @@
 	                });
 	        });
 	    });
+		function loadMicrowatershed(data) {
+			const pprId = data.pprId;
+			const selectedMwId = data.mwId;
+			fetch("/getMWListbyPprId?pprId=" + encodeURIComponent(pprId))
+				.then(response => {
+					if (!response.ok) {
+						throw new Error("Failed to load Microwatershed details");
+					}
+					return response.json();
+				})
+				.then(data => {
+					const mwElement = document.getElementById("editMicroWatershed");
+					// Clear existing options
+					mwElement.innerHTML = '<option value="">--Select--</option>';
+					// Add Micro-Watershed options
+					data.forEach(function(mw) {
+						const option = new Option(mw.mwName, mw.mwId);
+						mwElement.appendChild(option);
+					});
+					// Select the saved Micro-Watershed
+					if (selectedMwId != null) {
+						mwElement.value = String(selectedMwId);
+					}
+				})
+				.catch(error => {
+					console.error("Error loading Microwatershed details:", error);
+				});
+		}
+
+			
 	    function loadEditVillages(data) {
 	        if (!data.villages || data.villages.length === 0) {
 	            return;
@@ -226,7 +259,7 @@
 				const bcode = village.bcode;
 
 	            // Set block
-	            document.getElementById("editBlock").value = bcode;
+//	            document.getElementById("editBlock").value = bcode;
 	            // Load GP
 	            loadEditGP(bcode, gcode, data.villages);
 	        })
@@ -558,9 +591,9 @@
 			</div>
 			<div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
 				<i class="fas fa-exclamation-triangle me-2"></i>
-				<strong>Action Required:</strong>
+				<strong th:if="${!pprCompleted}">Action Required:</strong>
 				<span th:text="${error}"></span>
-				<a th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3">
+				<a th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3" th:if="${!pprCompleted}">
 					Go to Preliminary Project Report
 				</a>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -831,7 +864,7 @@
 		                    <div class="row mb-3 align-items-center">
 		                        <label class="col-md-4 fw-bold"> Name of the Project </label>
 		                        <div class="col-md-3">
-		                            <input type="text" class="form-control" id="editProject" th:value="${project}" readonly>
+		                            <input type="text" class="form-control" id="editProject" readonly>
 		                        </div>
 		                    </div>
 		                    <!-- Project Type -->
@@ -850,10 +883,7 @@
 							<div class="row mb-3 align-items-center">
 								<label class="col-md-4 fw-bold">Name of Block <span class="required">*</span></label>
 								<div class="col-md-3">
-									<select class="form-select" id="editBlock">
-										<option value="">--Select--</option>
-										<option th:each="b : ${blockList}" th:value="${b.bcode}" th:text="${b.blockName}"></option>
-									</select>
+									<input type="text" class="form-control" id="editBlock" readonly>
 								</div>
 							</div>
 
@@ -882,7 +912,7 @@
 								<div class="col-md-3">
 									<select class="form-select" id="editMicroWatershed" name="mwId">
 										<option value="">--Select--</option>
-										<option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"></option>
+<!--										<option th:each="m : ${microWatershedList}" th:value="${m.mwId}" th:text="${m.mwCode}"></option>-->
 									</select>
 								</div>
 							</div>
