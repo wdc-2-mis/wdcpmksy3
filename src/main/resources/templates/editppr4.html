@@ -441,16 +441,17 @@ Edit Functionaries of Watershed Cell (PPR4)
        id="MoUfile"
        name="mouFile"
        class="form-control"
-       accept=".pdf" onchange="hideMouView(this)" > </div>
+       accept=".pdf" onchange="hideMouView(this)" >
+	   <div class="invalid-feedback">Please upload a valid PDF.</div>
+
+	   <small class="text-muted">
+
+	   Only PDF file is allowed. Leave empty to keep existing PDF.
+
+	   </small> </div>
 	<div id="kdyp">   <a href="#" class="viewMouBtn" th:attr="data-id=${editData.pprWcdcId}">View MoU</a></div>	
 	   <br/>
-<div class="invalid-feedback">Please upload a valid PDF.</div>
 
-<small class="text-muted">
-
-Only PDF file is allowed. Leave empty to keep existing PDF.
-
-</small>
 
 </div>
 

@@ -47,6 +47,13 @@ document.addEventListener("DOMContentLoaded", function () {
 			.map(option => option.text).join(", ");
 		document.getElementById("microDisplay").textContent = selectedNames;
 	});
+	
+		document.getElementById("microEdit").addEventListener("change", function () {
+
+			const selectedNames = Array.from(this.selectedOptions)
+				.map(option => option.text).join(", ");
+			document.getElementById("microDisplay1").textContent = selectedNames;
+		});
    
     const form = document.getElementById("institutionForm");
 
@@ -567,6 +574,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </th:block>
 
                             </select>
+							
+							<div id="microDisplay1" class="mt-2 text-primary"></div>
 
                         </div>
 

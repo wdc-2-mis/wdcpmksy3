@@ -250,18 +250,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	    function validateSameFile1(changedInput, otherInput) {
 
-	        if (changedInput.files.length === 0 || otherInput.files.length === 0)
-	            return;
+			document.getElementById("notificationFile1Error").style.display = "none";
+			document.getElementById("notificationFile1Error").innerText = "";
 
-	        const file1 = changedInput.files[0];
-	        const file2 = otherInput.files[0];
+			document.getElementById("mouFile1Error").style.display = "none";
+			document.getElementById("mouFile1Error").innerText = "";
 
-	        if (
-	            file1.name.toLowerCase() === file2.name.toLowerCase() &&
-	            file1.size === file2.size
-	        ) {
-	            alert("Notification PDF and MoU PDF cannot be the same file.");
-	            changedInput.value = "";
+			if (changedInput.files.length === 0 || otherInput.files.length === 0) {
+				return;
+			}
+
+			const file1 = changedInput.files[0];
+			const file2 = otherInput.files[0];
+
+			if (
+				file1.name.toLowerCase() === file2.name.toLowerCase() &&
+				file1.size === file2.size
+			) {
+
+				const errorDiv =
+					changedInput.id === "notificationFile1"
+						? document.getElementById("notificationFile1Error")
+						: document.getElementById("mouFile1Error");
+
+				errorDiv.innerText =
+					"Notification PDF and MoU PDF cannot be the same file.";
+
+				errorDiv.style.display = "block";
+
+				// Remove selected file
+				changedInput.value = "";
+
+				// Focus the field
+				changedInput.focus();
 	        }
 	    }
 		
@@ -318,13 +339,13 @@ document.addEventListener("DOMContentLoaded", function () {
 	
 		notificationFile1.addEventListener("change", function () {
 			if (validatePDF(this)) {
-				validateSameFile(this, mouFile1);
+				validateSameFile1(this, mouFile1);
 			}
 		});
 
 		mouFile1.addEventListener("change", function () {
 			if (validatePDF(this)) {
-				validateSameFile(this, notificationFile1);
+				validateSameFile1(this, notificationFile1);
 			}
 		});
 	

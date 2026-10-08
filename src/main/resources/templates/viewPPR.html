@@ -74,7 +74,7 @@
 				.then(result => {
 					console.log(result);
 					if (result === "EXISTS") {
-						alert("This PPR Data already Forwarded. Please select different PPR");
+						latestAlert("This PPR Data already Forwarded/Approved. Please select different PPR");
 
 						document.getElementById("project").value = "";
 						document.getElementById("project").focus();
