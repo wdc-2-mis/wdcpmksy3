@@ -20,9 +20,9 @@ public interface PprWaterOutcomeRepository extends JpaRepository<PprWaterOutcome
 		    FROM PprWaterOutcome o
 		    JOIN FETCH o.ppr p
 		    JOIN FETCH p.district d
-		    JOIN FETCH o.microWatershed mw
-		    JOIN FETCH o.village v
-		    JOIN FETCH o.waterSource ws
+		    left JOIN FETCH o.microWatershed mw
+		    left JOIN FETCH o.village v
+		    left JOIN FETCH o.waterSource ws
 		    WHERE d.dcode = :dcode
 		    ORDER BY CASE
             WHEN o.status = 'D' THEN 0
@@ -67,14 +67,15 @@ public interface PprWaterOutcomeRepository extends JpaRepository<PprWaterOutcome
 			    FROM PprWaterOutcome o
 			    JOIN FETCH o.ppr p
 			    JOIN FETCH p.district d
-			    JOIN FETCH o.microWatershed mw
-			    JOIN FETCH o.village v
-			    JOIN FETCH o.waterSource ws
+			    left JOIN FETCH o.microWatershed mw
+			    left JOIN FETCH o.village v
+			    left JOIN FETCH o.waterSource ws
 			    WHERE d.state.stCode = :stcode
 			    ORDER BY CASE
 			        WHEN o.status = 'D' THEN 0
 			        WHEN o.status = 'C' THEN 1
-			        ELSE 2
+			        WHEN o.status = 'S' THEN 2
+			        ELSE 3
 			    END
 			""")
 			List<PprWaterOutcome> findByState(Integer stcode);

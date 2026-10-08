@@ -37,12 +37,12 @@ public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmpl
         FROM ppr_employment_generation e
         JOIN m_ppr p ON e.ppr_id = p.ppr_id
         JOIN m_district d ON p.dcode = d.dcode
-        JOIN m_micro_watershed mw ON e.mw_id = mw.mw_id
-        JOIN m_village v ON e.vcode = v.vcode
-        JOIN m_employment_type et ON e.employment_type_id = et.employment_type_id
+        left JOIN m_micro_watershed mw ON e.mw_id = mw.mw_id
+        left JOIN m_village v ON e.vcode = v.vcode
+        left JOIN m_employment_type et ON e.employment_type_id = et.employment_type_id
         WHERE p.dcode = :dcode
         ORDER BY
-        CASE WHEN e.status = 'D' THEN 0 ELSE 1 END,
+        CASE WHEN e.status = 'D' THEN 0 WHEN e.status = 'S' THEN 1 ELSE 2 END,
         d.dist_name, p.project_name, mw.mw_name, v.village_name, et.employment_type_id
         """, nativeQuery = true)
     List<Map<String,Object>> getEmploymentGenerationByDistrict(@Param("dcode") Integer dcode);
@@ -76,25 +76,48 @@ public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmpl
     	        e.st,
     	        e.others,
     	        e.women,
-    	        (COALESCE(e.sc,0) + COALESCE(e.st,0) + COALESCE(e.others,0)) AS total,
+    	        (COALESCE(e.sc, 0)
+    	         + COALESCE(e.st, 0)
+    	         + COALESCE(e.others, 0)) AS total,
     	        e.status
+
     	    FROM ppr_employment_generation e
-    	    JOIN m_ppr p ON e.ppr_id = p.ppr_id
-    	    JOIN m_district d ON p.dcode = d.dcode
-    	    JOIN m_state s ON d.st_code = s.st_code
-    	    JOIN m_micro_watershed mw ON e.mw_id = mw.mw_id
-    	    JOIN m_village v ON e.vcode = v.vcode
-    	    JOIN m_employment_type et ON e.employment_type_id = et.employment_type_id
+
+    	    JOIN m_ppr p
+    	        ON e.ppr_id = p.ppr_id
+
+    	    JOIN m_district d
+    	        ON p.dcode = d.dcode
+
+    	    JOIN m_state s
+    	        ON d.st_code = s.st_code
+
+    	    LEFT JOIN m_micro_watershed mw
+    	        ON e.mw_id = mw.mw_id
+
+    	    LEFT JOIN m_village v
+    	        ON e.vcode = v.vcode
+
+    	    LEFT JOIN m_employment_type et
+    	        ON e.employment_type_id = et.employment_type_id
+
     	    WHERE s.st_code = :stcode
+
     	    ORDER BY
-    	        CASE WHEN e.status = 'D' THEN 0 ELSE 1 END,
+    	        CASE
+    	            WHEN e.status = 'D' THEN 0
+    	            WHEN e.status = 'S' THEN 1
+    	            WHEN e.status = 'C' THEN 2
+    	            ELSE 3
+    	        END,
     	        d.dist_name,
     	        p.project_name,
     	        mw.mw_name,
     	        v.village_name,
     	        et.employment_type_id
+
     	    """, nativeQuery = true)
-    	List<Map<String,Object>> getEmploymentGenerationByState(
-    	        @Param("stcode") Integer stcode);	
+    	List<Map<String, Object>> getEmploymentGenerationByState(
+    	        @Param("stcode") Integer stcode);
 	
 }

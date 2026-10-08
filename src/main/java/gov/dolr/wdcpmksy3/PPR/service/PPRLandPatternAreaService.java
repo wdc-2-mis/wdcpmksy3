@@ -83,4 +83,9 @@ public class PPRLandPatternAreaService {
     	entity.setCreatedDate( LocalDateTime.now() ); 
     	landPatternAreaRepository.save(entity);
     }
+
+	public List<Map<String, Object>> getLandPatternAreaByState(Integer stcode) {
+		
+		return landPatternAreaRepository.getLandPatternAreaByState(stcode);
+	}
 }

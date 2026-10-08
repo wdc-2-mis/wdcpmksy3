@@ -24,6 +24,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprMicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.service.MPprService;
 import gov.dolr.wdcpmksy3.PPR.service.MicroWatershedService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRLandPatternAreaService;
+import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.PPR.service.VillageService;
 import gov.dolr.wdcpmksy3.entity.MVillage;
 import gov.dolr.wdcpmksy3.service.DistrictService;
@@ -49,8 +50,8 @@ public class PPRLandPatternAreaController {
 	private PPRLandPatternAreaService landPatternAreaService;
 	
 
-	
-
+	@Autowired
+	private PprAreaCoverService pprArea;
 	
 	@GetMapping("/pprLandPatternArea")
 	public String landPatternArea(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
@@ -68,6 +69,20 @@ public class PPRLandPatternAreaController {
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("statename", statename);
        
+        boolean pprCompleted =
+	    		pprArea.isPprCompleted(stcode);
+   
+   model.addAttribute("pprCompleted",
+		   pprCompleted);
+
+	    if (!pprCompleted) {
+
+	        model.addAttribute(
+	                "error",
+	                "Please complete the Preliminary Project Report First."
+	        );
+
+	    }
 
         return "ppr/pprLandPatternArea";
 	}
@@ -88,6 +103,16 @@ public class PPRLandPatternAreaController {
 	    
 	    
 	}
+	
+	@GetMapping("/getLandPatternAreaByState")
+	@ResponseBody
+	public List<Map<String, Object>> getLandPatternAreaByState(HttpSession session) {
+
+	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+
+	    return landPatternAreaService.getLandPatternAreaByState(stcode);
+	}
+	
 	
 	@GetMapping("/getMicroWatershedsByProject")
 	@ResponseBody

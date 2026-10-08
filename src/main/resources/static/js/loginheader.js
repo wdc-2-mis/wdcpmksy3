@@ -262,7 +262,7 @@ function showExtendPopup(timeLeft) {
 
 function showExpiredPopup(){
 
-    alert("Your session has expired.");
+    latestAlert("Your session has expired.");
 
     window.location.href="/login";
 
@@ -332,7 +332,7 @@ function extendSession() {
 
         } else {
 
-            alert("Unable to extend session. Please login again.");
+            latestAlert("Unable to extend session. Please login again.");
 
             window.location.href = "/login";
 
@@ -344,7 +344,7 @@ function extendSession() {
 
         console.error(error);
 
-        alert("Unable to extend session. Please login again.");
+        latestAlert("Unable to extend session. Please login again.");
 
         window.location.href = "/login";
 

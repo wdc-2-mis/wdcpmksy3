@@ -16,7 +16,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PPRLandPatternArea;
 public interface PPRLandPatternAreaRepository extends JpaRepository<PPRLandPatternArea,Integer> {
 	
 	@Query(value = """
-		    select
+		    SELECT
 		        l.ppr_land_pattern_area_id,
 		        d.dist_name,
 		        m.project_name,
@@ -30,17 +30,29 @@ public interface PPRLandPatternAreaRepository extends JpaRepository<PPRLandPatte
 		        l.cultivable_wasteland_area,
 		        l.non_cultivable_wasteland_area,
 		        l.status
-		    from ppr_land_pattern_area l
-		    join m_ppr m on l.ppr_id = m.ppr_id
-		    join m_district d on m.dcode = d.dcode
-		    join m_micro_watershed mw on l.mw_id = mw.mw_id
-		    join m_village mv on l.vcode = mv.vcode
-		    where m.dcode = :dcode
-		    order by case when l.status = 'D' then 0 else 1 end, 
-		    d.dist_name, m.project_name, mw.mw_name, mv.village_name
+		    FROM ppr_land_pattern_area l
+		    JOIN m_ppr m
+		        ON l.ppr_id = m.ppr_id
+		    JOIN m_district d
+		        ON m.dcode = d.dcode
+		    LEFT JOIN m_micro_watershed mw
+		        ON l.mw_id = mw.mw_id
+		    LEFT JOIN m_village mv
+		        ON l.vcode = mv.vcode
+		    WHERE m.dcode = :dcode
+		    ORDER BY
+		        CASE
+		            WHEN l.status = 'D' THEN 0
+		            WHEN l.status = 'S' THEN 1
+		            ELSE 2
+		        END,
+		        d.dist_name,
+		        m.project_name,
+		        mw.mw_name,
+		        mv.village_name
 		    """, nativeQuery = true)
-		List<Map<String,Object>> getLandPatternAreaByDistrict(@Param("dcode") Integer dcode);
-	
+		List<Map<String, Object>> getLandPatternAreaByDistrict(
+		        @Param("dcode") Integer dcode);
 	
 	@Query("""
 		    SELECT status FROM PPRLandPatternArea WHERE village.vcode = :vcode""")
@@ -62,4 +74,52 @@ public interface PPRLandPatternAreaRepository extends JpaRepository<PPRLandPatte
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
 	boolean existsByPprId_InstitutionalStructure_StCodeAndStatus(Integer stCode, Character status);
+
+	@Query(value = """
+		    SELECT
+		        l.ppr_land_pattern_area_id,
+		        d.dist_name,
+		        m.project_name,
+		        mw.mw_name,
+		        mv.village_name,
+		        l.village_area,
+		        l.forest_area,
+		        l.argiculture_land,
+		        l.rainfed_area,
+		        l.pastures,
+		        l.cultivable_wasteland_area,
+		        l.non_cultivable_wasteland_area,
+		        l.status
+
+		    FROM ppr_land_pattern_area l
+
+		    JOIN m_ppr m
+		        ON l.ppr_id = m.ppr_id
+
+		    JOIN m_district d
+		        ON m.dcode = d.dcode
+
+		    LEFT JOIN m_micro_watershed mw
+		        ON l.mw_id = mw.mw_id
+
+		    LEFT JOIN m_village mv
+		        ON l.vcode = mv.vcode
+
+		    WHERE d.st_code = :stcode
+
+		    ORDER BY
+		        CASE
+		            WHEN l.status = 'D' THEN 0
+		            WHEN l.status = 'S' THEN 1
+		            WHEN l.status = 'C' THEN 2
+		            ELSE 3
+		        END,
+		        d.dist_name,
+		        m.project_name,
+		        mw.mw_name,
+		        mv.village_name
+		    """,
+		    nativeQuery = true)
+		List<Map<String, Object>> getLandPatternAreaByState(
+		        @Param("stcode") Integer stcode);
 }
