@@ -605,19 +605,10 @@
 	    const fromDateError = document.getElementById("fromDateError");
 	    const toDateError = document.getElementById("toDateError");
 		
-		const fromDate1 = document.getElementById("fromDate1");
-		const toDate1 = document.getElementById("toDate1");
-
-		const fromDate1Error = document.getElementById("fromDate1Error");
-		const toDate1Error = document.getElementById("toDate1Error");
-
 	    // Clear previous messages
 	    fromDateError.innerText = "";
 	    toDateError.innerText = "";
 		
-		fromDate1Error.innerText = "";
-		toDate1Error.innerText = "";
-
 	    if (fromDate.value === "" || toDate.value === "") {
 	        return true;
 	    }
@@ -638,28 +629,45 @@
 	        return false;
 	    }
 		
-		if (fromDate1.value === "" || toDate1.value === "") {
-			return true;
-		}
-
-		if (fromDate1.value > toDate1.value) {
-
-			fromDate1.value = "";
-			toDate1.value = "";
-
-			fromDate1Error.innerText =
-				"From Date cannot be greater than To Date.";
-
-			toDate1Error.innerText =
-				"To Date must be greater than or equal to From Date.";
-
-			fromDate1.focus();
-
-			return false;
-		}
-
 	    return true;
 	}
+	
+	function validateDateRange1() {
+
+		    
+			
+			const fromDate1 = document.getElementById("fromDate1");
+			const toDate1 = document.getElementById("toDate1");
+
+			const fromDate1Error = document.getElementById("fromDate1Error");
+			const toDate1Error = document.getElementById("toDate1Error");
+
+		    // Clear previous messages
+			fromDate1Error.innerText = "";
+			toDate1Error.innerText = "";
+
+			if (fromDate1.value === "" || toDate1.value === "") {
+				return true;
+			}
+
+			if (fromDate1.value > toDate1.value) {
+
+				fromDate1.value = "";
+				toDate1.value = "";
+
+				fromDate1Error.innerText =
+					"From Date cannot be greater than To Date.";
+
+				toDate1Error.innerText =
+					"To Date must be greater than or equal to From Date.";
+
+				fromDate1.focus();
+
+				return false;
+			}
+
+		    return true;
+		}
 
 </script>
 
@@ -1191,13 +1199,13 @@
 									</label>
 									<div class="d-flex align-items-center gap-4">
 										<input type="date" name="fromDate1" id="fromDate1" class="form-control" min="2026-01-01"
-											style="height:40px; width: 300px;" onchange="validateDateRange()"> 
+											style="height:40px; width: 300px;" onchange="validateDateRange1();"> 
 											<div class="invalid-feedback">Please select Period of pending UC from Date</div>
 											<div id="fromDate1Error" class="text-danger mt-1"></div>
 
 											&nbsp; To &nbsp;
 										<input type="date" name="toDate1" id="toDate1" class="form-control" min="2026-01-01"
-											style="height:40px; width: 300px;" onchange="validateDateRange()">
+											style="height:40px; width: 300px;" onchange="validateDateRange1();">
 											<div class="invalid-feedback">Please select Period of pending UC To Date</div>
 											<div id="toDate1Error" class="text-danger mt-1"></div>
 									</div>
