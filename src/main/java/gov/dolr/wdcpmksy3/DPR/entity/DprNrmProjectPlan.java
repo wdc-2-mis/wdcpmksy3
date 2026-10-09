@@ -8,7 +8,8 @@ import jakarta.persistence.*;
 @Table(name = "dpr_nrm_project_plan") 
 public class DprNrmProjectPlan { 
 	
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) 
+	@Id 
+	@GeneratedValue(strategy = GenerationType.IDENTITY) 
 	@Column(name = "plan_id") 
 	private Integer planId; 
 	

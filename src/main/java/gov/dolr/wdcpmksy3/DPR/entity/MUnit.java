@@ -6,7 +6,8 @@ import jakarta.persistence.*;
 @Entity @Table(name = "m_unit") 
 public class MUnit { 
 	
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) 
+	@Id 
+	@GeneratedValue(strategy = GenerationType.IDENTITY) 
 	@Column(name = "unit_code") 
 	private Integer unitCode; 
 	

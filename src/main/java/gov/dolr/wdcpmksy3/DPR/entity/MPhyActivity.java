@@ -10,7 +10,8 @@ import jakarta.persistence.*;
 				columnNames = {"head_code", "seq_no"} ) } ) 
 public class MPhyActivity { 
 	
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) 
+	@Id 
+	@GeneratedValue(strategy = GenerationType.IDENTITY) 
 	@Column(name = "activity_code") 
 	private Integer activityCode; 
 	
