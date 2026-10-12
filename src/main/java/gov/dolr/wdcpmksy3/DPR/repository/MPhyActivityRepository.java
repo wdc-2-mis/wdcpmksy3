@@ -1,7 +1,9 @@
 package gov.dolr.wdcpmksy3.DPR.repository;
 
 import java.util.List; 
-import org.springframework.data.jpa.repository.JpaRepository; 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository; 
 import gov.dolr.wdcpmksy3.DPR.entity.MPhyActivity; 
 
@@ -11,5 +13,8 @@ public interface MPhyActivityRepository extends JpaRepository<MPhyActivity, Inte
 	List<MPhyActivity> findByHead_HeadCodeOrderBySeqNoAsc( Integer headCode); 
 	List<MPhyActivity> findByHead_HeadCodeAndStatusOrderBySeqNoAsc( Integer headCode, String status); 
 	List<MPhyActivity> findByStatusOrderBySeqNoAsc(String status); 
+	
+	@Query("SELECT a.unit.unitDesc FROM MPhyActivity a WHERE a.activityCode = :actId")
+	String findUnitDescByActivityCode(@Param("actId") Integer actId);
 	
 }

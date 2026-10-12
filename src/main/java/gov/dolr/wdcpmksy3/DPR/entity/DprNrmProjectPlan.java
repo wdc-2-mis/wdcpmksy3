@@ -18,7 +18,10 @@ public class DprNrmProjectPlan {
 	private MPpr ppr; 
 	
 	@Column(name = "status", length = 1) 
-	private String status; 
+	private Character status; 
+	
+	@Column(name = "dprupload_url", length = 500) 
+	private String dpruploadUrl; 
 	
 	@Column(name = "updatedby", length = 20) 
 	private String updatedBy; 
@@ -49,12 +52,51 @@ public class DprNrmProjectPlan {
 		this.ppr = ppr; 
 	} 
 	
-	public String getStatus() { 
+	public Character getStatus() { 
 		return status; 
 	} 
-	public void setStatus(String status) { 
+	public void setStatus(Character status) { 
 		this.status = status; 
-	} 
+	}
+
+	public String getDpruploadUrl() {
+		return dpruploadUrl;
+	}
+	public void setDpruploadUrl(String dpruploadUrl) {
+		this.dpruploadUrl = dpruploadUrl;
+	}
+	
 	public String getUpdatedBy() { 
 		return updatedBy; 
-	} public void setUpdatedBy(String updatedBy) { this.updatedBy = updatedBy; } public LocalDateTime getUpdatedOn() { return updatedOn; } public void setUpdatedOn(LocalDateTime updatedOn) { this.updatedOn = updatedOn; } public String getCreatedBy() { return createdBy; } public void setCreatedBy(String createdBy) { this.createdBy = createdBy; } public LocalDateTime getCreatedOn() { return createdOn; } public void setCreatedOn(LocalDateTime createdOn) { this.createdOn = createdOn; } public String getRequestIp() { return requestIp; } public void setRequestIp(String requestIp) { this.requestIp = requestIp; } }
+	} 
+	public void setUpdatedBy(String updatedBy) { 
+		this.updatedBy = updatedBy; 
+	} 
+	
+	public LocalDateTime getUpdatedOn() { 
+		return updatedOn; 
+	} 
+	public void setUpdatedOn(LocalDateTime updatedOn) { 
+		this.updatedOn = updatedOn; 
+	}
+	
+	public String getCreatedBy() { 
+		return createdBy; 
+	} 
+	public void setCreatedBy(String createdBy) { 
+		this.createdBy = createdBy; 
+	}
+	
+	public LocalDateTime getCreatedOn() { 
+		return createdOn; 
+	}
+	public void setCreatedOn(LocalDateTime createdOn) { 
+		this.createdOn = createdOn; 
+	} 
+	public String getRequestIp() { 
+		return requestIp; 
+	} 
+	public void setRequestIp(String requestIp) { 
+		this.requestIp = requestIp; 
+	} 
+}

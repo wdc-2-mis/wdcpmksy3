@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
+import gov.dolr.wdcpmksy3.entity.MDistrict;
 
 public interface PprTransactionRepository extends JpaRepository<PprTransaction, Integer> {
 
@@ -38,6 +40,15 @@ public interface PprTransactionRepository extends JpaRepository<PprTransaction, 
     @Query("select count(t) > 0 from PprTransaction t where t.ppr.pprId = :pprId and t.action in ('A', 'F') and t.senton=(select max(t2.senton)"
     		+ "from PprTransaction t2  where t2.ppr.pprId = t.ppr.pprId)  group by t.senton order by t.senton desc")
     boolean existsActionAOrF(@Param("pprId") Integer pprId);
+    
+    @Query("SELECT DISTINCT d  FROM PprTransaction t  JOIN t.ppr p JOIN p.district d  JOIN d.state s  WHERE s.stCode = :stCode  "
+    		+ "AND t.action = 'A'  ORDER BY d.distName")
+    List<MDistrict> findDistrictsByStCodeAndActionA(@Param("stCode") Integer stCode);
+    
+    @Query("SELECT DISTINCT p  FROM PprTransaction t JOIN t.ppr p  JOIN p.district d  WHERE d.dcode = :dcode  AND t.action = 'A'  "
+    		+ "ORDER BY p.projectName")
+    List<MPpr> findPprByDcodeAndActionA(@Param("dcode") Integer dcode);
+
     
     
 }
