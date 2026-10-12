@@ -12,4 +12,8 @@ public interface DprNrmProjectPlanRepository extends JpaRepository<DprNrmProject
 	
 	List<DprNrmProjectPlan> findByPpr_PprId(Integer pprId); 
 	Optional<DprNrmProjectPlan> findByPpr_PprIdAndStatus( Integer pprId, String status); 
-	List<DprNrmProjectPlan> findByStatus(String status); }
+	List<DprNrmProjectPlan> findByStatus(String status); 
+	
+	Optional<DprNrmProjectPlan> findByPprPprId(Integer pprId);
+	
+}
