@@ -2183,14 +2183,15 @@
 							</label>
 						</div>
 						<div class="col-md-4">
-							<select class="form-select" id="userid" name="userid" th:disabled="${!allSectionsFilled}">
+							<select class="form-select" id="userid" name="userid" th:disabled="${!allSectionsFilled}" required>
 								<option value="">--Select User-ID--</option>
 								<option th:each="u : ${userList}" th:value="${u.regId}" th:text="${u.userId}">
 								</option>
 							</select>
+							<div class="invalid-feedback">Please select User-ID.</div>
 						</div>
 						<div class="col-md-4">
-							<button type="submit" class="btn btn-primary" >
+							<button type="submit" class="btn btn-primary" th:disabled="${!allSectionsFilled}">
 								Forward
 							</button>
 						</div>
