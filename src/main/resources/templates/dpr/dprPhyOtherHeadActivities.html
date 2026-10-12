@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Prioritized List of Proposed Project</title>
+
+	<style>
+		.required {
+			color: red;
+		}
+	
+		.validation-error {
+			color: red;
+			font-size: 14px;
+			margin-top: 4px;
+		}
+	
+		.is-invalid {
+			border-color: #dc3545 !important;
+		}
+		.field-error {
+		    color: red;
+		    font-size: 14px;
+		    margin-top: 4px;
+		}
+	</style>
+<script th:inline="javascript">
+
+	document.addEventListener("DOMContentLoaded", function () {
+	    const district = document.getElementById("district");
+		const project = document.getElementById("project");
+	    district.addEventListener("change", function () {
+			if (this.value) {
+			           window.location.href = "/dprPhyOtherHeadActivities?dcode=" + this.value;
+			       } else {
+			           window.location.href = "/dprPhyOtherHeadActivities";
+			       }
+	    });
+		project.addEventListener("change", function () {
+			if (this.value) {
+				window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + this.value;
+			} else {
+				window.location.href = "/dprPhyOtherHeadActivities";
+			}
+		});
+	
+			const form = document.getElementById("projectForm");
+			form.addEventListener("submit", function (e) {
+				
+				form.querySelectorAll(".validation-error").forEach(function(error){
+					error.remove();
+				});
+				form.querySelectorAll(".is-invalid").forEach(function(field){
+					field.classList.remove("is-invalid");
+				});
+				// =========================
+				// VALIDATION FUNCTION
+				// =========================
+				function showError(field, message){
+					field.classList.add("is-invalid");
+					const error = document.createElement("div");
+					error.className = "validation-error";
+					error.innerText = message;
+					field.parentNode.appendChild(error);
+					field.focus();
+					return false;
+				}
+				// =========================
+				// GET FIELD VALUES
+				// =========================
+				const district = document.getElementById("district");
+				const project = document.getElementById("project");
+				const head = document.getElementById("head");
+				const activity = document.getElementById("activity");
+				const target = document.getElementById("target");
+				// =========================
+				// DISTRICT
+				// =========================
+				if(district.value.trim() === ""){
+					e.preventDefault();
+					showError(district,"Please select District.");
+					return;
+				}
+				// =========================
+				// PROJECT NAME
+				// =========================
+				if(project.value.trim() === ""){
+					e.preventDefault();
+					showError(project,"Project Name is missing.");
+					return;
+				}
+				// =========================
+				// MICRO-WATERSHED
+				// =========================
+				if(head.value.trim() === ""){
+					e.preventDefault();
+					showError(head,"Please select Head Activity.");
+					return;
+				}
+				// =========================
+				// PROJECT AREA
+				// =========================
+				if(activity.value.trim() === ""){
+					e.preventDefault();
+					showError(activity,"Please select Activity.");
+					return;
+				}
+				if(target.value.trim() === ""){
+					e.preventDefault();
+					showError(target,"Please Enter the target.");
+					return;
+				}
+				
+			});
+			// =========================
+			// REMOVE ERROR ON CHANGE
+			// =========================
+			form.addEventListener("input", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
+			form.addEventListener("change", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
+		
+	    document.querySelectorAll(".editBtn").forEach(function (btn) {
+	        btn.addEventListener("click", function () {
+	            let id = this.getAttribute("data-id");
+	            fetch("/getOtherProjectPlanDtlEdit?id=" + id)
+	                .then(response => response.json())
+	                .then(data => {
+	                    // Hidden ID
+	                    document.getElementById("editOtherPlanDtlId").value = data.id;
+	                    // Readonly fields
+	                    document.getElementById("editDistrict").value = data.district ?? "";
+	                    document.getElementById("editProject").value = data.project ?? "";
+	                    document.getElementById("editHead").value = data.microWatershed ?? "";
+	                    document.getElementById("editActivity").value = data.microWatershedCode ?? "";
+
+	                    // Editable fields
+	                    document.getElementById("editTarget").value = data.treatedArea ?? "";
+	                    // Select Project Type Radio
+	                })
+	                .catch(error => {
+	                    console.error("Error loading edit data:", error);
+	                });
+	        });
+	    });
+		
+		
+	    const editForm = document.getElementById("editProjectForm");
+	    if (!editForm) {
+	        return;
+	    }
+	    editForm.addEventListener("submit", function (e) {
+	        e.preventDefault();
+	        // =========================
+	        // CLEAR OLD ERRORS
+	        // =========================
+	        editForm.querySelectorAll(".field-error").forEach(function (error) {
+	            error.innerText = "";
+	        });
+	        let isValid = true;
+	        let firstInvalidField = null;
+	        // =========================
+	        // GET VALUES
+	        // =========================
+	        const treatedArea = document.getElementById("editTarget").value.trim();
+	        // =========================
+	        // STOP IF INVALID
+	        // =========================
+	        if (!isValid) {
+	            if (firstInvalidField) {
+	                firstInvalidField.focus();
+	            }
+	            return;
+	        }
+	        editForm.submit();
+	    });
+		
+		document.getElementById("activity").addEventListener("change", function () {
+						let actId = this.value;
+						const unitSpan = document.getElementById("unitDesc");
+						document.getElementById("target").value="";
+						if (actId === "") {
+							return;
+						}
+						fetch('/getUnitDescByOtherActivity?actId=' + encodeURIComponent(actId))
+						       .then(response => {
+						           if (!response.ok) {
+						               throw new Error("Unit description not found");
+						           }
+						           return response.text();
+						       })
+						       .then(unitDesc => {
+						           unitSpan.textContent = unitDesc;
+						       })
+						       .catch(error => {
+						           console.error("Error fetching unit description:", error);
+						           unitSpan.textContent = "";
+						       });
+					});
+					const targetInput = document.getElementById("target");
+					    targetInput.addEventListener("input", function () {
+					        const unitDesc = document.getElementById("unitDesc").textContent.trim().toLowerCase();
+					        let value = this.value;
+					        if (unitDesc === "nos") {
+					            // Whole numbers only
+					            value = value.replace(/[^0-9]/g, "");
+					        } else {
+					            // Decimal numbers up to 5 decimal places
+					            value = value.replace(/[^0-9.]/g, "");
+					            const parts = value.split(".");
+					            if (parts.length > 2) {
+					                value = parts[0] + "." + parts.slice(1).join("");
+					            }
+					            const decimalParts = value.split(".");
+					            if (decimalParts.length === 2) {
+					                value = decimalParts[0] + "." + decimalParts[1].substring(0, 2);
+					            }
+					        }
+					        this.value = value;
+					    });	
+	});
+	
+			
+		
+</script>
+	
+
+</head>
+<body>
+	<div layout:fragment="content">
+
+	    <div class="card shadow-sm border-0">
+	        <div class="card-header bg-primary text-white">
+	            <h4 class="mb-0">
+	               Physical Other Activities
+	            </h4>
+	        </div>
+			<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+				<span th:text="${success}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
+				<span th:text="${error}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+	        <div class="card-body">
+	            <form th:action="@{/dprPhyOtherHeadActivities}" method="post" id="projectForm">
+	                
+					<input type="hidden" id="pprId" name="pprId" th:value="${pprId}">
+	                <div class="row mb-3 align-items-center">
+	                    <label class="col-md-3 fw-bold"> District <span class="required">*</span></label>
+						<div class="col-md-5">
+							<select class="form-select" id="district" name="district">
+								<option value="">--Select--</option>
+								<option th:each="d : ${districtList}" th:value="${d.dcode}" th:text="${d.distName}" 
+									th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"> </option>
+							</select>
+						</div>
+	                </div>
+
+					<div class="row mb-3 align-items-center">
+					    <label class="col-md-3 fw-bold">Project Name <span class="required">*</span></label>
+						<div class="col-md-5">
+							<select class="form-select" id="project" name="project">
+								<option value="">--Select--</option>
+								<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
+									th:selected="${pprId != null and pprId == p.pprId}"> </option>
+							</select>
+						</div>
+					</div>
+
+					<div class="row mb-3 align-items-center">
+						<label class="col-md-3 fw-bold">Name of the Head <span class="required">*</span></label>
+						<div class="col-md-5">
+							<select class="form-select" id="head" name="head">
+								<option value="">--Select--</option>
+								<option th:each="hd : ${headList}" th:value="${hd.otherHeadId}" th:text="${hd.otherHeadDesc}"
+								th:selected="$selectedHead != null and selectedHead == hd.otherHeadId}"></option>
+							</select>
+						</div>
+					</div>
+
+	                <div class="row mb-3 align-items-center">
+	                    <label class="col-md-3 fw-bold">Name of the Activity </label>
+						<div class="col-md-3">
+						    <input type="text" class="form-control" id="activity" name="activity" readonly>
+							<option value="">--Select--</option>
+							<option th:each="act : ${activityList}" th:value="${act.otherActivityId}" th:text="${act.otherActivityDesc}"></option>
+						</div>
+	                </div>
+
+					<div class="row mb-3 align-items-center">
+					    <label class="col-md-3 fw-bold"> Target(<span id="unitDesc" class="fw-bold text-primary"></span>) <span class="required">*</span></label>
+						<div class="col-md-6">
+							<input type="text" name="target" id="target" class="form-control" style="height:40px; width: 300px;"
+								inputmode="decimal" maxlength="10" required>
+						</div>
+					</div>										
+
+					<div class="text-center mt-4">
+						<button type="submit" name="action" value="D" class="btn btn-warning">
+					         <i class="fas fa-save"></i>
+					          Save As Draft
+					     </button>
+	                </div>
+	            </form>
+			</div>
+		</div>
+		<br/>
+		<div th:if="${detailsOfListOfProposedProject != null}">
+			<h4> <b><center>DPR Other Project Plan Details</center></b> </h4>
+			
+		    <table class="table table-bordered table-striped table-hover">
+		        
+		        <thead class="table-primary">
+		        <tr>
+		            <th>District</th>
+		            <th>Project Name</th>
+		            <th>Name of the Head</th>
+		            <th>Name of the Activity</th>
+		            <th>Target</th>
+		            <th>Action</th>
+		        </tr>
+		        </thead>
+		        <tbody>
+		        
+		        </tbody>
+		    </table>
+		</div>
+		
+		</div>
+</body>
+</html>
