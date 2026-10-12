@@ -1,6 +1,6 @@
 package gov.dolr.wdcpmksy3.DPR.controller;
 
-import java.math.BigDecimal;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,22 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.DPR.entity.MPhyActivity;
 import gov.dolr.wdcpmksy3.DPR.repository.MPhyActivityRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MPhyHeadsRepository;
-import gov.dolr.wdcpmksy3.DPR.service.DPRNRMPlanService;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
-import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
-import gov.dolr.wdcpmksy3.PPR.repository.PprWcdcUnspentBalanceRepository;
-import gov.dolr.wdcpmksy3.common.CommonFunctions;
-import gov.dolr.wdcpmksy3.service.DistrictService;
-import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -40,8 +33,7 @@ public class DPRNRMPlanController {
 	@Autowired
     private MPhyActivityRepository actrepo;
 	
-	@Autowired
-    private DPRNRMPlanService dprserv;
+	
 	
 	@GetMapping("/createDPRNRMPlan")
     public String createDPRNRMPlan(HttpSession session, Model model) 

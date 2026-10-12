@@ -21,4 +21,6 @@ public interface MDistrictRepository extends JpaRepository<MDistrict, Integer> {
     
     @Query("SELECT DISTINCT p.district FROM MPpr p WHERE p.district.state.stCode = :stcode AND p.status = 'C' ORDER BY p.district.distName")
 	List<MDistrict> getPPRDistrictsByState(Integer stcode);
+
+	List<MDistrict> getDPRDistrictsByState(Integer stcode);
 }
