@@ -1,6 +1,8 @@
 package gov.dolr.wdcpmksy3.DPR.controller;
 
-
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,15 +12,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.DPR.entity.MPhyActivity;
+import gov.dolr.wdcpmksy3.DPR.repository.DprNrmProjectPlanDtlRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.DprNrmProjectPlanRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MPhyActivityRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MPhyHeadsRepository;
+import gov.dolr.wdcpmksy3.DPR.service.DPRNRMPlanService;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
-import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 
+import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
+import gov.dolr.wdcpmksy3.common.CommonFunctions;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -33,7 +43,14 @@ public class DPRNRMPlanController {
 	@Autowired
     private MPhyActivityRepository actrepo;
 	
+	@Autowired
+    private DPRNRMPlanService dprserv;
 	
+	@Autowired
+    private DprNrmProjectPlanDtlRepository plndtlrepo;
+	
+	@Autowired
+    private DprNrmProjectPlanRepository plan;
 	
 	@GetMapping("/createDPRNRMPlan")
     public String createDPRNRMPlan(HttpSession session, Model model) 
@@ -45,7 +62,29 @@ public class DPRNRMPlanController {
 
             return "redirect:/login";
         }
-		
+        List<Object[]> list=plan.getDprNrmProjectPlanList(stcode);
+        
+        List<Object[]> finalList = new ArrayList<>();
+
+        int srNo = 1;
+        Integer previousId = null;
+
+        for (Object[] row : list) {
+
+            Integer currentId = ((Number) row[0]).intValue();
+
+            // Create a new array with one extra column for serial number
+            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+            if (previousId == null || !previousId.equals(currentId)) {
+                newRow[row.length] = srNo++;   // Serial No.
+            } else {
+                newRow[row.length] = "";       // Blank for duplicate rows
+            }
+            finalList.add(newRow);
+            previousId = currentId;
+        }
+        model.addAttribute("dprNrmProjectPlanList", finalList);
         model.addAttribute("headList", head.findAllByOrderBySeqNoAsc());
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
         
@@ -95,6 +134,54 @@ public class DPRNRMPlanController {
 	    return ResponseEntity.ok(unitDesc);
 	}
 	
+	@GetMapping("/checkProjectActivityExistsNRM")
+	@ResponseBody
+	public String checkProjectActivityExistsNRM(@RequestParam("pprid") Integer pprid, @RequestParam("actId") Integer actId) {
+
+	    boolean exists =plndtlrepo.existsByPprIdAndActivityId(pprid,actId);
+	   // System.out.println("kdy"+exists);
+	    if (exists) {
+	        return "EXISTS";
+	    }
+
+	    return "NOT_EXISTS";
+	}
 	
+	 @PostMapping("/saveDPRNRMTarget")
+	 public String saveDPRNRMTarget(HttpSession session, Model model, HttpServletRequest request,
+	    		@RequestParam Integer district,
+	    		@RequestParam Integer project,
+	    		@RequestParam Integer head,
+	            @RequestParam Integer activity,
+	            @RequestParam BigDecimal target,
+	            @RequestParam String action,
+	            RedirectAttributes redirectAttributes) {
+	   
+				Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+				String userid=(String)session.getAttribute("userid");
+				Integer block=0;
+				try {
+					
+					 if(userid==null){
+	
+				            return "redirect:/login";
+				     }
+					boolean save=false;
+			    	
+					save=dprserv.saveDPRNRMTarget(district, project, head, activity, target, action, 
+							userid, CommonFunctions.getClientIpAddr(request));
+					
+					if(save)
+						redirectAttributes.addFlashAttribute( "success", "DPR NRM Target saved successfully.");
+					else
+						redirectAttributes.addFlashAttribute("error", "Unable to saved DPR NRM Target.");
+				}
+				catch (Exception e) {
+	
+						e.printStackTrace();
+				        redirectAttributes.addFlashAttribute("error", "Unable to DPR NRM Target.");
+				}
+				return "redirect:/createDPRNRMPlan";	
+	    }
 
 }
