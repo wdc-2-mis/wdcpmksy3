@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.DPR.entity.DprNrmProjectPlanDtl;
 import gov.dolr.wdcpmksy3.DPR.entity.MPhyActivity;
 import gov.dolr.wdcpmksy3.DPR.repository.DprNrmProjectPlanDtlRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.DprNrmProjectPlanRepository;
@@ -27,7 +28,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
-
+import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionary;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -182,6 +183,40 @@ public class DPRNRMPlanController {
 				        redirectAttributes.addFlashAttribute("error", "Unable to DPR NRM Target.");
 				}
 				return "redirect:/createDPRNRMPlan";	
+	    }
+	 
+	 	@GetMapping("/deleteDPRNRMTarget")
+	    public String deleteDPRNRMTarget(HttpSession session, Model model, @RequestParam("id") Integer id,  
+	    		RedirectAttributes redirectAttributes) {
+
+			String userid=(String)session.getAttribute("userid");
+			try {
+				
+		        if(userid==null){
+		
+		            return "redirect:/login";
+		        }
+		        DprNrmProjectPlanDtl data = plndtlrepo.findById(id).orElse(null);
+	            if (data == null) {
+	                redirectAttributes.addFlashAttribute("error", "Record not found.");
+	                return "redirect:/createDPRNRMPlan";
+	            }
+	            
+	            if (plndtlrepo.existsById(id)) {
+	            	plndtlrepo.deleteById(id);
+	            	redirectAttributes.addFlashAttribute("success", "Activity Record deleted successfully.");
+	            }
+	            else {
+	            	redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+	            }
+	            
+	        } 
+	        catch (Exception e) {
+
+	            redirectAttributes.addFlashAttribute("error", "Unable to delete record.");
+	            e.printStackTrace();
+	        }
+			return "redirect:/createDPRNRMPlan";
 	    }
 
 }

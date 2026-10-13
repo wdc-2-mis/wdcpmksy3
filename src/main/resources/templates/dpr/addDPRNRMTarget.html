@@ -534,7 +534,7 @@
 							
 							<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[4] != null and row[4].toString().equals('D')}"
 								title="Delete"
-								th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteWCDCFunctionariesPPR4B?id=' + ${row[6]} + '\'; }); return false;'">
+								th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteDPRNRMTarget?id=' + ${row[6]} + '\'; }); return false;'">
 							
 								<i class="fas fa-trash"></i>
 							</a>

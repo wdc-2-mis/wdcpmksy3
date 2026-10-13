@@ -54,7 +54,7 @@ public class SecurityConfig {
                         "/checkDistrictCompleted", "/nextProjectName", "/rajectAndConfirm","/modifyPprTransaction", "/pprRequestDolrApproval", "/rejPprReqForAprov", "/referBackPprReqForAprov", "/approvePprReqForAprov", "/viewPprRequest", "/stWisePprTransactionStatus", "/newUserActiveDelete", "/slnausersrch", "/activatePiaUser", "/userRoleMap", "/userRoleMap/**", "/deleteUser", "/deactivateUser", "/activateExistingUser", "/extendSession", "/projectStats/**", "/checkWaterOutcome", "/checkPPR8BlockStatus",  "/checkFloodDroughtVillage",
                         "/checkCropOutcomeSeason", "/getLandPatternAreaByState",
 // DPR 					 
-                        "/createDPRNRMPlan", "/saveDPRNRMTarget", "/getProjectsByDistrictDPRNRM", "/getActivitiesByHeadCodeDPRNRM", "/getUnitDescByActivity", "/checkProjectActivityExistsNRM",
+                        "/createDPRNRMPlan", "/saveDPRNRMTarget", "/getProjectsByDistrictDPRNRM", "/getActivitiesByHeadCodeDPRNRM", "/getUnitDescByActivity", "/checkProjectActivityExistsNRM", "/deleteDPRNRMTarget",
                         
                         "/css/**",
                         "/js/**",
