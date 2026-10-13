@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Report P1</title>
+	<link rel="stylesheet" th:href="@{/css/report.css}">
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			// Reload districts when the state changes; reset so an invalid state/district pair can't be submitted.
+			document.getElementById("stateCode").addEventListener("change", function () {
+				const dd = document.getElementById("districtCode");
+				dd.innerHTML = '<option value="">---All District---</option>';
+				fetch('/reports/p1/districts' + (this.value ? '?stateCode=' + encodeURIComponent(this.value) : ''))
+					.then(r => r.json())
+					.then(list => list.forEach(d => {
+						const o = document.createElement("option");
+						o.value = d.code;
+						o.textContent = d.name;
+						dd.appendChild(o);
+					}))
+					.catch(e => console.error("Error:", e));
+			});
+		});
+	</script>
+</head>
+
+<div layout:fragment="content">
+
+	<div class="rp-title">Report P1- State-wise,District-wise and Year-wise Details of Projects Sanctioned including Area Sanctioned, Total Cost(Central/State Share)</div>
+
+	<form id="rpForm" th:action="@{/reports/p1}" method="get" class="rp-filter">
+		<div class="row g-3 align-items-center">
+
+			<div class="col-auto"><label class="col-form-label">Select State</label></div>
+			<div class="col-auto">
+				<select name="stateCode" id="stateCode" class="form-select">
+					<option value="">---All State---</option>
+					<option th:each="s : ${states}" th:value="${s.code}" th:text="${s.name}"
+						th:selected="${stateCode != null and stateCode == s.code}"></option>
+				</select>
+			</div>
+
+			<div class="col-auto"><label class="col-form-label">Select District</label></div>
+			<div class="col-auto">
+				<select name="districtCode" id="districtCode" class="form-select">
+					<option value="">---All District---</option>
+					<option th:each="d : ${districts}" th:value="${d.code}" th:text="${d.name}"
+						th:selected="${districtCode != null and districtCode == d.code}"></option>
+				</select>
+			</div>
+
+			<div class="col-auto"><label class="col-form-label">Select Financial Year</label></div>
+			<div class="col-auto">
+				<select name="finYrCd" id="finYrCd" class="form-select">
+					<option value="">---All Financial Year---</option>
+					<option th:each="f : ${finYears}" th:value="${f.code}" th:text="${f.name}"
+						th:selected="${finYrCd != null and finYrCd == f.code}"></option>
+				</select>
+			</div>
+
+			<div class="col-auto"><button type="submit" class="rp-go">Go</button></div>
+		</div>
+		<div class="rp-filter-bar"></div>
+	</form>
+
+	<div class="rp-actions">
+		<a class="rp-btn" th:href="@{/reports/p1/excel(stateCode=${stateCode},districtCode=${districtCode},finYrCd=${finYrCd})}">Excel</a>
+		<a class="rp-btn" th:href="@{/reports/p1/pdf(stateCode=${stateCode},districtCode=${districtCode},finYrCd=${finYrCd})}">PDF</a>
+	</div>
+	<div class="rp-asof">Report as on: <span th:text="${reportOn}"></span></div>
+
+	<div class="rp-scroll">
+		<table class="rp-table">
+			<thead>
+				<tr><th colspan="10" class="rp-note">All amounts(in Rs lakhs), All Area in Ha.</th></tr>
+				<tr>
+					<th>S.No.</th><th>State Name</th><th>District Name</th><th>Financial Year</th><th>Project Name</th>
+					<th>Project Sanction Date</th><th>Area Sanctioned</th><th>Total Cost</th><th>Central Share</th><th>State Share</th>
+				</tr>
+				<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+			</thead>
+			<tbody>
+				<tr th:each="r, st : ${rows}">
+					<td class="c" th:text="${st.count}"></td>
+					<td th:text="${r.stateName}"></td>
+					<td th:text="${r.districtName}"></td>
+					<td class="n" th:text="${r.finYear}"></td>
+					<td th:text="${r.projectName}"></td>
+					<td class="n" th:text="${r.sanctionDate != null} ? ${#temporals.format(r.sanctionDate,'dd/MM/yyyy')} : ''"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.areaSanctioned,1,'COMMA',4,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.totCost,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.centralShare,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.stateShare,1,'COMMA',2,'POINT')}"></td>
+				</tr>
+				<tr th:if="${#lists.isEmpty(rows)}">
+					<td colspan="10" class="c text-danger">No records found.</td>
+				</tr>
+				<tr class="rp-total" th:unless="${#lists.isEmpty(rows)}">
+					<td colspan="6" class="n">Grand Total</td>
+					<td class="n" th:text="${#numbers.formatDecimal(totArea,1,'COMMA',4,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totCost,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totCentral,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totState,1,'COMMA',2,'POINT')}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</div>
+</html>
