@@ -5,7 +5,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Prioritized List of Proposed Project</title>
+	<title>Physical Other Activities</title>
 
 	<style>
 		.required {
@@ -32,6 +32,7 @@
 	document.addEventListener("DOMContentLoaded", function () {
 	    const district = document.getElementById("district");
 		const project = document.getElementById("project");
+		const head = document.getElementById("head");
 	    district.addEventListener("change", function () {
 			if (this.value) {
 			           window.location.href = "/dprPhyOtherHeadActivities?dcode=" + this.value;
@@ -42,6 +43,13 @@
 		project.addEventListener("change", function () {
 			if (this.value) {
 				window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + this.value;
+			} else {
+				window.location.href = "/dprPhyOtherHeadActivities";
+			}
+		});
+		head.addEventListener("change", function () {
+			if (this.value) {
+				window.location.href = "/dprPhyOtherHeadActivities?head=" +  this.value;
 			} else {
 				window.location.href = "/dprPhyOtherHeadActivities";
 			}
@@ -194,6 +202,7 @@
 		
 		document.getElementById("activity").addEventListener("change", function () {
 						let actId = this.value;
+						alert('cehck '+actId);
 						const unitSpan = document.getElementById("unitDesc");
 						document.getElementById("target").value="";
 						if (actId === "") {
@@ -297,8 +306,8 @@
 						<div class="col-md-3">
 							<select class="form-select" id="head" name="head">
 								<option value="">--Select--</option>
-								<option th:each="hd : ${headList}" th:value="${hd.otherHeadId}" th:text="${hd.otherHeadDesc}"
-									th:selected="$selectedHead != null and selectedHead == hd.otherHeadId}"></option>
+								<option th:each="hd : ${headList}" th:value="${hd.otherHeadsId}" th:text="${hd.otherHeadDesc}"
+									th:selected="${selectedHead != null and selectedHead == hd.otherHeadsId}"></option>
 							</select>
 						</div>
 						<div class="col-md-2">
