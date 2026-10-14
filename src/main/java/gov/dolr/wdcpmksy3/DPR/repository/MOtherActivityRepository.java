@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface MOtherActivityRepository extends JpaRepository<MOtherActivity, Integer> {
 	
-	List<MOtherActivity> findByOtherHeadsIdOrderBySeqNoAsc(Integer otherHeadsId);
+	List<MOtherActivity> findByOtherHeads_OtherHeadsIdOrderBySeqNoAsc(Integer otherHeadsId);
 	
 	String findUnitDescByOtherActivityId(Integer actId);
 

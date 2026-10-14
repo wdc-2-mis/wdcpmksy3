@@ -261,56 +261,63 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 	        <div class="card-body">
-	            <form th:action="@{/dprPhyOtherHeadActivities}" method="post" id="projectForm">
+	            <form th:action="@{/saveDPROtherHeadActivities}" method="post" id="projectForm">
 	                
 					<input type="hidden" id="pprId" name="pprId" th:value="${pprId}">
-	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold"> District <span class="required">*</span></label>
-						<div class="col-md-5">
+
+					<div class="row mb-4">
+						<div class="col-md-2">
+							<label>District Name:</label><span class="required">*</span>
+						</div>
+						<div class="col-md-3">
 							<select class="form-select" id="district" name="district">
 								<option value="">--Select--</option>
-								<option th:each="d : ${districtList}" th:value="${d.dcode}" th:text="${d.distName}" 
-									th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"> </option>
+								<option th:each="d : ${districtList}" th:value="${d.dcode}" th:text="${d.distName}"
+									th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"></option>
 							</select>
+							<div class="validation-error" data-error-for="district"></div>
 						</div>
-	                </div>
-
-					<div class="row mb-3 align-items-center">
-					    <label class="col-md-3 fw-bold">Project Name <span class="required">*</span></label>
-						<div class="col-md-5">
+						<div class="col-md-2">
+							<label>Project Name:</label><span class="required">*</span>
+						</div>
+						<div class="col-md-3">
 							<select class="form-select" id="project" name="project">
 								<option value="">--Select--</option>
 								<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
 									th:selected="${pprId != null and pprId == p.pprId}"> </option>
 							</select>
+							<div class="validation-error" data-error-for="project"></div>
 						</div>
 					</div>
 
-					<div class="row mb-3 align-items-center">
-						<label class="col-md-3 fw-bold">Name of the Head <span class="required">*</span></label>
-						<div class="col-md-5">
+					<div class="row mb-4">
+						<div class="col-md-2">
+							<label>Name of the Head <span class="required">*</span></label>
+						</div>
+						<div class="col-md-3">
 							<select class="form-select" id="head" name="head">
 								<option value="">--Select--</option>
 								<option th:each="hd : ${headList}" th:value="${hd.otherHeadId}" th:text="${hd.otherHeadDesc}"
-								th:selected="$selectedHead != null and selectedHead == hd.otherHeadId}"></option>
+									th:selected="$selectedHead != null and selectedHead == hd.otherHeadId}"></option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<label>Name of the Activity <span class="required">*</span></label>
+						</div>
+						<div class="col-md-3">
+							<select class="form-select" id="activity" name="activity">
+								<option value="">--Select--</option>
+								<option th:each="act : ${activityList}" th:value="${act.otherActivityId}" th:text="${act.otherActivityDesc}"></option>
 							</select>
 						</div>
 					</div>
 
-	                <div class="row mb-3 align-items-center">
-	                    <label class="col-md-3 fw-bold">Name of the Activity </label>
-						<div class="col-md-3">
-						    <input type="text" class="form-control" id="activity" name="activity" readonly>
-							<option value="">--Select--</option>
-							<option th:each="act : ${activityList}" th:value="${act.otherActivityId}" th:text="${act.otherActivityDesc}"></option>
+					<div class="row mb-4">
+						<div class="col-md-2">
+							<label> Target(<span id="unitDesc" class="fw-bold text-primary"></span>) <span class="required">*</span></label>
 						</div>
-	                </div>
-
-					<div class="row mb-3 align-items-center">
-					    <label class="col-md-3 fw-bold"> Target(<span id="unitDesc" class="fw-bold text-primary"></span>) <span class="required">*</span></label>
 						<div class="col-md-6">
-							<input type="text" name="target" id="target" class="form-control" style="height:40px; width: 300px;"
-								inputmode="decimal" maxlength="10" required>
+							<input type="text" name="target" id="target" class="form-control" style="height:40px; width: 300px;" inputmode="decimal" maxlength="10">
 						</div>
 					</div>										
 
