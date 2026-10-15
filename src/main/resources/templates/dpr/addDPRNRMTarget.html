@@ -501,21 +501,19 @@
 		            <thead class="table-primary">
 		            <tr>
 		                <th>Sl. No.</th>
-		                
 		                <th>District</th>
 		                <th>Project</th>
 		                <th>Head </th>
 		                <th>Activity</th>
 						<th>Unit</th>
 		                <th>Target</th>
-						<th>Edit/Delete</th>
 						<th>Action</th>
 		            </tr>
 		            </thead>
 		            <tbody>
 		            <tr th:each="row, stat : ${dprNrmProjectPlanList}">
 		                <!-- SL NO -->
-		                <td th:text="${row[15]}"></td>
+		                <td th:text="${row[14]}"></td>
 		                <!-- ACTION -->
 		               
 		                <!-- DISTRICT -->
@@ -523,18 +521,18 @@
 		                <!-- project -->
 		                <td th:text="${(stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]) ? row[2] : ''}"></td>
 		                <!-- head NAME -->
-		                <td th:text="${(stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]) ? row[9] : ''}"></td>
+		                <td th:text="${row[8]}"></td>
 		                <!-- Activity -->
-		                <td th:text="${row[11]}"></td>
+		                <td th:text="${row[10]}"></td>
 		                <!-- unit -->
-		                <td th:text="${row[12]}"></td>
+		                <td th:text="${row[11]}"></td>
 		                <!-- Target -->
-		                <td th:text="${row[14]}"></td>
+		                <td th:text="${row[13]}"></td>
 						<td>
 							
-							<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[4] != null and row[4].toString().equals('D')}"
+							<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[5] != null and row[5].toString().equals('D')}"
 								title="Delete"
-								th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteDPRNRMTarget?id=' + ${row[6]} + '\'; }); return false;'">
+								th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteDPRNRMTarget?id=' + ${row[4]} + '\'; }); return false;'">
 							
 								<i class="fas fa-trash"></i>
 							</a>
@@ -545,32 +543,40 @@
 							
 							<!-- EDIT -->
 							
-							<a th:if="${row[4] != null and row[4].toString().equals('D')}" title="Edit"
-								th:href="@{/editWCDCFunctionariesPPR4B(id=${row[6]})}" class="btn btn-primary btn-sm">
+							<button type="button" title="Edit" class="btn btn-primary btn-sm editBtn" th:if="${row[5] != null and row[5].toString().equals('D')}"
+									th:attr="data-id=${row[4]},
+									data-district=${row[3]},
+									data-project=${row[2]},
+									data-projectid=${row[1]},
+									data-head=${row[8]},
+									data-actid=${row[9]},
+									data-activity=${row[10]},
+									data-unit=${row[11]},
+									data-target=${row[13]}" data-bs-toggle="modal"
+								data-bs-target="#editModal">
+							
+								<i class="fas fa-edit"></i>
+							</button>
+							
+							<a th:if="${row[5] != null and row[5].toString().equals('D')}" title="Edit"
+								th:href="@{/editWCDCFunctionariesPPR4B(id=${row[4]})}" class="btn btn-primary btn-sm">
 							
 								<i class="fas fa-edit"></i>
 							
 							</a>
+							&nbsp;&nbsp;
+							<a href="javascript:void(0)" class="btn btn-success btn-sm" th:if="${row[5] != null and row[5].toString().equals('D')}"
+								title="Complete"
+								th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeWCDCFunctionariesPPR4B?id=' + ${row[4]} + '\'; }); return false;'">
 							
-						</td>
-						<td th:if="${stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]}">
-						
-							<a href="javascript:void(0)" class="btn btn-success btn-sm"
-								th:if="${row[4] != null and row[4].toString().equals('D')}" title="Complete"
-								th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeWCDCFunctionariesPPR4B?id=' + ${row[0]} + '\'; }); return false;'">
-						
 								<i class="fas fa-check"></i>
 							</a>
-							<!-- COMPLETED -->
-						
-							<span th:if="${row[4] != null and row[4].toString().equals('C')}" class="badge bg-success">
-								<i class="fas fa-check-circle"></i>
-								Completed
+							
+							<span th:if="${row[5].toString().equals('C')}" class="badge bg-success">
+								<i class="fas fa-check-circle"></i> Completed
 							</span>
+							
 						</td>
-						
-						<!-- EMPTY ACTION FOR SAME GROUP -->
-						<td th:unless="${stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]}"> </td>
 
 		            </tr>
 

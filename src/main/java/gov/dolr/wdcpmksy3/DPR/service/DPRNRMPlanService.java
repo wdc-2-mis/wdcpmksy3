@@ -6,11 +6,13 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gov.dolr.wdcpmksy3.DPR.entity.DprNrmProjectPlan;
-import gov.dolr.wdcpmksy3.DPR.entity.DprNrmProjectPlanDtl;
+import gov.dolr.wdcpmksy3.DPR.entity.DprDetails;
+import gov.dolr.wdcpmksy3.DPR.entity.DprNrmDtl;
+import gov.dolr.wdcpmksy3.DPR.entity.MDprHead;
 import gov.dolr.wdcpmksy3.DPR.entity.MPhyActivity;
-import gov.dolr.wdcpmksy3.DPR.repository.DprNrmProjectPlanDtlRepository;
-import gov.dolr.wdcpmksy3.DPR.repository.DprNrmProjectPlanRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.DprDetailsRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.DprNrmDtlRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.MDprHeadRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MPhyActivityRepository;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
@@ -24,13 +26,16 @@ public class DPRNRMPlanService {
     private MPprRepository mprep;
 	
 	@Autowired
-    private DprNrmProjectPlanRepository planrepo;
+    private DprDetailsRepository planrepo;
 	
 	@Autowired
     private MPhyActivityRepository mactrepo;
 	
 	@Autowired
-    private DprNrmProjectPlanDtlRepository plndtlrepo;
+    private DprNrmDtlRepository plndtlrepo;
+	
+	@Autowired
+    private MDprHeadRepository mdprheadrepo;
 	
 	public boolean saveDPRNRMTarget(Integer district, Integer project, Integer head, Integer activity, BigDecimal target, String action, String userid, String ip) {
 		
@@ -38,26 +43,28 @@ public class DPRNRMPlanService {
 		try {
 			
 			MPpr mp= mprep.getReferenceById(project);
-			
-			DprNrmProjectPlan pln = planrepo.findByPprPprId(project).orElse(null);
+			MDprHead dh=mdprheadrepo.getReferenceById(2);
+			DprDetails pln = planrepo.findByPprPprId(project).orElse(null);
 			
 			if (pln == null) {
 
-			    pln = new DprNrmProjectPlan();
+			    pln = new DprDetails();
+			    pln.setHeadType(dh);
 			    pln.setPpr(mp);
 			    pln.setStatus('D');
-			    pln.setCreatedBy(userid);
-			    pln.setCreatedOn(LocalDateTime.now());
+			    pln.setCreatedby(userid);
+			    pln.setCreatedon(LocalDateTime.now());
 			    pln.setRequestIp(ip);
 			    planrepo.save(pln);
 			}
 			
 			MPhyActivity act = mactrepo.findById(activity).orElseThrow();
-			DprNrmProjectPlanDtl plndtl = new DprNrmProjectPlanDtl();
+			DprNrmDtl plndtl = new DprNrmDtl();
                 
-			plndtl.setPlan(pln);;
+			plndtl.setDpr(pln);
 			plndtl.setActivity(act);
 			plndtl.setQtyPlanned(target);
+			plndtl.setStatus('D');
 			plndtl.setCreatedBy(userid);
 			plndtl.setCreatedOn(LocalDateTime.now());
 			plndtl.setRequestIp(ip);

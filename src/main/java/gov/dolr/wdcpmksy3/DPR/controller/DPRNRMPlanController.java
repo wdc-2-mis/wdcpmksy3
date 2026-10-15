@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import gov.dolr.wdcpmksy3.DPR.entity.DprNrmProjectPlanDtl;
+import gov.dolr.wdcpmksy3.DPR.entity.DprNrmDtl;
 import gov.dolr.wdcpmksy3.DPR.entity.MPhyActivity;
-import gov.dolr.wdcpmksy3.DPR.repository.DprNrmProjectPlanDtlRepository;
-import gov.dolr.wdcpmksy3.DPR.repository.DprNrmProjectPlanRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.DprDetailsRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.DprNrmDtlRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MPhyActivityRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MPhyHeadsRepository;
 import gov.dolr.wdcpmksy3.DPR.service.DPRNRMPlanService;
@@ -48,10 +48,10 @@ public class DPRNRMPlanController {
     private DPRNRMPlanService dprserv;
 	
 	@Autowired
-    private DprNrmProjectPlanDtlRepository plndtlrepo;
+    private DprNrmDtlRepository plndtlrepo;
 	
 	@Autowired
-    private DprNrmProjectPlanRepository plan;
+    private DprDetailsRepository plan;
 	
 	@GetMapping("/createDPRNRMPlan")
     public String createDPRNRMPlan(HttpSession session, Model model) 
@@ -196,7 +196,7 @@ public class DPRNRMPlanController {
 		
 		            return "redirect:/login";
 		        }
-		        DprNrmProjectPlanDtl data = plndtlrepo.findById(id).orElse(null);
+		        DprNrmDtl data = plndtlrepo.findById(id).orElse(null);
 	            if (data == null) {
 	                redirectAttributes.addFlashAttribute("error", "Record not found.");
 	                return "redirect:/createDPRNRMPlan";
