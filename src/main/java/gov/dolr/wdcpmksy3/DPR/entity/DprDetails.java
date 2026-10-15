@@ -27,7 +27,7 @@ public class DprDetails {
     private MPpr ppr;
 
     @Column(name = "status", length = 1)
-    private String status;
+    private Character status;
 
     @Column(name = "dprupload_url", length = 500)
     private String dpruploadUrl;
@@ -67,11 +67,11 @@ public class DprDetails {
         this.ppr = ppr;
     }
 
-    public String getStatus() {
+    public Character getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Character status) {
         this.status = status;
     }
 
