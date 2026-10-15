@@ -83,22 +83,17 @@
   color: var(--rp-text);
 }
 .rp-table th {
-  background: var(--rp-head-bg);
-  color: var(--rp-head-text);
+  background: var(--rp-title-from);   /* same dark teal as the "All amounts" row */
+  color: #fff;
   font-weight: 700;
   padding: 12px;
-  border: 1px solid var(--rp-border);
+  border: 1px solid rgba(255, 255, 255, .25);
   text-align: center;
 }
 .rp-table thead tr:nth-child(1) th.rp-note {
   text-align: right;
-  background: var(--rp-title-from);
-  color: #fff;
-  border-color: var(--rp-title-from);
 }
 .rp-table thead tr:nth-child(3) th {
-  background: var(--rp-head-bg2);
-  font-weight: 600;
   padding: 8px;
 }
 .rp-table tbody td { padding: 12px; border: 1px solid #dbe6f3; background: #fff; }
