@@ -1,19 +1,113 @@
-.rp-title{background:linear-gradient(90deg,#1e90ff,#00ffa8);color:#fff;font-size:22px;padding:28px 30px}
-.rp-filter{margin:10px 25px;padding:10px;border:1px solid #ddd}
-.rp-filter-table td{padding:14px 15px;font-size:17px}
-.rp-filter-table select{font-size:16px;padding:2px;max-width:260px}
-.rp-filter-bar{background:#cfe2e6;height:24px;padding:0!important}
-.rp-go{background:#00203f;color:#fff;border:2px solid #4a7c82;padding:10px 18px;font-size:17px;cursor:pointer}
-.rp-actions{margin:15px 25px}
-.rp-btn{display:inline-block;background:#17a2b8;color:#fff;padding:9px 12px;margin-right:4px;font-size:17px;text-decoration:none}
-.rp-asof{text-align:right;margin:10px 25px;font-size:16px}
-.rp-scroll{overflow-x:auto;margin:10px 25px 30px}
-.rp-table{width:100%;border-collapse:collapse;min-width:1100px;font-size:16px}
-.rp-table th{background:#4a7c82;color:#fff;font-weight:bold;padding:14px;border:1px solid #fff;text-align:center}
-.rp-table th.rp-note{text-align:right}
-.rp-table tbody td{padding:14px;border:1px solid #fff}
-.rp-table tbody tr:nth-child(odd){background:#cfe2e6}
-.rp-table tbody tr:nth-child(even){background:#fff}
-.rp-table td.n{text-align:right}
-.rp-table td.c{text-align:center}
-.rp-table tr.rp-total td{background:#b8d9f8!important;font-weight:bold}
+/* Report P1 - styled to match the WDC-PMKSY 3.0 site theme (teal/blue) */
+:root {
+  --rp-title-from: #0f5b7e;   /* same dark teal as site header/sidebar */
+  --rp-title-to:   #1e88e5;   /* same blue as the PPR page title bar */
+  --rp-primary:    #1976d2;   /* buttons (matches "Area Covered" button) */
+  --rp-primary-dk: #125aa6;
+  --rp-success:    #198754;   /* matches the green "Data Completed" badge */
+  --rp-head-bg:    #d6e6fb;   /* light-blue table header (as in PPR list table) */
+  --rp-head-bg2:   #e8f1fd;
+  --rp-head-text:  #14304d;
+  --rp-border:     #c3d7f0;
+  --rp-row-alt:    #f3f8fe;
+  --rp-total-bg:   #cfe2fb;
+  --rp-text:       #1b2a41;
+}
+
+.rp-title {
+  background: linear-gradient(90deg, var(--rp-title-from), var(--rp-title-to));
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  padding: 26px 30px;
+}
+
+/* Filter panel */
+.rp-filter {
+  margin: 14px 0;
+  padding: 14px 16px;
+  background: #f7fbff;
+  border: 1px solid var(--rp-border);
+  border-radius: 6px;
+}
+.rp-filter .col-form-label { color: var(--rp-text); font-weight: 500; }
+.rp-filter .form-select {
+  min-width: 190px;
+  max-width: 250px;
+  border: 1px solid #b8cde6;
+  color: var(--rp-text);
+}
+.rp-filter .form-select:focus {
+  border-color: var(--rp-primary);
+  box-shadow: 0 0 0 .2rem rgba(25, 118, 210, .18);
+}
+.rp-filter-bar { display: none; }
+
+.rp-go {
+  background: var(--rp-primary);
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 26px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rp-go:hover { background: var(--rp-primary-dk); }
+
+/* Export buttons */
+.rp-actions { margin: 14px 0 6px; }
+.rp-btn {
+  display: inline-block;
+  color: #fff;
+  padding: 8px 18px;
+  margin-right: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.rp-actions .rp-btn:nth-child(1) { background: var(--rp-success); }
+.rp-actions .rp-btn:nth-child(2) { background: var(--rp-primary); }
+.rp-btn:hover { opacity: .88; color: #fff; }
+
+.rp-asof { text-align: right; margin: 8px 0; font-size: 15px; color: var(--rp-text); }
+
+/* Table */
+.rp-scroll { overflow-x: auto; margin: 8px 0 24px; }
+.rp-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+  font-size: 15px;
+  color: var(--rp-text);
+}
+.rp-table th {
+  background: var(--rp-head-bg);
+  color: var(--rp-head-text);
+  font-weight: 700;
+  padding: 12px;
+  border: 1px solid var(--rp-border);
+  text-align: center;
+}
+.rp-table thead tr:nth-child(1) th.rp-note {
+  text-align: right;
+  background: var(--rp-title-from);
+  color: #fff;
+  border-color: var(--rp-title-from);
+}
+.rp-table thead tr:nth-child(3) th {
+  background: var(--rp-head-bg2);
+  font-weight: 600;
+  padding: 8px;
+}
+.rp-table tbody td { padding: 12px; border: 1px solid #dbe6f3; background: #fff; }
+.rp-table tbody tr:nth-child(even) td { background: var(--rp-row-alt); }
+.rp-table tbody tr:hover td { background: #e9f2fd; }
+.rp-table td.n { text-align: right; }
+.rp-table td.c { text-align: center; }
+.rp-table tr.rp-total td {
+  background: var(--rp-total-bg) !important;
+  font-weight: 700;
+  border-color: var(--rp-border);
+}
