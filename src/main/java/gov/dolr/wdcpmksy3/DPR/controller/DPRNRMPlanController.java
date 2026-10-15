@@ -218,5 +218,61 @@ public class DPRNRMPlanController {
 	        }
 			return "redirect:/createDPRNRMPlan";
 	    }
+	 	
+	 	@GetMapping("/completeDPRNRMTarget")
+	    public String completeDPRNRMTarget(HttpSession session, Model model, @RequestParam("id") Integer id,  
+	    		RedirectAttributes redirectAttributes) {
+
+			
+				String userid=(String)session.getAttribute("userid");
+			 	try {
+			 		
+			 		if(userid==null){
+
+			            return "redirect:/login";
+			        }
+			 		dprserv.completeRecord(id);
+			        redirectAttributes.addFlashAttribute("success", "Record completed successfully.");
+			    } 
+			 	catch (Exception e) {
+			 		e.printStackTrace();
+			        redirectAttributes.addFlashAttribute("error", "Unable to complete record.");
+			    }
+	       
+	        return "redirect:/createDPRNRMPlan";
+	    }
+	 	
+	 	 @PostMapping("/editDPRNRMTarget")
+		 public String editDPRNRMTarget(HttpSession session, Model model, HttpServletRequest request,
+		    		
+		    		@RequestParam Integer nrmid,
+		    		@RequestParam BigDecimal target1,
+		            @RequestParam String updateAction,
+		            RedirectAttributes redirectAttributes) {
+		   
+					Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+					String userid=(String)session.getAttribute("userid");
+					try {
+						
+						 if(userid==null){
+		
+					            return "redirect:/login";
+					     }
+						boolean save=false;
+				    	
+						save=dprserv.editDPRNRMTarget(nrmid, target1, updateAction, userid, CommonFunctions.getClientIpAddr(request));
+						
+						if(save)
+							redirectAttributes.addFlashAttribute( "success", "DPR NRM Activity Target Update successfully.");
+						else
+							redirectAttributes.addFlashAttribute("error", "Unable to Update DPR NRM Activity Target.");
+						}
+						catch (Exception e) {
+		
+							e.printStackTrace();
+					        redirectAttributes.addFlashAttribute("error", "Unable to Update Livelihood Summary.");
+						}
+					return "redirect:/createDPRNRMPlan";	
+		    }
 
 }

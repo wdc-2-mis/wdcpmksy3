@@ -38,7 +38,7 @@ public class SecurityConfig {
 
                 .requestMatchers(
 
-                		"/reports/p1/pdf" ,"/reports/p1/districts","/reports/p1/excel",	"/reports/p1" ,"/error","/test500","/test404","/preliminaryPPR15","/testppr15","/saveDraftPPR15","/getVillagesByProject1","/getMicroWatershedsByProject1","/getDraftsPPR15","/getDraftsPPR15", "/updatePPR15","/deletePreliminaryPPR15", "/viewPPR", "/checkTransPPRExists", "/forwardViewPPR", "/newMenu", "/saveMenu", "/mainmenu", "/editMenu", "/deleteMenu", "/fetchMenu",
+                		"/reports/p1/pdf" ,"/reports/p1/districts","/reports/p1/excel",	"/reports/p1" ,"/error","/test500","/test404","/preliminaryPPR15","/testppr15","/saveDraftPPR15","/getVillagesByProject1","/getMicroWatershedsByProject1","/getDraftsPPR15","/getDraftsPPR15", "/updatePPR15","/deletePreliminaryPPR15", "/viewPPR", "/checkTransPPRExists", "/forwardViewPPR", "/newMenu", "/saveMenu", "/mainmenu", "/editMenu", "/deleteMenu", "/fetchMenu", 
                   	    "/completePreliminaryPPR15","/", "/login", "/loginSuccess", "/getEmailandGenerateotp", "/verifyOtp", "/piaPjtNotLocatiaon", "/institutionalStructurePPR1", "/saveInstitutionalStructurePPR1", "/updateInstitutionalStructurePPR1", "/viewPdfPreliminaryPPR4A","/editPreliminaryPPR4A", "/updatePreliminaryPPR4A", "/detailsOfSLNA", "/saveDetailsOfSLNA", "/downloadPPRPdf",
                         "/deleteDetailsOfSLNA", "/completeDetailsOfSLNA", "/updateDetailsOfSLNA", "/getDetailsOfSLNAById", "/register", "/register/**", "/technicalsupport", "/customLogout", "/download/**","/viewPdfInstitutionalStructure", "/deleteInstitutionalStructurePPR1", "/completeInstitutionalStructurePPR1", "/editInstitutionalStructurePPR1", "/skipFloodDroughtArea", "/skipPendingUCPPR19",
                         "/slnaFunctionariesPPR3", "/saveSLNAFunctionariesPPR3", "/deleteSLNAFunctionariesPPR3", "/editSLNAFunctionariesPPR3", "/completeSLNAFunctionariesPPR3","/updateSLNAFunctionariesPPR3", "/preliminaryPPR4A", "/savePreliminaryPPR4A", "/deletePreliminaryPPR4A", "/completePreliminaryPPR4A","/checkDistrictExists", "/areaCoveredUnderWP", "/skipPreliminaryPPR15", "/skipPprWaterOutcomes",
@@ -54,7 +54,7 @@ public class SecurityConfig {
                         "/checkDistrictCompleted", "/nextProjectName", "/rajectAndConfirm","/modifyPprTransaction", "/pprRequestDolrApproval", "/rejPprReqForAprov", "/referBackPprReqForAprov", "/approvePprReqForAprov", "/viewPprRequest", "/stWisePprTransactionStatus", "/newUserActiveDelete", "/slnausersrch", "/activatePiaUser", "/userRoleMap", "/userRoleMap/**", "/deleteUser", "/deactivateUser", "/activateExistingUser", "/extendSession", "/projectStats/**", "/checkWaterOutcome", "/checkPPR8BlockStatus",  "/checkFloodDroughtVillage",
                         "/checkCropOutcomeSeason", "/getLandPatternAreaByState", "/dprPhyOtherHeadActivities", "/getUnitDescByOtherActivity", "/saveDPROtherHeadActivities",
 // DPR 					 
-                        "/createDPRNRMPlan", "/saveDPRNRMTarget", "/getProjectsByDistrictDPRNRM", "/getActivitiesByHeadCodeDPRNRM", "/getUnitDescByActivity", "/checkProjectActivityExistsNRM", "/deleteDPRNRMTarget",
+                        "/createDPRNRMPlan", "/saveDPRNRMTarget", "/getProjectsByDistrictDPRNRM", "/getActivitiesByHeadCodeDPRNRM", "/getUnitDescByActivity", "/checkProjectActivityExistsNRM", "/deleteDPRNRMTarget", "/completeDPRNRMTarget", "/editDPRNRMTarget",
                         
                         "/css/**",
                         "/js/**",

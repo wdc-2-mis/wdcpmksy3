@@ -356,6 +356,63 @@
 
 		        this.value = value;
 		    });
+			
+			var editModal = document.getElementById('editModal');
+			editModal.addEventListener('show.bs.modal', function (event) {
+			var button = event.relatedTarget;
+
+			// Get data attributes  
+			var Id = button.getAttribute('data-id');
+			var district = button.getAttribute('data-district');
+			var project = button.getAttribute('data-project');
+			var projectId = button.getAttribute('data-projectid');
+			var head = button.getAttribute('data-head');
+			var actid = button.getAttribute('data-actid');
+			var activity = button.getAttribute('data-activity');
+			var unit = button.getAttribute('data-unit');
+			var target = button.getAttribute('data-target');
+			
+			document.getElementById('nrmid').value = Id;
+			document.getElementById('district1').value = district;
+			document.getElementById('project1').value = project;
+			document.getElementById('head1').value = head;
+			document.getElementById('activity1').value = activity;
+			document.getElementById('unit1').textContent = unit || '';
+			document.getElementById('target1').value = target;
+		});
+		
+		const targetInput1 = document.getElementById("target1");
+
+		targetInput1.addEventListener("input", function () {
+
+			const unit1 = document.getElementById("unit1")
+				.textContent.trim().toLowerCase();
+
+			let value = this.value;
+
+			if (unit1 === "nos") {
+				// Whole numbers only
+				value = value.replace(/[^0-9]/g, "");
+			} else {
+				// Decimal numbers up to 5 decimal places
+				value = value.replace(/[^0-9.]/g, "");
+
+				const parts = value.split(".");
+
+				if (parts.length > 2) {
+					value = parts[0] + "." + parts.slice(1).join("");
+				}
+
+				const decimalPart = value.split(".");
+
+				if (decimalPart.length === 2) {
+					value = decimalPart[0] + "." +
+						decimalPart[1].substring(0, 2);
+				}
+			}
+
+			this.value = value;
+		});
 		
 		
 	});
@@ -512,22 +569,28 @@
 		            </thead>
 		            <tbody>
 		            <tr th:each="row, stat : ${dprNrmProjectPlanList}">
-		                <!-- SL NO -->
-		                <td th:text="${row[14]}"></td>
+		                <!-- SL NO 
+		                <td th:text="${row[14]}"></td> -->
+						
+						<td th:text="${stat.count}"></td>
 		                <!-- ACTION -->
 		               
 		                <!-- DISTRICT -->
-		                <td th:text="${(stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]) ? row[3] : ''}"></td>
+		                <td style="text-align: left;" th:text="${(stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]) ? row[3] : ''}"></td>
 		                <!-- project -->
-		                <td th:text="${(stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]) ? row[2] : ''}"></td>
-		                <!-- head NAME -->
-		                <td th:text="${row[8]}"></td>
+		                <td style="text-align: left;" th:text="${(stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]) ? row[2] : ''}"></td>
+		                <!-- head NAME 
+		                <td th:text="${row[8]}"></td> -->
+						<td style="text-align: left;" th:text="${row[8]}"
+						       th:if="${stat.first or row[8] != dprNrmProjectPlanList[stat.index - 1][8]}">
+						</td>
+						<td th:unless="${stat.first or row[8] != dprNrmProjectPlanList[stat.index - 1][8]}"></td>
 		                <!-- Activity -->
-		                <td th:text="${row[10]}"></td>
+		                <td style="text-align: left;" th:text="${row[10]}"></td>
 		                <!-- unit -->
-		                <td th:text="${row[11]}"></td>
+		                <td style="text-align: left;" th:text="${row[11]}"></td>
 		                <!-- Target -->
-		                <td th:text="${row[13]}"></td>
+		                <td style="text-align: right;" th:text="${row[13]}"></td>
 						<td>
 							
 							<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[5] != null and row[5].toString().equals('D')}"
@@ -558,16 +621,16 @@
 								<i class="fas fa-edit"></i>
 							</button>
 							
-							<a th:if="${row[5] != null and row[5].toString().equals('D')}" title="Edit"
+							<!--<a th:if="${row[5] != null and row[5].toString().equals('D')}" title="Edit"
 								th:href="@{/editWCDCFunctionariesPPR4B(id=${row[4]})}" class="btn btn-primary btn-sm">
 							
 								<i class="fas fa-edit"></i>
 							
-							</a>
+							</a>-->
 							&nbsp;&nbsp;
 							<a href="javascript:void(0)" class="btn btn-success btn-sm" th:if="${row[5] != null and row[5].toString().equals('D')}"
 								title="Complete"
-								th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeWCDCFunctionariesPPR4B?id=' + ${row[4]} + '\'; }); return false;'">
+								th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeDPRNRMTarget?id=' + ${row[4]} + '\'; }); return false;'">
 							
 								<i class="fas fa-check"></i>
 							</a>
@@ -589,6 +652,82 @@
 		
 
     </div>
+	
+				<div class="modal fade" id="editModal" >
+					<div class="modal-dialog modal-xl">
+						<div class="modal-content">
+							<div class="modal-header bg-primary text-white">
+								<h5>Edit Details</h5>
+								<button class="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							
+							<div class="modal-body">
+								<form id="editForm" th:action="@{/editDPRNRMTarget}" method="post">
+								<input type="hidden" id="nrmid" name="nrmid">
+								<!-- Member Details -->
+								<div class="row g-4">
+								
+									<div class="col-md-6">
+										<label class="form-label">
+											<b> District </b><span class="required">*</span>
+										</label>
+										<input type="text" name="district1" id="district1" class="form-control" readonly>
+										<div class="invalid-feedback">Please select a District.</div>
+									</div>
+								
+									<div class="col-md-6">
+										<label class="form-label">
+											<b> Project </b><span class="required">*</span>
+										</label>
+										<input type="text" name="project1" id="project1" class="form-control" readonly>
+										<div class="invalid-feedback">Please select a Project.</div>
+									</div>
+								
+									<div class="col-md-6">
+										<label class="form-label">
+											<b> Name of Head </b><span class="required">*</span>
+										</label>
+										<input type="text" name="head1" id="head1" class="form-control" readonly>
+										<div class="invalid-feedback">Please select a Head.</div>
+									</div>
+									<div class="col-md-6">
+										<label class="form-label">activity
+											<b> Name of Activity</b> <span class="required">*</span>
+										</label>
+										<input type="text" name="activity1" id="activity1" class="form-control" readonly>
+										<div class="invalid-feedback">Please select Activity</div>
+									</div>
+								
+									<div class="col-md-6">
+										<label class="form-label">
+											<b>Target (<span id="unit1" class="fw-bold text-primary"></span>)</b> <span class="required">*</span>
+										</label>
+								
+									</div>
+								
+									<div class="col-md-6">
+										<input type="text" name="target1" id="target1" class="form-control" style="height:40px; width: 300px;"
+											inputmode="decimal" maxlength="10" required>
+										<div class="invalid-feedback">Please Enter Target</div>
+										<div id="targetError" class="text-danger"></div>
+									</div>
+								
+								
+								</div>
+								
+								<div class="text-center mt-4">
+									<button type="submit" name="updateAction" value="D" class="btn btn-warning">
+										<i class="fas fa-save"></i>
+										Update
+									</button>
+								</div>
+							</form>
+							</div>
+							
+							
+						</div>
+					</div>
+				</div>
 	
 </div>
 
