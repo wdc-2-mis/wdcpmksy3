@@ -26,7 +26,7 @@ public class MOtherHeads {
     private BigDecimal seqNo;
 
     @Column(name = "status", length = 1)
-    private String status;
+    private Character status;
 
     @Column(name = "last_updated_by", length = 20)
     private String lastUpdatedBy;
@@ -64,11 +64,11 @@ public class MOtherHeads {
         this.seqNo = seqNo;
     }
 
-    public String getStatus() {
+    public Character getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Character status) {
         this.status = status;
     }
 

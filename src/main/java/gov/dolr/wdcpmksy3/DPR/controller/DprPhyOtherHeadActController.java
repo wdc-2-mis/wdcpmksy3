@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherActivityRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherHeadsRepository;
-import gov.dolr.wdcpmksy3.DPR.service.DprOtherProjectPlanDtlService;
+import gov.dolr.wdcpmksy3.DPR.service.DprOtherDtlService;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
@@ -38,7 +38,7 @@ public class DprPhyOtherHeadActController {
 	private MOtherActivityRepository mOtherActivityRepo;
 	
 	@Autowired
-	private DprOtherProjectPlanDtlService otherProjectPlanDtlService;
+	private DprOtherDtlService otherProjectPlanDtlService;
 	
 	@GetMapping("/dprPhyOtherHeadActivities")
     public String dprPhyOtherHeadActivities(@RequestParam(required = false) Integer dcode, HttpSession session, 
@@ -56,8 +56,10 @@ public class DprPhyOtherHeadActController {
 	        List<MPpr> pprList = pprTransactionRepo.findPprByDcodeAndActionA(dcode);
 	        if(!pprList.isEmpty()){
 	        	model.addAttribute("pprList", pprList);
-	        	if(project != null) 
+	        	if(project != null) {
 	        		model.addAttribute("pprId", project);
+	        		model.addAttribute("headList", mOtherHeadsRepo.findAllByOrderBySeqNoAsc());
+	        	}
 	        }
 	    }
 		if(head != null) {
@@ -65,7 +67,6 @@ public class DprPhyOtherHeadActController {
 			model.addAttribute("activityList", mOtherActivityRepo.findByOtherHeads_OtherHeadsIdOrderBySeqNoAsc(head));
 		}
 			
-		model.addAttribute("headList", mOtherHeadsRepo.findAllByOrderBySeqNoAsc());
 		model.addAttribute("districtList", pprTransactionRepo.findDistrictsByStCodeAndActionA(stcode));
 		model.addAttribute("state", statename);
 //		model.addAttribute("pprProjectAtGlanceList", pprProjectGlanceRepo.findPprProjectGlanceBystCode(stcode));

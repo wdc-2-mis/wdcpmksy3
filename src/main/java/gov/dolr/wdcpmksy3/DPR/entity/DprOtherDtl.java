@@ -14,17 +14,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "dpr_other_project_plan_dtl", schema = "public")
-public class DprOtherProjectPlanDtl {
+@Table(name = "dpr_other_dtl", schema = "public")
+public class DprOtherDtl {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "other_plan_dtl_id")
-    private Integer otherPlanDtlId;
+    @Column(name = "other_id")
+    private Integer otherId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "other_plan_id")
-    private DprOtherProjectPlan otherPlan;
+    @JoinColumn(name = "dpr_id")
+    private DprDetails dprDetails;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "other_activity_id")
@@ -47,27 +47,30 @@ public class DprOtherProjectPlanDtl {
 
     @Column(name = "updatedon")
     private LocalDateTime updatedon;
+    
+    @Column(name = "status", length = 1)
+    private Character status;
 
-    public DprOtherProjectPlanDtl() {
+    public DprOtherDtl() {
     }
 
-    public Integer getOtherPlanDtlId() {
-        return otherPlanDtlId;
+    public Integer getOtherId() {
+        return otherId;
     }
 
-    public void setOtherPlanDtlId(Integer otherPlanDtlId) {
-        this.otherPlanDtlId = otherPlanDtlId;
+    public void setOtherId(Integer otherId) {
+        this.otherId = otherId;
     }
+    
+    public DprDetails getDprDetails() {
+		return dprDetails;
+	}
 
-    public DprOtherProjectPlan getOtherPlan() {
-        return otherPlan;
-    }
+	public void setDprDetails(DprDetails dprDetails) {
+		this.dprDetails = dprDetails;
+	}
 
-    public void setOtherPlan(DprOtherProjectPlan otherPlan) {
-        this.otherPlan = otherPlan;
-    }
-
-    public MOtherActivity getOtherActivity() {
+	public MOtherActivity getOtherActivity() {
         return otherActivity;
     }
 
@@ -122,4 +125,12 @@ public class DprOtherProjectPlanDtl {
     public void setUpdatedon(LocalDateTime updatedon) {
         this.updatedon = updatedon;
     }
+
+	public Character getStatus() {
+		return status;
+	}
+
+	public void setStatus(Character status) {
+		this.status = status;
+	}
 }

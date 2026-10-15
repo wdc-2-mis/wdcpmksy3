@@ -6,29 +6,38 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gov.dolr.wdcpmksy3.DPR.entity.DprDetails;
+import gov.dolr.wdcpmksy3.DPR.entity.DprOtherDtl;
 import gov.dolr.wdcpmksy3.DPR.entity.DprOtherProjectPlan;
-import gov.dolr.wdcpmksy3.DPR.entity.DprOtherProjectPlanDtl;
+import gov.dolr.wdcpmksy3.DPR.entity.MDprHead;
 import gov.dolr.wdcpmksy3.DPR.entity.MOtherActivity;
-import gov.dolr.wdcpmksy3.DPR.repository.DprOtherProjectPlanDtlRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.DprDetailsRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.DprOtherDtlRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.DprOtherProjectPlanRepository;
+import gov.dolr.wdcpmksy3.DPR.repository.MDprHeadRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherActivityRepository;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class DprOtherProjectPlanDtlService {
+public class DprOtherDtlService {
 	
 	@Autowired
 	private DprOtherProjectPlanRepository planRepository;
 	@Autowired
-    private DprOtherProjectPlanDtlRepository detailRepository;
+    private DprOtherDtlRepository detailRepository;
 	@Autowired
     private MPprRepository mPprRepo;
 	@Autowired
     private MOtherActivityRepository mOtherActivityRepo;
+	
+	@Autowired
+	private DprDetailsRepository dprDetailsRepo;
+	@Autowired
+	private MDprHeadRepository mDprHeadRepo;
 
-    public DprOtherProjectPlanDtlService(DprOtherProjectPlanRepository planRepository, DprOtherProjectPlanDtlRepository detailRepository,
+    public DprOtherDtlService(DprOtherProjectPlanRepository planRepository, DprOtherDtlRepository detailRepository,
             MPprRepository mPprRepo, MOtherActivityRepository mOtherActivityRepo) {
         this.planRepository = planRepository;
         this.detailRepository = detailRepository;
@@ -36,26 +45,34 @@ public class DprOtherProjectPlanDtlService {
         this.mOtherActivityRepo = mOtherActivityRepo;
     }
 
-    @Transactional
+    @SuppressWarnings("null")
+	@Transactional
     public void saveOtherProjectPlan(Integer pprId, Integer activityId,
             BigDecimal target, String userid, String requestIp, String action) {
-
-        MPpr ppr = mPprRepo.findById(pprId).orElseThrow(() -> new RuntimeException("Project not found"));
+    	Integer headTypeId = 3;
+    	LocalDateTime now = LocalDateTime.now();
+        MPpr ppr = mPprRepo.findById(pprId).orElse(null);
+        DprDetails dpr = dprDetailsRepo.findByPprPprId(pprId).orElse(null);
+        
+        if(dpr==null) {
+        	dpr.setPpr(ppr);
+        	dpr.setStatus('D');
+        	MDprHead headType = mDprHeadRepo.getById(headTypeId);
+        	dpr.setHeadType(headType);
+        	dpr.setCreatedby(userid);
+        	dpr.setCreatedon(now);
+        	dpr.setRequestIp(requestIp);
+        	dpr = dprDetailsRepo.save(dpr);
+        	
+        }
+        
         MOtherActivity activity = mOtherActivityRepo.findById(activityId).orElseThrow(() -> new RuntimeException("Activity not found"));
-        LocalDateTime now = LocalDateTime.now();
-        DprOtherProjectPlan plan = new DprOtherProjectPlan();
-        plan.setPpr(ppr);
-        plan.setStatus(action);
-        plan.setCreatedby(userid);
-        plan.setCreatedon(now);
-        plan.setRequestIp(requestIp);
-
-        plan = planRepository.save(plan);
-
-        DprOtherProjectPlanDtl detail = new DprOtherProjectPlanDtl();
-        detail.setOtherPlan(plan);
+        
+        DprOtherDtl detail = new DprOtherDtl();
+        detail.setDprDetails(dpr);
         detail.setOtherActivity(activity);
         detail.setQtyPlanned(target);
+        detail.setStatus('D');
         detail.setCreatedby(userid);
         detail.setCreatedon(now);
         detail.setRequestIp(requestIp);

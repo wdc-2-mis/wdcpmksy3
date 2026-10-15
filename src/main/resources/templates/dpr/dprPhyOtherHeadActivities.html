@@ -49,7 +49,7 @@
 		});
 		head.addEventListener("change", function () {
 			if (this.value) {
-				window.location.href = "/dprPhyOtherHeadActivities?head=" +  this.value;
+				window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + project.value+ "&&head=" +  this.value;
 			} else {
 				window.location.href = "/dprPhyOtherHeadActivities";
 			}
@@ -145,64 +145,63 @@
 				}
 			});
 		
-	    document.querySelectorAll(".editBtn").forEach(function (btn) {
-	        btn.addEventListener("click", function () {
-	            let id = this.getAttribute("data-id");
-	            fetch("/getOtherProjectPlanDtlEdit?id=" + id)
-	                .then(response => response.json())
-	                .then(data => {
-	                    // Hidden ID
-	                    document.getElementById("editOtherPlanDtlId").value = data.id;
-	                    // Readonly fields
-	                    document.getElementById("editDistrict").value = data.district ?? "";
-	                    document.getElementById("editProject").value = data.project ?? "";
-	                    document.getElementById("editHead").value = data.microWatershed ?? "";
-	                    document.getElementById("editActivity").value = data.microWatershedCode ?? "";
-
-	                    // Editable fields
-	                    document.getElementById("editTarget").value = data.treatedArea ?? "";
-	                    // Select Project Type Radio
-	                })
-	                .catch(error => {
-	                    console.error("Error loading edit data:", error);
-	                });
-	        });
-	    });
+//	    document.querySelectorAll(".editBtn").forEach(function (btn) {
+//			btn.addEventListener("click", function () {
+//				let id = this.getAttribute("data-id");
+//				fetch("/getOtherProjectPlanDtlEdit?id=" + id)
+//					.then(response => response.json())
+//					.then(data => {
+//						// Hidden ID
+//						document.getElementById("editOtherPlanDtlId").value = data.id;
+//						// Readonly fields
+//						document.getElementById("editDistrict").value = data.district ?? "";
+//						document.getElementById("editProject").value = data.project ?? "";
+//						document.getElementById("editHead").value = data.microWatershed ?? "";
+//						document.getElementById("editActivity").value = data.microWatershedCode ?? "";
+//
+//						// Editable fields
+//						document.getElementById("editTarget").value = data.treatedArea ?? "";
+//						// Select Project Type Radio
+//					})
+//					.catch(error => {
+//						console.error("Error loading edit data:", error);
+//					});
+//			});
+//		});
 		
 		
-	    const editForm = document.getElementById("editProjectForm");
-	    if (!editForm) {
-	        return;
-	    }
-	    editForm.addEventListener("submit", function (e) {
-	        e.preventDefault();
-	        // =========================
-	        // CLEAR OLD ERRORS
-	        // =========================
-	        editForm.querySelectorAll(".field-error").forEach(function (error) {
-	            error.innerText = "";
-	        });
-	        let isValid = true;
-	        let firstInvalidField = null;
-	        // =========================
-	        // GET VALUES
-	        // =========================
-	        const treatedArea = document.getElementById("editTarget").value.trim();
-	        // =========================
-	        // STOP IF INVALID
-	        // =========================
-	        if (!isValid) {
-	            if (firstInvalidField) {
-	                firstInvalidField.focus();
-	            }
-	            return;
-	        }
-	        editForm.submit();
-	    });
+//	    const editForm = document.getElementById("editProjectForm");
+//	    if (!editForm) {
+//	        return;
+//	    }
+//	    editForm.addEventListener("submit", function (e) {
+//	        e.preventDefault();
+//	        // =========================
+//	        // CLEAR OLD ERRORS
+//	        // =========================
+//	        editForm.querySelectorAll(".field-error").forEach(function (error) {
+//	            error.innerText = "";
+//	        });
+//	        let isValid = true;
+//	        let firstInvalidField = null;
+//	        // =========================
+//	        // GET VALUES
+//	        // =========================
+//	        const treatedArea = document.getElementById("editTarget").value.trim();
+//	        // =========================
+//	        // STOP IF INVALID
+//	        // =========================
+//	        if (!isValid) {
+//	            if (firstInvalidField) {
+//	                firstInvalidField.focus();
+//	            }
+//	            return;
+//	        }
+//	        editForm.submit();
+//	    });
 		
 		document.getElementById("activity").addEventListener("change", function () {
 						let actId = this.value;
-						alert('cehck '+actId);
 						const unitSpan = document.getElementById("unitDesc");
 						document.getElementById("target").value="";
 						if (actId === "") {
