@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.DPR.repository.DprOtherDtlRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherActivityRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherHeadsRepository;
 import gov.dolr.wdcpmksy3.DPR.service.DprOtherDtlService;
@@ -39,6 +40,9 @@ public class DprPhyOtherHeadActController {
 	
 	@Autowired
 	private DprOtherDtlService otherProjectPlanDtlService;
+	
+	@Autowired
+	private DprOtherDtlRepository dprOtherDtlRepo;
 	
 	@GetMapping("/dprPhyOtherHeadActivities")
     public String dprPhyOtherHeadActivities(@RequestParam(required = false) Integer dcode, HttpSession session, 
@@ -69,7 +73,7 @@ public class DprPhyOtherHeadActController {
 			
 		model.addAttribute("districtList", pprTransactionRepo.findDistrictsByStCodeAndActionA(stcode));
 		model.addAttribute("state", statename);
-//		model.addAttribute("pprProjectAtGlanceList", pprProjectGlanceRepo.findPprProjectGlanceBystCode(stcode));
+		model.addAttribute("dprOtherTargetList", dprOtherDtlRepo.findDprOtherDtlDataBystCode(stcode));
 		
 		return "dpr/dprPhyOtherHeadActivities";
 	}
@@ -82,6 +86,18 @@ public class DprPhyOtherHeadActController {
 	        return ResponseEntity.notFound().build();
 	    }
 	    return ResponseEntity.ok(unitDesc);
+	}
+	
+	@GetMapping("/checkProjectActivityExistsOther")
+	@ResponseBody
+	public String checkProjectActivityExistsOther(@RequestParam("pprid") Integer pprid, @RequestParam("actId") Integer actId) {
+
+	    boolean exists =dprOtherDtlRepo.existsByPprIdAndOtherActivityId(pprid,actId);
+	    if (exists) {
+	        return "EXISTS";
+	    }
+
+	    return "NOT_EXISTS";
 	}
 
 	@PostMapping("/saveDPROtherHeadActivities")
