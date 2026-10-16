@@ -1,5 +1,12 @@
 /* ================= HEADER ================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+.gov-header,
+.gov-header *,
+.gov-nav,
+.gov-nav * {
+    font-family: 'Poppins', sans-serif;
+}
 .gov-header {
     display: flex;
     align-items: center;
@@ -74,6 +81,50 @@
     font-weight: 500;
     white-space: nowrap;
     transition: all 0.3s ease;
+}
+
+/* ================= REPORTS DROPDOWN (Reports -> MIS) ================= */
+
+.gov-nav .menu-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.gov-nav .menu-dropdown .dropdown-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 210px;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    z-index: 1000;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.gov-nav .menu-dropdown:hover .dropdown-panel,
+.gov-nav .menu-dropdown:focus-within .dropdown-panel {
+    display: block;
+}
+
+.gov-nav .menu-dropdown .dropdown-panel a {
+    display: block;
+    margin-right: 0;
+    padding: 11px 18px;
+    white-space: nowrap;
+    color: #14304d !important;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 0;
+}
+
+.gov-nav .menu-dropdown .dropdown-panel a:hover,
+.gov-nav .menu-dropdown .dropdown-panel a:focus {
+    background: #e8f1fd;
+    color: #1976d2 !important;
+    text-decoration: none;
+    box-shadow: none;
 }
 
 .auth {
@@ -264,5 +315,64 @@
     .auth a {
         padding: 6px 12px;
         font-size: 12px;
+    }
+	
+}
+
+
+.gov-header {
+    width: 100%;
+    min-height: 86px;
+    padding: 10px 25px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.gov-header .gov-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.gov-header .gov-left img {
+    width: auto;
+    height: 80px;
+    max-width: none;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.gov-header .gov-left h3 {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.gov-header .gov-left p {
+    margin: 4px 0 0;
+    font-size: 14px;
+}
+
+/* Keep the navigation dimensions consistent too */
+.gov-nav {
+    width: 100%;
+    min-height: 36px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .gov-header {
+        min-height: auto;
+        padding: 8px 15px;
+    }
+
+    .gov-header .gov-left img {
+        height: 55px;
+    }
+
+    .gov-header .gov-left h3 {
+        font-size: 16px;
     }
 }

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layout/layout}">
+	  layout:decorate="~{layout/report-layout}">
+	  
 
 <head>
 	<meta charset="UTF-8">
 	<title>Report P1</title>
-	<link rel="stylesheet" th:href="@{/css/report.css}">
+
 
 	<script>
 		document.addEventListener("DOMContentLoaded", function () {
@@ -72,7 +73,49 @@
 	</div>
 	<div class="rp-asof">Report as on: <span th:text="${reportOn}"></span></div>
 
-	<div class="rp-scroll">
+	<!-- ================= SUMMARY VIEW: all State / District / Financial Year = All ================= -->
+	<div class="rp-scroll" th:if="${summaryMode}">
+		<table class="rp-table">
+			<thead>
+				<tr>
+					<th colspan="4" class="rp-note rp-fy-note">Financial Year : All Financial Year</th>
+					<th colspan="4" class="rp-note">All amounts(in Rs lakhs), All Area in Ha.</th>
+				</tr>
+				<tr>
+					<th>S.No.</th><th>State Name</th><th>District</th><th>Project</th>
+					<th>Area Sanctioned</th><th>Total Cost</th><th>Central Share</th><th>State Share</th>
+				</tr>
+				<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
+			</thead>
+			<tbody>
+				<tr th:each="r, st : ${summaryRows}">
+					<td class="c" th:text="${st.count}"></td>
+					<td><a class="rp-link" th:href="@{/reports/p1(stateCode=${r.stateCode})}" th:text="${r.stateName}"></a></td>
+					<td class="n" th:text="${r.districtCount}"></td>
+					<td class="n" th:text="${r.projectCount}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.areaSanctioned,1,'COMMA',4,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.totCost,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.centralShare,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.stateShare,1,'COMMA',2,'POINT')}"></td>
+				</tr>
+				<tr th:if="${#lists.isEmpty(summaryRows)}">
+					<td colspan="8" class="c text-danger">No records found.</td>
+				</tr>
+				<tr class="rp-total" th:unless="${#lists.isEmpty(summaryRows)}">
+					<td colspan="2" class="n">Grand Total</td>
+					<td class="n" th:text="${totDistricts}"></td>
+					<td class="n" th:text="${totProjects}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totArea,1,'COMMA',4,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totCost,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totCentral,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totState,1,'COMMA',2,'POINT')}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<!-- ================= PROJECT-LEVEL VIEW: any filter selected ================= -->
+	<div class="rp-scroll" th:unless="${summaryMode}">
 		<table class="rp-table">
 			<thead>
 				<tr><th colspan="10" class="rp-note">All amounts(in Rs lakhs), All Area in Ha.</th></tr>
@@ -108,6 +151,7 @@
 			</tbody>
 		</table>
 	</div>
-
+ 
+	
 </div>
 </html>

@@ -1,108 +1,353 @@
-/* Report P1 - styled to match the WDC-PMKSY 3.0 site theme (teal/blue) */
+
+/* =========================================================
+   WDC-PMKSY 3.0 - PUBLIC REPORT P1
+   Theme: Light Blue to Navy Blue
+   File: static/css/report.css
+   ========================================================= */
+
+
+/* ================= COLOR VARIABLES ================= */
+
 :root {
-  --rp-title-from: #0f5b7e;   /* same dark teal as site header/sidebar */
-  --rp-title-to:   #1e88e5;   /* same blue as the PPR page title bar */
-  --rp-primary:    #1976d2;   /* buttons (matches "Area Covered" button) */
-  --rp-primary-dk: #125aa6;
-  --rp-success:    #198754;   /* matches the green "Data Completed" badge */
-  --rp-head-bg:    #d6e6fb;   /* light-blue table header (as in PPR list table) */
-  --rp-head-bg2:   #e8f1fd;
-  --rp-head-text:  #14304d;
-  --rp-border:     #c3d7f0;
-  --rp-row-alt:    #f3f8fe;
-  --rp-total-bg:   #cfe2fb;
-  --rp-text:       #1b2a41;
+    --rp-title-from: #87CEFA;
+    --rp-title-to: #000080;
+
+    --rp-primary: #1976d2;
+    --rp-primary-dk: #125aa6;
+    --rp-success: #198754;
+
+    --rp-table-head: #164f78;
+    --rp-table-head-border: #4f8fb5;
+
+    --rp-border: #c3d7f0;
+    --rp-row-alt: #edf5ff;
+    --rp-total-bg: #c7ddf7;
+    --rp-text: #1b2a41;
 }
+
+
+/* ================= REPORT TITLE ================= */
 
 .rp-title {
-  background: linear-gradient(90deg, var(--rp-title-from), var(--rp-title-to));
-  color: #fff;
-  font-size: 22px;
-  font-weight: 600;
-  padding: 26px 30px;
+    background: linear-gradient(
+        90deg,
+        var(--rp-title-from),
+        var(--rp-title-to)
+    ) !important;
+
+    color: #ffffff !important;
+    font-size: 22px;
+    font-weight: 600;
+    padding: 26px 30px;
+    border: none;
+    border-radius: 0;
+    margin: 0;
 }
 
-/* Filter panel */
+
+/* ================= FILTER PANEL ================= */
+
 .rp-filter {
-  margin: 14px 0;
-  padding: 14px 16px;
-  background: #f7fbff;
-  border: 1px solid var(--rp-border);
-  border-radius: 6px;
+    margin: 14px 0;
+    padding: 14px 16px;
+    background: #f7fbff;
+    border: 1px solid var(--rp-border);
+    border-radius: 6px;
 }
-.rp-filter .col-form-label { color: var(--rp-text); font-weight: 500; }
+
+.rp-filter .col-form-label {
+    color: var(--rp-text);
+    font-weight: 500;
+}
+
 .rp-filter .form-select {
-  min-width: 190px;
-  max-width: 250px;
-  border: 1px solid #b8cde6;
-  color: var(--rp-text);
+    min-width: 190px;
+    max-width: 250px;
+    border: 1px solid #b8cde6;
+    color: var(--rp-text);
+    background-color: #ffffff;
 }
+
 .rp-filter .form-select:focus {
-  border-color: var(--rp-primary);
-  box-shadow: 0 0 0 .2rem rgba(25, 118, 210, .18);
+    border-color: var(--rp-primary);
+    box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.18);
 }
-.rp-filter-bar { display: none; }
+
+.rp-filter-bar {
+    display: none;
+}
+
+
+/* ================= GO BUTTON ================= */
 
 .rp-go {
-  background: var(--rp-primary);
-  color: #fff;
-  border: 0;
-  border-radius: 6px;
-  padding: 9px 26px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
+    background: var(--rp-primary);
+    color: #ffffff;
+    border: 0;
+    border-radius: 6px;
+    padding: 9px 26px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
 }
-.rp-go:hover { background: var(--rp-primary-dk); }
 
-/* Export buttons */
-.rp-actions { margin: 14px 0 6px; }
+.rp-go:hover {
+    background: var(--rp-primary-dk);
+    color: #ffffff;
+}
+
+
+/* ================= EXCEL / PDF BUTTONS ================= */
+
+.rp-actions {
+    margin: 14px 0 6px;
+}
+
 .rp-btn {
-  display: inline-block;
-  color: #fff;
-  padding: 8px 18px;
-  margin-right: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 6px;
-  text-decoration: none;
+    display: inline-block;
+    color: #ffffff;
+    padding: 8px 18px;
+    margin-right: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
 }
-.rp-actions .rp-btn:nth-child(1) { background: var(--rp-success); }
-.rp-actions .rp-btn:nth-child(2) { background: var(--rp-primary); }
-.rp-btn:hover { opacity: .88; color: #fff; }
 
-.rp-asof { text-align: right; margin: 8px 0; font-size: 15px; color: var(--rp-text); }
+.rp-actions .rp-btn:nth-child(1) {
+    background: var(--rp-success);
+}
 
-/* Table */
-.rp-scroll { overflow-x: auto; margin: 8px 0 24px; }
+.rp-actions .rp-btn:nth-child(2) {
+    background: var(--rp-primary);
+}
+
+.rp-btn:hover {
+    opacity: 0.88;
+    color: #ffffff;
+}
+
+
+/* ================= REPORT DATE ================= */
+
+.rp-asof {
+    text-align: right;
+    margin: 8px 0;
+    font-size: 15px;
+    color: var(--rp-text);
+}
+
+
+/* ================= TABLE CONTAINER ================= */
+
+.rp-scroll {
+    overflow-x: auto;
+    margin: 8px 0 24px;
+    width: 100%;
+}
+
+
+/* ================= TABLE BASE ================= */
+
 .rp-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 1100px;
-  font-size: 15px;
-  color: var(--rp-text);
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px;
+    font-size: 15px;
+    color: var(--rp-text);
 }
-.rp-table th {
-  background: var(--rp-title-from);   /* same dark teal as the "All amounts" row */
-  color: #fff;
-  font-weight: 700;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, .25);
-  text-align: center;
+
+
+/* ================= TABLE HEADER: GENERAL ================= */
+
+.rp-table thead th {
+    background-color: var(--rp-table-head) !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    padding: 12px;
+    border: 1px solid var(--rp-table-head-border) !important;
+    text-align: center;
+    vertical-align: middle;
 }
-.rp-table thead tr:nth-child(1) th.rp-note {
-  text-align: right;
+
+
+/* ================= UNITS ROW ================= */
+/* All amounts (in Rs lakhs), All Area in Ha. */
+
+.rp-table thead tr:first-child th.rp-note {
+    background: linear-gradient(
+        90deg,
+        var(--rp-title-from),
+        var(--rp-title-to)
+    ) !important;
+
+    color: #ffffff !important;
+    text-align: right;
+    font-weight: 700;
+    padding: 12px;
+    border: 1px solid var(--rp-table-head-border) !important;
 }
+
+
+/* ================= COLUMN HEADINGS ================= */
+/* S.No., State Name, District Name, etc. */
+
+.rp-table thead tr:nth-child(2) th {
+    background-color: var(--rp-table-head) !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    padding: 12px;
+    border: 1px solid var(--rp-table-head-border) !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+/* ================= COLUMN NUMBERING ROW ================= */
+/* 1, 2, 3 ... 10 */
+
 .rp-table thead tr:nth-child(3) th {
-  padding: 8px;
+    background-color: var(--rp-table-head) !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 8px;
+    border: 1px solid var(--rp-table-head-border) !important;
+    text-align: center;
 }
-.rp-table tbody td { padding: 12px; border: 1px solid #dbe6f3; background: #fff; }
-.rp-table tbody tr:nth-child(even) td { background: var(--rp-row-alt); }
-.rp-table tbody tr:hover td { background: #e9f2fd; }
-.rp-table td.n { text-align: right; }
-.rp-table td.c { text-align: center; }
-.rp-table tr.rp-total td {
-  background: var(--rp-total-bg) !important;
-  font-weight: 700;
-  border-color: var(--rp-border);
+
+
+/* ================= TABLE BODY ================= */
+
+.rp-table tbody td {
+    padding: 12px;
+    border: 1px solid var(--rp-border) !important;
+    background-color: #ffffff !important;
+    color: var(--rp-text) !important;
+    vertical-align: middle;
 }
+
+
+/* Alternating data rows */
+
+.rp-table tbody tr:nth-child(even):not(.rp-total) td {
+    background-color: var(--rp-row-alt) !important;
+}
+
+
+/* Hover effect */
+
+.rp-table tbody tr:not(.rp-total):hover td {
+    background-color: #dcecff !important;
+}
+
+
+/* Numeric cells */
+
+.rp-table td.n {
+    text-align: right;
+}
+
+
+/* Centered cells */
+
+.rp-table td.c {
+    text-align: center;
+}
+
+
+/* ================= GRAND TOTAL ROW ================= */
+
+.rp-table tbody tr.rp-total td {
+    background-color: var(--rp-total-bg) !important;
+    background-image: none !important;
+    color: #102f57 !important;
+    font-weight: 700;
+    border: 1px solid #a9c8ed !important;
+}
+
+
+/* ================= PUBLIC REPORT LAYOUT ================= */
+
+.report-layout-content {
+    min-height: calc(100vh - 260px);
+    padding: 18px 20px 40px;
+    box-sizing: border-box;
+    background: #f5f8fc;
+}
+
+
+/* ================= PUBLIC REPORT FOOTER ================= */
+
+.report-layout-footer {
+    background: linear-gradient(
+        90deg,
+        var(--rp-title-from),
+        var(--rp-title-to)
+    ) !important;
+
+    color: #ffffff !important;
+    text-align: center;
+    padding: 14px 10px;
+    font-size: 13px;
+    line-height: 1.7;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+
+/* ================= RESPONSIVE DESIGN ================= */
+
+@media (max-width: 768px) {
+
+    .rp-title {
+        font-size: 18px;
+        padding: 18px 15px;
+    }
+
+    .rp-filter {
+        padding: 12px;
+    }
+
+    .rp-filter .form-select {
+        min-width: 160px;
+        max-width: 100%;
+    }
+
+    .rp-table {
+        font-size: 13px;
+    }
+
+    .rp-table thead th,
+    .rp-table tbody td {
+        padding: 9px;
+    }
+
+    .report-layout-content {
+        padding: 12px 10px 25px;
+    }
+
+}
+
+/* ===== Column heading rows: same gradient as header/footer ===== */
+.rp-table thead tr:nth-child(2),
+.rp-table thead tr:nth-child(3) {
+    background: linear-gradient(90deg, var(--rp-title-from), var(--rp-title-to)) !important;
+}
+
+.rp-table thead tr:nth-child(2) th,
+.rp-table thead tr:nth-child(3) th {
+    background: transparent !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* Summary view: left "Financial Year : ..." cell + state links */
+.rp-table thead tr:first-child th.rp-fy-note { text-align: left; }
+.rp-table a.rp-link { color: #0b4f8a; font-weight: 600; text-decoration: none; }
+.rp-table a.rp-link:hover { text-decoration: underline; }

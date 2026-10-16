@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import gov.dolr.wdcpmksy3.DPR.repository.ReportP1Repository;
 import gov.dolr.wdcpmksy3.dto.CodeName;
 import gov.dolr.wdcpmksy3.dto.ReportP1Row;
+import gov.dolr.wdcpmksy3.dto.ReportP1StateSummary;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,7 +33,12 @@ public class ReportP1Service {
     public List<CodeName> districts(Integer state) { return repo.findDistricts(norm(state)); }
     public List<CodeName> finYears()               { return repo.findFinYears(); }
 
-    public BigDecimal sum(List<ReportP1Row> rows, Function<ReportP1Row, BigDecimal> f) {
-        return rows.stream().map(f).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+    public <T> BigDecimal sum(List<T> rows, Function<T, BigDecimal> f) {
+        return rows.stream().map(f).filter(Objects::nonNull)
+                   .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    public List<ReportP1StateSummary> getStateSummary() {
+        return repo.findStateSummary();
     }
 }

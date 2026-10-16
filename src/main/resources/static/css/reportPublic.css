@@ -1,0 +1,103 @@
+/* =========================================================
+   WDC-PMKSY 3.0 - PUBLIC "MIS Report" listing page
+   File: static/css/reportPublic.css
+   Used by: templates/reports/mis-reports.html
+   ========================================================= */
+
+:root {
+  --pr-grad-from: #87CEFA;     /* same as site header/footer */
+  --pr-grad-to: #000080;
+  --pr-primary: #1976d2;
+  --pr-border: #c3d7f0;
+  --pr-text: #1b2a41;
+}
+
+/* ---- Keep the footer at the bottom of the window ---- */
+body:has(.pr-page) {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Page ---- */
+.pr-page {
+  flex: 1;                      /* pushes the footer down */
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 18px 20px 40px;
+  box-sizing: border-box;
+  color: var(--pr-text);
+  font-family: 'Poppins', sans-serif;
+}
+
+.pr-heading {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 8px 0 0;
+  color: var(--pr-text);
+}
+
+.pr-heading-line {
+  height: 2px;
+  background: var(--pr-primary);
+  margin: 6px 0 22px;
+}
+
+/* ---- Report list ---- */
+.pr-list {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.pr-group {
+  background: linear-gradient(90deg, var(--pr-grad-from), var(--pr-grad-to));
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px 20px;
+  border: 1px solid var(--pr-border);
+  margin-top: 0;
+}
+
+.pr-item {
+  display: block;
+  padding: 17px 24px;
+  background: #fff;
+  color: var(--pr-text);
+  border: 1px solid #dbe6f3;
+  border-top: 0;
+  text-decoration: none;
+  line-height: 1.6;
+}
+
+a.pr-item:hover {
+  background: #eef5fd;
+  color: var(--pr-primary);
+}
+
+.pr-item.pr-soon {
+  color: #7a8aa0;
+  cursor: default;
+}
+
+.pr-soon-tag {
+  font-size: 12px;
+  background: #eef2f7;
+  color: #6b7c93;
+  border-radius: 10px;
+  padding: 2px 8px;
+  margin-left: 8px;
+}
+
+/* ---- Footer ---- */
+.pr-footer {
+  background: linear-gradient(90deg, var(--pr-grad-from), var(--pr-grad-to));
+  color: #fff;
+  text-align: center;
+  padding: 18px 10px;
+  font-size: 14px;
+  line-height: 1.7;
+}

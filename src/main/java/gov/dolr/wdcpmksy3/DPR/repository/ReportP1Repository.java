@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.dto.CodeName;
 import gov.dolr.wdcpmksy3.dto.ReportP1Row;
+import gov.dolr.wdcpmksy3.dto.ReportP1StateSummary;
 
 /**
  * m_ppr.dcode -> m_district.dcode ; m_district.st_code -> m_state.st_code
@@ -66,4 +67,27 @@ public interface ReportP1Repository extends JpaRepository<MPpr, Integer> {
             ORDER BY fin_yr_desc
             """, nativeQuery = true)
         List<CodeName> findFinYears();
+    
+    @Query(value = """
+            SELECT st.st_code                    AS "stateCode",
+                   st.st_name                    AS "stateName",
+                   COUNT(DISTINCT d.dcode)       AS "districtCount",
+                   COUNT(*)                      AS "projectCount",
+                   SUM(s.area_proposed)          AS "areaSanctioned",
+                   SUM(s.tot_cost)               AS "totCost",
+                   SUM(s.central_share_amt)      AS "centralShare",
+                   SUM(s.state_share_amt)        AS "stateShare"
+            FROM public.m_ppr p
+            JOIN public.m_sanction s
+                  ON s.sanction_id = (SELECT MAX(s2.sanction_id) FROM public.m_sanction s2
+                                      WHERE s2.ppr_id = p.ppr_id)
+            JOIN public.m_district d ON d.dcode = p.dcode
+            JOIN public.m_state st   ON st.st_code = d.st_code
+            WHERE (SELECT t.action FROM public.ppr_transaction t
+                   WHERE t.ppr_id = p.ppr_id
+                   ORDER BY t.senton DESC, t.tranx_id DESC LIMIT 1) = 'A'
+            GROUP BY st.st_code, st.st_name
+            ORDER BY st.st_name
+            """, nativeQuery = true)
+        List<ReportP1StateSummary> findStateSummary();
 }

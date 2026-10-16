@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
  <script>
- 
- 
- 
+
+
+
  </script>
 </head>
 <body>
@@ -24,8 +24,14 @@
                 <a th:href="@{/}">Home</a>
                 <a th:href="@{/about}">About</a>
                 <a th:href="@{/dashboard}">Dashboard</a>
-                <a th:href="@{/reports}">Reports</a>
-                <a th:href="@{/map}">Map</a>
+
+                <div class="menu-dropdown">
+                    <a th:href="@{/reports(roleId=1)}">Reports &#9662;</a>
+                    <div class="dropdown-panel">
+                        <a th:href="@{/reports(roleId=1)}">MIS</a>
+                    </div>
+                </div>
+
                 <a th:href="@{/technicalsupport}">Contact Us</a>
             </div>
             <div class="auth">
@@ -46,8 +52,7 @@
   <button onclick="changeFontSize('decrease')">A-</button>
 </div>
 
-        
+
     </div>
 </body>
 </html>
-	

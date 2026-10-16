@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+		
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MIS Report | WDC-PMKSY 3.0</title>
+	<link rel="stylesheet" th:href="@{/css/header.css}">
+	<link rel="stylesheet" th:href="@{/css/reportPublic.css}">
+	
+	<!-- Login CSS -->
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+
+<div th:replace="~{header :: govHeader}"></div>
+
+<main class="pr-page">
+	<h2 class="pr-heading">MIS Report</h2>
+	<div class="pr-heading-line"></div>
+
+	<div class="pr-list">
+
+		<div class="pr-group">~ Details of Sanctioned Projects</div>
+		<a class="pr-item" th:href="@{/reports/p1}">P1- State, District and Financial year wise Project Sanctioned detailes, Total Cost (Central / State Share)</a>
+		
+
+		
+	</div>
+</main>
+
+<footer class="pr-footer">
+	
+	    Data presented in this site has been updated by respective State Governments/UT Administration and Department of Land Resources, Ministry of Rural Development (MoRD), Government of India.<br>
+	    Website hosted and maintained by National Informatics Center.
+
+</footer>
+
+<script th:src="@{/js/language.js}"></script>
+</body>
+</html>
