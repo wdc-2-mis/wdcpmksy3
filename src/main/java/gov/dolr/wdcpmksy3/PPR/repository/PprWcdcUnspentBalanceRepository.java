@@ -15,6 +15,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 public interface PprWcdcUnspentBalanceRepository extends JpaRepository<PprWcdcUnspentBalance, Integer> {
 	
 	List<PprWcdcUnspentBalance> findByPpr_District_State_StCode(Integer stCode);
+	List<PprWcdcUnspentBalance> findByPpr_District_State_StCodeOrderByStatusDesc(Integer stCode);
 	
 	List<PprWcdcUnspentBalance> findByPprPprIdAndStatus(Integer pprId, Character status);
 	

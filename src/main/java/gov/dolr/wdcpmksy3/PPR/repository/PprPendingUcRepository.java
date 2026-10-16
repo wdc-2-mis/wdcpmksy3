@@ -18,6 +18,8 @@ public interface PprPendingUcRepository extends JpaRepository<PprPendingUc, Inte
     List<PprPendingUc> findByPpr(MPpr ppr);
     
     List<PprPendingUc> findByPpr_District_State_StCode(Integer stCode);
+    
+    List<PprPendingUc> findByPpr_District_State_StCodeOrderByStatusDesc(Integer stCode);
 
     List<PprPendingUc> findByPprPprId(Integer pprId);
 

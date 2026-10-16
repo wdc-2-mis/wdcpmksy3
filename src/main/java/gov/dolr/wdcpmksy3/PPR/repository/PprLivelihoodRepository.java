@@ -22,5 +22,7 @@ public interface PprLivelihoodRepository extends JpaRepository<PprLivelihood, In
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
 	List<PprLivelihood> findByPprPprIdAndStatusIn( Integer pprId, List<Character> statuses);
+	
+	List<PprLivelihood> findByPpr_District_State_StCodeOrderByStatusDesc(Integer stCode);
 
 }

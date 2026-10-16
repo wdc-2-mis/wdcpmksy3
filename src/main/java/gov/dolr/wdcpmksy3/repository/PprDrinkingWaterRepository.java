@@ -22,5 +22,7 @@ public interface PprDrinkingWaterRepository extends JpaRepository<PprDrinkingWat
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
 	
 	List<PprDrinkingWater> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
+	
+	List<PprDrinkingWater> findByPpr_District_State_StCodeOrderByStatusDesc(Integer stCode);
 
 }

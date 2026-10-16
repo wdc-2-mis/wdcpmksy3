@@ -68,7 +68,7 @@ public class DrinkingWaterController {
         
         List<MWaterQuality> waterQualityList =wtrqua.findAll();
         model.addAttribute("waterQualityList", waterQualityList);
-        List<PprDrinkingWater> records = dwrepo.findByPpr_District_State_StCode(stcode);
+        List<PprDrinkingWater> records = dwrepo.findByPpr_District_State_StCodeOrderByStatusDesc(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
 	

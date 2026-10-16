@@ -65,7 +65,7 @@ public class PendingUCPPR19Controller {
 	        model.addAttribute( "error1", "Please complete the Preliminary Project Report");
 	    }
         
-        List<PprPendingUc> records = ucrepo.findByPpr_District_State_StCode(stcode);
+        List<PprPendingUc> records = ucrepo.findByPpr_District_State_StCodeOrderByStatusDesc(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("finYearList", finService.getFinYearCdAndDesc());

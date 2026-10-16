@@ -20,7 +20,7 @@ public interface SlnaFunctionaryRepository extends JpaRepository<SlnaFunctionary
 			+ "e.office_name, e.address, e.work_exp_yrs, e.work_exp_days, e.work_details, f.slna_fun_lname, f.level FROM ppr_slna_institutional_structure i inner join ppr_slna_functionary f "
 			+ "on f.ppr_inst_str_id = i.ppr_inst_str_id INNER JOIN m_designation d  ON d.designation_id = f.designation_id INNER JOIN m_qualification q "
 			+ "ON q.qualification_id = f.qualification_id LEFT JOIN ppr_slna_functionary_work_experience e ON e.ppr_slna_fun_id = f.ppr_slna_fun_id "
-			+ "WHERE i.st_code =:stcode ORDER BY f.ppr_slna_fun_id DESC, e.ppr_slna_fun_exp_id ASC", nativeQuery = true)
+			+ "WHERE i.st_code =:stcode ORDER BY f.status DESC ", nativeQuery = true)
 	    List<Object[]> getFunctionariesList(@Param("stcode") int stcode);
 	    
 	    @Transactional

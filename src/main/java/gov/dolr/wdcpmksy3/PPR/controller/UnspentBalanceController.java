@@ -58,7 +58,7 @@ public class UnspentBalanceController {
 	        model.addAttribute( "error1", "Please complete the Preliminary Project Report");
 	    }
 		
-        List<PprWcdcUnspentBalance> records = unblance.findByPpr_District_State_StCode(stcode);
+        List<PprWcdcUnspentBalance> records = unblance.findByPpr_District_State_StCodeOrderByStatusDesc(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         
