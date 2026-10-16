@@ -3,11 +3,14 @@ package gov.dolr.wdcpmksy3.PPR.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import gov.dolr.wdcpmksy3.DPR.entity.MUnit;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -36,6 +39,10 @@ public class LivelihoodActivity {
 
     @Column(name = "updated_date")
     private LocalDate updatedDate;
+    
+    @ManyToOne
+    @JoinColumn(name = "unit_code", referencedColumnName = "unit_code")
+    private MUnit unit;
 
     // Getters and Setters
 
@@ -94,4 +101,16 @@ public class LivelihoodActivity {
     public void setUpdatedDate(LocalDate updatedDate) {
         this.updatedDate = updatedDate;
     }
+
+	public MUnit getUnit() {
+		return unit;
+	}
+
+	public void setUnit(MUnit unit) {
+		this.unit = unit;
+	}
+
+	
+    
+    
 }
