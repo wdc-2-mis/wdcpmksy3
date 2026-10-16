@@ -54,7 +54,7 @@ public class SecurityConfig {
                         "/checkDistrictCompleted", "/nextProjectName", "/rajectAndConfirm","/modifyPprTransaction", "/pprRequestDolrApproval", "/rejPprReqForAprov", "/referBackPprReqForAprov", "/approvePprReqForAprov", "/viewPprRequest", "/stWisePprTransactionStatus", "/newUserActiveDelete", "/slnausersrch", "/activatePiaUser", "/userRoleMap", "/userRoleMap/**", "/deleteUser", "/deactivateUser", "/activateExistingUser", "/extendSession", "/projectStats/**", "/checkWaterOutcome", "/checkPPR8BlockStatus",  "/checkFloodDroughtVillage",
                         "/checkCropOutcomeSeason", "/getLandPatternAreaByState", "/dprPhyOtherHeadActivities", "/getUnitDescByOtherActivity", "/saveDPROtherHeadActivities",
 // DPR 					 
-                        "/createDPRNRMPlan", "/saveDPRNRMTarget", "/getProjectsByDistrictDPRNRM", "/getActivitiesByHeadCodeDPRNRM", "/getUnitDescByActivity", "/checkProjectActivityExistsNRM", "/deleteDPRNRMTarget", "/completeDPRNRMTarget", "/editDPRNRMTarget", "/completeDPRNRMTargetAll", "/deleteDPRNRMTargetAll", "/epalivproddetails", "/getActivitiesByHeadCodeDPRELP", "/getUnitDescByelpActivity", "/saveDPRELPTarget",
+                        "/createDPRNRMPlan", "/saveDPRNRMTarget", "/getProjectsByDistrictDPRNRM", "/getActivitiesByHeadCodeDPRNRM", "/getUnitDescByActivity", "/checkProjectActivityExistsNRM", "/deleteDPRNRMTarget", "/completeDPRNRMTarget", "/editDPRNRMTarget", "/completeDPRNRMTargetAll", "/deleteDPRNRMTargetAll", "/getProjectsByDPRNRMData", "/epalivproddetails", "/getActivitiesByHeadCodeDPRELP", "/getUnitDescByelpActivity", "/saveDPRELPTarget",
                         
                         "/css/**",
                         "/js/**",

@@ -45,6 +45,7 @@
 
 
 <script>
+	
 	function setInvalid(el, msg) {
 		el.classList.add("is-invalid");
 		el.classList.remove("is-valid");
@@ -61,32 +62,46 @@
 		
 	document.addEventListener("DOMContentLoaded", function () {
 
-		const form1 = document.getElementById("DPRNRMTarget");
-		
-		const selectAll = document.getElementById('chkSelectAllkd');
+		// Select All and individual checkbox handling
+		document.addEventListener("change", function (event) {
 
-		if (selectAll) {
-			selectAll.addEventListener('change', function () {
-				document.querySelectorAll('.chkIndividualkd').forEach(function (checkbox) {
-					checkbox.checked = selectAll.checked;
-				});
-			});
-		}
+		    // When Select All is clicked
+		    if (event.target.id === "chkSelectAllkd") {
 
-		// Individual checkbox changes
-		document.addEventListener('change', function (event) {
-			if (event.target.classList.contains('chkIndividualkd')) {
-				const checkboxes = document.querySelectorAll('.chkIndividualkd');
-				const checkedBoxes = document.querySelectorAll('.chkIndividualkd:checked');
+		        const selectAll = event.target;
 
-				if (selectAll) {
-					selectAll.checked =
-						checkboxes.length > 0 &&
-						checkboxes.length === checkedBoxes.length;
-				}
-			}
+		        document.querySelectorAll(
+		            "#saveddprnrm .chkIndividualkd"
+		        ).forEach(function (checkbox) {
+
+		            checkbox.checked = selectAll.checked;
+
+		        });
+		    }
+
+		    // When an individual checkbox is clicked
+		    if (event.target.classList.contains("chkIndividualkd")) {
+
+		        const checkboxes = document.querySelectorAll(
+		            "#saveddprnrm .chkIndividualkd"
+		        );
+
+		        const checkedBoxes = document.querySelectorAll(
+		            "#saveddprnrm .chkIndividualkd:checked"
+		        );
+
+		        const selectAll = document.getElementById("chkSelectAllkd");
+
+		        if (selectAll) {
+		            selectAll.checked =
+		                checkboxes.length > 0 &&
+		                checkboxes.length === checkedBoxes.length;
+		        }
+		    }
 		});
-		       
+		
+		
+		const form1 = document.getElementById("DPRNRMTarget");    
 		if (!form1) {
 			return;
 		}
@@ -283,9 +298,47 @@
 		            console.error("Error:", error);
 		        });
 				
-			
-
 		});
+		
+		
+		document.getElementById("project").addEventListener("change", function () {
+
+				    let project = this.value;
+				 //   let project = document.getElementById("project");
+				 document.getElementById("saveddprnrm").innerHTML = "";
+					fetch(
+					        "/getProjectsByDPRNRMData?project=" +
+					        encodeURIComponent(project)
+					    )
+
+					        .then(response => {
+
+					            if (!response.ok) {
+					                throw new Error(
+					                    "nrm data fetch error: " +
+					                    response.status
+					                );
+					            }
+
+					            return response.text();
+					        })
+
+					        .then(html => {
+
+					            document.getElementById(
+					                "saveddprnrm"
+					            ).innerHTML = html;
+
+					        })
+
+					        .catch(error =>
+					            console.error(
+					                "dpr nrm Loading Error:",
+					                error
+					            )
+					        );
+						
+				});
 		
 		document.getElementById("head").addEventListener("change", function () {
 
@@ -441,100 +494,67 @@
 		
 		const forme = document.getElementById("editForm");
 
-		if (!forme) {
-			return;
+		if (forme) {
+
+		    forme.addEventListener("submit", function (e) {
+
+		        let isValide = true;
+
+		        const target1 = document.getElementById("target1");
+
+		        // Validate Target
+		        if (!target1 || target1.value.trim() === "") {
+
+		            if (target1) {
+		                target1.classList.add("is-invalid");
+		                target1.classList.remove("is-valid");
+		            }
+
+		            isValide = false;
+
+		        } else {
+
+		            target1.classList.remove("is-invalid");
+		            target1.classList.add("is-valid");
+		        }
+
+		        // Stop submission if invalid
+		        if (!isValide) {
+
+		            e.preventDefault();
+		            e.stopPropagation();
+
+		            if (target1 && target1.classList.contains("is-invalid")) {
+		                target1.scrollIntoView({
+		                    behavior: "smooth",
+		                    block: "center"
+		                });
+
+		                target1.focus();
+		            }
+
+		            return false;
+		        }
+
+		    });
+
+		    // Remove validation error when the user enters a value
+		    const target1 = document.getElementById("target1");
+
+		    if (target1) {
+		        target1.addEventListener("input", function () {
+
+		            if (this.value.trim() !== "") {
+		                this.classList.remove("is-invalid");
+		                this.classList.add("is-valid");
+		            } else {
+		                this.classList.add("is-invalid");
+		                this.classList.remove("is-valid");
+		            }
+
+		        });
+		    }
 		}
-
-		forme.addEventListener("submit", function (e) {
-
-			let isValide = true;
-
-			// ==========================================
-			// Helper function for text fields
-			// ==========================================
-
-			function validateTextField(element) {
-
-				if (element.value.trim() === "") {
-
-					element.classList.add("is-invalid");
-					element.classList.remove("is-valid");
-
-					isValide = false;
-
-				} else {
-
-					element.classList.remove("is-invalid");
-					element.classList.add("is-valid");
-				}
-			}
-
-
-			// ==========================================
-			// Numeric / Area fields
-			// ==========================================
-
-			validateTextField(
-				document.getElementById("target1")
-			);
-
-			// ==========================================
-			// Stop form submission if invalid
-			// ==========================================
-
-			if (!isValide) {
-
-				e.preventDefault();
-				e.stopPropagation();
-
-				// Scroll to first invalid field
-				const firstInvalide =
-					forme.querySelector(".is-invalid");
-
-				if (firstInvalide) {
-
-					firstInvalide.scrollIntoView({
-						behavior: "smooth",
-						block: "center"
-					});
-
-					firstInvalide.focus();
-				}
-
-				return false;
-			}
-
-		});
-
-		const fieldse = forme.querySelectorAll(
-			"input"
-		);
-
-		fieldse.forEach(function (field) {
-
-			field.addEventListener("change", function () {
-
-				if (field.value.trim() !== "") {
-
-					field.classList.remove("is-invalid");
-					field.classList.add("is-valid");
-
-				}
-
-			});
-
-			field.addEventListener("input", function () {
-
-				if (field.value.trim() !== "") {
-
-					field.classList.remove("is-invalid");
-					field.classList.add("is-valid");
-
-				}
-
-			});
-
-		});
 		
 		document.addEventListener('click', function (e) {
 
@@ -701,6 +721,8 @@
 										<th:block th:each="dist : ${distList}">
 											<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
 										</th:block>
+										<option th:each="d : ${districtList}" th:value="${d.dcode}" th:text="${d.distName}" 
+											th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"></option>
 								</select>
 								<div class="invalid-feedback">Please select a District.</div>
 				       	</div>
@@ -767,7 +789,8 @@
 
         </div>
 		
-		
+		<div id="saveddprnrm"
+		     th:fragment="cropOutcomeTable">
 		<div class="table-responsive mt-4"
 		         th:if="${#lists.size(dprNrmProjectPlanList) > 0}">
 
@@ -794,7 +817,7 @@
 		               style="min-width:1200px;">
 		            <thead class="table-primary">
 		            <tr>
-		                <th>Sl. No.  &nbsp; <input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" /></th>
+		                <th>Sl. No.  &nbsp; <input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" /> Select All</th>
 		                <th>District</th>
 		                <th>Project</th>
 		                <th>Head </th>
@@ -835,7 +858,10 @@
 		                <!-- unit -->
 		                <td style="text-align: left;" th:text="${row[11]}"></td>
 		                <!-- Target -->
-		                <td style="text-align: right;" th:text="${row[13]}"></td>
+						<td style="text-align: right;"
+						    th:text="${row[11] == 'nos' ? T(java.lang.String).format('%.0f', row[13]) : row[13]}">
+						</td>
+		               <!-- <td style="text-align: right;" th:text="${row[13]}"></td>-->
 						<td>
 							
 							<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[5] != null and row[5].toString().equals('D')}"
@@ -899,7 +925,7 @@
 		        </table>
 
 		    </div>	
-		
+		</div>
 		
 
     </div>

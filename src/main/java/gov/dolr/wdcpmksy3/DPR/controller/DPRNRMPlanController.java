@@ -25,7 +25,7 @@ import gov.dolr.wdcpmksy3.DPR.repository.MPhyActivityRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MPhyHeadsRepository;
 import gov.dolr.wdcpmksy3.DPR.service.DPRNRMPlanService;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
-
+import gov.dolr.wdcpmksy3.PPR.entity.PprCropOutcome;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionary;
@@ -54,19 +54,20 @@ public class DPRNRMPlanController {
     private DprDetailsRepository plan;
 	
 	@GetMapping("/createDPRNRMPlan")
-    public String createDPRNRMPlan(HttpSession session, Model model) 
+    public String createDPRNRMPlan(HttpSession session, Model model, @RequestParam(required = false) Integer dcode, 
+    		@RequestParam(required = false) Integer project) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
-		
+		List<Object[]> finalList = new ArrayList<>();
         if(userid==null){
 
             return "redirect:/login";
         }
+        	
         List<Object[]> list=plan.getDprNrmProjectPlanList(stcode);
         
-        List<Object[]> finalList = new ArrayList<>();
-
+        if(list!=null && !list.isEmpty()) {
         int srNo = 1;
         Integer previousId = null;
 
@@ -85,12 +86,46 @@ public class DPRNRMPlanController {
             finalList.add(newRow);
             previousId = currentId;
         }
+        }
+        model.addAttribute("selectedDistrict", dcode);
         model.addAttribute("dprNrmProjectPlanList", finalList);
         model.addAttribute("headList", head.findAllByOrderBySeqNoAsc());
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
         
         return "dpr/addDPRNRMTarget";
     }
+	
+	@GetMapping("/getProjectsByDPRNRMData")
+	public String getProjectsByDPRNRMData(
+	        @RequestParam("project") Integer project,
+	        Model model) {
+		List<Object[]> finalList = new ArrayList<>();
+		List<Object[]> list =plan.getDprNrmProjectPlanListByProject(project);
+
+		if(list!=null && !list.isEmpty()) {
+	        int srNo = 1;
+	        Integer previousId = null;
+
+	        for (Object[] row : list) {
+
+	            Integer currentId = ((Number) row[0]).intValue();
+
+	            // Create a new array with one extra column for serial number
+	            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+	            if (previousId == null || !previousId.equals(currentId)) {
+	                newRow[row.length] = srNo++;   // Serial No.
+	            } else {
+	                newRow[row.length] = "";       // Blank for duplicate rows
+	            }
+	            finalList.add(newRow);
+	            previousId = currentId;
+	        }
+	        }
+	        model.addAttribute("dprNrmProjectPlanList", finalList);
+
+	    return "dpr/addDPRNRMTarget :: cropOutcomeTable";
+	}
 	
 	@GetMapping("/getProjectsByDistrictDPRNRM")
 	@ResponseBody
