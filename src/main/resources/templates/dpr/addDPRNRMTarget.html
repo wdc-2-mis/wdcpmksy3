@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
-
+	  
 <head>
 <meta charset="UTF-8">
 <title>add DPR NRM Target </title>
@@ -62,6 +62,30 @@
 	document.addEventListener("DOMContentLoaded", function () {
 
 		const form1 = document.getElementById("DPRNRMTarget");
+		
+		const selectAll = document.getElementById('chkSelectAllkd');
+
+		if (selectAll) {
+			selectAll.addEventListener('change', function () {
+				document.querySelectorAll('.chkIndividualkd').forEach(function (checkbox) {
+					checkbox.checked = selectAll.checked;
+				});
+			});
+		}
+
+		// Individual checkbox changes
+		document.addEventListener('change', function (event) {
+			if (event.target.classList.contains('chkIndividualkd')) {
+				const checkboxes = document.querySelectorAll('.chkIndividualkd');
+				const checkedBoxes = document.querySelectorAll('.chkIndividualkd:checked');
+
+				if (selectAll) {
+					selectAll.checked =
+						checkboxes.length > 0 &&
+						checkboxes.length === checkedBoxes.length;
+				}
+			}
+		});
 		       
 		if (!form1) {
 			return;
@@ -415,6 +439,219 @@
 		});
 		
 		
+		const forme = document.getElementById("editForm");
+
+		if (!forme) {
+			return;
+		}
+
+		forme.addEventListener("submit", function (e) {
+
+			let isValide = true;
+
+			// ==========================================
+			// Helper function for text fields
+			// ==========================================
+
+			function validateTextField(element) {
+
+				if (element.value.trim() === "") {
+
+					element.classList.add("is-invalid");
+					element.classList.remove("is-valid");
+
+					isValide = false;
+
+				} else {
+
+					element.classList.remove("is-invalid");
+					element.classList.add("is-valid");
+				}
+			}
+
+
+			// ==========================================
+			// Numeric / Area fields
+			// ==========================================
+
+			validateTextField(
+				document.getElementById("target1")
+			);
+
+			// ==========================================
+			// Stop form submission if invalid
+			// ==========================================
+
+			if (!isValide) {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				// Scroll to first invalid field
+				const firstInvalide =
+					forme.querySelector(".is-invalid");
+
+				if (firstInvalide) {
+
+					firstInvalide.scrollIntoView({
+						behavior: "smooth",
+						block: "center"
+					});
+
+					firstInvalide.focus();
+				}
+
+				return false;
+			}
+
+		});
+
+		const fieldse = forme.querySelectorAll(
+			"input"
+		);
+
+		fieldse.forEach(function (field) {
+
+			field.addEventListener("change", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+			field.addEventListener("input", function () {
+
+				if (field.value.trim() !== "") {
+
+					field.classList.remove("is-invalid");
+					field.classList.add("is-valid");
+
+				}
+
+			});
+
+		});
+		
+		document.addEventListener('click', function (e) {
+
+		    const button = e.target.closest('#complete');
+
+		    if (!button) {
+		        return;
+		    }
+
+		    e.preventDefault();
+
+		    const selectedIds = Array.from(
+		        document.querySelectorAll('.chkIndividualkd:checked')
+		    ).map(checkbox => checkbox.value);
+
+		    if (selectedIds.length === 0) {
+				latestAlert('Please select at least one record.');
+				return;
+			}
+
+		    completeAlert(
+				'Do you want to complete the selected DPR NRM Target records?',
+				function () {
+
+					const form = document.createElement('form');
+					form.method = 'POST';
+					form.action = '/completeDPRNRMTargetAll';
+
+					selectedIds.forEach(function (id) {
+						const input = document.createElement('input');
+						input.type = 'hidden';
+						input.name = 'ids';
+						input.value = id;
+						form.appendChild(input);
+					});
+
+					// Add CSRF token if Spring Security requires it
+					const csrfToken = document.querySelector(
+						'meta[name="_csrf"]'
+					);
+					const csrfHeader = document.querySelector(
+						'meta[name="_csrf_header"]'
+					);
+
+					if (csrfToken) {
+						const csrfInput = document.createElement('input');
+						csrfInput.type = 'hidden';
+						csrfInput.name = csrfHeader
+							? csrfHeader.content
+							: '_csrf';
+						csrfInput.value = csrfToken.content;
+						form.appendChild(csrfInput);
+					}
+
+					document.body.appendChild(form);
+					console.log('Submitting POST:', form.action, selectedIds);
+					form.submit();
+				}
+			);
+		});
+		
+		document.addEventListener('click', function (e) {
+
+		    const button = e.target.closest('#delete');
+
+		    if (!button) {
+		        return;
+		    }
+
+		    e.preventDefault();
+
+		    const selectedIds = Array.from(
+		        document.querySelectorAll('.chkIndividualkd:checked')
+		    ).map(checkbox => checkbox.value);
+
+		    if (selectedIds.length === 0) {
+		        latestAlert('Please select at least one record.');
+		        return;
+		    }
+
+		    deleteAlert('Are you sure you want to delete the selected DPR NRM Target records?',
+		        function () {
+
+		            const form = document.createElement('form');
+		            form.method = 'POST';
+		            form.action = '/deleteDPRNRMTargetAll';
+
+		            selectedIds.forEach(function (id) {
+		                const input = document.createElement('input');
+		                input.type = 'hidden';
+		                input.name = 'ids';
+		                input.value = id;
+		                form.appendChild(input);
+		            });
+
+		            // Include CSRF token if Spring Security requires it
+		            const csrfToken = document.querySelector(
+		                'meta[name="_csrf"]'
+		            );
+
+		            if (csrfToken) {
+		                const csrfInput = document.createElement('input');
+		                csrfInput.type = 'hidden';
+		                csrfInput.name = '_csrf';
+		                csrfInput.value = csrfToken.content;
+		                form.appendChild(csrfInput);
+		            }
+
+		            document.body.appendChild(form);
+		            form.submit();
+		        }
+		    );
+		});
+		
+		
+		
+		
 	});
 	
 	
@@ -557,7 +794,7 @@
 		               style="min-width:1200px;">
 		            <thead class="table-primary">
 		            <tr>
-		                <th>Sl. No.</th>
+		                <th>Sl. No.  &nbsp; <input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" /></th>
 		                <th>District</th>
 		                <th>Project</th>
 		                <th>Head </th>
@@ -572,7 +809,15 @@
 		                <!-- SL NO 
 		                <td th:text="${row[14]}"></td> -->
 						
-						<td th:text="${stat.count}"></td>
+						<td style="text-align: left;">
+						    <span th:text="${stat.count}"></span>
+						    &nbsp;
+						    <input type="checkbox"
+						           class="chkIndividualkd"
+						           th:id="${row[4]}"
+						           th:name="${row[4]}"
+						           th:value="${row[4]}" th:if="${row[5] != null and row[5].toString().equals('D')}"/>
+						</td>
 		                <!-- ACTION -->
 		               
 		                <!-- DISTRICT -->
@@ -642,6 +887,12 @@
 						</td>
 
 		            </tr>
+					
+						<tr th:if="${#lists.size(dprNrmProjectPlanList) > 0}">
+							<td> <input type="button" class="btn btn-danger btn-sm" id="delete" name="delete" value="Delete" /> </td>
+							<td> <input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" /> </td>
+						</tr>
+					
 
 		            </tbody>
 
@@ -709,7 +960,7 @@
 										<input type="text" name="target1" id="target1" class="form-control" style="height:40px; width: 300px;"
 											inputmode="decimal" maxlength="10" required>
 										<div class="invalid-feedback">Please Enter Target</div>
-										<div id="targetError" class="text-danger"></div>
+										<div id="target1Error" class="text-danger"></div>
 									</div>
 								
 								
@@ -727,9 +978,15 @@
 							
 						</div>
 					</div>
+					
+					<script>
+						
+						
+					</script>
+					
 				</div>
 	
 </div>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </body>
 </html>

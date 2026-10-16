@@ -242,37 +242,89 @@ public class DPRNRMPlanController {
 	        return "redirect:/createDPRNRMPlan";
 	    }
 	 	
-	 	 @PostMapping("/editDPRNRMTarget")
-		 public String editDPRNRMTarget(HttpSession session, Model model, HttpServletRequest request,
-		    		
-		    		@RequestParam Integer nrmid,
-		    		@RequestParam BigDecimal target1,
-		            @RequestParam String updateAction,
-		            RedirectAttributes redirectAttributes) {
-		   
-					Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-					String userid=(String)session.getAttribute("userid");
-					try {
-						
-						 if(userid==null){
-		
-					            return "redirect:/login";
-					     }
-						boolean save=false;
-				    	
-						save=dprserv.editDPRNRMTarget(nrmid, target1, updateAction, userid, CommonFunctions.getClientIpAddr(request));
-						
-						if(save)
-							redirectAttributes.addFlashAttribute( "success", "DPR NRM Activity Target Update successfully.");
-						else
-							redirectAttributes.addFlashAttribute("error", "Unable to Update DPR NRM Activity Target.");
-						}
-						catch (Exception e) {
-		
-							e.printStackTrace();
-					        redirectAttributes.addFlashAttribute("error", "Unable to Update Livelihood Summary.");
-						}
-					return "redirect:/createDPRNRMPlan";	
-		    }
+		@PostMapping("/editDPRNRMTarget")
+		public String editDPRNRMTarget(HttpSession session, Model model, HttpServletRequest request,
+				@RequestParam Integer nrmid, @RequestParam BigDecimal target1, @RequestParam String updateAction,
+				RedirectAttributes redirectAttributes) {
+
+			Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+			String userid = (String) session.getAttribute("userid");
+			try {
+
+				if (userid == null) {
+
+					return "redirect:/login";
+				}
+				boolean save = false;
+
+				save = dprserv.editDPRNRMTarget(nrmid, target1, updateAction, userid,CommonFunctions.getClientIpAddr(request));
+
+				if (save)
+					redirectAttributes.addFlashAttribute("success", "DPR NRM Activity Target Update successfully.");
+				else
+					redirectAttributes.addFlashAttribute("error", "Unable to Update DPR NRM Activity Target.");
+			} 
+			catch (Exception e) {
+
+				e.printStackTrace();
+				redirectAttributes.addFlashAttribute("error", "Unable to Update Livelihood Summary.");
+			}
+			return "redirect:/createDPRNRMPlan";
+		}
+
+	 	@PostMapping("/completeDPRNRMTargetAll")
+	 	public String completeDPRNRMTargetAll(HttpSession session, Model model, HttpServletRequest request, 
+	 			@RequestParam("ids") List<Integer> ids,
+	 	        RedirectAttributes redirectAttributes) {
+	 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+			String userid = (String) session.getAttribute("userid");
+	 	    try {
+	 	    	
+	 	    	if (userid == null) {
+
+					return "redirect:/login";
+				}
+	 	    	//System.out.println("kdy"+ids);
+	 	        boolean completed = dprserv.completeSelected(ids);
+
+	 	        if (completed) {
+	 	            redirectAttributes.addFlashAttribute("success", "All selected records completed successfully.");
+	 	        } 
+	 	        else {
+	 	            redirectAttributes.addFlashAttribute("error", "Records could not be completed.");
+	 	        }
+
+	 	    } 
+	 	    catch (Exception e) {
+	 	    	e.printStackTrace();
+	 	        redirectAttributes.addFlashAttribute("error", "An error occurred while completing records.");
+	 	    }
+
+	 	    return "redirect:/createDPRNRMPlan";
+	 	}
+	 	
+	 	@PostMapping("/deleteDPRNRMTargetAll")
+	 	public String deleteDPRNRMTargetAll(
+	 	        @RequestParam("ids") List<Integer> ids,
+	 	        RedirectAttributes redirectAttributes) {
+
+	 	    try {
+	 	        boolean deleted = dprserv.deleteSelected(ids);
+
+	 	        if (deleted) {
+	 	            redirectAttributes.addFlashAttribute("success", "Selected records deleted successfully.");
+	 	        } 
+	 	        else {
+	 	            redirectAttributes.addFlashAttribute("error", "Records could not be deleted.");
+	 	        }
+
+	 	    } 
+	 	    catch (Exception e) {
+	 	    	e.printStackTrace();
+	 	        redirectAttributes.addFlashAttribute("error", "An error occurred while deleting records.");
+	 	    }
+
+	 	    return "redirect:/createDPRNRMPlan";
+	 	}
 
 }

@@ -125,5 +125,58 @@ public class DPRNRMPlanService {
 		return state;	
 		
 	}
+	
+	 @Transactional
+	 public boolean completeSelected(List<Integer> ids) {
+
+	        if (ids == null || ids.isEmpty()) {
+	            return false;
+	        }
+
+	        List<Integer> uniqueIds = ids.stream().distinct().toList();
+
+	        List<DprNrmDtl> records =plndtlrepo.findAllById(uniqueIds);
+
+	        // Validate all IDs before updating any record
+	        if (records.size() != uniqueIds.size()) {
+	            return false;
+	        }
+
+	        records.forEach(record -> record.setStatus('C'));
+
+	        plndtlrepo.saveAll(records);
+
+	        return true;
+	  }
+	 
+	 @Transactional
+	 public boolean deleteSelected(List<Integer> ids) {
+
+	     if (ids == null || ids.isEmpty()) {
+	         return false;
+	     }
+
+	     List<Integer> uniqueIds = ids.stream()
+	             .distinct()
+	             .toList();
+
+	     List<DprNrmDtl> records =plndtlrepo.findAllById(uniqueIds);
+
+	     // Ensure all requested IDs exist
+	     if (records.size() != uniqueIds.size()) {
+	         return false;
+	     }
+
+	     // Allow deletion of Draft records only
+	     if (records.stream().anyMatch(
+	             record -> record.getStatus() == null
+	                     || record.getStatus() != 'D')) {
+	         return false;
+	     }
+
+	     plndtlrepo.deleteAll(records);
+
+	     return true;
+	 }
 
 }
