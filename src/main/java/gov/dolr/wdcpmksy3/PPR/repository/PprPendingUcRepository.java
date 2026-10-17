@@ -19,7 +19,7 @@ public interface PprPendingUcRepository extends JpaRepository<PprPendingUc, Inte
     
     List<PprPendingUc> findByPpr_District_State_StCode(Integer stCode);
     
-    List<PprPendingUc> findByPpr_District_State_StCodeOrderByStatusDesc(Integer stCode);
+    List<PprPendingUc> findByPpr_District_State_StCodeOrderByStatusDescPpr_ProjectNameAsc(Integer stCode);
 
     List<PprPendingUc> findByPprPprId(Integer pprId);
 
@@ -37,4 +37,6 @@ public interface PprPendingUcRepository extends JpaRepository<PprPendingUc, Inte
 	int changeStatusByPprId(@Param("pprId") Integer pprId);	
     
     List<PprPendingUc> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
+    
+    List<PprPendingUc> findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc(Integer dcode);
 }

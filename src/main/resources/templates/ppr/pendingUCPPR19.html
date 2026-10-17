@@ -535,6 +535,41 @@
 		            console.error("Error:", error);
 		        });
 				
+				document.getElementById("saveddprnrm").innerHTML = "";
+			fetch(
+				"/getPendingUCPPR19Data?dcode=" +
+				encodeURIComponent(districtId)
+			)
+
+				.then(response => {
+
+					if (!response.ok) {
+						throw new Error(
+							"nrm data fetch error: " +
+							response.status
+						);
+					}
+
+					return response.text();
+				})
+
+				.then(html => {
+
+					document.getElementById(
+						"saveddprnrm"
+					).innerHTML = html;
+
+				})
+
+				.catch(error =>
+					console.error(
+						"dpr nrm Loading Error:",
+						error
+					)
+				);
+				
+				
+				
 		});
 		
 		document.getElementById("project").addEventListener("change", function () {
@@ -916,7 +951,8 @@
 			</form>-->
 
         </div>
-		
+		<div id="saveddprnrm"
+						     th:fragment="cropOutcomeTable">
 		<div class="table-responsive mt-4"
 		     th:if="${#lists.size(records) > 0}">
 			 <h4>
@@ -929,6 +965,7 @@
 			               <tr>
 			                   <!--<th>S.No.</th>-->
 							   <th rowspan="2" style="width: 200px;">Action</th>
+							   <th rowspan="2">District Name</th>
 			                   <th rowspan="2">Project Name</th>
 							   <th rowspan="2">Financial Year</th>
 			                   <th rowspan="2">Installment No.</th>
@@ -1022,7 +1059,7 @@
 								</span>
 							
 							</td>
-							
+								<td th:text="${rec.ppr.district.distName}"></td>
 								<td th:text="${rec.ppr.projectName}"></td>
 								<td th:text="${rec.finYear != null ? rec.finYear.finYrDesc : ''}"></td>
 								<td th:text="${rec.installmentNo}"></td>
@@ -1050,7 +1087,7 @@
 			       </table>
 
 		</div>
-		
+		</div>
 		
 		
 

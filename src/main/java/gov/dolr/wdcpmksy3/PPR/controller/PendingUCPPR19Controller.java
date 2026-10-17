@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.entity.PprDrinkingWater;
 import gov.dolr.wdcpmksy3.PPR.entity.PprPendingUc;
 import gov.dolr.wdcpmksy3.PPR.repository.PprPendingUcRepository;
 import gov.dolr.wdcpmksy3.PPR.service.FinYearService;
@@ -65,12 +66,24 @@ public class PendingUCPPR19Controller {
 	        model.addAttribute( "error1", "Please complete the Preliminary Project Report");
 	    }
         
-        List<PprPendingUc> records = ucrepo.findByPpr_District_State_StCodeOrderByStatusDesc(stcode);
+        List<PprPendingUc> records = ucrepo.findByPpr_District_State_StCodeOrderByStatusDescPpr_ProjectNameAsc(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
         return "ppr/pendingUCPPR19";
     }
+	
+	@GetMapping("/getPendingUCPPR19Data")
+	public String getPendingUCPPR19Data(
+	        @RequestParam("dcode") Integer dcode,
+	        Model model) {
+		
+			List<PprPendingUc> records = ucrepo.findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc(dcode);
+	        model.addAttribute("records", records);
+        
+
+	    return "ppr/pendingUCPPR19 :: cropOutcomeTable";
+	}
 	
 	@PostMapping("/savePendingUCPPR19")
 	 public String savePendingUCPPR19(HttpSession session, Model model, HttpServletRequest request,

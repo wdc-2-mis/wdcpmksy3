@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.entity.PprDrinkingWater;
 import gov.dolr.wdcpmksy3.PPR.entity.PprPendingUc;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.PPR.repository.PprWcdcUnspentBalanceRepository;
@@ -58,12 +59,22 @@ public class UnspentBalanceController {
 	        model.addAttribute( "error1", "Please complete the Preliminary Project Report");
 	    }
 		
-        List<PprWcdcUnspentBalance> records = unblance.findByPpr_District_State_StCodeOrderByStatusDesc(stcode);
+        List<PprWcdcUnspentBalance> records = unblance.findByPpr_District_State_StCodeOrderByStatusDescPpr_ProjectNameAsc(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         
         return "ppr/unspentBalancePPR20";
     }
+	
+	@GetMapping("/getUnspentBalancePPR20Data")
+	public String getUnspentBalancePPR20Data(
+	        @RequestParam("dcode") Integer dcode,
+	        Model model) {
+		List<PprWcdcUnspentBalance> records = unblance.findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc(dcode);
+	        model.addAttribute("records", records);
+
+	    return "ppr/unspentBalancePPR20 :: cropOutcomeTable";
+	}
 	
 	@GetMapping("/checkUnspentBalancePPR20")
 	@ResponseBody
