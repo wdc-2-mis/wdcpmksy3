@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.PPR.entity.PprDrinkingWater;
 import gov.dolr.wdcpmksy3.PPR.repository.PprSlnaDetailsRepository;
 import gov.dolr.wdcpmksy3.entity.InstitutionalStructure;
 import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionary;
@@ -826,6 +827,37 @@ public class PPR1Controller {
 	    }
         return "wcdcFunctionariesPPR4";
     } 
+    
+    @GetMapping("/getWCDCFunctionariesDistData")
+	public String getWCDCFunctionariesDistData(
+	        @RequestParam("dcode") Integer dcode,
+	        Model model) {
+    	List<Object[]> functionariesList = wdcrep.getWCDCFunctionariesDistData(dcode);
+
+        List<Object[]> finalList = new ArrayList<>();
+
+        int srNo = 1;
+        Integer previousId = null;
+
+        for (Object[] row : functionariesList) {
+
+            Integer currentId = ((Number) row[0]).intValue();
+
+            // Create a new array with one extra column for serial number
+            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+            if (previousId == null || !previousId.equals(currentId)) {
+                newRow[row.length] = srNo++;   // Serial No.
+            } else {
+                newRow[row.length] = "";       // Blank for duplicate rows
+            }
+            finalList.add(newRow);
+            previousId = currentId;
+        }
+        model.addAttribute("functionariesList", finalList);
+
+	    return "wcdcFunctionariesPPR4 :: cropOutcomeTable";
+	}
     
     @PostMapping("/saveWCDCFunctionariesPPR4B")
     public String saveWCDCFunctionariesPPR4B(HttpSession session, Model model, HttpServletRequest request,

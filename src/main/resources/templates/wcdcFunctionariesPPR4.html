@@ -87,7 +87,46 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
+		
+		
+		document.getElementById("district").addEventListener("change", function () {
 
+			let districtId = this.value;
+			document.getElementById("saveddprnrm").innerHTML = "";
+			fetch(
+				"/getWCDCFunctionariesDistData?dcode=" +
+				encodeURIComponent(districtId)
+			)
+
+				.then(response => {
+
+					if (!response.ok) {
+						throw new Error(
+							"nrm data fetch error: " +
+							response.status
+						);
+					}
+
+					return response.text();
+				})
+
+				.then(html => {
+
+					document.getElementById(
+						"saveddprnrm"
+					).innerHTML = html;
+
+				})
+
+				.catch(error =>
+					console.error(
+						"dpr nrm Loading Error:",
+						error
+					)
+				);
+
+		});
+		
         const form = document.getElementById("wcdcFunctionaries");
 
         if (!form) {
@@ -1151,7 +1190,6 @@
     );
 
 </script>
-```
 
 </head>
 
@@ -1774,7 +1812,8 @@
     <!-- =========================================================
          EXISTING RECORDS
     ========================================================== -->
-
+	<div id="saveddprnrm"
+					     th:fragment="cropOutcomeTable">
     <div class="table-responsive mt-4"
          th:if="${#lists.size(functionariesList) > 0}">
 
@@ -2038,6 +2077,7 @@
         </table>
 
     </div>
+	</div>
 
 </div>
 
