@@ -68,12 +68,22 @@ public class DrinkingWaterController {
         
         List<MWaterQuality> waterQualityList =wtrqua.findAll();
         model.addAttribute("waterQualityList", waterQualityList);
-        List<PprDrinkingWater> records = dwrepo.findByPpr_District_State_StCodeOrderByStatusDesc(stcode);
+        List<PprDrinkingWater> records = dwrepo.findByPpr_District_State_StCodeOrderByStatusDescPpr_ProjectNameAsc(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
 	
         return "ppr/drinkingWaterStatus";
     }
+	
+	@GetMapping("/getDrinkingWaterStatusData")
+	public String getDrinkingWaterStatusData(
+	        @RequestParam("dcode") Integer dcode,
+	        Model model) {
+		 	List<PprDrinkingWater> records = dwrepo.findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc(dcode);
+	        model.addAttribute("records", records);
+
+	    return "ppr/drinkingWaterStatus :: cropOutcomeTable";
+	}
 	
 	@PostMapping("/saveDrinkingWaterStatus")
 	 public String saveDrinkingWaterStatus(HttpSession session, Model model, HttpServletRequest request,

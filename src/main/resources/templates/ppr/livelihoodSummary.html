@@ -751,21 +751,42 @@
 		            console.error("Error:", error);
 		        });
 				
-			block.innerHTML = '<option value="">--Select Block--</option>';
-				
-			fetch('/getBlocksByDistrictPPR13?dcode=' + districtId)
-				.then(response => response.json())
-				.then(data => {
-					data.forEach(function(item) {
-						 let option = document.createElement("option");
-						 option.value = item.id;          // bcode
-						 option.textContent = item.name;  // block Name
-						 block.appendChild(option);
-					});
-			})
-			.catch(error => {
-				console.error("Error:", error);
-			});
+			
+			document.getElementById("saveddprnrm").innerHTML = "";
+			fetch(
+				"/getLivelihoodSummaryDistData?dcode=" +
+				encodeURIComponent(districtId)
+			)
+
+				.then(response => {
+
+					if (!response.ok) {
+						throw new Error(
+							"nrm data fetch error: " +
+							response.status
+						);
+					}
+
+					return response.text();
+				})
+
+				.then(html => {
+
+					document.getElementById(
+						"saveddprnrm"
+					).innerHTML = html;
+
+				})
+
+				.catch(error =>
+					console.error(
+						"dpr nrm Loading Error:",
+						error
+					)
+				);
+
+			
+			
 
 		});
 		
@@ -1091,7 +1112,8 @@
 			</form>-->
 
         </div>
-		
+		<div id="saveddprnrm"
+				     th:fragment="cropOutcomeTable">
 		<div class="table-responsive mt-4"
 		     th:if="${#lists.size(records) > 0}">
 			 <h4>
@@ -1104,6 +1126,8 @@
 			               <tr>
 			                   <!--<th>S.No.</th>-->
 							   <th>Action</th>
+							   <th>District Name</th>
+							   <th>Project Name</th>
 			                   <th>Block Name</th>
 							   <th>Village Name</th>
 			                   <th>Name of Watershed</th>
@@ -1193,7 +1217,8 @@
 							
 							</td>
 							
-							
+							<td th:text="${rec.ppr.district.distName}"></td>
+							<td th:text="${rec.ppr.projectName}"></td>
 								<td th:text="${rec.village.gramPanchayat.block.blockName}"></td>
 								<td th:text="${rec.village.villageName}"></td>
 								<td th:text="${rec.microWatershed.mwName}"></td>
@@ -1226,7 +1251,7 @@
 			       </table>
 
 		</div>
-		
+		</div>
 		
 		
 

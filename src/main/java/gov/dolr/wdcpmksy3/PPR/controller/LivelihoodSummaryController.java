@@ -69,7 +69,7 @@ public class LivelihoodSummaryController {
         if (pprid != null) {
         	laser.changeStatusByPprId(pprid);
         }
-        List<PprLivelihood> records = livrepo.findByPpr_District_State_StCodeOrderByStatusDesc(stcode);
+        List<PprLivelihood> records = livrepo.findByPpr_District_State_StCodeOrderByStatusDescPpr_ProjectNameAsc(stcode);
         model.addAttribute("records", records);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("LivelihoodActList", laser.getAllLivelihoodActivity());
@@ -83,6 +83,16 @@ public class LivelihoodSummaryController {
         
         return "ppr/livelihoodSummary";
     }
+	
+	@GetMapping("/getLivelihoodSummaryDistData")
+	public String getLivelihoodSummaryDistData(
+	        @RequestParam("dcode") Integer dcode,
+	        Model model) {
+		 	List<PprLivelihood> records = livrepo.findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc(dcode);
+	        model.addAttribute("records", records);
+
+	    return "ppr/livelihoodSummary :: cropOutcomeTable";
+	}
 	
 	@GetMapping("/getBlocksByDistrictPPR13")
 	@ResponseBody

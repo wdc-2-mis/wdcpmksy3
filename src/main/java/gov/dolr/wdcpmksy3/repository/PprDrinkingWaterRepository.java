@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.PPR.entity.PprDrinkingWater;
+import gov.dolr.wdcpmksy3.PPR.entity.PprLivelihood;
 
 public interface PprDrinkingWaterRepository extends JpaRepository<PprDrinkingWater, Integer> {
 	
@@ -23,6 +24,8 @@ public interface PprDrinkingWaterRepository extends JpaRepository<PprDrinkingWat
 	
 	List<PprDrinkingWater> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
 	
-	List<PprDrinkingWater> findByPpr_District_State_StCodeOrderByStatusDesc(Integer stCode);
+	List<PprDrinkingWater> findByPpr_District_State_StCodeOrderByStatusDescPpr_ProjectNameAsc(Integer stCode);
+	
+	List<PprDrinkingWater> findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc( Integer dcode);
 
 }
