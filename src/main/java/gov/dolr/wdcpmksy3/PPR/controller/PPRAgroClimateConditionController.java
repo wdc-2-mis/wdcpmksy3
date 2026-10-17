@@ -121,6 +121,38 @@ public class PPRAgroClimateConditionController {
         return "ppr/agroClimateCondition";
     }
 	
+	@GetMapping("/getAgroClimateConditiondist")
+	public String getAgroClimateConditiondist(
+	        @RequestParam("dcode") Integer dcode,
+	        Model model) {
+		List<Object[]> finalList = new ArrayList<>();
+		List<Object[]> list =agcrepo.getAgroClimateConditiondist(dcode);
+
+		if(list!=null && !list.isEmpty()) {
+	        int srNo = 1;
+	        Integer previousId = null;
+
+	        for (Object[] row : list) {
+
+	            Integer currentId = ((Number) row[0]).intValue();
+
+	            // Create a new array with one extra column for serial number
+	            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+	            if (previousId == null || !previousId.equals(currentId)) {
+	                newRow[row.length] = srNo++;   // Serial No.
+	            } else {
+	                newRow[row.length] = "";       // Blank for duplicate rows
+	            }
+	            finalList.add(newRow);
+	            previousId = currentId;
+	        }
+	        }
+		model.addAttribute("agroClimateList", finalList);
+
+	    return "ppr/agroClimateCondition :: cropOutcomeTable";
+	}
+	
 	@GetMapping("/checkPPRTransctionExists")
 	@ResponseBody
 	public String checkPPRTransctionExists(@RequestParam Integer pprid) {
