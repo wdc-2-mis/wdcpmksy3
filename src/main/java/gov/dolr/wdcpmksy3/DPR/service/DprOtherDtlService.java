@@ -80,4 +80,9 @@ public class DprOtherDtlService {
         detailRepository.save(detail);
     }
 
+	public void completeDprOtherTargetData(Integer id) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

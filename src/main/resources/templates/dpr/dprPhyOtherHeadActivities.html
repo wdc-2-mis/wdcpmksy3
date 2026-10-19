@@ -159,60 +159,61 @@
 				}
 			});
 		
-//	    document.querySelectorAll(".editBtn").forEach(function (btn) {
-//			btn.addEventListener("click", function () {
-//				let id = this.getAttribute("data-id");
-//				fetch("/getOtherProjectPlanDtlEdit?id=" + id)
-//					.then(response => response.json())
-//					.then(data => {
-//						// Hidden ID
-//						document.getElementById("editOtherPlanDtlId").value = data.id;
-//						// Readonly fields
-//						document.getElementById("editDistrict").value = data.district ?? "";
-//						document.getElementById("editProject").value = data.project ?? "";
-//						document.getElementById("editHead").value = data.microWatershed ?? "";
-//						document.getElementById("editActivity").value = data.microWatershedCode ?? "";
-//
-//						// Editable fields
-//						document.getElementById("editTarget").value = data.treatedArea ?? "";
-//						// Select Project Type Radio
-//					})
-//					.catch(error => {
-//						console.error("Error loading edit data:", error);
-//					});
-//			});
-//		});
+	    document.querySelectorAll(".editBtn").forEach(function (btn) {
+			btn.addEventListener("click", function () {
+				let id = this.getAttribute("data-id");
+				fetch("/getOtherDtlEditById?id=" + id)
+					.then(response => response.json())
+					.then(data => {
+						// Hidden ID
+						document.getElementById("otherId").value = data.id;
+						// Readonly fields
+						document.getElementById("editDistrict").value = data.district ?? "";
+						document.getElementById("editProject").value = data.project ?? "";
+						document.getElementById("editHead").value = data.head ?? "";
+						document.getElementById("editActivity").value = data.activity ?? "";
+						document.getElementById("editUnit").value = data.unit ?? "";
+
+						// Editable fields
+						document.getElementById("editTarget").value = data.target ?? "";
+						// Select Project Type Radio
+					})
+					.catch(error => {
+						console.error("Error loading edit data:", error);
+					});
+			});
+		});
 		
 		
-//	    const editForm = document.getElementById("editProjectForm");
-//	    if (!editForm) {
-//	        return;
-//	    }
-//	    editForm.addEventListener("submit", function (e) {
-//	        e.preventDefault();
-//	        // =========================
-//	        // CLEAR OLD ERRORS
-//	        // =========================
-//	        editForm.querySelectorAll(".field-error").forEach(function (error) {
-//	            error.innerText = "";
-//	        });
-//	        let isValid = true;
-//	        let firstInvalidField = null;
-//	        // =========================
-//	        // GET VALUES
-//	        // =========================
-//	        const treatedArea = document.getElementById("editTarget").value.trim();
-//	        // =========================
-//	        // STOP IF INVALID
-//	        // =========================
-//	        if (!isValid) {
-//	            if (firstInvalidField) {
-//	                firstInvalidField.focus();
-//	            }
-//	            return;
-//	        }
-//	        editForm.submit();
-//	    });
+	    const editForm = document.getElementById("editProjectForm");
+	    if (!editForm) {
+	        return;
+	    }
+	    editForm.addEventListener("submit", function (e) {
+	        e.preventDefault();
+	        // =========================
+	        // CLEAR OLD ERRORS
+	        // =========================
+	        editForm.querySelectorAll(".field-error").forEach(function (error) {
+	            error.innerText = "";
+	        });
+	        let isValid = true;
+	        let firstInvalidField = null;
+	        // =========================
+	        // GET VALUES
+	        // =========================
+	        const treatedArea = document.getElementById("editTarget").value.trim();
+	        // =========================
+	        // STOP IF INVALID
+	        // =========================
+	        if (!isValid) {
+	            if (firstInvalidField) {
+	                firstInvalidField.focus();
+	            }
+	            return;
+	        }
+	        editForm.submit();
+	    });
 		
 		document.getElementById("activity").addEventListener("change", function () {
 						let actId = this.value;
@@ -293,6 +294,28 @@
 										checkboxes.length === checkedBoxes.length;
 								}
 							}
+						});
+						
+						$(document).ready(function () {
+						    // Select all checkboxes
+						    $('#chkSelectAllkd').on('change', function () {
+						        $('.chkIndividualkd').prop('checked', this.checked);
+						    });
+						    // Complete all selected records
+						    $('#complete').on('click', function () {
+						        let selectedIds = [];
+						        $('.chkIndividualkd:checked').each(function () {
+						            selectedIds.push($(this).val());
+						        });
+						        if (selectedIds.length === 0) {
+						            latestAlert('Please select at least one record to complete.');
+						            return;
+						        }
+						        completeAlert('Are you sure you want to complete all selected records?',function () {
+						                window.location.href = '/completeDprOtherTargetData?ids= '+ encodeURIComponent(selectedIds.join(','));
+						            }
+						        );
+						    });
 						});
 	});
 	
@@ -447,14 +470,13 @@
 							</div>
 					    </td>
 					</tr>
-<!--					<tr th:if="${#lists.size(dprOtherTargetList) > 0}">-->
-<!--						<td colspan="8"> -->
-<!--							<div class="d-flex align-items-center">-->
-<!--								<input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" -->
-<!--								th:onclick="'completeAlert(\'Are you sure you want to complete all selected records?\', function() { window.location.href = \'/completeDprOtherTargetData?id=' + ${data.otherId} + '\'; }); return false;'" />-->
-<!--							</div>-->
-<!--						</td>-->
-<!--					</tr>-->
+					<tr th:if="${#lists.size(dprOtherTargetList) > 0}">
+						<td colspan="8"> 
+							<div class="d-flex align-items-center">
+								<input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" />
+							</div>
+						</td>
+					</tr>
 					<tr th:if="${#lists.isEmpty(dprOtherTargetList)}">
 					    <td colspan="8" class="text-center text-danger">
 					        No records found.
@@ -463,6 +485,72 @@
 		        
 		        </tbody>
 		    </table>
+		</div>
+		
+		<!-- =====================================================
+		 EDIT MODAL
+		 ===================================================== -->
+
+		<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title" id="editModalLabel">Edit DPR Other Target</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+					</div>
+					<div class="modal-body">
+						<form id="editForm" th:action="@{/updateDPROtherTargetRecord}" method="post">
+							<input type="hidden" id="otherId" name="otherId">
+							<div class="row mb-3">
+								<div class="col-md-2">
+									<label> District: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editDistrict" class="form-control form-control-sm" readonly>
+								</div>
+								<div class="col-md-2">
+									<label> Project: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editProject" class="form-control form-control-sm" readonly>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<div class="col-md-2">
+									<label> Head: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editHead" class="form-control form-control-sm" readonly>
+								</div>
+								<div class="col-md-2">
+									<label> Activity: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editActivity" class="form-control form-control-sm" readonly>
+								</div>
+							</div>
+							<hr>
+							<div class="row mb-3">
+								<div class="col-md-6">
+									<label class="form-label">
+										<b>Target (<span id="editUnit" class="fw-bold text-primary"></span>)</b> <span class="required">*</span>
+									</label>
+								
+								</div>
+								<div class="col-md-6">
+									<input type="text" name="target" id="editTarget" class="form-control" style="height:40px; width: 300px;"
+										inputmode="decimal" maxlength="10" required>
+								</div>
+							</div>
+							<div class="text-end">
+								<button type="submit" class="btn btn-success">
+									<i class="fas fa-save"></i> Update
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
 		
 		</div>
