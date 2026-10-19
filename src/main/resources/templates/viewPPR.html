@@ -1674,7 +1674,7 @@
 								<td th:text="${data.remarks}"></td>
 
 							</tr>
-							<tr th:if="${pprWaterOutcomesList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
+							<tr th:if="${pprWaterOutcomesList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">	
 								<td colspan="8">
 							
 									<div class="d-flex justify-content-center align-items-center gap-3">

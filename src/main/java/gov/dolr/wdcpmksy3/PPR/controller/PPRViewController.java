@@ -475,9 +475,9 @@ public class PPRViewController {
         data.put("ppr15List", ppr15List);
 
         // ---- PPR-16 ----
-        List<PprWaterOutcome> pprWaterOutcomesList =pprWaterOutcomeRepo.findByPprIdAndStatusIn(project, statuse);
+        List<PprWaterOutcome> pprWaterOutcomesList =pprWaterOutcomeRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pprWaterOutcomesList", pprWaterOutcomesList);
-     //   System.out.println("kdy"+pprWaterOutcomesList.size());
+        System.out.println("kdy"+pprWaterOutcomesList.size());
         // ---- PPR-17 ----
         List<PprDrinkingWater> pprDrinkingWaterList = pprDrinkingWaterRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pprDrinkingWaterList", pprDrinkingWaterList);

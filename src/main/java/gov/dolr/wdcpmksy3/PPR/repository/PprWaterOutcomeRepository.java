@@ -33,20 +33,23 @@ public interface PprWaterOutcomeRepository extends JpaRepository<PprWaterOutcome
 		List<PprWaterOutcome> findByDistrict(@Param("dcode") Integer dcode);
 	
 	@Query("""
-	        SELECT o
-	        FROM PprWaterOutcome o
-	        JOIN FETCH o.ppr p
-	        JOIN FETCH p.district d
-	        JOIN FETCH o.microWatershed mw
-	        JOIN FETCH o.village v
-	        JOIN FETCH o.waterSource ws
-	        WHERE p.pprId = :pprId
-	          AND o.status IN :statuses
-	        ORDER BY o.pprWaterOutcomeId
-	        """)
-	List<PprWaterOutcome> findByPprIdAndStatusIn(
-	        @Param("pprId") Integer pprId,
-	        @Param("statuses") List<Character> statuses);
+		    SELECT o
+		    FROM PprWaterOutcome o
+		    JOIN FETCH o.ppr p
+		    JOIN FETCH p.district d
+		    JOIN FETCH o.microWatershed mw
+		    JOIN FETCH o.village v
+		    JOIN FETCH o.waterSource ws
+		    WHERE p.pprId = :pprId
+		      AND o.status IN (:statuses)
+		    ORDER BY o.pprWaterOutcomeId ASC
+		    """)
+		List<PprWaterOutcome> findByPprIdAndStatusIn(
+		        @Param("pprId") Integer pprId,
+		        @Param("statuses") List<Character> statuses
+		);
+	
+	List<PprWaterOutcome> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
 	
 	@Modifying
 	@Transactional
