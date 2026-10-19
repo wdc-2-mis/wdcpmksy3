@@ -183,6 +183,7 @@ public class PPRViewController {
         model.addAttribute("selectedProjectName", resolveProjectName(data, project));
 
         boolean allSectionsFilled = isAllSectionsFilled(data);
+     //   System.out.println("kdy1"+allSectionsFilled);
         model.addAttribute("allSectionsFilled", allSectionsFilled);
 
         List<WdcpmksyUserReg> users = ur.findDLUsersByStateAndRole(stcode);
@@ -191,7 +192,7 @@ public class PPRViewController {
         return "viewPPR";
     }
 
-    private boolean isAllSectionsFilled(Map<String, Object> data) {
+    private boolean isAllSectionsFilled1(Map<String, Object> data) {
 
         String[] keysToCheck = {
             "records",
@@ -214,7 +215,10 @@ public class PPRViewController {
         };
 
         for (String key : keysToCheck) {
+
             Object value = data.get(key);
+          //  System.out.println("kdy1"+value);
+
             if (!(value instanceof List<?> list) || list.isEmpty()) {
                 return false;
             }
@@ -222,6 +226,23 @@ public class PPRViewController {
 
         return true;
     }
+    
+    private boolean isAllSectionsFilled(Map<String, Object> data) {
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) 
+        {
+            // Watershed list is optional
+            if ("watershedList".equals(entry.getKey())) {
+                continue;
+            }
+
+            if (entry.getValue() instanceof List<?> list && list.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     
 
     @PostMapping("/downloadPPRPdf")
@@ -288,34 +309,6 @@ public class PPRViewController {
         // ---- PPR-1 ----
         List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus(dcode, project, finYrCd, "C");
         data.put("records", records);
-
-        // ---- PPR-2 ----
-        
-      //  List<PprWatershedCoveredArea> areaRecords = area.findByPprPprIdAndStatus(project, "C");
-   /*     List<PprWatershedCoveredArea> areaRecords = area.findByPprPprIdAndStatusIn(project, statuses);
-
-        Map<Integer, WatershedAreaBean> map = new LinkedHashMap<>();
-        for (PprWatershedCoveredArea row : areaRecords) {
-
-            Integer mwId = row.getMicroWatershed().getMwId();
-            WatershedAreaBean bean = map.getOrDefault(mwId, new WatershedAreaBean());
-            bean.setMwId(mwId);
-            bean.setMwName(row.getMicroWatershed().getMwName());
-
-            Integer scheme = row.getScheme().getSchemeId();
-            switch (scheme) {
-                case 1: bean.setPreNo(row.getNoMw()); bean.setPreArea(row.getAreaMw()); break;
-                case 2: bean.setDpapNo(row.getNoMw()); bean.setDpapArea(row.getAreaMw()); break;
-                case 3: bean.setDdpNo(row.getNoMw()); bean.setDdpArea(row.getAreaMw()); break;
-                case 4: bean.setIwdpNo(row.getNoMw()); bean.setIwdpArea(row.getAreaMw()); break;
-                case 5: bean.setIwmpNo(row.getNoMw()); bean.setIwmpArea(row.getAreaMw()); break;
-                case 6: bean.setPmksyNo(row.getNoMw()); bean.setPmksyArea(row.getAreaMw()); break;
-                case 7: bean.setOtherNo(row.getNoMw()); bean.setOtherArea(row.getAreaMw()); break;
-            }
-            map.put(mwId, bean);
-        }
-        data.put("watershedList", new ArrayList<>(map.values())); */
-       // List<String> statuses = List.of("C", "S");
 
         List<PprWatershedCoveredArea> areaRecords =
                 area.findByPprPprIdAndStatusIn(project, statuses);
@@ -477,7 +470,7 @@ public class PPRViewController {
         // ---- PPR-16 ----
         List<PprWaterOutcome> pprWaterOutcomesList =pprWaterOutcomeRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pprWaterOutcomesList", pprWaterOutcomesList);
-        System.out.println("kdy"+pprWaterOutcomesList.size());
+     //   System.out.println("kdy"+pprWaterOutcomesList.size());
         // ---- PPR-17 ----
         List<PprDrinkingWater> pprDrinkingWaterList = pprDrinkingWaterRepo.findByPprPprIdAndStatusIn(project, statuse);
         data.put("pprDrinkingWaterList", pprDrinkingWaterList);
