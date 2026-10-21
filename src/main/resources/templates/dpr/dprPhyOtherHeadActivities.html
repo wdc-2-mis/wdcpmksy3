@@ -57,21 +57,25 @@
 	
 		function showError(field, message) {
 			field.classList.add("is-invalid");
+			// Avoid duplicate error messages
+			const oldError = field.parentNode.querySelector(".validation-error");
+			if (oldError) {
+			    oldError.remove();
+			}
 			const error = document.createElement("div");
 			error.className = "validation-error";
 			error.innerText = message;
 			field.parentNode.appendChild(error);
 			field.focus();
-			return false;
 		}
 		function hideError(field){
-			const error = document.getElementsByClassName("validation-error");
-			error.innerText = "";
-//			error.remove();
+			field.classList.remove("is-invalid");
+			const error = field.parentNode.querySelector("validation-error");
+			if (error) 
+			    error.remove();
 		}
 			const form = document.getElementById("projectForm");
 			form.addEventListener("submit", function (e) {
-				
 				form.querySelectorAll(".validation-error").forEach(function(error){
 					error.remove();
 				});
@@ -163,7 +167,12 @@
 			btn.addEventListener("click", function () {
 				let id = this.getAttribute("data-id");
 				fetch("/getOtherDtlEditById?id=" + id)
-					.then(response => response.json())
+					.then(response => {
+						if (!response.ok) {
+							throw new Error("Failed to fetch edit data");
+						}
+						return response.json();
+					})
 					.then(data => {
 						// Hidden ID
 						document.getElementById("otherId").value = data.id;
@@ -172,7 +181,7 @@
 						document.getElementById("editProject").value = data.project ?? "";
 						document.getElementById("editHead").value = data.head ?? "";
 						document.getElementById("editActivity").value = data.activity ?? "";
-						document.getElementById("editUnit").value = data.unit ?? "";
+						document.getElementById("editUnit").textContent = data.unit ?? "";
 
 						// Editable fields
 						document.getElementById("editTarget").value = data.target ?? "";
@@ -183,140 +192,167 @@
 					});
 			});
 		});
+		const targetInput1 = document.getElementById("editTarget");
+		targetInput1.addEventListener("input", function () {
+			const unit1 = document.getElementById("editUnit").textContent.trim().toLowerCase();
+			let value = this.value;
+			if (unit1 === "nos") {
+				// Whole numbers only
+				value = value.replace(/[^0-9]/g, "");
+			} else {
+				// Decimal numbers up to 5 decimal places
+				value = value.replace(/[^0-9.]/g, "");
+				const parts = value.split(".");
+				if (parts.length > 2) {
+					value = parts[0] + "." + parts.slice(1).join("");
+				}
+				const decimalPart = value.split(".");
+				if (decimalPart.length === 2) {
+					value = decimalPart[0] + "." +
+						decimalPart[1].substring(0, 2);
+				}
+			}
+			this.value = value;
+		});
 		
 		
-	    const editForm = document.getElementById("editProjectForm");
-	    if (!editForm) {
-	        return;
+	    const editForm = document.getElementById("editForm");
+	    if (editForm) {
+			editForm.addEventListener("submit", function (e) {
+			    e.preventDefault();
+			    // =========================
+			    // CLEAR OLD ERRORS
+			    // =========================
+			    editForm.querySelectorAll(".field-error").forEach(function (error) {
+			        error.innerText = "";
+			    });
+			   
+			    // =========================
+			    // GET VALUES
+			    // =========================
+				const editTarget = document.getElementById("editTarget");
+				if(editTarget.value.trim() === ""){
+					e.preventDefault();
+					showError(editTarget,"Please Enter the target.");
+					return;
+				}
+			    editForm.submit();
+			});
 	    }
-	    editForm.addEventListener("submit", function (e) {
-	        e.preventDefault();
-	        // =========================
-	        // CLEAR OLD ERRORS
-	        // =========================
-	        editForm.querySelectorAll(".field-error").forEach(function (error) {
-	            error.innerText = "";
-	        });
-	        let isValid = true;
-	        let firstInvalidField = null;
-	        // =========================
-	        // GET VALUES
-	        // =========================
-	        const treatedArea = document.getElementById("editTarget").value.trim();
-	        // =========================
-	        // STOP IF INVALID
-	        // =========================
-	        if (!isValid) {
-	            if (firstInvalidField) {
-	                firstInvalidField.focus();
-	            }
-	            return;
-	        }
-	        editForm.submit();
-	    });
+	    
 		
-		document.getElementById("activity").addEventListener("change", function () {
-						let actId = this.value;
-						const unitSpan = document.getElementById("unitDesc");
-						let project = document.getElementById("project").value;
-						const activity =document.getElementById("activity");
-						document.getElementById("target").value="";
-						if (actId === "") {
-							return;
-						}
-						fetch('/getUnitDescByOtherActivity?actId=' + encodeURIComponent(actId))
-						       .then(response => {
-						           if (!response.ok) {
-						               throw new Error("Unit description not found");
-						           }
-						           return response.text();
-						       })
-						       .then(unitDesc => {
-						           unitSpan.textContent = unitDesc;
-						       })
-						       .catch(error => {
-						           console.error("Error fetching unit description:", error);
-						           unitSpan.textContent = "";
-						       });
-						fetch('/checkProjectActivityExistsOther?pprid=' + encodeURIComponent(project) + '&actId=' + encodeURIComponent(actId))
-							.then(response => response.text())
-							.then(result => {
-								if (result === "EXISTS") {
-									this.value = "";
-									showError(activity, "This Activity data already exist for selected Project. Please select a different Activity.");
-								} else {
-									hideError(activity);
-								}
-							})
-							.catch(error => console.error(error));
-					});
-					const targetInput = document.getElementById("target");
-					    targetInput.addEventListener("input", function () {
-					        const unitDesc = document.getElementById("unitDesc").textContent.trim().toLowerCase();
-					        let value = this.value;
-					        if (unitDesc === "nos") {
-					            // Whole numbers only
-					            value = value.replace(/[^0-9]/g, "");
-					        } else {
-					            // Decimal numbers up to 5 decimal places
-					            value = value.replace(/[^0-9.]/g, "");
-					            const parts = value.split(".");
-					            if (parts.length > 2) {
-					                value = parts[0] + "." + parts.slice(1).join("");
-					            }
-					            const decimalParts = value.split(".");
-					            if (decimalParts.length === 2) {
-					                value = decimalParts[0] + "." + decimalParts[1].substring(0, 2);
-					            }
-					        }
-					        this.value = value;
-					    });	
+		const activityElement = document.getElementById("activity");
+		if (activityElement) {
+		    activityElement.addEventListener("change", function () {
+		        console.log("Activity changed:", this.value);
+		        const actId = this.value;
+		        const unitSpan = document.getElementById("unitDesc");
+		        const projectId = document.getElementById("project").value;
+		        document.getElementById("target").value = "";
+		        if (!actId) {
+		            unitSpan.textContent = "";
+		            return;
+		        }
+		        fetch('/getUnitDescByOtherActivity?actId=' + encodeURIComponent(actId))
+		            .then(response => {
+		                if (!response.ok) {
+		                    throw new Error("Unit description not found");
+		                }
+		                return response.text();
+		            })
+		            .then(unitDesc => {
+		                unitSpan.textContent = unitDesc;
+		            })
+		            .catch(error => {
+		                console.error("Error fetching unit description:", error);
+		                unitSpan.textContent = "";
+		            });
+		        // Check whether activity already exists
+		        fetch('/checkProjectActivityExistsOther?pprid='
+		            + encodeURIComponent(projectId)
+		            + '&actId=' + encodeURIComponent(actId))
+		            .then(response => {
+		                if (!response.ok) {
+		                    throw new Error("Failed to check existing activity");
+		                }
+		                return response.text();
+		            })
+		            .then(result => {
+		                if (result.trim() === "EXISTS") {
+		                    activityElement.value = "";
+		                    showError(activityElement, "This Activity data already exists for the selected Project. Please select a different Activity.");
+		                } else {
+		                    hideError(activityElement);
+		                }
+		            })
+		            .catch(error => console.error(error));
+		    });
+		}
+
+		const targetInput = document.getElementById("target");
+		targetInput.addEventListener("input", function () {
+			const unitDesc = document.getElementById("unitDesc").textContent.trim().toLowerCase();
+			let value = this.value;
+			if (unitDesc === "nos") {
+				// Whole numbers only
+				value = value.replace(/[^0-9]/g, "");
+			} else {
+				// Decimal numbers up to 5 decimal places
+				value = value.replace(/[^0-9.]/g, "");
+				const parts = value.split(".");
+				if (parts.length > 2) {
+					value = parts[0] + "." + parts.slice(1).join("");
+				}
+				const decimalParts = value.split(".");
+				if (decimalParts.length === 2) {
+					value = decimalParts[0] + "." + decimalParts[1].substring(0, 2);
+				}
+			}
+			this.value = value;
+		});	
+					
+		const selectAll = document.getElementById('chkSelectAllkd');
+		if (selectAll) {
+			selectAll.addEventListener('change', function () {
+				document.querySelectorAll('.chkIndividualkd').forEach(function (checkbox) {
+					checkbox.checked = selectAll.checked;
+				});
+			});
+		}
+
+		// Individual checkbox changes
+		document.addEventListener('change', function (event) {
+			if (event.target.classList.contains('chkIndividualkd')) {
+				const checkboxes = document.querySelectorAll('.chkIndividualkd');
+				const checkedBoxes = document.querySelectorAll('.chkIndividualkd:checked');
+
+				if (selectAll) {
+					selectAll.checked =
+						checkboxes.length > 0 &&
+						checkboxes.length === checkedBoxes.length;
+				}
+			}
+		});
 						
-						const selectAll = document.getElementById('chkSelectAllkd');
-
-						if (selectAll) {
-							selectAll.addEventListener('change', function () {
-								document.querySelectorAll('.chkIndividualkd').forEach(function (checkbox) {
-									checkbox.checked = selectAll.checked;
-								});
-							});
-						}
-
-						// Individual checkbox changes
-						document.addEventListener('change', function (event) {
-							if (event.target.classList.contains('chkIndividualkd')) {
-								const checkboxes = document.querySelectorAll('.chkIndividualkd');
-								const checkedBoxes = document.querySelectorAll('.chkIndividualkd:checked');
-
-								if (selectAll) {
-									selectAll.checked =
-										checkboxes.length > 0 &&
-										checkboxes.length === checkedBoxes.length;
-								}
-							}
-						});
-						
-						$(document).ready(function () {
-						    // Select all checkboxes
-						    $('#chkSelectAllkd').on('change', function () {
-						        $('.chkIndividualkd').prop('checked', this.checked);
-						    });
-						    // Complete all selected records
-						    $('#complete').on('click', function () {
-						        let selectedIds = [];
-						        $('.chkIndividualkd:checked').each(function () {
-						            selectedIds.push($(this).val());
-						        });
-						        if (selectedIds.length === 0) {
-						            latestAlert('Please select at least one record to complete.');
-						            return;
-						        }
-						        completeAlert('Are you sure you want to complete all selected records?',function () {
-						                window.location.href = '/completeDprOtherTargetData?ids= '+ encodeURIComponent(selectedIds.join(','));
-						            }
-						        );
-						    });
-						});
+		// Complete all selected records
+		const completeBtn = document.getElementById("complete");
+		if (completeBtn) {
+		    completeBtn.addEventListener("click", function () {
+		        const selectedIds = [];
+		        document.querySelectorAll(".chkIndividualkd:checked").forEach(function (checkbox) {
+		            selectedIds.push(checkbox.value);
+		        });
+		        if (selectedIds.length === 0) {
+		            latestAlert("Please select at least one record to complete.");
+		            return;
+		        }
+		        completeAlert("Are you sure you want to complete all selected records?",function () {
+					const url = /*[[@{/completeDprOtherTargetData}]]*/ "/completeDprOtherTargetData";
+					window.location.href = url + "?ids=" + encodeURIComponent(selectedIds.join(","));
+		            }
+		        );
+		    });
+		}
 	});
 	
 			
@@ -399,7 +435,7 @@
 							<label> Target(<span id="unitDesc" class="fw-bold text-primary"></span>) <span class="required">*</span></label>
 						</div>
 						<div class="col-md-6">
-							<input type="text" name="target" id="target" class="form-control" style="height:40px; width: 300px;" inputmode="decimal" maxlength="10">
+							<input type="text" name="target" id="target" class="form-control" style="height:40px; width: 300px;" inputmode="decimal" maxlength="9">
 						</div>
 					</div>										
 
@@ -449,7 +485,10 @@
 							<span th:if="${data.otherActivity != null}" th:text="${data.otherActivity.unit.unitDesc}">
 							</span>
 						</td>
-						<td th:text="${data.qtyPlanned}"></td>
+						<td>
+							<span th:if="${data.otherActivity != null}" th:text="${data.otherActivity.unit.unitDesc == 'nos' ? T(java.lang.String).format('%.0f', data.qtyPlanned) : data.qtyPlanned}">
+							</span>
+						</td>
 						<td>
 							<div class="d-flex align-items-center gap-2">
 								<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${data.otherId}" data-bs-toggle="modal"
@@ -457,7 +496,7 @@
 									<i class="fas fa-edit"></i>
 								</button>
 								<a th:if="${#strings.trim(data.status) == 'D'}" class="btn btn-danger btn-sm"
-									 th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteDprOtherTargetData?id=' + ${data.otherId} + '\'; }); return false;'">
+									 th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteDPROtherTarget?id=' + ${data.otherId} + '\'; }); return false;'">
 									<i class="fas fa-trash"></i>
 								</a>
 								<a th:if="${#strings.trim(data.status) == 'D'}" class="btn btn-success btn-sm"
@@ -470,11 +509,9 @@
 							</div>
 					    </td>
 					</tr>
-					<tr th:if="${#lists.size(dprOtherTargetList) > 0}">
-						<td colspan="8"> 
-							<div class="d-flex align-items-center">
-								<input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" />
-							</div>
+					<tr th:if="${statusCheck}">
+						<td colspan="8" class="text-center">
+						    <input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" />
 						</td>
 					</tr>
 					<tr th:if="${#lists.isEmpty(dprOtherTargetList)}">
@@ -531,15 +568,12 @@
 							</div>
 							<hr>
 							<div class="row mb-3">
-								<div class="col-md-6">
-									<label class="form-label">
-										<b>Target (<span id="editUnit" class="fw-bold text-primary"></span>)</b> <span class="required">*</span>
-									</label>
-								
+								<div class="col-md-3">
+									<label><b>Target (<span id="editUnit" class="fw-bold text-primary"></span>)</b> <span class="required">*</span></label>
 								</div>
 								<div class="col-md-6">
 									<input type="text" name="target" id="editTarget" class="form-control" style="height:40px; width: 300px;"
-										inputmode="decimal" maxlength="10" required>
+										inputmode="decimal" maxlength="9">
 								</div>
 							</div>
 							<div class="text-end">

@@ -20,6 +20,9 @@ public interface DprOtherDtlRepository extends JpaRepository<DprOtherDtl, Intege
 	List<DprOtherDtl> getListOfDprOtherDtlByDcode(Integer dcode);
 	
 	List<DprOtherDtl> findByDprDetailsOrderByStatusDesc(DprDetails dpr);
+	
+	@Query("select dp from DprOtherDtl dp WHERE dp.dprDetails.ppr.pprId = :pprId order by dp.status desc")
+	List<DprOtherDtl> getListOfDprOtherDtlByPprIdOrderByStatusDesc(Integer pprId);
 
 	@Query("select dp from DprOtherDtl dp WHERE dp.dprDetails.ppr.district.state.stCode = :stCode order by dp.status desc")
 	List<DprOtherDtl> findDprOtherDtlDataBystCode(Integer stCode);

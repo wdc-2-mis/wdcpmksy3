@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.DPR.entity.DprNrmDtl;
 import gov.dolr.wdcpmksy3.DPR.entity.DprOtherDtl;
 import gov.dolr.wdcpmksy3.DPR.repository.DprOtherDtlRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherActivityRepository;
@@ -28,6 +29,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProposedProject;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
+import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -60,6 +62,7 @@ public class DprPhyOtherHeadActController {
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 	    
 		String userid=(String)session.getAttribute("userid");
+		List<DprOtherDtl> dprOtherDtlList = new ArrayList<>();
 		if(userid==null){
             return "redirect:/login";
         }
@@ -69,8 +72,11 @@ public class DprPhyOtherHeadActController {
 	        if(!pprList.isEmpty()){
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
+	        		dprOtherDtlList = dprOtherDtlRepo.getListOfDprOtherDtlByPprIdOrderByStatusDesc(project);
 	        		model.addAttribute("pprId", project);
 	        		model.addAttribute("headList", mOtherHeadsRepo.findAllByOrderBySeqNoAsc());
+	        	}else {
+	        		dprOtherDtlList = dprOtherDtlRepo.getListOfDprOtherDtlByDcode(dcode);
 	        	}
 	        }
 	    }
@@ -78,11 +84,12 @@ public class DprPhyOtherHeadActController {
 			model.addAttribute("selectedHead", head);
 			model.addAttribute("activityList", mOtherActivityRepo.findByOtherHeads_OtherHeadsIdOrderBySeqNoAsc(head));
 		}
-			
+		if(dcode == null && project == null)
+			dprOtherDtlList = dprOtherDtlRepo.findDprOtherDtlDataBystCode(stcode);
+		model.addAttribute("dprOtherTargetList", dprOtherDtlList);
 		model.addAttribute("districtList", pprTransactionRepo.findDistrictsByStCodeAndActionA(stcode));
 		model.addAttribute("state", statename);
-		model.addAttribute("dprOtherTargetList", dprOtherDtlRepo.findDprOtherDtlDataBystCode(stcode));
-		
+		model.addAttribute("statusCheck", dprOtherDtlList != null && dprOtherDtlList.stream().anyMatch(dtl -> dtl.getStatus() != null && dtl.getStatus() == 'D'));
 		return "dpr/dprPhyOtherHeadActivities";
 	}
 	
@@ -127,9 +134,9 @@ public class DprPhyOtherHeadActController {
 	    }
 	    try {
 	    	dprOtherDtlService.saveOtherProjectPlan(pprId, activityId, target, userid, request.getRemoteAddr(), action);
-	        redirectAttributes.addFlashAttribute("success", "Other project plan saved successfully.");
+	        redirectAttributes.addFlashAttribute("success", "Other Activity Target successfully.");
 	    } catch (RuntimeException e) {
-	        redirectAttributes.addFlashAttribute("error", "Unable to save the other project plan.");
+	        redirectAttributes.addFlashAttribute("error", "Unable to save the Other Activity Target.");
 	    }
 
 	    return "redirect:/dprPhyOtherHeadActivities";
@@ -137,9 +144,8 @@ public class DprPhyOtherHeadActController {
 	
 	@GetMapping("/getOtherDtlEditById")
 	@ResponseBody
-	public Map<String,Object> getOtherDtlEditById(
-	        @RequestParam Integer id) {
-	    DprOtherDtl data = dprOtherDtlRepo.getById(id);
+	public Map<String,Object> getOtherDtlEditById(@RequestParam Integer id) {
+		DprOtherDtl data = dprOtherDtlRepo.getById(id);
 	    Map<String,Object> map = new HashMap<>();
 	    map.put("id", data.getOtherId());
 	    map.put("district", data.getDprDetails().getPpr().getDistrict().getDistName());
@@ -151,14 +157,40 @@ public class DprPhyOtherHeadActController {
 	    return map;
 	}
 	
+	@GetMapping("/deleteDPROtherTarget")
+    public String deleteDPROtherTarget(HttpSession session, Model model, @RequestParam("id") Integer id, RedirectAttributes redirectAttributes) {
+		String userId =(String) session.getAttribute("userid");
+        if (userId == null) 
+			return "redirect:/login";
+		try {
+	        dprOtherDtlService.deleteDPROtherTarget(id);
+	        redirectAttributes.addFlashAttribute("success","Record deleted successfully.");
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("error","Unable to delete record.");
+	        e.printStackTrace();
+	    }
+		return "redirect:/dprPhyOtherHeadActivities";
+    }
+	
 	@PostMapping("/updateDPROtherTargetRecord")
 	public String updateDPROtherTargetRecord(@RequestParam Integer otherId, @RequestParam BigDecimal target, 
-			HttpSession session, RedirectAttributes redirectAttributes) {
+			HttpServletRequest request, HttpSession session, RedirectAttributes redirectAttributes) {
 		String userId = (String) session.getAttribute("userid");
-//	    proposedProjectService.updateProposedProject(dto, userId);
-	    redirectAttributes.addFlashAttribute("success",
-	            "Record updated successfully.");
-	    return "redirect:/pprProposedProjectDetails";
+		try {
+			if (userId == null) 
+				return "redirect:/login";
+			boolean save = false;
+			save = dprOtherDtlService.updateDPROtherTargetRecord(otherId, target, userId, CommonFunctions.getClientIpAddr(request));
+			if (save)
+				redirectAttributes.addFlashAttribute("success", "DPR Other Activity Target Update successfully.");
+			else
+				redirectAttributes.addFlashAttribute("error", "Unable to Update DPR Other Activity Target.");
+		} 
+	catch (Exception e) {
+		e.printStackTrace();
+		redirectAttributes.addFlashAttribute("error", "Unable to Update DPR Other Activity Target.");
+	}
+	    return "redirect:/dprPhyOtherHeadActivities";
 	}
 	
 	@GetMapping("/completeDprOtherTargetData")

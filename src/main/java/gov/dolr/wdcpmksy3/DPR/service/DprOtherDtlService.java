@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gov.dolr.wdcpmksy3.DPR.entity.DprDetails;
+import gov.dolr.wdcpmksy3.DPR.entity.DprNrmDtl;
 import gov.dolr.wdcpmksy3.DPR.entity.DprOtherDtl;
 import gov.dolr.wdcpmksy3.DPR.entity.DprOtherProjectPlan;
 import gov.dolr.wdcpmksy3.DPR.entity.MDprHead;
@@ -53,7 +54,6 @@ public class DprOtherDtlService {
     	LocalDateTime now = LocalDateTime.now();
         MPpr ppr = mPprRepo.findById(pprId).orElse(null);
         DprDetails dpr = dprDetailsRepo.findByPprPprId(pprId).orElse(null);
-        
         if(dpr==null) {
         	dpr.setPpr(ppr);
         	dpr.setStatus('D');
@@ -63,11 +63,8 @@ public class DprOtherDtlService {
         	dpr.setCreatedon(now);
         	dpr.setRequestIp(requestIp);
         	dpr = dprDetailsRepo.save(dpr);
-        	
         }
-        
         MOtherActivity activity = mOtherActivityRepo.findById(activityId).orElseThrow(() -> new RuntimeException("Activity not found"));
-        
         DprOtherDtl detail = new DprOtherDtl();
         detail.setDprDetails(dpr);
         detail.setOtherActivity(activity);
@@ -81,8 +78,31 @@ public class DprOtherDtlService {
     }
 
 	public void completeDprOtherTargetData(Integer id) {
-		// TODO Auto-generated method stub
-		
+		DprOtherDtl dtl = detailRepository.findById(id).orElseThrow(() -> new RuntimeException("Record not found"));
+		dtl.setStatus('C');
+		detailRepository.save(dtl);
+	}
+
+	public boolean updateDPROtherTargetRecord(Integer otherId, BigDecimal target, String userId, String clientIpAddr) {
+		boolean state=false;
+		try {
+			DprOtherDtl dtl = detailRepository.findById(otherId).orElseThrow(() -> new RuntimeException("Record not found"));
+			dtl.setQtyPlanned(target);
+			dtl.setUpdatedby(userId);
+			dtl.setUpdatedon(LocalDateTime.now());
+			detailRepository.save(dtl);
+			state=true;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			state=false;
+		}
+		return state;	
+	}
+
+	public void deleteDPROtherTarget(Integer id) {
+		DprOtherDtl dtl = detailRepository.findById(id).orElseThrow(() -> new RuntimeException("Record not found"));
+		detailRepository.delete(dtl);
 	}
 
 }
