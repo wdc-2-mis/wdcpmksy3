@@ -223,33 +223,77 @@
 				});
 		
 		document.getElementById("district").addEventListener("change", function () {
+    let districtId = this.value;
+    let project = document.getElementById("project");
+    let head = document.getElementById("head");
+    let activity = document.getElementById("activity");
+    const unitSpan = document.getElementById("unitDesc");
+    const targetInput = document.getElementById("target");
+    const saveBtn = document.getElementById("saveBtn");
+    const activityAlert = document.getElementById("activityAlert");
 
-		    let districtId = this.value;
-		    let project = document.getElementById("project");
-			
-		    // Clear existing options
-		    project.innerHTML = '<option value="">--Select Project--</option>';
-		    if (districtId === "") {
-		        return;
-		    }
-		    fetch('/getProjectsByDistrictDPRNRM?dcode=' + districtId)
-		        .then(response => response.json())
-		        .then(data => {
-		            data.forEach(function(item) {
-		                let option = document.createElement("option");
-		                option.value = item.id;          // PPR ID
-		                option.textContent = item.name;  // Project Name
-		                project.appendChild(option);
-		            });
+    // Reset dependent fields
+    project.innerHTML = '<option value="">--Select Project--</option>';
+    head.value = "";
+    activity.innerHTML = '<option value="">--Select Activity--</option>';
+    unitSpan.textContent = "";
+    targetInput.value = "";
+    activityAlert.textContent = "";
+    saveBtn.disabled = false;
 
-		        })
-		        .catch(error => {
-		            console.error("Error:", error);
-		        });
-				
-			
+    if (districtId === "") {
+        return;
+    }
 
-		});
+    fetch('/getProjectsByDistrictDPREPA?dcode=' + districtId)
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(function(item) {
+                let option = document.createElement("option");
+                option.value = item.id;         
+                option.textContent = item.name;  
+                project.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+});
+		
+		
+	document.getElementById("project").addEventListener("change", function () {
+    let projectId = this.value;
+    let head = document.getElementById("head");
+    let activity = document.getElementById("activity");
+    const unitSpan = document.getElementById("unitDesc");
+    const targetInput = document.getElementById("target");
+    const saveBtn = document.getElementById("saveBtn");
+    const activityAlert = document.getElementById("activityAlert");
+
+    // Reset head + activity
+    head.value = "";
+    activity.innerHTML = '<option value="">--Select Activity--</option>';
+    unitSpan.textContent = "";
+    targetInput.value = "";
+    activityAlert.textContent = "";
+    saveBtn.disabled = false;
+
+    if (projectId === "") {
+        return;
+    }
+
+   
+    fetch('/getDprELPByProject?pprId=' + projectId)
+        .then(response => response.json())
+        .then(data => {
+            // TODO: render table rows dynamically with data
+            console.log("Project-wise records:", data);
+        })
+        .catch(error => {
+            console.error("Error fetching project records:", error);
+        });
+});
+		
 		
 		document.getElementById("head").addEventListener("change", function () {
 
@@ -281,31 +325,54 @@
 		});
 		
 		document.getElementById("activity").addEventListener("change", function () {
+    let actId = this.value;
+    let headId = document.getElementById("head").value;
+    const unitSpan = document.getElementById("unitDesc");
+    const targetInput = document.getElementById("target");
+    const saveBtn = document.getElementById("saveBtn"); // your Save button id
+    const activityAlert = document.getElementById("activityAlert"); // div below dropdown
+    let projectId = document.getElementById("project").value;
 
-			let actId = this.value;
-			let headId = document.getElementById("head").value;
-			const unitSpan = document.getElementById("unitDesc");
-			document.getElementById("target").value="";
-			if (actId === "" || headId === "") {
+    targetInput.value = "";
+    activityAlert.textContent = "";
+    saveBtn.disabled = false;
+
+    if (actId === "" || headId === "") {
         unitSpan.textContent = "";
         return;
     }
-			fetch('/getUnitDescByelpActivity?head=' + encodeURIComponent(headId) + '&actId=' + encodeURIComponent(actId))
-			       .then(response => {
-			           if (!response.ok) {
-			               throw new Error("Unit description not found");
-			           }
-			           return response.text();
-			       })
-			       .then(unitDesc => {
-			           unitSpan.textContent = unitDesc;
-			       })
-			       .catch(error => {
-			           console.error("Error fetching unit description:", error);
-			           unitSpan.textContent = "";
-			       });
+    if (!projectId) {
+        activityAlert.textContent = "Please select project first.";
+        saveBtn.disabled = true;
+        return;
+    }
 
-		});
+    fetch('/getUnitDescByelpActivity?head=' + encodeURIComponent(headId) 
+          + '&actId=' + encodeURIComponent(actId) 
+          + '&projectId=' + encodeURIComponent(projectId))
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Unit description not found");
+            }
+            return response.json();
+        })
+        .then(data => {
+            unitSpan.textContent = data.unitDesc;
+
+            if (data.status === 'D') {
+                activityAlert.textContent = "Data already in Draft mode";
+                saveBtn.disabled = true;
+            } else if (data.status === 'C') {
+                activityAlert.textContent = "Data already Completed";
+                saveBtn.disabled = true;
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching unit description:", error);
+            unitSpan.textContent = "";
+        });
+});
+		
 		
 		const targetInput = document.getElementById("target");
 
@@ -340,10 +407,86 @@
 		        this.value = value;
 		    });
 		
+		document.getElementById("selectAll").addEventListener("change", function() {
+    const checkboxes = document.querySelectorAll(".recordCheckbox");
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+document.querySelectorAll(".editBtn").forEach(btn => {
+    btn.addEventListener("click", function() {
+        document.getElementById("nrmid").value = this.dataset.id;
+        document.getElementById("district1").value = this.dataset.district;
+        document.getElementById("project1").value = this.dataset.project;
+        document.getElementById("head1").value = this.dataset.head;
+        document.getElementById("activity1").value = this.dataset.activity;
+        document.getElementById("unit1").textContent = this.dataset.unit;
+        document.getElementById("target1").value = this.dataset.target;
+    });
+});	
+
+
+const targetInput1 = document.getElementById("target1");
+
+		targetInput1.addEventListener("input", function () {
+
+			const unit1 = document.getElementById("unit1")
+				.textContent.trim().toLowerCase();
+
+			let value = this.value;
+
+			if (unit1 === "nos") {
+				// Whole numbers only
+				value = value.replace(/[^0-9]/g, "");
+			} else {
+				// Decimal numbers up to 5 decimal places
+				value = value.replace(/[^0-9.]/g, "");
+
+				const parts = value.split(".");
+
+				if (parts.length > 2) {
+					value = parts[0] + "." + parts.slice(1).join("");
+				}
+
+				const decimalPart = value.split(".");
+
+				if (decimalPart.length === 2) {
+					value = decimalPart[0] + "." +
+						decimalPart[1].substring(0, 2);
+				}
+			}
+
+			this.value = value;
+		});
 		
+
+document.getElementById("editForm").addEventListener("submit", function(e) {
+    const targetField = document.getElementById("target1");
+    if (!targetField.value.trim()) {
+        e.preventDefault();
+        document.getElementById("target1Error").textContent = "Please Enter Target";
+    } else {
+        document.getElementById("target1Error").textContent = "";
+    }
+});
+
+
+
 	});
 	
 	
+function bulkCompleteAlert() {
+    const selected = document.querySelectorAll(".recordCheckbox:checked");
+    if (selected.length === 0) {
+        latestAlert("Please select at least one record to complete.");
+        return;
+    }
+
+    completeAlert("Are you sure you want to complete selected records?", function() {
+        document.getElementById("bulkCompleteForm").submit();
+    });
+}
+
+
 
 </script>
 
@@ -426,6 +569,8 @@
 							    <option value="">--Select Activity--</option>
 							</select>
 							<div class="invalid-feedback">Please select Activity</div>
+							<div id="activityAlert" class="text-danger mt-2"></div>
+
 						</div>
 						
 						<div class="col-md-6">
@@ -446,7 +591,7 @@
 				</div>
 				
 						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning" >
+							<button type="submit" name="action"  id="saveBtn" value="D" class="btn btn-warning" >
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>
@@ -459,11 +604,169 @@
         </div>
 		
 		
+		<div class="mt-4" th:if="${dprList != null and !#lists.isEmpty(dprList)}">
+   <h5 class="fw-bold text-primary text-center">Saved EPA Livelihood Production Target Records</h5>
+    <form th:action="@{/completeSelectedDprELPTargets}" method="post" id="bulkCompleteForm">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="table-primary">
+                    <input type="checkbox" id="selectAll" />
+                </th>
+                <th class="table-primary">S.No</th>
+                <th class="table-primary">District</th>
+                <th class="table-primary">Project</th>
+                <th class="table-primary">Head</th>
+                <th class="table-primary">Activity</th>
+                <th class="table-primary">Unit</th>
+                <th class="table-primary">Target</th>
+                <th class="table-primary" style="width:200px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="row, stat : ${dprList}">
+                <td>
+                    <input type="checkbox" name="selectedIds" th:value="${row[4]}" class="recordCheckbox" />
+                </td>
+                <td th:text="${stat.index + 1}"></td>
+                <td th:text="${row[3]}"></td>
+                <td th:text="${row[2]}"></td>
+                <td>
+                    <span th:switch="${row[6]}">
+                        <span th:case="'L'">Livelihood</span>
+                        <span th:case="'P'">Production</span>
+                        <span th:case="'E'">EPA</span>
+                    </span>
+                </td>
+                <td th:text="${row[7]}"></td>
+                <td th:text="${row[10]}"></td>
+                <td th:text="${row[8]}"></td>
+                <td>
+                    <div th:switch="${row[9]}">
+                        <div th:case="'D'">
+                            <button type="button" class="btn btn-sm btn-primary editBtn"
+                                    th:attr="data-id=${row[4]},data-district=${row[3]},data-project=${row[2]},
+                                             data-head=${row[6]},data-activity=${row[7]},data-unit=${row[10]},
+                                             data-target=${row[8]}"
+                                    data-bs-toggle="modal" data-bs-target="#editModal">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            &nbsp;&nbsp;
+                            
+                            <a href="javascript:void(0)"
+   class="btn btn-danger btn-sm"
+   th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'' 
+       + @{/deleteDprELPTarget(id=${row[4]})}
+       + '\'; }); return false;'">
+
+    <i class="fas fa-trash"></i>
+</a>
+           &nbsp;&nbsp;
+        
+        
+         <a href="javascript:void(0)"
+   class="btn btn-success btn-sm"
+   th:onclick="'completeAlert(\'Are you sure you want to complete this record?\', function() { window.location.href = \'' 
+       + @{/completeDprELPTarget(id=${row[4]})}
+       + '\'; }); return false;'">
+
+    <i class="fas fa-check"></i>
+</a>
+                        </div>
+                        <div th:case="'C'">
+                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Completed</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+  
+<div class="text-center mt-3">
+    <button type="button" class="btn btn-warning"
+            th:disabled="${allCompleted}"
+            onclick="bulkCompleteAlert()">
+        <i class="fas fa-check"></i> Complete
+    </button>
+</div>
+
+    
+</form>
+    
+        
+        
+        
+        
+</div>
+		
+		<div class="modal fade" id="editModal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5>Edit Details</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="editForm" th:action="@{/editDPRELPTarget}" method="post" novalidate>
+                    <input type="hidden" id="nrmid" name="nrmid">
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label"><b>District <span class="required">*</span></b></label>
+                            <input type="text" id="district1" name="district1" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><b>Project <span class="required">*</span></b></label>
+                            <input type="text" id="project1" name="project1" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><b>Name of Head <span class="required">*</span></b></label>
+                            <input type="text" id="head1" name="head1" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><b>Name of Activity <span class="required">*</span></b></label>
+                            <input type="text" id="activity1" name="activity1" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <b>Target (<span id="unit1" class="fw-bold text-primary"></span>)<span class="required">*</span></b>
+                            </label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <input type="text" id="target1" name="target1" class="form-control"
+                                   inputmode="decimal" maxlength="10" required autocomplete="off">
+                            <div class="invalid-feedback">Please Enter Target</div>
+                            <div id="target1Error" class="text-danger"></div>
+                        </div>
+                        
+                        
+						
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Update
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 		
 		
 		
 
     </div>
+    
+    
 	
 </div>
 

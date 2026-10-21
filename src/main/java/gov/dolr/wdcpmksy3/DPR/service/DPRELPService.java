@@ -88,4 +88,90 @@ public class DPRELPService {
         }
 	
 	}
+
+	public List<Object[]> getDprELPProjectPlanList(Integer stcode) {
+		
+		return dprEpaLivProdDtlRepo.getDprELPProjectPlanList(stcode);
+	}
+
+	public boolean updateDprTarget(Integer elpId, BigDecimal target, String userId, HttpServletRequest request) {
+        try {
+            DprEpaLivProdDtl entity = dprEpaLivProdDtlRepo.findById(elpId)
+                    .orElseThrow(() -> new RuntimeException("Record not found"));
+
+            entity.setQtyPlanned(target);
+            entity.setUpdatedBy(userId);
+            entity.setUpdatedOn(LocalDateTime.now());
+            entity.setRequestIp(request.getRemoteAddr());
+
+            dprEpaLivProdDtlRepo.save(entity);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+	public boolean deleteDprTarget(Integer elpId) {
+        try {
+            dprEpaLivProdDtlRepo.deleteById(elpId);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+
+    public boolean completeDprTarget(Integer elpId, String userId, HttpServletRequest request) {
+        try {
+            DprEpaLivProdDtl entity = dprEpaLivProdDtlRepo.findById(elpId)
+                    .orElseThrow(() -> new RuntimeException("Record not found"));
+
+            entity.setStatus('C'); 
+            entity.setUpdatedBy(userId);
+            entity.setUpdatedOn(LocalDateTime.now());
+            entity.setRequestIp(request.getRemoteAddr());
+
+            dprEpaLivProdDtlRepo.save(entity);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean completeMultipleDprTargets(List<Integer> ids, String userId, HttpServletRequest request) {
+        try {
+            List<DprEpaLivProdDtl> records = dprEpaLivProdDtlRepo.findAllById(ids);
+            for (DprEpaLivProdDtl entity : records) {
+                entity.setStatus('C');
+                entity.setUpdatedBy(userId);
+                entity.setUpdatedOn(LocalDateTime.now());
+                entity.setRequestIp(request.getRemoteAddr());
+            }
+            dprEpaLivProdDtlRepo.saveAll(records);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+	public String findStatusByProjectAndActivityAndHead(Integer projectId, Integer actId, Character headChar) {
+		// TODO Auto-generated method stub
+		return dprEpaLivProdDtlRepo.findStatusByProjectAndActivityAndHead(projectId, actId, headChar);
+	}
+
+	public List<Object[]> getDprELPProjectPlanListByDistrict(Integer dcode) {
+		// TODO Auto-generated method stub
+		return dprEpaLivProdDtlRepo.getDprELPProjectPlanListByDistrict(dcode);
+	}
+
+	public List<Object[]> getDprELPProjectPlanListByProject(Integer pprId) {
+		// TODO Auto-generated method stub
+		return dprEpaLivProdDtlRepo.getDprELPProjectPlanListByProject(pprId);
+	}
+
 }
