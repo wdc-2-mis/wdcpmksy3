@@ -76,6 +76,16 @@ public class UnspentBalanceController {
 	    return "ppr/unspentBalancePPR20 :: cropOutcomeTable";
 	}
 	
+	@GetMapping("/getUnspentBalancePPR20ProjectData")
+	public String getUnspentBalancePPR20ProjectData(
+	        @RequestParam("projid") Integer projid,
+	        Model model) {
+		List<PprWcdcUnspentBalance> records = unblance.findByPprPprIdOrderByStatusDesc(projid);
+	        model.addAttribute("records", records);
+
+	    return "ppr/unspentBalancePPR20 :: cropOutcomeTable";
+	}
+	
 	@GetMapping("/checkUnspentBalancePPR20")
 	@ResponseBody
 	public boolean checkUnspentBalancePPR20(

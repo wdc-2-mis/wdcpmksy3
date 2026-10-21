@@ -27,5 +27,7 @@ public interface PprDrinkingWaterRepository extends JpaRepository<PprDrinkingWat
 	List<PprDrinkingWater> findByPpr_District_State_StCodeOrderByStatusDescPpr_ProjectNameAsc(Integer stCode);
 	
 	List<PprDrinkingWater> findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc( Integer dcode);
+	
+	List<PprDrinkingWater> findByPprPprIdOrderByStatusDesc( Integer pprId);
 
 }

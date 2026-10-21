@@ -39,4 +39,6 @@ public interface PprPendingUcRepository extends JpaRepository<PprPendingUc, Inte
     List<PprPendingUc> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
     
     List<PprPendingUc> findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc(Integer dcode);
+    
+    List<PprPendingUc> findByPprPprIdOrderByStatusDesc( Integer pprId);
 }

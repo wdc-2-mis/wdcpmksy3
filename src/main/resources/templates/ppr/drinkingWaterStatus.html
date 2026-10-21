@@ -725,23 +725,48 @@
 
 		        }).catch(err=>console.log(err));
 				
-				watershed.innerHTML ='<option value="">--Select Micro Watershed--</option>';
+				watershed.innerHTML = '<option value="">--Select Micro Watershed--</option>';
+
+			fetch("/getMicroWatershedsByProject?pprId=" + projectId)
+				.then(response => response.json())
+				.then(data => {
+					data.forEach(function (item) {
+						let option = document.createElement("option");
+						option.value = item.id;
+						option.textContent = item.name;
+						watershed.appendChild(option);
+
+					});
+
+				})
+				.catch(error => {
+					console.error("Micro Watershed Loading Error :", error);
+				});
 				
-				fetch("/getMicroWatershedsByProject?pprId=" + projectId)
-				            .then(response => response.json())
-				            .then(data => {
-				                data.forEach(function(item){
-				                    let option = document.createElement("option");
-				                    option.value = item.id;
-				                    option.textContent = item.name;
-				                    watershed.appendChild(option);
-
-				                });
-
-				            })
-				            .catch(error => {
-				                console.error("Micro Watershed Loading Error :", error);
-				            });
+				document.getElementById("saveddprnrm").innerHTML = "";
+			fetch(
+				"/getDrinkingWaterStatusProjectData?projid=" +
+				encodeURIComponent(projectId)
+			)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error(
+							"nrm data fetch error: " +
+							response.status
+						);
+					}
+					return response.text();
+				})
+				.then(html => {
+					document.getElementById(
+						"saveddprnrm"
+					).innerHTML = html;
+				})
+				.catch(error =>
+					console.error(
+						"dpr nrm Loading Error:",
+						error
+				));
 				
 		});
 	});

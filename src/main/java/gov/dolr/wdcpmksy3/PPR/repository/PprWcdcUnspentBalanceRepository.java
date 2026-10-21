@@ -29,5 +29,7 @@ public interface PprWcdcUnspentBalanceRepository extends JpaRepository<PprWcdcUn
 	List<PprWcdcUnspentBalance> findByPprPprIdAndStatusIn(Integer pprId, List<Character> status);
 	
 	List<PprWcdcUnspentBalance> findByPpr_District_DcodeOrderByStatusDescPpr_ProjectNameAsc( Integer dcode);
+	
+	List<PprWcdcUnspentBalance> findByPprPprIdOrderByStatusDesc( Integer pprId);
 
 }

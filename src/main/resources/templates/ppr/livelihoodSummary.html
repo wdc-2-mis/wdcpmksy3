@@ -834,20 +834,52 @@
 				watershed.innerHTML ='<option value="">--Select Micro Watershed--</option>';
 				
 				fetch("/getMicroWatershedsByProject?pprId=" + projectId)
-				            .then(response => response.json())
-				            .then(data => {
-				                data.forEach(function(item){
-				                    let option = document.createElement("option");
-				                    option.value = item.id;
-				                    option.textContent = item.name;
-				                    watershed.appendChild(option);
+				.then(response => response.json())
+				.then(data => {
+					data.forEach(function (item) {
+						let option = document.createElement("option");
+						option.value = item.id;
+						option.textContent = item.name;
+						watershed.appendChild(option);
 
-				                });
+					});
 
-				            })
-				            .catch(error => {
-				                console.error("Micro Watershed Loading Error :", error);
-				            });
+				})
+				.catch(error => {
+					console.error("Micro Watershed Loading Error :", error);
+				});
+				
+				document.getElementById("saveddprnrm").innerHTML = "";
+			fetch(
+				"/getLivelihoodSummaryProjectData?projid=" +
+				encodeURIComponent(projectId)
+			)
+
+				.then(response => {
+
+					if (!response.ok) {
+						throw new Error(
+							"nrm data fetch error: " +
+							response.status
+						);
+					}
+
+					return response.text();
+				})
+
+				.then(html => {
+
+					document.getElementById(
+						"saveddprnrm"
+					).innerHTML = html;
+
+				})
+
+				.catch(error =>
+					console.error(
+						"dpr nrm Loading Error:",
+						error
+				));
 				
 		});
 		
@@ -895,40 +927,7 @@
 		
 	});
 	
-	function submitSkipForm() {
-
-	    const district = document.getElementById("district");
-	    const project = document.getElementById("project");
-
-	    // District mandatory
-	    if (district.value.trim() === "") {
-	        district.classList.add("is-invalid");
-	        district.focus();
-
-	        alert("Please select District.");
-	        return false;
-	    }
-
-	    // Project mandatory
-	    if (project.value.trim() === "") {
-	        project.classList.add("is-invalid");
-	        project.focus();
-
-	        alert("Please select Project.");
-	        return false;
-	    }
-
-	    // Remove invalid state
-	    district.classList.remove("is-invalid");
-	    project.classList.remove("is-invalid");
-
-	    // Put values into separate form
-	    document.getElementById("skipDistrict").value = district.value;
-	    document.getElementById("skipProject").value = project.value;
-
-	    // Submit separate form
-	    document.getElementById("skipForm").submit();
-	}
+	
 
 </script>
 
@@ -1217,11 +1216,11 @@
 							
 							</td>
 							
-							<td th:text="${rec.ppr.district.distName}"></td>
-							<td th:text="${rec.ppr.projectName}"></td>
-								<td th:text="${rec.village.gramPanchayat.block.blockName}"></td>
-								<td th:text="${rec.village.villageName}"></td>
-								<td th:text="${rec.microWatershed.mwName}"></td>
+								<td th:text="${rec.ppr.district.distName}"></td>
+								<td th:text="${rec.ppr.projectName}"></td>
+								<td th:text="${rec.village != null ? rec.village.gramPanchayat.block.blockName : ''}"></td>
+								<td th:text="${rec.village != null ? rec.village.villageName : ''}"></td>
+								<td th:text="${rec.microWatershed != null ? rec.microWatershed.mwName : ''}"></td>
 								<td>
 								    <ul>
 								        <li style="text-align: left;" th:each="livact : ${rec.existingLivelihoodActivities}"

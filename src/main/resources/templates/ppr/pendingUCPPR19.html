@@ -591,6 +591,32 @@
 					}
 				})
 				.catch(error => console.error(error));
+				
+			document.getElementById("saveddprnrm").innerHTML = "";
+			fetch(
+				"/getPendingUCPPR19ProjectData?projid=" +
+				encodeURIComponent(projectId)
+			)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error(
+							"nrm data fetch error: " +
+							response.status
+						);
+					}
+					return response.text();
+				})
+				.then(html => {
+					document.getElementById(
+						"saveddprnrm"
+					).innerHTML = html;
+				})
+				.catch(error =>
+					console.error(
+						"dpr nrm Loading Error:",
+						error
+				));	
+				
 
 		});
 		

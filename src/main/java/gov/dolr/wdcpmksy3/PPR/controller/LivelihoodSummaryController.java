@@ -94,6 +94,16 @@ public class LivelihoodSummaryController {
 	    return "ppr/livelihoodSummary :: cropOutcomeTable";
 	}
 	
+	@GetMapping("/getLivelihoodSummaryProjectData")
+	public String getLivelihoodSummaryProjectData(
+	        @RequestParam("projid") Integer projid,
+	        Model model) {
+		 	List<PprLivelihood> records = livrepo.findByPprPprIdOrderByStatusDesc(projid);
+	        model.addAttribute("records", records);
+
+	    return "ppr/livelihoodSummary :: cropOutcomeTable";
+	}
+	
 	@GetMapping("/getBlocksByDistrictPPR13")
 	@ResponseBody
 	public List<Map<String, Object>> getProjectsByDistrict(@RequestParam Integer dcode) {

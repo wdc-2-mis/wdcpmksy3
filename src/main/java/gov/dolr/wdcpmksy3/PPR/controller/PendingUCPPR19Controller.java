@@ -85,6 +85,18 @@ public class PendingUCPPR19Controller {
 	    return "ppr/pendingUCPPR19 :: cropOutcomeTable";
 	}
 	
+	@GetMapping("/getPendingUCPPR19ProjectData")
+	public String getPendingUCPPR19ProjectData(
+	        @RequestParam("projid") Integer projid,
+	        Model model) {
+		
+			List<PprPendingUc> records = ucrepo.findByPprPprIdOrderByStatusDesc(projid);
+	        model.addAttribute("records", records);
+        
+
+	    return "ppr/pendingUCPPR19 :: cropOutcomeTable";
+	}
+	
 	@PostMapping("/savePendingUCPPR19")
 	 public String savePendingUCPPR19(HttpSession session, Model model, HttpServletRequest request,
 	    		@RequestParam Integer district,

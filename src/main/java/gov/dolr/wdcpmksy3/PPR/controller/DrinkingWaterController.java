@@ -85,6 +85,16 @@ public class DrinkingWaterController {
 	    return "ppr/drinkingWaterStatus :: cropOutcomeTable";
 	}
 	
+	@GetMapping("/getDrinkingWaterStatusProjectData")
+	public String getDrinkingWaterStatusProjectData(
+	        @RequestParam("projid") Integer projid,
+	        Model model) {
+		 	List<PprDrinkingWater> records = dwrepo.findByPprPprIdOrderByStatusDesc(projid);
+	        model.addAttribute("records", records);
+
+	    return "ppr/drinkingWaterStatus :: cropOutcomeTable";
+	}
+	
 	@PostMapping("/saveDrinkingWaterStatus")
 	 public String saveDrinkingWaterStatus(HttpSession session, Model model, HttpServletRequest request,
 	    		@RequestParam Integer district,
