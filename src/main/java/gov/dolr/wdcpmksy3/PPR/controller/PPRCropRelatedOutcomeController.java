@@ -159,11 +159,36 @@ public class PPRCropRelatedOutcomeController {
 	
 	@GetMapping("/getCropOutcomesByDistrict")
 	public String getCropOutcomesByDistrict(
-	        @RequestParam("dcode") Integer dcode,
+	        @RequestParam(required = false) Integer dcode,
+	        @RequestParam(required = false) Integer pprId,
+	        HttpSession session,
 	        Model model) {
 
-	    List<PprCropOutcome> cropOutcomes =
-	            cropOutcomeRepo.findByDistrictOrderByStatus(dcode);
+	    Object userid = session.getAttribute("userid");
+
+	    if (userid == null) {
+	        throw new org.springframework.web.server.ResponseStatusException(
+	                org.springframework.http.HttpStatus.UNAUTHORIZED);
+	    }
+
+	    Integer stcode = Integer.parseInt(
+	            session.getAttribute("stcode").toString());
+
+	    List<PprCropOutcome> cropOutcomes;
+
+	    if (pprId != null) {
+	        // Project-wise records
+	    	cropOutcomes = cropOutcomeRepo.findByProjectOrderByStatus(
+	    	        pprId, stcode, dcode);
+
+	    } else if (dcode != null) {
+	        // District-wise records
+	        cropOutcomes = cropOutcomeRepo.findByDistrictOrderByStatus(dcode);
+
+	    } else {
+	        // All records for the logged-in user's state
+	        cropOutcomes = cropOutcomeRepo.findByStateOrderByStatus(stcode);
+	    }
 
 	    model.addAttribute("cropOutcomes", cropOutcomes);
 

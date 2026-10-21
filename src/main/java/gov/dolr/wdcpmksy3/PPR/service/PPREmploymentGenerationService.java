@@ -324,4 +324,10 @@ public class PPREmploymentGenerationService {
 	public List<Map<String, Object>> getEmploymentGenerationByState(Integer stcode) {
 		return repository.getEmploymentGenerationByState(stcode);
 	}
+
+
+	public List<Map<String, Object>> getEmploymentGenerationByProject(Integer pprId, Integer stcode, Integer dcode) {
+		// TODO Auto-generated method stub
+		return repository.getEmploymentGenerationByProject(pprId, stcode, dcode);
+	}
 }

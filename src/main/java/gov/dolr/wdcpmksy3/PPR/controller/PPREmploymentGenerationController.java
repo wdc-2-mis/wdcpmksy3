@@ -162,10 +162,11 @@ public class PPREmploymentGenerationController {
         return result;
     }
 
-    @GetMapping("/getEmploymentGenerationByDistrict")
+     @GetMapping("/getEmploymentGenerationByDistrict")
     @ResponseBody
     public List<Map<String, Object>> getEmploymentGenerationByDistrict(
             @RequestParam(required = false) Integer dcode,
+            @RequestParam(required = false) Integer pprId,
             HttpSession session) {
 
         Object userid = session.getAttribute("userid");
@@ -177,13 +178,21 @@ public class PPREmploymentGenerationController {
         Integer stcode =
                 Integer.parseInt(session.getAttribute("stcode").toString());
 
+        // Project selected: show only that project's records.
+        if (pprId != null) {
+            return employmentService.getEmploymentGenerationByProject(
+                    pprId, stcode, dcode);
+        }
+
+        // District selected: show only that district's records.
         if (dcode != null) {
             return employmentService.getEmploymentGenerationByDistrict(dcode);
         }
 
+        // No district or project selected: show state-wise records.
         return employmentService.getEmploymentGenerationByState(stcode);
     }
-
+   
     @PostMapping("/savePPREmployment")
     public String saveEmployment(@RequestParam Integer dcode, @RequestParam Integer project, @RequestParam Integer watershed,
             @RequestParam Integer village, @ModelAttribute PPREmploymentGenerationFormDTO form, HttpSession session,

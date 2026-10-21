@@ -47,4 +47,28 @@ public interface CropOutcomeRepository extends JpaRepository<PprCropOutcome, Int
 		        @Param("pprId") Integer pprId,
 		        @Param("seasonId") Integer seasonId);
 
+	
+	
+	@Query("""
+		    SELECT c
+		    FROM PprCropOutcome c
+		    WHERE c.ppr.pprId = :pprId
+		      AND c.ppr.district.state.stCode = :stcode
+		      AND (:dcode IS NULL OR c.ppr.district.dcode = :dcode)
+		    ORDER BY
+		        CASE
+		            WHEN c.status = 'D' THEN 0
+		            WHEN c.status = 'C' THEN 1
+		            WHEN c.status = 'S' THEN 2
+		            ELSE 3
+		        END,
+		        c.pprCropOutcomeId
+		    """)
+		List<PprCropOutcome> findByProjectOrderByStatus(
+		        @Param("pprId") Integer pprId,
+		        @Param("stcode") Integer stcode,
+		        @Param("dcode") Integer dcode);
+
+	
+
 }

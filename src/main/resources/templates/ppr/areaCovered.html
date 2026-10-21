@@ -701,14 +701,17 @@ function loadProjects(districtId, projectToSelect = null) {
     // ------------------------------------------
 
     if (!records || records.length === 0) {
+    recordsGrid.innerHTML = `
+        <h4 class="text-center">
+            List of Area covered under the watershed programme
+        </h4>
 
-        recordsGrid.innerHTML =
-            '<div class="alert alert-warning text-center">' +
-            'Data not found!' +
-            '</div>';
-
-        return;
-    }
+        <div class="alert alert-warning text-center mt-3">
+            Data not found!
+        </div>
+    `;
+    return;
+}
 
 
     console.log("Initial Area Covered records:", records);
@@ -1091,8 +1094,39 @@ function loadProjects(districtId, projectToSelect = null) {
 }
 
 
-    const district =
-    document.getElementById("district");
+function filterAreaCoveredRecords() {
+
+    const district = document.getElementById("district");
+    const project = document.getElementById("project");
+
+    const selectedDistrict = district.value;
+    const selectedProject = project.value;
+
+    let filteredRecords = initialAreaCoveredRecords;
+
+    // Filter district-wise
+    if (selectedDistrict) {
+
+        const selectedDistrictName =
+            district.options[district.selectedIndex].text.trim();
+
+        filteredRecords = filteredRecords.filter(record =>
+            (record.dist_name ?? "").trim() === selectedDistrictName
+        );
+    }
+
+    // Filter project-wise
+    if (selectedProject) {
+
+        filteredRecords = filteredRecords.filter(record =>
+            String(record.pprId) === String(selectedProject)
+        );
+    }
+
+    renderAreaCoveredRecords(filteredRecords);
+}
+
+    const district = document.getElementById("district");
 
 if (district) {
 
@@ -1100,6 +1134,7 @@ if (district) {
 
         const dcode = this.value;
 
+filterAreaCoveredRecords();
         console.log(
             "Selected District:",
             dcode
@@ -1142,6 +1177,7 @@ const project =
         project.addEventListener("change", function () {
 
             const pprId = this.value;
+            filterAreaCoveredRecords();
 
             console.log(
                 "Selected Project / PPR ID:",
@@ -1150,10 +1186,12 @@ const project =
 
             if (!pprId) {
 
-                clearProjectDependentFields();
+    clearProjectDependentFields();
 
-                return;
-            }
+    filterAreaCoveredRecords();
+
+    return;
+}
 
             loadProjectStats(pprId);
 

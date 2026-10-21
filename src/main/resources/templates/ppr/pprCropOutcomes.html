@@ -28,6 +28,34 @@ document.addEventListener("DOMContentLoaded", function () {
 let seasonAlreadyExists = false;
 let existingSeasonStatus = null;
     
+    function loadCropOutcomeRecords(districtId, projectId) {
+
+    const params = new URLSearchParams();
+
+    if (districtId) {
+        params.set("dcode", districtId);
+    }
+
+    if (projectId) {
+        params.set("pprId", projectId);
+    }
+
+    fetch("/getCropOutcomesByDistrict?" + params.toString())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Crop outcome API error: " + response.status);
+            }
+
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById("savedCropOutcomes").innerHTML = html;
+        })
+        .catch(error => {
+            console.error("Crop Outcome Loading Error:", error);
+        });
+}
+    
     const form = document.getElementById("cropRelatedOutcome"); 
 
     form.addEventListener("submit", function (event) {
@@ -62,6 +90,23 @@ document.querySelectorAll(
 
 
    let usedCrops = [];
+   
+   const pendingUCButton = document.getElementById("pendingUCButton");
+
+function updatePendingUCButton() {
+    const districtId = district.value;
+
+    if (districtId) {
+        const url = new URL(pendingUCButton.href);
+
+        url.searchParams.set("dcode", districtId);
+
+        pendingUCButton.href = url.toString();
+        pendingUCButton.style.display = "inline-block";
+    } else {
+        pendingUCButton.style.display = "none";
+    }
+}
 
     district.addEventListener("change", function () {
 
@@ -77,8 +122,13 @@ document.querySelectorAll(
     document.getElementById("savedCropOutcomes").innerHTML = "";
 
     if (districtId === "") {
-        return;
-    }
+    loadCropOutcomeRecords("", "");
+    updatePendingUCButton();
+    return;
+}
+
+loadCropOutcomeRecords(districtId, "");
+updatePendingUCButton();
 
        fetch("/getProjectsByDistrictLandPattern?dcode=" + districtId)
 
@@ -334,6 +384,8 @@ function checkExistingCropSeason() {
     console.log("Project selected:", projectId);
 
     const existingRow = cropTable.querySelector("tr");
+    loadCropOutcomeRecords(district.value, projectId);
+    checkExistingCropSeason();
 
     if (!existingRow) {
         console.error("Crop row not found");
@@ -729,20 +781,36 @@ document.addEventListener("click", function (e) {
         <i class="fas fa-save"></i> Save As Draft
     </button>
 </div>
+
+<div class="text-end mt-2">
+<a th:href="@{/pendingUCPPR19}"
+       id="pendingUCButton"
+       class="btn btn-primary ms-2"
+       style="display: none;">
+        <i class="fas fa-file-alt"></i> Pending UC's
+    </a>
+</div>
 </div>
 				
 			</form>
 			
-			<div id="savedCropOutcomes"
-     th:fragment="cropOutcomeTable">
+			
+<div id="savedCropOutcomes" th:fragment="cropOutcomeTable">
 
-    <div th:if="${cropOutcomes != null and !cropOutcomes.isEmpty()}">
+    <!-- Heading: always visible -->
+    <h5 class="fw-bold mb-3 text-center">
+        List of Crop Related Outcomes
+    </h5>
 
-        <h5 class="fw-bold mb-3"><center>List of Crop Related Outcomes</center></h5>
-
-    <div th:if="${#lists.isEmpty(cropOutcomes)}" class="alert alert-info">
-        No Records Found
+    <!-- Show message when no records exist -->
+    <div th:if="${cropOutcomes == null or #lists.isEmpty(cropOutcomes)}"
+         class="alert alert-info text-center">
+        Data not Found
     </div>
+
+    <!-- Show table only when records exist -->
+    <div th:if="${cropOutcomes != null and !#lists.isEmpty(cropOutcomes)}">
+
         <table class="table table-bordered table-striped">
 
             <thead class="table-light">
@@ -756,112 +824,90 @@ document.addEventListener("click", function (e) {
                     <th class="table-primary">Current Productivity</th>
                     <th class="table-primary">Expected Area</th>
                     <th class="table-primary">Expected Productivity</th>
-                    <th class="table-primary"  style="width:150px;">Action</th>
+                    <th class="table-primary" style="width: 150px;">Action</th>
                 </tr>
             </thead>
 
             <tbody>
+                <tr th:each="rec, iterStat : ${cropOutcomes}">
 
-                <tr th:each="rec,  iterStat : ${cropOutcomes}">
-              
-                 <td th:text="${iterStat.index + 1}"></td>
-                 
-                 <td th:text="${rec.ppr.district.distName}"></td>
-                <td th:text="${rec.ppr.projectName}"></td>
-                    
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${rec.ppr.district.distName}"></td>
+                    <td th:text="${rec.ppr.projectName}"></td>
+
                     <td th:text="${rec.season != null ? rec.season.seasonName : ''}"></td>
-              
                     <td th:text="${rec.cropType != null ? rec.cropType.cropName : ''}"></td>
 
-                    <td th:text="${rec.currentArea}">
-                    </td>
-
-                    <td th:text="${rec.currentProd}">
-                    </td>
-
-                    <td th:text="${rec.expectedArea}">
-                    </td>
-
-                    <td th:text="${rec.expectedProd}">
-                    </td>
-
+                    <td th:text="${rec.currentArea}"></td>
+                    <td th:text="${rec.currentProd}"></td>
+                    <td th:text="${rec.expectedArea}"></td>
+                    <td th:text="${rec.expectedProd}"></td>
 
                     <td>
+                        <!-- Draft records -->
+                        <div th:if="${#strings.equals(rec.status, 'D')}">
 
-                        <!-- Draft -->
-                        
-<div th:if="${#strings.equals(rec.status, 'D')}">
-                            <!-- <a th:href="@{/editCropOutcome/{id}(id=${rec.pprCropOutcomeId})}"
-                               class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i>
-                            </a> -->
-                            
                             <a href="#"
-   								class="btn btn-sm btn-primary edit-crop-btn"
-   							data-bs-toggle="modal"
-   							data-bs-target="#editModal"
+                               class="btn btn-sm btn-primary edit-crop-btn"
+                               data-bs-toggle="modal"
+                               data-bs-target="#editModal"
+                               th:data-id="${rec.pprCropOutcomeId}"
+                               th:data-district="${rec.ppr.district.dcode}"
+                               th:data-district-name="${rec.ppr.district.distName}"
+                               th:data-project="${rec.ppr.pprId}"
+                               th:data-project-name="${rec.ppr.projectName}"
+                               th:data-season="${rec.season != null ? rec.season.seasonId : ''}"
+                               th:data-crop="${rec.cropType != null ? rec.cropType.cropTypeId : ''}"
+                               th:data-current-area="${rec.currentArea}"
+                               th:data-current-prod="${rec.currentProd}"
+                               th:data-expected-area="${rec.expectedArea}"
+                               th:data-expected-prod="${rec.expectedProd}">
+                                <i class="fas fa-edit"></i>
+                            </a>
 
-   							th:data-id="${rec.pprCropOutcomeId}"
-   							th:data-district="${rec.ppr.district.dcode}"
-   							th:data-district-name="${rec.ppr.district.distName}"
-   							th:data-project="${rec.ppr.pprId}"
-   							th:data-project-name="${rec.ppr.projectName}"
-   							th:data-season="${rec.season.seasonId}"
-   							th:data-crop="${rec.cropType.cropTypeId}"
-   							th:data-current-area="${rec.currentArea}"
-   							th:data-current-prod="${rec.currentProd}"
-   							th:data-expected-area="${rec.expectedArea}"
-   							th:data-expected-prod="${rec.expectedProd}">
+                            &nbsp;
 
-    						<i class="fas fa-edit"></i>
-    						
-    							</a>
-    							
-    						
-    							
-                             &nbsp;
-                            <a href="javascript:void(0)" 
-   class="btn btn-sm btn-success"
-   th:onclick="'completeAlert(\'Are you sure you want to complete this record?\', function() { window.location.href = \'/completeCropOutcome?id=' + ${rec.pprCropOutcomeId} + '\'; }); return false;'">
-    <i class="fas fa-check"></i>
-</a>
-                            
-							&nbsp; 
-                            
-                            
-                            
-               <a href="javascript:void(0)" 
-   class="btn btn-danger btn-sm"
-   th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteCropOutcome?id=' + ${rec.pprCropOutcomeId} + '\'; }); return false;'">
-    <i class="fas fa-trash"></i>
-</a>
-               
-               
+                            <a href="javascript:void(0)"
+                               class="btn btn-sm btn-success"
+                               th:onclick="'completeAlert(\'Are you sure you want to complete this record?\', function() { window.location.href = \'/completeCropOutcome?id=' + ${rec.pprCropOutcomeId} + '\'; }); return false;'">
+                                <i class="fas fa-check"></i>
+                            </a>
+
+                            &nbsp;
+
+                            <a href="javascript:void(0)"
+                               class="btn btn-danger btn-sm"
+                               th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteCropOutcome?id=' + ${rec.pprCropOutcomeId} + '\'; }); return false;'">
+                                <i class="fas fa-trash"></i>
+                            </a>
 
                         </div>
 
+                        <!-- Completed records -->
                         <div th:if="${#strings.equals(rec.status, 'C')}">
                             <span class="badge bg-success">Data Completed</span>
                         </div>
-                        
-                        <div th:if="${#strings.equals(rec.status, 'S')}">
-                            <span class="badge bg-warning text-dark">
-									<i class="fas fa-forward"></i>
-									Skipped
-								</span>
-								&nbsp; 
-							<a href="javascript:void(0)" 
-   class="btn btn-danger btn-sm"
-   th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteCropOutcome?id=' + ${rec.pprCropOutcomeId} + '\'; }); return false;'">
-    <i class="fas fa-trash"></i>
-</a>	
-								
-                        </div>
 
+                        <!-- Skipped records -->
+                        <div th:if="${#strings.equals(rec.status, 'S')}">
+
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-forward"></i>
+                                Skipped
+                            </span>
+
+                            &nbsp;
+
+                            <a href="javascript:void(0)"
+                               class="btn btn-danger btn-sm"
+                               th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteCropOutcome?id=' + ${rec.pprCropOutcomeId} + '\'; }); return false;'">
+                                <i class="fas fa-trash"></i>
+                            </a>
+
+                        </div>
                     </td>
 
                 </tr>
-
             </tbody>
 
         </table>
@@ -869,6 +915,7 @@ document.addEventListener("click", function (e) {
     </div>
 
 </div>
+
 
 
 <div class="modal fade"

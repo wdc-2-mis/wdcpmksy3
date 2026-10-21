@@ -104,10 +104,12 @@ public class PPRWaterOutcomesController {
 
 	
 	
+
 	@GetMapping("/getWaterOutcomesByDistrict")
 	@ResponseBody
 	public List<Map<String, Object>> getWaterOutcomesByDistrict(
 	        @RequestParam(required = false) Integer dcode,
+	        @RequestParam(required = false) Integer pprId,
 	        HttpSession session) {
 
 	    Object userid = session.getAttribute("userid");
@@ -121,63 +123,37 @@ public class PPRWaterOutcomesController {
 
 	    List<PprWaterOutcome> outcomes;
 
-	    if (dcode != null) {
-	        // District selected
+	    if (pprId != null) {
+	        outcomes = outcomeService.findByProject(pprId);
+	    } else if (dcode != null) {
 	        outcomes = outcomeService.findByDistrict(dcode);
 	    } else {
-	        // No district selected -> all records of logged-in state
 	        outcomes = outcomeService.findByState(stcode);
 	    }
 
 	    return outcomes.stream().map(o -> {
-
 	        Map<String, Object> map = new HashMap<>();
 
 	        map.put("id", o.getPprWaterOutcomeId());
-
-	        map.put("district",
-	                o.getPpr().getDistrict().getDistName());
-
-	        map.put("project",
-	                o.getPpr().getProjectName());
-
-	        map.put("watershed",
-	                o.getMicroWatershed() != null
-	                        ? o.getMicroWatershed().getMwName()
-	                        : "");
-
-	        map.put("village",
-	                o.getVillage() != null
-	                        ? o.getVillage().getVillageName()
-	                        : "");
-
-	        map.put("sourceId",
-	                o.getWaterSource() != null
-	                        ? String.valueOf(
-	                                o.getWaterSource().getWaterSourceId())
-	                        : "");
-
-	        map.put("source",
-	                o.getWaterSource() != null
-	                        ? o.getWaterSource().getSourceName()
-	                        : "");
-
-	        map.put("preProject",
-	                o.getPreProjectLevel());
-
-	        map.put("postProject",
-	                o.getPostProjectLevel());
-
-	        map.put("remarks",
-	                o.getRemarks());
-
-	        map.put("status",
-	                o.getStatus());
+	        map.put("district", o.getPpr().getDistrict().getDistName());
+	        map.put("project", o.getPpr().getProjectName());
+	        map.put("watershed", o.getMicroWatershed() != null
+	                ? o.getMicroWatershed().getMwName() : "");
+	        map.put("village", o.getVillage() != null
+	                ? o.getVillage().getVillageName() : "");
+	        map.put("sourceId", o.getWaterSource() != null
+	                ? String.valueOf(o.getWaterSource().getWaterSourceId()) : "");
+	        map.put("source", o.getWaterSource() != null
+	                ? o.getWaterSource().getSourceName() : "");
+	        map.put("preProject", o.getPreProjectLevel());
+	        map.put("postProject", o.getPostProjectLevel());
+	        map.put("remarks", o.getRemarks());
+	        map.put("status", o.getStatus());
 
 	        return map;
-
 	    }).toList();
 	}
+
 
 	@PostMapping("/updateWaterOutcome")
 	public String updateWaterOutcome(@RequestParam Integer pprWaterOutcomeId, @RequestParam Integer editSourceTypeId, @RequestParam String editPreProject, @RequestParam String editPostProject, @RequestParam(required = false) String editRemarks,

@@ -202,5 +202,10 @@ public class PprWaterOutcomeService {
 		return repository.findByState(stcode);
 	}
 
+	public List<PprWaterOutcome> findByProject(Integer pprId) {
+		// TODO Auto-generated method stub
+		return repository.findByPpr_PprId(pprId);
+	}
+
 	
 }

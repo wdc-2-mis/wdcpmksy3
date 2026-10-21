@@ -292,11 +292,13 @@
 <div class="mt-5">
     <h5 class="fw-bold mb-3"><center>List of Details of Flood and Drought in Project Area</center></h5>
 
-    <div th:if="${#lists.isEmpty(records)}" class="alert alert-info">
-        No Records Found
-    </div>
+    <div id="noFloodDroughtRecords"
+     class="alert alert-info text-center"
+     style="display: none;">
+    Data not Found
+</div>
 
-    <table th:if="${!#lists.isEmpty(records)}" class="table table-bordered table-striped" >
+    <table id="floodDroughtRecordsTable" th:if="${!#lists.isEmpty(records)}" class="table table-bordered table-striped" >
         <thead class="table-light">
             <tr>
                 <th class="table-primary">S No.</th>
@@ -311,8 +313,11 @@
                 <th class="table-primary">Actions</th>
             </tr>
         </thead>
+        
         <tbody>
-            <tr th:each="rec, iterStat : ${records}">
+            <tr th:each="rec, iterStat : ${records}"
+    th:data-dcode="${rec.ppr.district.dcode}"
+    th:data-pprid="${rec.ppr.pprId}">
                 <td th:text="${iterStat.index + 1}"></td>
                 <td th:text="${rec.ppr.district.distName}"></td>
                 <td th:text="${rec.ppr.projectName}"></td>
@@ -681,7 +686,52 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const nextButton = document.getElementById("nextButton");
 
+function filterFloodDroughtRecords() {
+    const table = document.getElementById("floodDroughtRecordsTable");
+    const message = document.getElementById("noFloodDroughtRecords");
 
+    if (!message) return;
+
+    const districtValue =
+        document.getElementById("district")?.value || "";
+
+    const projectValue =
+        document.getElementById("project")?.value || "";
+
+    const rows = table
+        ? table.querySelectorAll("tbody tr")
+        : [];
+
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const districtMatches =
+            !districtValue ||
+            row.dataset.dcode === districtValue;
+
+        const projectMatches =
+            !projectValue ||
+            row.dataset.pprid === projectValue;
+
+        const showRow = districtMatches && projectMatches;
+
+        row.style.display = showRow ? "" : "none";
+
+        if (showRow) {
+            visibleCount++;
+        }
+    });
+
+    // Show the message when no matching records exist
+    message.style.display =
+        visibleCount === 0 ? "block" : "none";
+
+    // Hide the table when no matching records exist
+    if (table) {
+        table.style.display =
+            visibleCount === 0 ? "none" : "";
+    }
+}
 
     /* =========================================================
        VALUES COMING FROM CONTROLLER
@@ -1015,24 +1065,15 @@ function loadVillages(projectId) {
                     this.value;
 
 
-                /*
-                 * Validate District
-                 */
-
                 validateTextField(this);
 
-
-                /*
-                 * Load Projects
-                 *
-                 * For normal user selection,
-                 * no Project needs to be auto-selected.
-                 */
 
                 loadProjects(
                     districtId,
                     null
                 );
+                 filterFloodDroughtRecords();
+                 updateNextButton();
 
             }
         );
@@ -1049,21 +1090,13 @@ function loadVillages(projectId) {
         "change",
         function () {
 
-            const projectId =
-                this.value;
-
-
-            /*
-             * Validate Project
-             */
+            const projectId = this.value;
 
             validateTextField(this);
 
-
-            /*
-             * Load Village
-             */
-
+ filterFloodDroughtRecords();
+  updateNextButton();
+  
             loadVillages(
                 projectId
             );
@@ -1077,21 +1110,37 @@ function loadVillages(projectId) {
        ========================================================= */
 
     function updateNextButton() {
+
     const nextButton = document.getElementById("nextButton");
 
-    if (!nextButton) return;
+    if (!nextButton) {
+        return;
+    }
 
-    if (district && district.value !== "" && project && project.value !== "") {
+    const selectedDistrict = district ? district.value : "";
+    const selectedProject = project ? project.value : "";
+
+    // District is required to display the next-page button.
+    if (selectedDistrict) {
+
         nextButton.style.display = "inline-block";
 
         nextButton.onclick = function () {
-            window.location.href =
-                "/pprSoilErosion?dcode=" +
-                encodeURIComponent(district.value) +
-                "&pprid=" +
-                encodeURIComponent(project.value);
+
+            let url = "/pprSoilErosion?dcode=" +
+                encodeURIComponent(selectedDistrict);
+
+            // Add project ID only when a project is selected.
+            if (selectedProject) {
+                url += "&pprid=" +
+                    encodeURIComponent(selectedProject);
+            }
+
+            window.location.href = url;
         };
+
     } else {
+
         nextButton.style.display = "none";
         nextButton.onclick = null;
     }
@@ -1935,6 +1984,8 @@ village.addEventListener("change", function () {
     });
 });
 
+filterFloodDroughtRecords();
+updateNextButton();
 });
 </script>
 </div>

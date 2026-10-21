@@ -119,5 +119,59 @@ public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmpl
     	    """, nativeQuery = true)
     	List<Map<String, Object>> getEmploymentGenerationByState(
     	        @Param("stcode") Integer stcode);
+
+
+    @Query(value = """
+    	    SELECT
+    	        e.ppr_employment_id,
+    	        d.dist_name,
+    	        p.project_name,
+    	        mw.mw_name,
+    	        v.village_name,
+    	        et.employment_type_id,
+    	        et.employment_type_name,
+    	        e.sc,
+    	        e.st,
+    	        e.others,
+    	        e.women,
+    	        (
+    	            COALESCE(e.sc, 0) +
+    	            COALESCE(e.st, 0) +
+    	            COALESCE(e.others, 0)
+    	        ) AS total,
+    	        e.status
+    	    FROM ppr_employment_generation e
+    	    JOIN m_ppr p
+    	        ON e.ppr_id = p.ppr_id
+    	    JOIN m_district d
+    	        ON p.dcode = d.dcode
+    	    JOIN m_state s
+    	        ON d.st_code = s.st_code
+    	    LEFT JOIN m_micro_watershed mw
+    	        ON e.mw_id = mw.mw_id
+    	    LEFT JOIN m_village v
+    	        ON e.vcode = v.vcode
+    	    LEFT JOIN m_employment_type et
+    	        ON e.employment_type_id = et.employment_type_id
+    	    WHERE p.ppr_id = :pprId
+    	      AND s.st_code = :stcode
+    	      AND (:dcode IS NULL OR p.dcode = :dcode)
+    	    ORDER BY
+    	        CASE
+    	            WHEN e.status = 'D' THEN 0
+    	            WHEN e.status = 'S' THEN 1
+    	            WHEN e.status = 'C' THEN 2
+    	            ELSE 3
+    	        END,
+    	        d.dist_name,
+    	        p.project_name,
+    	        mw.mw_name,
+    	        v.village_name,
+    	        et.employment_type_id
+    	    """, nativeQuery = true)
+    	List<Map<String, Object>> getEmploymentGenerationByProject(
+    	        @Param("pprId") Integer pprId,
+    	        @Param("stcode") Integer stcode,
+    	        @Param("dcode") Integer dcode);
 	
 }
