@@ -21,6 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const village = document.getElementById("village");
     const form = document.getElementById("landPatternAreaForm");
 
+    /* rows currently loaded (state-wise or district-wise) - used for project filter */
+    let allData = [];
+
 
     /* =========================================================
        COMMON VALIDATION FUNCTIONS
@@ -213,6 +216,8 @@ document.addEventListener("DOMContentLoaded", function () {
        ========================================================= */
 
     project.addEventListener("change", function () {
+
+        applyProjectFilter();      // project-wise table data
 
         const pprId = this.value;
 
@@ -762,10 +767,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =========================================================
-       RENDER LAND PATTERN TABLE
+       STORE LOADED DATA + APPLY PROJECT FILTER
        ========================================================= */
 
     function renderLandPatternTable(data) {
+        allData = data || [];
+        applyProjectFilter();
+    }
+
+    function applyProjectFilter() {
+
+        let rowsToShow = allData;
+
+        if (project.value !== "") {
+
+            const selectedProject =
+                project.options[project.selectedIndex].text.trim().toLowerCase();
+
+            rowsToShow = allData.filter(function (item) {
+                return (item.project_name || "").trim().toLowerCase() === selectedProject;
+            });
+        }
+
+        drawLandPatternTable(rowsToShow);
+    }
+
+
+    /* =========================================================
+       DRAW LAND PATTERN TABLE
+       ========================================================= */
+
+    function drawLandPatternTable(data) {
 
         const tableBody =
             document.getElementById(

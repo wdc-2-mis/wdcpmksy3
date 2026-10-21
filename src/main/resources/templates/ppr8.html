@@ -889,7 +889,67 @@ document.getElementById("proposedAreaOthers")
 			}
 		}
 
+		document.addEventListener("DOMContentLoaded", function () {
 
+		    const districtSel = document.getElementById("district");
+		    const projectSel  = document.getElementById("project");
+		    const tbody       = document.querySelector("#draftTable tbody");
+
+		    if (!districtSel || !projectSel || !tbody) {
+		        return;
+		    }
+
+		    const rows = Array.from(tbody.querySelectorAll("tr"));
+
+		    // "No records" row (hidden by default)
+		    const emptyRow = document.createElement("tr");
+		    emptyRow.innerHTML =
+		        '<td colspan="12" class="text-center text-muted">No records found.</td>';
+		    emptyRow.style.display = "none";
+		    tbody.appendChild(emptyRow);
+
+		    function selectedText(sel) {
+		        return sel.value
+		            ? sel.options[sel.selectedIndex].text.trim().toLowerCase()
+		            : "";
+		    }
+
+		    function applyFilter(useProject) {
+
+		        const d = selectedText(districtSel);
+		        const p = useProject ? selectedText(projectSel) : "";
+
+		        let visible = 0;
+
+		        rows.forEach(function (tr) {
+
+		            const rowDistrict = tr.children[1].textContent.trim().toLowerCase();
+		            const rowProject  = tr.children[2].textContent.trim().toLowerCase();
+
+		            const show = (d === "" || rowDistrict === d) &&
+		                         (p === "" || rowProject === p);
+
+		            tr.style.display = show ? "" : "none";
+
+		            if (show) {
+		                visible++;
+		            }
+		        });
+
+		        emptyRow.style.display = visible === 0 ? "" : "none";
+		    }
+
+		    // District changed -> show that district's rows
+		    // (the project list is reloaded by your other handler, so ignore project here)
+		    districtSel.addEventListener("change", function () {
+		        applyFilter(false);
+		    });
+
+		    // Project changed -> district + project
+		    projectSel.addEventListener("change", function () {
+		        applyFilter(true);
+		    });
+		});
 	</script>
 
 </head>
@@ -1213,7 +1273,7 @@ document.getElementById("proposedAreaOthers")
 
 					</h4>
 
-					<table class="table table-bordered table-striped table-hover">
+					<table id="draftTable" class="table table-bordered table-striped table-hover">
 
 						<thead>
 
