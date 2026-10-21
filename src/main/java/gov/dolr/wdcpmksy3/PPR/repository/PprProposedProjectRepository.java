@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import gov.dolr.wdcpmksy3.DPR.entity.DprOtherDtl;
 import gov.dolr.wdcpmksy3.PPR.dto.PprRequestDolrApprovalDto;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PPRMigrationDetails;
@@ -19,7 +20,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprProposedProject;
 @Repository
 public interface PprProposedProjectRepository extends JpaRepository<PprProposedProject, Integer> {
 	
-	List<PprProposedProject> getListOfPprProposedProjectsByPpr(MPpr ppr);
+	List<PprProposedProject> getListOfPprProposedProjectsByPprOrderByStatusDesc(MPpr ppr);
 	
 	Optional<PprProposedProject> findById(Integer id);
 
@@ -51,5 +52,8 @@ public interface PprProposedProjectRepository extends JpaRepository<PprProposedP
 	
 	@Query("select pp from PprProposedProject pp WHERE pp.ppr.district.state.stCode = :stCode order by pp.status desc")
 	List<PprProposedProject> findPprProposedProjectBystCode(Integer stCode);
+	
+	@Query("select dp from PprProposedProject dp WHERE dp.ppr.district.dcode = :dcode order by dp.status desc")
+	List<PprProposedProject> getListOfPprProposedProjectByDcode(Integer dcode);
 
 }

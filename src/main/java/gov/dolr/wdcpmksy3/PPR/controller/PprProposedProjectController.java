@@ -77,7 +77,7 @@ public class PprProposedProjectController {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-	    
+		List<PprProposedProject> pprProposedProjectList = new ArrayList<>();
 		String userid=(String)session.getAttribute("userid");
 		if(userid==null){
             return "redirect:/login";
@@ -96,16 +96,22 @@ public class PprProposedProjectController {
 	        	model.addAttribute("pprList", pprList);
 	            if(project != null) {
 	            	MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
+	            	pprProposedProjectList = pprProposedProjectRepo.getListOfPprProposedProjectsByPprOrderByStatusDesc(ppr);
 	 	            model.addAttribute("pprId", project);
 	 	            model.addAttribute("microWatershedList", microWatershedServ.getListOfMicroWatershedByPprId(project));
+	            }else {
+	            	pprProposedProjectList = pprProposedProjectRepo.getListOfPprProposedProjectByDcode(dcode);
 	            }
 	        }
 	    }
+		if(dcode == null && project == null)
+			pprProposedProjectList = pprProposedProjectRepo.findPprProposedProjectBystCode(stcode);
+		model.addAttribute("detailsOfListOfProposedProject", pprProposedProjectList);
 		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("criteriaList", criteriaRepo.findAll());
 		model.addAttribute("statename", statename);
-		model.addAttribute("detailsOfListOfProposedProject", pprProposedProjectRepo.findPprProposedProjectBystCode(stcode));
+		
 		
 		return "prioritizedListOfProposedProject";
 	}

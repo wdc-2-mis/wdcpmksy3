@@ -1,6 +1,7 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,7 @@ public class PPRSoilErosionController {
 		
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		Object userid = session.getAttribute("userid");
+		List<PPRSoilErosion> pprSoilErosionList = new ArrayList<>();
         if(userid==null){
             return "redirect:/login";
         }
@@ -64,18 +66,22 @@ public class PPRSoilErosionController {
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
+	        		pprSoilErosionList = pprSoilErosionRepo.findByPprPprIdOrderByStatusDesc(project);
 	        		model.addAttribute("pprId", project);
-	        	}
+	        	}else
+	        		pprSoilErosionList = pprSoilErosionRepo.findPPRSoilErosionBydcode(dcode);
         	}
 			model.addAttribute("selectedDistrict", dcode);
         }
         List<MErosion> erosionList = soilErosionService.getErosionList();
+        if(dcode == null && project == null)
+        	pprSoilErosionList = pprSoilErosionRepo.findPPRSoilErosionBystCode(stcode);
         
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("erosionList", erosionList);
         model.addAttribute("monthList", soilErosionService.getAllMonths());
         model.addAttribute("yearList", soilErosionService.getAllYears());
-        model.addAttribute("soilErosionList",pprSoilErosionRepo.findPPRSoilErosionBystCode(stcode));
+        model.addAttribute("soilErosionList",pprSoilErosionList);
 
         return "ppr/pprSoilErosion";
     }

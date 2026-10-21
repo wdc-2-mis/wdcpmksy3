@@ -1,5 +1,6 @@
 package gov.dolr.wdcpmksy3.PPR.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import gov.dolr.wdcpmksy3.PPR.dto.VillageDetailsDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.VillageDropdownDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
+import gov.dolr.wdcpmksy3.PPR.entity.PprProjectGlance;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
@@ -69,7 +71,7 @@ public class PprProjectAtGlanceController {
 		
 		String statename=session.getAttribute("statename").toString();
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
-	    
+	    List<PprProjectGlance> pprProjectGlanceList = new ArrayList<>();
 		String userid=(String)session.getAttribute("userid");
 		if(userid==null){
             return "redirect:/login";
@@ -89,16 +91,21 @@ public class PprProjectAtGlanceController {
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
+	        		pprProjectGlanceList = pprProjectGlanceRepo.getListOfPprProjectGlanceByPprOrderByStatusDesc(ppr);
 	        		model.addAttribute("pprId", project);
 		            model.addAttribute("project", ppr.getProjectName());
 		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
+	        	}else {
+	        		pprProjectGlanceList = pprProjectGlanceRepo.findPprProjectGlanceBydcode(dcode);
 	        	}
 	        }
 	    }
+		if(dcode == null && project == null)
+			pprProjectGlanceList = pprProjectGlanceRepo.findPprProjectGlanceBystCode(stcode);
 		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("state", statename);
-		model.addAttribute("pprProjectAtGlanceList", pprProjectGlanceRepo.findPprProjectGlanceBystCode(stcode));
+		model.addAttribute("pprProjectAtGlanceList", pprProjectGlanceList);
 		
 		return "ppr/pprProjectAtGlance";
 	}

@@ -85,5 +85,10 @@ public interface PPRMigrationDetailsRepository extends JpaRepository<PPRMigratio
 	@Query("select m from PPRMigrationDetails m WHERE m.ppr.district.state.stCode = :stCode order by m.status desc")
 	List<PPRMigrationDetails> findPPRMigrationDetailsBystCode(Integer stCode);
 	
+	@Query("select m from PPRMigrationDetails m WHERE m.ppr.district.dcode = :dcode order by m.status desc")
+	List<PPRMigrationDetails> findPPRMigrationDetailsBydcode(Integer dcode);
+	
+	List<PPRMigrationDetails> findByPprPprIdOrderByStatusDesc(Integer pprId);
+	
 	
 }

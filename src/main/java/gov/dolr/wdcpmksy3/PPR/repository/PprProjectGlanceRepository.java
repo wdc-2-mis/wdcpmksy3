@@ -14,7 +14,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprProjectGlance;
 
 public interface PprProjectGlanceRepository extends JpaRepository<PprProjectGlance, Integer>{
 	
-	List<PprProjectGlance> getListOfPprProjectGlanceByPpr(MPpr ppr);
+	List<PprProjectGlance> getListOfPprProjectGlanceByPprOrderByStatusDesc(MPpr ppr);
 	List<PprProjectGlance> findByPprPprIdAndStatus(Integer pprId, Character status);
 	
 	@Modifying
@@ -26,5 +26,8 @@ public interface PprProjectGlanceRepository extends JpaRepository<PprProjectGlan
 	
 	@Query("select pg from PprProjectGlance pg WHERE pg.ppr.district.state.stCode = :stCode order by pg.status desc")
 	List<PprProjectGlance> findPprProjectGlanceBystCode(Integer stCode);
+	
+	@Query("select pg from PprProjectGlance pg WHERE pg.ppr.district.dcode = :dcode order by pg.status desc")
+	List<PprProjectGlance> findPprProjectGlanceBydcode(Integer dcode);
 
 }

@@ -50,7 +50,7 @@ public interface PPRSoilErosionRepository extends JpaRepository<PPRSoilErosion, 
 			Integer monthId, Integer yearId);
 
 
-    List<PPRSoilErosion> findByPprPprId(Integer pprId);
+    List<PPRSoilErosion> findByPprPprIdOrderByStatusDesc(Integer pprId);
     
     @Query("SELECT se.erosionType.erosionTypeId FROM PPRSoilErosion se WHERE se.ppr.pprId = :pprId")
 	List<Integer> findErosionTypeIdsByPprId(@Param("pprId") Integer pprId);
@@ -76,4 +76,7 @@ public interface PPRSoilErosionRepository extends JpaRepository<PPRSoilErosion, 
     
     @Query("select sr from PPRSoilErosion sr WHERE sr.ppr.district.state.stCode = :stCode order by sr.status desc")
     List<PPRSoilErosion> findPPRSoilErosionBystCode(Integer stCode);
+    
+    @Query("select sr from PPRSoilErosion sr WHERE sr.ppr.district.dcode = :dcode order by sr.status desc")
+    List<PPRSoilErosion> findPPRSoilErosionBydcode(Integer dcode);
 }

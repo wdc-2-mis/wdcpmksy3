@@ -85,7 +85,20 @@
 					error.textContent = "";
 				});
 			}
-
+			
+			const daysMigrating = document.getElementById("daysMigrating");
+			const editDaysMigrating = document.getElementById("editMigrationDaysPerYear");
+			if (daysMigrating) {
+			    daysMigrating.addEventListener("blur", function () {
+			        validateDaysMigrating(this);
+			    });
+			}
+			if (editDaysMigrating) {
+			    editDaysMigrating.addEventListener("blur", function () {
+			        validateDaysMigrating(this);
+			    });
+			}
+			
 			function validateRequiredField(field, message) {
 				if (!field.value || field.value.trim() === "") {
 					showFieldError(field, message);
@@ -100,19 +113,62 @@
 				const value = field.value.trim();
 				if (value === "") {
 					showFieldError(field, "Please enter No. of days per year Migrating.");
-					field.focus();
+//					field.focus();
 					return false;
 				}
 				const days = parseInt(value, 10);
 				if (days < 1 || days > 365) {
 					showFieldError(field, "No. of days per year Migrating cannot be more than 365.");
-					field.focus();
+//					field.focus();
 					field.value="";
 					return false;
 				}
 				clearFieldError(field);
 				return true;
 			}
+			
+			const watershed = document.getElementById("watershed");
+			const village = document.getElementById("village");
+			const projectElement = document.getElementById("project");
+			async function checkMigrationExists(changedField) {
+			    const mwId = watershed.value;
+			    const vcode = village.value;
+			    const pprid = projectElement.value;
+			    // Check only when all three values are selected
+			    if (!mwId || !vcode) {
+			        clearFieldError(watershed);
+			        clearFieldError(village);
+			        return;
+			    }
+			    const params = new URLSearchParams({pprid, mwId, vcode});
+			    try {
+			        const response = await fetch("[[@{/checkMwIdAndVcodeExistsInMigration}]]?" + params);
+			        if (!response.ok) {
+			            throw new Error("Failed to check existing migration details");
+			        }
+			        const result = (await response.text()).trim();
+			        if (result === "EXISTS") {
+			            watershed.value = "";
+			            village.value = "";
+			            showFieldError(changedField, "This Micro Watershed and Village combination is already saved for this project. Please select a different combination.");
+			        } else {
+			            clearFieldError(watershed);
+			            clearFieldError(village);
+			        }
+			    } catch (error) {
+			        console.error(error);
+			    }
+			}
+			if (watershed) {
+			    watershed.addEventListener("change", function () {
+			        checkMigrationExists(watershed);
+			    });
+			}
+			if (village) {
+			    village.addEventListener("change", function () {
+			        checkMigrationExists(village);
+			    });
+			} 
 
 			document.getElementById("ppr15Form").addEventListener("submit", function(event) {
 				event.preventDefault();
@@ -441,6 +497,11 @@
 										</span>
 
 									</td>
+								</tr>
+								<tr th:if="${#lists.isEmpty(draftList)}">
+								    <td colspan="9" class="text-center text-danger">
+								        No records found.
+								    </td>
 								</tr>
 
 							</tbody>

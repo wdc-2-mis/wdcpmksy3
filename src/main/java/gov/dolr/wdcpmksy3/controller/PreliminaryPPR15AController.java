@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -62,6 +63,7 @@ public class PreliminaryPPR15AController {
 
 		String statename = session.getAttribute("statename").toString();
 	    Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
+	    List<PPRMigrationDetails> pprMigrationDtlList = new ArrayList<>();
 	    Object userid = session.getAttribute("userid");
         if(userid==null){
             return "redirect:/login";
@@ -80,16 +82,20 @@ public class PreliminaryPPR15AController {
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
+	        		pprMigrationDtlList = pprMigrationDetailsRepository.findByPprPprIdOrderByStatusDesc(project);
 	        		model.addAttribute("pprId", project);
 		            model.addAttribute("project", ppr.getProjectName());
 		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
 		            model.addAttribute("villageList",villageService.getVillagesByProject(ppr.getPprId()));
-	        	}
+	        	}else
+	        		pprMigrationDtlList = pprMigrationDetailsRepository.findPPRMigrationDetailsBydcode(dcode);
 	        }
 	    }
+	    if(dcode == null && project == null)
+	    	pprMigrationDtlList = pprMigrationDetailsRepository.findPPRMigrationDetailsBystCode(stcode);
 	    model.addAttribute("statename", statename);
 	    model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
-	    model.addAttribute("draftList", pprMigrationDetailsRepository.findPPRMigrationDetailsBystCode(stcode));
+	    model.addAttribute("draftList", pprMigrationDtlList);
 
 	    return "ppr15";
 	}
@@ -145,6 +151,21 @@ public class PreliminaryPPR15AController {
 	@ResponseBody
 	public PprMigrationDetailsDTO getDraftsPPR15(@RequestParam Integer id) {
 	    return migrationDetailsService.getPprMigrationDetailsById(id);
+	}
+	
+	@GetMapping("/checkMwIdAndVcodeExistsInMigration")
+	@ResponseBody
+	public String checkProjectActivityExistsOther(@RequestParam("pprid") Integer pprid, 
+			@RequestParam(required = false) Integer mwId, @RequestParam(required = false) Integer vcode) {
+		if (pprid == null || mwId == null || vcode == null) 
+	        return "NOT_EXISTS";
+		List<PPRMigrationDetails> pprMigrationDtlList = pprMigrationDetailsRepository.findByPprPprIdOrderByStatusDesc(pprid);
+	    boolean exists = pprMigrationDtlList != null && pprMigrationDtlList.stream()
+	    		.filter(Objects::nonNull).anyMatch(migrationDtl ->
+	                Objects.equals(mwId, migrationDtl.getMwId()) &&
+	                Objects.equals(vcode, migrationDtl.getVcode()));
+
+	    return exists ? "EXISTS" : "NOT_EXISTS";
 	}
 	
 	
