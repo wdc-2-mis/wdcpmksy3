@@ -369,13 +369,13 @@
 							</th:block>
 						</select>
 					</div>
-					<div class="col-md-2">
+					<div class="col-md-4">
 						<br/>
 						<button type="submit" class="btn btn-primary">
 							Get Data
 						</button>
-					
-						<button type="submit" formaction="/downloadPPRPdf" class="btn btn-success">
+					&nbsp; &nbsp;
+						<button type="submit" formaction="/downloadDPRActivityPdf" class="btn btn-success" th:if="${selectedProject != null}">
 							<i class="fas fa-file-pdf"></i> Download PDF
 						</button>
 					</div>

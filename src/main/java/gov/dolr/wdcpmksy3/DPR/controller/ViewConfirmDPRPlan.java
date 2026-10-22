@@ -166,7 +166,7 @@ public class ViewConfirmDPRPlan {
 				return "redirect:/getViewConfirmDPRPlan";	
 	    }
 	
-	@GetMapping("/downloadPPRPdf")
+	@GetMapping("/downloadDPRActivityPdf")
 	public ResponseEntity<byte[]> downloadPPRPdf(HttpSession session,
 	        @RequestParam(required = false) Integer project) {
 
@@ -242,7 +242,7 @@ public class ViewConfirmDPRPlan {
 	        doc.open();
 
 	        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 15);
-	        Paragraph title = new Paragraph("Detailed Project Report (DPR) - Targets", titleFont);
+	        Paragraph title = new Paragraph("Details of Project wise DPR Target", titleFont);
 	        title.setAlignment(Element.ALIGN_CENTER);
 	        title.setSpacingAfter(12);
 	        doc.add(title);
