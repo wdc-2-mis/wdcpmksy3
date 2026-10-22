@@ -284,19 +284,33 @@
 		        return;
 		    }
 		    fetch('/getProjectsByDistrictDPRNRM?dcode=' + districtId)
-		        .then(response => response.json())
-		        .then(data => {
-		            data.forEach(function(item) {
-		                let option = document.createElement("option");
-		                option.value = item.id;          // PPR ID
-		                option.textContent = item.name;  // Project Name
-		                project.appendChild(option);
-		            });
+				.then(response => response.json())
+				.then(data => {
+					data.forEach(function (item) {
+						let option = document.createElement("option");
+						option.value = item.id;          // PPR ID
+						option.textContent = item.name;  // Project Name
+						project.appendChild(option);
+					});
 
-		        })
-		        .catch(error => {
-		            console.error("Error:", error);
-		        });
+				})
+				.catch(error => {
+					console.error("Error:", error);
+				});
+				
+				document.getElementById("saveddprnrm").innerHTML = "";
+				
+				fetch("/getDistrictByDPRNRMData?dcode=" +encodeURIComponent(districtId))
+				.then(response => {
+					if (!response.ok) {
+						throw new Error("nrm data fetch error: " + response.status);
+					}
+					return response.text();
+				})
+				.then(html => {
+					document.getElementById("saveddprnrm").innerHTML = html;
+				})
+				.catch(error => console.error("dpr nrm Loading Error:", error));
 				
 		});
 		
@@ -330,17 +344,11 @@
 					return response.text();
 				})
 				.then(html => {
-					document.getElementById(
-						"saveddprnrm"
-					).innerHTML = html;
+					document.getElementById("saveddprnrm").innerHTML = html;
 				})
-				.catch(error =>
-					console.error(
-						"dpr nrm Loading Error:",
-						error
-					));
+				.catch(error =>console.error("dpr nrm Loading Error:",error));
 						
-				});
+		});
 		
 		document.getElementById("head").addEventListener("change", function () {
 

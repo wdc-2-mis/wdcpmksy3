@@ -98,10 +98,41 @@ public class DPRNRMPlanController {
         return "dpr/addDPRNRMTarget";
     }
 	
+	@GetMapping("/getDistrictByDPRNRMData")
+	public String getDistrictByDPRNRMData(@RequestParam("dcode") Integer dcode, Model model) {
+		
+		List<Object[]> finalList = new ArrayList<>();
+		List<Object[]> list =plan.getDprNrmDistrictPlanList(dcode);
+		boolean allCompleted = list.stream()
+	    	    .allMatch(row -> "C".equals(String.valueOf(row[5])));
+		if(list!=null && !list.isEmpty()) {
+	        int srNo = 1;
+	        Integer previousId = null;
+
+	        for (Object[] row : list) {
+
+	            Integer currentId = ((Number) row[0]).intValue();
+
+	            // Create a new array with one extra column for serial number
+	            Object[] newRow = Arrays.copyOf(row, row.length + 1);
+
+	            if (previousId == null || !previousId.equals(currentId)) {
+	                newRow[row.length] = srNo++;   // Serial No.
+	            } else {
+	                newRow[row.length] = "";       // Blank for duplicate rows
+	            }
+	            finalList.add(newRow);
+	            previousId = currentId;
+	        }
+	        }
+	        model.addAttribute("dprNrmProjectPlanList", finalList);
+	        model.addAttribute("allCompleted", allCompleted);
+	    return "dpr/addDPRNRMTarget :: cropOutcomeTable";
+	}
+	
 	@GetMapping("/getProjectsByDPRNRMData")
-	public String getProjectsByDPRNRMData(
-	        @RequestParam("project") Integer project,
-	        Model model) {
+	public String getProjectsByDPRNRMData(@RequestParam("project") Integer project,Model model) {
+		
 		List<Object[]> finalList = new ArrayList<>();
 		List<Object[]> list =plan.getDprNrmProjectPlanListByProject(project);
 		boolean allCompleted = list.stream()
