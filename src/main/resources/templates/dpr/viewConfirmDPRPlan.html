@@ -99,55 +99,112 @@
 
 
 		document.addEventListener("DOMContentLoaded", function () {
-			document.querySelectorAll(".viewBtn").forEach(function (btn) {
-				btn.addEventListener("click", function () {
-					let id = this.getAttribute("data-id");
-					let loading = document.getElementById("criteriaLoading");
-					let error = document.getElementById("criteriaError");
-					let noData = document.getElementById("criteriaNoData");
-					let tableContainer = document.getElementById("criteriaTableContainer");
-					let tableBody = document.getElementById("criteriaTableBody");
-					tableBody.innerHTML = "";
-					loading.style.display = "block";
-					error.style.display = "none";
-					noData.style.display = "none";
-					tableContainer.style.display = "none";
-					fetch("/viewSavedCriteriaDetails?id=" + id)
-						.then(response => {
-							if (!response.ok) {
-								throw new Error("Unable to fetch criteria details");
-							}
-							return response.json();
-						})
-						.then(data => {
-							loading.style.display = "none";
-							if (!data || data.length === 0) {
-								noData.style.display = "block";
-								return;
-							}
-							data.forEach(function (item, index) {
-								let row = document.createElement("tr");
-								let serialCell = document.createElement("td");
-								serialCell.textContent = index + 1;
-								let criteriaCell = document.createElement("td");
-								criteriaCell.textContent = item.criteriaDesc ? item.criteriaDesc : "";
-								let marksCell = document.createElement("td");
-								marksCell.textContent = item.scoredMarks != null ? item.scoredMarks : 0;
-								row.appendChild(serialCell);
-								row.appendChild(criteriaCell);
-								row.appendChild(marksCell);
-								tableBody.appendChild(row);
-							});
-							tableContainer.style.display = "block";
-						})
-						.catch(errorMessage => {
-							console.error("Error:", errorMessage);
-							loading.style.display = "none";
-							error.textContent = "Unable to load criteria details. Please try again.";
-							error.style.display = "block";
+			
+			const form11 = document.getElementById("viewDPR");
+			if (!form11) {
+				return;
+			}
+
+			form11.addEventListener("submit", function (e) {
+
+				let isValid = true;
+
+				// ==========================================
+				// District
+				// ==========================================
+
+				const district = document.getElementById("district");
+
+				if (district.value === "") {
+
+					district.classList.add("is-invalid");
+					district.classList.remove("is-valid");
+
+					isValid = false;
+
+				} else {
+
+					district.classList.remove("is-invalid");
+					district.classList.add("is-valid");
+				}
+
+				// ==========================================
+				// Project
+				// ==========================================
+
+				const project = document.getElementById("project");
+
+				if (project.value === "") {
+
+					project.classList.add("is-invalid");
+					project.classList.remove("is-valid");
+
+					isValid = false;
+
+				} else {
+
+					project.classList.remove("is-invalid");
+					project.classList.add("is-valid");
+				}
+
+				// ==========================================
+				// Stop form submission if invalid
+				// ==========================================
+
+				if (!isValid) {
+
+					e.preventDefault();
+					e.stopPropagation();
+
+					// Scroll to first invalid field
+					const firstInvalid =
+						form1.querySelector(".is-invalid");
+
+					if (firstInvalid) {
+
+						firstInvalid.scrollIntoView({
+							behavior: "smooth",
+							block: "center"
 						});
-				});
+
+						firstInvalid.focus();
+					}
+
+					return false;
+				}
+
 			});
+
+			const fields1 = form11.querySelectorAll(
+				"select"
+			);
+
+			fields1.forEach(function (field) {
+
+				field.addEventListener("change", function () {
+
+					if (field.value.trim() !== "") {
+
+						field.classList.remove("is-invalid");
+						field.classList.add("is-valid");
+
+					}
+
+				});
+
+				field.addEventListener("input", function () {
+
+					if (field.value.trim() !== "") {
+
+						field.classList.remove("is-invalid");
+						field.classList.add("is-valid");
+
+					}
+
+				});
+
+			});
+			
 		});
 
 		
@@ -240,14 +297,14 @@
 					setValid(district);
 				}
 
-				// Agency
+				// project
 				if (project.value.trim() === "") {
 					setInvalid(project, "Please select a Project.");
 					isValid = false;
 				} else {
 					setValid(agency);
 				}
-				// MoU PDF
+				//  PDF
 				const pdfErr = getPdfError(mouFile);
 				if (pdfErr) {
 					setInvalid(mouFile, pdfErr);
@@ -357,6 +414,7 @@
 									th:selected="${selectedDcode != null and dist.dcode == selectedDcode}"></option>
 							</th:block>
 						</select>
+						<div class="invalid-feedback">Please select a District.</div>
 					</div>
 
 					<div class="col-md-4">
@@ -368,6 +426,7 @@
 									th:selected="${selectedProject != null and proj.pprId == selectedProject}"></option>
 							</th:block>
 						</select>
+						<div class="invalid-feedback">Please select a Project.</div>
 					</div>
 					<div class="col-md-4">
 						<br/>
