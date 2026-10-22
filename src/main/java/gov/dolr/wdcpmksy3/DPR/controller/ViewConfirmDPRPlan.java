@@ -182,6 +182,20 @@ public class ViewConfirmDPRPlan {
 	        List<Object[]> nrm = plan.getDprNrmProjectPlanComplitedList(project);
 	        List<Object[]> elp = plan.getDprELPProjectPlanCompletedList(project);
 	        List<DprOtherDtl> oth = other.findCompletedOtherDtlByPprId(project);
+	        
+	        String districtName = "";
+	        String projectName = "";
+
+	        if (nrm != null && !nrm.isEmpty()) {
+	            districtName = str(nrm.get(0)[3]);
+	            projectName  = str(nrm.get(0)[2]);
+	        } else if (elp != null && !elp.isEmpty()) {
+	            districtName = str(elp.get(0)[3]);
+	            projectName  = str(elp.get(0)[2]);
+	        } else if (oth != null && !oth.isEmpty()) {
+	            districtName = str(oth.get(0).getDprDetails().getPpr().getDistrict().getDistName());
+	            projectName  = str(oth.get(0).getDprDetails().getPpr().getProjectName());
+	        }
 
 	        // ---------- DPR-1 rows ----------
 	        List<String[]> r1 = new ArrayList<>();
@@ -246,14 +260,29 @@ public class ViewConfirmDPRPlan {
 	        title.setAlignment(Element.ALIGN_CENTER);
 	        title.setSpacingAfter(12);
 	        doc.add(title);
+	        
+	        Font infoFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE);
+
+	        PdfPTable info = new PdfPTable(1);
+	        info.setWidthPercentage(100);
+	        info.setSpacingAfter(0);
+
+	        PdfPCell infoCell = new PdfPCell(new Phrase(
+	                "District : " + districtName + "          Project : " + projectName,
+	                infoFont));
+	        infoCell.setBackgroundColor(new Color(25, 135, 84));   // green
+	        infoCell.setPadding(6);
+	        infoCell.setBorder(0);
+
+	        info.addCell(infoCell);
+	        doc.add(info);
 
 	        String[] heads = { "District", "Project", "Head", "Activity", "Unit", "Target" };
 	        float[] widths = { 1.2f, 2.2f, 3f, 2.6f, 0.8f, 1.2f };
 
-	        addSection(doc, "DPR-1 : Details of DPR NRM Target", heads, widths, r1);
-	        addSection(doc, "DPR-2 : Details of DPR EPA, Livelihood and Production Target", heads, widths, r2);
-	        addSection(doc, "DPR-3 : Details of DPR Other Activity Target", heads, widths, r3);
-
+	        addSection(doc, "DPR-1 : Details of DPR NRM Target", heads, widths, r1, 0);
+	        addSection(doc, "DPR-2 : Details of DPR EPA, Livelihood and Production Target", heads, widths, r2, 10);
+	        addSection(doc, "DPR-3 : Details of DPR Other Activity Target", heads, widths, r3, 10);
 	        doc.close();
 
 	        return ResponseEntity.ok()
@@ -269,7 +298,7 @@ public class ViewConfirmDPRPlan {
 	}
 
 	private void addSection(Document doc, String heading, String[] heads,
-	        float[] widths, List<String[]> rows) throws Exception {
+	        float[] widths, List<String[]> rows, float spaceBefore) throws Exception {
 
 	    Font hFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE);
 	    Font thFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9);
@@ -277,7 +306,7 @@ public class ViewConfirmDPRPlan {
 
 	    PdfPTable bar = new PdfPTable(1);
 	    bar.setWidthPercentage(100);
-	    bar.setSpacingBefore(10);
+	    bar.setSpacingBefore(spaceBefore);
 	    PdfPCell barCell = new PdfPCell(new Phrase(heading, hFont));
 	    barCell.setBackgroundColor(new Color(13, 110, 253));
 	    barCell.setPadding(5);
