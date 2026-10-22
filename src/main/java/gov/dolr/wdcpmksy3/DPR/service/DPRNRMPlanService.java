@@ -190,11 +190,10 @@ public class DPRNRMPlanService {
 			boolean state=false;
 			try {
 				
-				MPpr mp= mprep.getReferenceById(project);
 				DprDetails pln = planrepo.findByPprPprId(project).orElse(null);
 				Integer id = pln.getDprId();
-				if (pln != null) {
-					
+				if (pln != null) 
+				{
 					dprFile.transferTo(new File(uploadPath + id + "_"+ dprFile.getOriginalFilename()));
 					pln.setDpruploadUrl(uploadPath + id + "_"+ dprFile.getOriginalFilename());
 				    pln.setStatus('C');

@@ -40,7 +40,6 @@ import gov.dolr.wdcpmksy3.DPR.entity.DprOtherDtl;
 import gov.dolr.wdcpmksy3.DPR.repository.DprDetailsRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.DprOtherDtlRepository;
 import gov.dolr.wdcpmksy3.DPR.service.DPRNRMPlanService;
-import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import jakarta.servlet.http.HttpServletRequest;
@@ -114,9 +113,9 @@ public class ViewConfirmDPRPlan {
         return "dpr/viewConfirmDPRPlan";
     }
 	
-	 	@GetMapping("/checkDPRProjectDataApproved")
-		@ResponseBody
-		public String checkDPRProjectDataApproved(@RequestParam Integer pprid) {
+	@GetMapping("/checkDPRProjectDataApproved")
+	@ResponseBody
+	public String checkDPRProjectDataApproved(@RequestParam Integer pprid) {
 
 	    	List<DprDetails> records = plan.findByPprPprIdandStatus(pprid);
 		    
@@ -125,9 +124,9 @@ public class ViewConfirmDPRPlan {
 		    }
 
 		    return "NOT_EXISTS";
-		}
+	}
 	
-	@PostMapping("/confirmDPR")
+	 @PostMapping("/confirmDPR")
 	 public String confirmDPR(HttpSession session, Model model, HttpServletRequest request,
 	    		@RequestParam Integer pprdcode,
 	    		@RequestParam Integer pprid,
@@ -139,10 +138,10 @@ public class ViewConfirmDPRPlan {
 				Integer block=0;
 				try {
 					
-					 if(userid==null){
+					if(userid==null){
 	
-				            return "redirect:/login";
-				     }
+				        return "redirect:/login";
+				    }
 					boolean save=false;
 					
 					File dir = new File(uploadPath);
@@ -150,8 +149,7 @@ public class ViewConfirmDPRPlan {
 						dir.mkdirs();
 					}
 			    	
-					save=dprserv.updateDPRNRMELPOtherTarget(pprid, dprFile, 
-							userid, CommonFunctions.getClientIpAddr(request));
+					save=dprserv.updateDPRNRMELPOtherTarget(pprid, dprFile, userid, CommonFunctions.getClientIpAddr(request));
 					
 					if(save)
 						redirectAttributes.addFlashAttribute( "success", "DPR Approved.");
@@ -186,13 +184,18 @@ public class ViewConfirmDPRPlan {
 	        String districtName = "";
 	        String projectName = "";
 
-	        if (nrm != null && !nrm.isEmpty()) {
+	        if (nrm != null && !nrm.isEmpty()) 
+	        {
 	            districtName = str(nrm.get(0)[3]);
 	            projectName  = str(nrm.get(0)[2]);
-	        } else if (elp != null && !elp.isEmpty()) {
+	        } 
+	        else if (elp != null && !elp.isEmpty()) 
+	        {
 	            districtName = str(elp.get(0)[3]);
 	            projectName  = str(elp.get(0)[2]);
-	        } else if (oth != null && !oth.isEmpty()) {
+	        } 
+	        else if (oth != null && !oth.isEmpty()) 
+	        {
 	            districtName = str(oth.get(0).getDprDetails().getPpr().getDistrict().getDistName());
 	            projectName  = str(oth.get(0).getDprDetails().getPpr().getProjectName());
 	        }
@@ -201,8 +204,10 @@ public class ViewConfirmDPRPlan {
 	        List<String[]> r1 = new ArrayList<>();
 	        Object prevId = null;
 	        String prevHead = null;
-	        if (nrm != null) {
-	            for (Object[] row : nrm) {
+	        if (nrm != null) 
+	        {
+	            for (Object[] row : nrm) 
+	            {
 	                boolean firstOfProject = prevId == null || !prevId.equals(row[0]);
 	                String head = str(row[8]);
 	                boolean sameHead = !firstOfProject && head.equals(prevHead);
@@ -218,11 +223,12 @@ public class ViewConfirmDPRPlan {
 	                prevHead = head;
 	            }
 	        }
-
 	        // ---------- DPR-2 rows ----------
 	        List<String[]> r2 = new ArrayList<>();
-	        if (elp != null) {
-	            for (Object[] row : elp) {
+	        if (elp != null) 
+	        {
+	            for (Object[] row : elp) 
+	            {
 	                String code = str(row[6]);
 	                String head = "L".equals(code) ? "Livelihood"
 	                        : "P".equals(code) ? "Production"
@@ -235,15 +241,16 @@ public class ViewConfirmDPRPlan {
 	        // ---------- DPR-3 rows ----------
 	        List<String[]> r3 = new ArrayList<>();
 	        if (oth != null) {
-	            for (DprOtherDtl d : oth) {
+	            for (DprOtherDtl d : oth) 
+	            {
 	                String head = "", act = "", unit = "";
-	                if (d.getOtherActivity() != null) {
+	                if (d.getOtherActivity() != null) 
+	                {
 	                    head = str(d.getOtherActivity().getOtherHeads().getOtherHeadDesc());
 	                    act = str(d.getOtherActivity().getOtherActivityDesc());
 	                    unit = str(d.getOtherActivity().getUnit().getUnitDesc());
 	                }
-	                r3.add(new String[] {
-	                        str(d.getDprDetails().getPpr().getDistrict().getDistName()),
+	                r3.add(new String[] {str(d.getDprDetails().getPpr().getDistrict().getDistName()),
 	                        str(d.getDprDetails().getPpr().getProjectName()),
 	                        head, act, unit, str(d.getQtyPlanned()) });
 	            }
@@ -291,7 +298,8 @@ public class ViewConfirmDPRPlan {
 	                        "attachment; filename=\"DPR_Targets_" + project + ".pdf\"")
 	                .body(out.toByteArray());
 
-	    } catch (Exception e) {
+	    } 
+	    catch (Exception e) {
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	    }
@@ -331,7 +339,8 @@ public class ViewConfirmDPRPlan {
 	        c.setHorizontalAlignment(Element.ALIGN_CENTER);
 	        c.setPadding(5);
 	        t.addCell(c);
-	    } else {
+	    } 
+	    else {
 	        for (String[] r : rows) {
 	            for (int i = 0; i < r.length; i++) {
 	                PdfPCell c = new PdfPCell(new Phrase(r[i], tdFont));
