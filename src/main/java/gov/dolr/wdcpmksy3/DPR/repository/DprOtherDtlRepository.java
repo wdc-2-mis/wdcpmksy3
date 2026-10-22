@@ -2,14 +2,13 @@ package gov.dolr.wdcpmksy3.DPR.repository;
 
 import java.util.List;
 
-import org.jspecify.annotations.Nullable;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import gov.dolr.wdcpmksy3.DPR.entity.DprDetails;
 import gov.dolr.wdcpmksy3.DPR.entity.DprOtherDtl;
-import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
-import gov.dolr.wdcpmksy3.PPR.entity.PprProjectGlance;
+
 
 public interface DprOtherDtlRepository extends JpaRepository<DprOtherDtl, Integer>{
 
@@ -26,6 +25,9 @@ public interface DprOtherDtlRepository extends JpaRepository<DprOtherDtl, Intege
 
 	@Query("select dp from DprOtherDtl dp WHERE dp.dprDetails.ppr.district.state.stCode = :stCode order by dp.status desc")
 	List<DprOtherDtl> findDprOtherDtlDataBystCode(Integer stCode);
+	
+	@Query("select dp from DprOtherDtl dp WHERE dp.dprDetails.ppr.pprId = :pprId and dp.status='C' ")
+	List<DprOtherDtl> findCompletedOtherDtlByPprId(Integer pprId);
 
 	
 }

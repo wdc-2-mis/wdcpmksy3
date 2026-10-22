@@ -721,8 +721,6 @@
 										<th:block th:each="dist : ${distList}">
 											<option th:value="${dist.dcode}" th:text="${dist.distName}"></option>
 										</th:block>
-										<option th:each="d : ${districtList}" th:value="${d.dcode}" th:text="${d.distName}" 
-											th:selected="${selectedDistrict != null and selectedDistrict == d.dcode}"></option>
 								</select>
 								<div class="invalid-feedback">Please select a District.</div>
 				       	</div>

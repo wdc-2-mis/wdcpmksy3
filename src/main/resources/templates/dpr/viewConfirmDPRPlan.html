@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+
+<head>
+	<meta charset="UTF-8">
+	<title>View and Confirm DPR Target</title>
+
+	<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+	<style>
+		.required {
+			color: red;
+		}
+
+
+
+		@keyframes blinkButton {
+			0% {
+				opacity: 1;
+			}
+
+			50% {
+				opacity: 0.4;
+			}
+
+			100% {
+				opacity: 1;
+			}
+		}
+
+		.btn-blink {
+			animation: blinkButton 1.2s infinite;
+		}
+
+
+
+		@keyframes blinkArrow {
+			0% {
+				opacity: 1;
+				transform: translateX(0);
+			}
+
+			50% {
+				opacity: 0.3;
+				transform: translateX(5px);
+			}
+
+			100% {
+				opacity: 1;
+				transform: translateX(0);
+			}
+		}
+
+		.arrow-blink {
+			animation: blinkArrow 1s infinite;
+			color: #0d6efd;
+			font-size: 18px;
+		}
+	</style>
+
+
+	<script>
+		
+		function setInvalid(el, msg) {
+				el.classList.add("is-invalid");
+				el.classList.remove("is-valid");
+				const fb = el.parentElement.querySelector(".invalid-feedback");
+				if (fb && msg) {
+					fb.textContent = msg;
+				}
+			}
+
+			function setValid(el) {
+				el.classList.remove("is-invalid");
+				el.classList.add("is-valid");
+			}
+
+		function checkProjectForwarded() {
+
+			let project = document.getElementById("project").value;
+
+			if (project === "") {
+				return;
+			}
+			fetch('/checkDPRApproved?pprid=' + project)
+				.then(response => response.text())
+				.then(result => {
+					console.log(result);
+					if (result === "EXISTS") {
+						latestAlert("This DPR Data already Approved. Please select different Project");
+						document.getElementById("project").value = "";
+						document.getElementById("project").focus();
+					}
+
+				})
+				.catch(error => console.error(error));
+		}
+
+
+		document.addEventListener("DOMContentLoaded", function () {
+			document.querySelectorAll(".viewBtn").forEach(function (btn) {
+				btn.addEventListener("click", function () {
+					let id = this.getAttribute("data-id");
+					let loading = document.getElementById("criteriaLoading");
+					let error = document.getElementById("criteriaError");
+					let noData = document.getElementById("criteriaNoData");
+					let tableContainer = document.getElementById("criteriaTableContainer");
+					let tableBody = document.getElementById("criteriaTableBody");
+					tableBody.innerHTML = "";
+					loading.style.display = "block";
+					error.style.display = "none";
+					noData.style.display = "none";
+					tableContainer.style.display = "none";
+					fetch("/viewSavedCriteriaDetails?id=" + id)
+						.then(response => {
+							if (!response.ok) {
+								throw new Error("Unable to fetch criteria details");
+							}
+							return response.json();
+						})
+						.then(data => {
+							loading.style.display = "none";
+							if (!data || data.length === 0) {
+								noData.style.display = "block";
+								return;
+							}
+							data.forEach(function (item, index) {
+								let row = document.createElement("tr");
+								let serialCell = document.createElement("td");
+								serialCell.textContent = index + 1;
+								let criteriaCell = document.createElement("td");
+								criteriaCell.textContent = item.criteriaDesc ? item.criteriaDesc : "";
+								let marksCell = document.createElement("td");
+								marksCell.textContent = item.scoredMarks != null ? item.scoredMarks : 0;
+								row.appendChild(serialCell);
+								row.appendChild(criteriaCell);
+								row.appendChild(marksCell);
+								tableBody.appendChild(row);
+							});
+							tableContainer.style.display = "block";
+						})
+						.catch(errorMessage => {
+							console.error("Error:", errorMessage);
+							loading.style.display = "none";
+							error.textContent = "Unable to load criteria details. Please try again.";
+							error.style.display = "block";
+						});
+				});
+			});
+		});
+
+		
+		function loadProjectsForDistrict(districtId, projectIdToSelect) {
+			let project = document.getElementById("project");
+			project.innerHTML = '<option value="">--Select Project--</option>';
+			if (!districtId) {
+				return;
+			}
+			fetch('/getProjectsByDistrictDPRNRM?dcode=' + districtId)
+				.then(response => response.json())
+				.then(data => {
+					data.forEach(function (item) {
+						let option = document.createElement("option");
+						option.value = item.id;          // PPR ID
+						option.textContent = item.name;  // Project Name
+						project.appendChild(option);
+					});
+					if (projectIdToSelect) {
+						project.value = String(projectIdToSelect);
+					}
+				})
+				.catch(error => {
+					console.error("Error:", error);
+				});
+		}
+
+		document.addEventListener("DOMContentLoaded", function () {
+
+			document.getElementById("district").addEventListener("change", function () {
+				loadProjectsForDistrict(this.value, null);
+			});
+
+			const form = document.getElementById("confirmDPR");
+			const mouFile = document.getElementById("dprFile");
+			let selectedDcode = form.dataset.selectedDcode;
+			let selectedProject = form.dataset.selectedProject;
+			if (selectedDcode) {
+				loadProjectsForDistrict(selectedDcode, selectedProject);
+			}
+			
+			function getPdfError(input) {
+
+				if (input.files.length === 0) {
+					return "Please upload DPR PDF.";
+				}
+
+				const file = input.files[0];
+				const name = file.name;
+
+				// Only letters, numbers, underscore, hyphen + .pdf
+				if (!/^[a-zA-Z0-9_-]+\.pdf$/i.test(name)) {
+					return "File name should contain only letters, numbers, underscore (_) or hyphen (-), and end with .pdf";
+				}
+
+				if (file.type !== "application/pdf" && !name.toLowerCase().endsWith(".pdf")) {
+					return "Only PDF files are allowed.";
+				}
+
+				// Max 5 MB
+				if (file.size > 5 * 1024 * 1024) {
+					return "PDF file size must not be more than 5 MB.";
+				}
+
+				return "";
+			}
+			mouFile.addEventListener("change", function () {
+				const err = getPdfError(mouFile);
+
+				if (err) {
+					if (mouFile.files.length > 0) {
+						mouFile.value = "";
+					}
+					setInvalid(mouFile, err);
+				} else {
+					setValid(mouFile);
+				}
+			});
+			form.addEventListener("submit", function (e) {
+				let isValid = true;
+				const district = document.getElementById("district");
+				const project = document.getElementById("project");
+				const mouFile = document.getElementById("dprFile");
+			//	const fyear = document.getElementById("fyear");
+
+			if (district.value.trim() === "") {
+					setInvalid(district, "Please select a District.");
+					isValid = false;
+				} else {
+					setValid(district);
+				}
+
+				// Agency
+				if (project.value.trim() === "") {
+					setInvalid(project, "Please select a Project.");
+					isValid = false;
+				} else {
+					setValid(agency);
+				}
+				// MoU PDF
+				const pdfErr = getPdfError(mouFile);
+				if (pdfErr) {
+					setInvalid(mouFile, pdfErr);
+					isValid = false;
+				} else {
+					setValid(mouFile);
+				}
+
+				// Stop submit if anything is invalid
+				if (!isValid) {
+
+					e.preventDefault();
+					e.stopPropagation();
+
+					const firstInvalid = form.querySelector(".is-invalid");
+
+					if (firstInvalid) {
+						firstInvalid.scrollIntoView({
+							behavior: "smooth",
+							block: "center"
+						});
+						firstInvalid.focus();
+					}
+
+					return false;
+				}
+
+			});
+			
+			if (form) {
+
+				       const inputs =
+				           form.querySelectorAll("select[required]");
+
+				       inputs.forEach(function (input) {
+
+				           input.addEventListener("blur", function () {
+
+				               if (!input.value) {
+
+				                   input.classList.add("is-invalid");
+				                   input.classList.remove("is-valid");
+
+				               } else {
+
+				                   input.classList.remove("is-invalid");
+				                   input.classList.add("is-valid");
+
+				               }
+
+				           });
+
+				       });
+
+
+				       form.addEventListener("submit", function (event) {
+
+				           if (!form.checkValidity()) {
+
+				               event.preventDefault();
+				               event.stopPropagation();
+
+				           }
+
+				           form.classList.add("was-validated");
+
+				       });
+
+				   }
+
+		});
+	</script>
+
+</head>
+
+
+<div layout:fragment="content">
+
+	<div class="card shadow border-0">
+
+		<div class="card-header bg-success text-white">
+			<h3 class="mb-0">View and Confirm DPR</h3>
+		</div>
+		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${error}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div class="card-body">
+
+			<div th:if="${validationError}" class="alert alert-danger" th:text="${validationError}"></div>
+
+			<form id="viewDPR" th:action="@{/getViewConfirmDPRPlan}" method="get"
+				th:attr="data-selected-dcode=${selectedDcode},data-selected-project=${selectedProject}">
+				<div class="row mb-4">
+
+					<div class="col-md-4">
+						<label><b>District</b></label><span class="required">*</span>
+						<select id="district" name="district" class="form-select" required>
+							<option value="">--Select District--</option>
+							<th:block th:each="dist : ${distList}">
+								<option th:value="${dist.dcode}" th:text="${dist.distName}"
+									th:selected="${selectedDcode != null and dist.dcode == selectedDcode}"></option>
+							</th:block>
+						</select>
+					</div>
+
+					<div class="col-md-4">
+						<label><b>Project</b></label><span class="required">*</span>
+						<select class="form-control" id="project" name="project" onchange="checkProjectForwarded()" required>
+							<option value="">--Select Project--</option>
+							<th:block th:each="proj : ${projList}">
+								<option th:value="${proj.pprId}" th:text="${proj.projectName}"
+									th:selected="${selectedProject != null and proj.pprId == selectedProject}"></option>
+							</th:block>
+						</select>
+					</div>
+					<div class="col-md-2">
+						<br/>
+						<button type="submit" class="btn btn-primary">
+							Get Data
+						</button>
+					
+						<!--<button type="submit" formaction="/downloadPPRPdf" class="btn btn-success" th:if="${searched}">
+							<i class="fas fa-file-pdf"></i> Download PDF
+						</button>-->
+					</div>
+					
+
+				</div>
+
+				
+			</form>
+
+			<div >
+
+				
+				<!-- ===================== DPR-1 ===================== -->
+				<div class="mt-4" >
+
+					<h4 class="bg-primary text-white p-2">
+						DPR-1 : Details of DPR NRM Target
+					</h4>
+
+					<table class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="table-primary">District</th>
+								<th class="table-primary">Project</th>
+								<th class="table-primary">Head </th>
+								<th class="table-primary">Activity</th>
+								<th class="table-primary">Unit</th>
+								<th class="table-primary">Target</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr th:each="row, stat : ${dprNrmProjectPlanList}">
+
+								<!-- DISTRICT -->
+								<td style="text-align: left;"
+									th:text="${(stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]) ? row[3] : ''}"></td>
+								<!-- project -->
+								<td style="text-align: left;"
+									th:text="${(stat.first || row[0] != dprNrmProjectPlanList[stat.index-1][0]) ? row[2] : ''}"></td>
+								<!-- head NAME  -->
+								<td style="text-align: left;" th:text="${row[8]}"
+									th:if="${stat.first or row[8] != dprNrmProjectPlanList[stat.index - 1][8]}">
+								</td>
+								<td th:unless="${stat.first or row[8] != dprNrmProjectPlanList[stat.index - 1][8]}"></td>
+								<!-- Activity -->
+								<td style="text-align: left;" th:text="${row[10]}"></td>
+								<!-- unit -->
+								<td style="text-align: left;" th:text="${row[11]}"></td>
+								<!-- Target -->
+								<td style="text-align: right;"
+									th:text="${row[11] == 'nos' ? T(java.lang.String).format('%.0f', row[13]) : row[13]}">
+								</td>
+							</tr>
+
+							<!--<tr th:if="${#lists.isEmpty(records)}">
+								<td colspan="4">
+									<div class="d-flex justify-content-center align-items-center gap-3">
+										<span class="text-danger">No records found.</span>
+										<i class="fas fa-arrow-right arrow-blink"></i>
+										 TODO: confirm URL 
+										<a th:href="@{/pprDistrict}" class="btn btn-primary btn-sm btn-blink">
+											<i class="fas fa-plus"></i> Add Details
+										</a>
+										
+									</div>
+								</td>
+							</tr>-->
+						</tbody>
+					</table>
+
+				</div>
+				
+				<!-- ===================== PPR-2 ===================== -->
+				<div class="mt-4" >
+				
+					<h4 class="bg-primary text-white p-2">
+						DPR-2 : Details of DPR EPA, Livelihood and Production Target
+					</h4>
+				
+					<div>
+				
+						<table class="table table-bordered table-striped">
+				
+							<thead>
+								<tr>
+									<th class="table-primary">District</th>
+									<th class="table-primary">Project</th>
+									<th class="table-primary">Head</th>
+									<th class="table-primary">Activity</th>
+									<th class="table-primary">Unit</th>
+									<th class="table-primary">Target</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="row, stat : ${dprELPList}">
+									
+									<td th:text="${row[3]}"></td>
+									<td th:text="${row[2]}"></td>
+									<td>
+										<span th:switch="${row[6]}">
+											<span th:case="'L'">Livelihood</span>
+											<span th:case="'P'">Production</span>
+											<span th:case="'E'">EPA</span>
+										</span>
+									</td>
+									<td th:text="${row[7]}"></td>
+									<td th:text="${row[10]}"></td>
+									<td th:text="${row[8]}"></td>
+								</tr>
+							</tbody>
+						</table>
+				
+					</div>
+				
+				</div>
+
+				<!-- ===================== PPR-3 ===================== -->
+				<div class="mt-4" >
+				
+					<h4 class="bg-primary text-white p-2">
+						DPR-3 : Details of DPR Other Activity Target
+					</h4>
+				
+					<div>
+				
+						<table class="table table-bordered table-striped">
+				
+							<thead>
+								<tr>
+									<th class="table-primary">District</th>
+									<th class="table-primary">Project</th>
+									<th class="table-primary">Head</th>
+									<th class="table-primary">Activity</th>
+									<th class="table-primary">Unit</th>
+									<th class="table-primary">Target</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="data, stat : ${dprOtherTargetList}">
+									
+									<td th:text="${data.dprDetails.ppr.district.distName}"></td>
+									<td th:text="${data.dprDetails.ppr.projectName}"></td>
+									<td>
+										<span th:if="${data.otherActivity != null}" th:text="${data.otherActivity.otherHeads.otherHeadDesc}"></span>
+									</td>
+									<td>
+										<span th:if="${data.otherActivity != null }" th:text="${data.otherActivity.otherActivityDesc}">
+										</span>
+									</td>
+									<td>
+										<span th:if="${data.otherActivity != null}" th:text="${data.otherActivity.unit.unitDesc}">
+										</span>
+									</td>
+									<td th:text="${data.qtyPlanned}"></td>
+								</tr>
+							</tbody>
+						</table>
+				
+					</div>
+				
+				</div>
+				
+				<form id="confirmDPR" th:action="@{/confirmDPR}" method="post" enctype="multipart/form-data" novalidate>
+
+					<input type="hidden" name="pprdcode" th:value="${selectedDcode}">
+					<input type="hidden" name="pprid" th:value="${selectedProject}">
+					<div class="card-header bg-primary text-white">
+					           <h4 class="mb-0">
+					              Upload DPR
+					           </h4>
+					</div>
+					<div class="col-md-12">
+								<br/>				
+					</div>
+					<div class="row mb-3 align-items-center">
+						
+						<div class="col-md-2">
+							<label class="form-label fw-semibold">
+								Upload <span class="text-danger">*</span>
+							</label>
+						</div>
+						<div class="col-md-4">
+							<input type="file" id="dprFile" name="dprFile" class="form-control" accept=".pdf,application/pdf"
+								required>
+							<div class="invalid-feedback">Please select a Upload DPR PDF within 5 MB. </div>
+							<small class="form-text text-muted">Only PDF file is allowed.</small>
+							<div id="dprFileError" class="text-danger mt-1"></div>
+						</div>
+						<div class="col-md-6">
+							<button type="submit" class="btn btn-primary" >
+								Approve DPR
+							</button>
+						</div>
+					
+					</div>
+					
+				</form>
+
+
+
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</html>

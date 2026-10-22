@@ -1,13 +1,16 @@
 package gov.dolr.wdcpmksy3.DPR.service;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import gov.dolr.wdcpmksy3.DPR.entity.DprDetails;
 import gov.dolr.wdcpmksy3.DPR.entity.DprNrmDtl;
@@ -31,6 +34,9 @@ import gov.dolr.wdcpmksy3.entity.MVillage;
 
 @Service
 public class DPRNRMPlanService {
+	
+	@Value("${dpr.path}")
+    private String uploadPath;
 	
 	@Autowired
     private MPprRepository mprep;
@@ -178,5 +184,35 @@ public class DPRNRMPlanService {
 
 	     return true;
 	 }
+	 
+	 public boolean updateDPRNRMELPOtherTarget(Integer project, MultipartFile dprFile, String userid, String ip) {
+			
+			boolean state=false;
+			try {
+				
+				MPpr mp= mprep.getReferenceById(project);
+				DprDetails pln = planrepo.findByPprPprId(project).orElse(null);
+				Integer id = pln.getDprId();
+				if (pln != null) {
+					
+					dprFile.transferTo(new File(uploadPath + id + "_"+ dprFile.getOriginalFilename()));
+					pln.setDpruploadUrl(uploadPath + id + "_"+ dprFile.getOriginalFilename());
+				    pln.setStatus('C');
+				    pln.setUpdatedby(userid);
+				    pln.setUpdatedon(LocalDateTime.now());
+				    pln.setRequestIp(ip);
+				    planrepo.save(pln);
+				}
+				
+				state=true;
+				
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				state=false;
+			}
+			return state;	
+			
+		}
 
 }
