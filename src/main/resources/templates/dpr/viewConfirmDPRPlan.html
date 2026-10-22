@@ -83,12 +83,12 @@
 			if (project === "") {
 				return;
 			}
-			fetch('/checkDPRApproved?pprid=' + project)
+			fetch('/checkDPRProjectDataApproved?pprid=' + project)
 				.then(response => response.text())
 				.then(result => {
 					console.log(result);
 					if (result === "EXISTS") {
-						latestAlert("This DPR Data already Approved. Please select different Project");
+						latestAlert("This Project DPR Data already Approved. Please select different Project");
 						document.getElementById("project").value = "";
 						document.getElementById("project").focus();
 					}

@@ -55,7 +55,7 @@ public class SecurityConfig {
                         "/checkCropOutcomeSeason", "/getLandPatternAreaByState", "/dprPhyOtherHeadActivities", "/getUnitDescByOtherActivity", "/saveDPROtherHeadActivities", "/checkProjectActivityExistsOther", "/getOtherDtlEditById", "/deleteDPROtherTarget", "/updateDPROtherTargetRecord", "/completeDprOtherTargetData", "/getAgroClimateConditiondist", "/getLivelihoodSummaryDistData", "/getDrinkingWaterStatusData", "/getPendingUCPPR19Data", "/getUnspentBalancePPR20Data", "/getWCDCFunctionariesDistData",
 // DPR 					 
                         "/createDPRNRMPlan", "/saveDPRNRMTarget", "/getProjectsByDistrictDPRNRM", "/getActivitiesByHeadCodeDPRNRM", "/getUnitDescByActivity", "/checkProjectActivityExistsNRM", "/deleteDPRNRMTarget", "/completeDPRNRMTarget", "/editDPRNRMTarget", "/completeDPRNRMTargetAll", "/deleteDPRNRMTargetAll", "/getProjectsByDPRNRMData", "/epalivproddetails", "/getActivitiesByHeadCodeDPRELP", "/getUnitDescByelpActivity", "/saveDPRELPTarget", "/editDPRELPTarget",  "/deleteDprELPTarget", "/completeSelectedDprELPTargets", "/completeDprELPTarget",
-                        "/getProjectsByDistrictDPREPA", "/getDprELPByProject", "/getViewConfirmDPRPlan", "/confirmDPR", "/checkDPRApproved",
+                        "/getProjectsByDistrictDPREPA", "/getDprELPByProject", "/getViewConfirmDPRPlan", "/confirmDPR", "/checkDPRProjectDataApproved",
                         
                         "/css/**",
                         "/js/**",

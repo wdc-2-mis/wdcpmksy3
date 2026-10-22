@@ -96,9 +96,9 @@ public class ViewConfirmDPRPlan {
         return "dpr/viewConfirmDPRPlan";
     }
 	
-	 	@GetMapping("/checkDPRApproved")
+	 	@GetMapping("/checkDPRProjectDataApproved")
 		@ResponseBody
-		public String checkDPRApproved(@RequestParam Integer pprid) {
+		public String checkDPRProjectDataApproved(@RequestParam Integer pprid) {
 
 	    	List<DprDetails> records = plan.findByPprPprIdandStatus(pprid);
 		    
