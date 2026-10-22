@@ -67,6 +67,9 @@ public class DPRNRMPlanController {
         	
         List<Object[]> list=plan.getDprNrmProjectPlanList(stcode);
         
+        boolean allCompleted = list.stream()
+	    	    .allMatch(row -> "C".equals(String.valueOf(row[5])));
+        
         if(list!=null && !list.isEmpty()) {
         int srNo = 1;
         Integer previousId = null;
@@ -91,7 +94,7 @@ public class DPRNRMPlanController {
         model.addAttribute("dprNrmProjectPlanList", finalList);
         model.addAttribute("headList", head.findAllByOrderBySeqNoAsc());
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
-        
+        model.addAttribute("allCompleted", allCompleted);
         return "dpr/addDPRNRMTarget";
     }
 	
@@ -101,7 +104,8 @@ public class DPRNRMPlanController {
 	        Model model) {
 		List<Object[]> finalList = new ArrayList<>();
 		List<Object[]> list =plan.getDprNrmProjectPlanListByProject(project);
-
+		boolean allCompleted = list.stream()
+	    	    .allMatch(row -> "C".equals(String.valueOf(row[5])));
 		if(list!=null && !list.isEmpty()) {
 	        int srNo = 1;
 	        Integer previousId = null;
@@ -123,7 +127,7 @@ public class DPRNRMPlanController {
 	        }
 	        }
 	        model.addAttribute("dprNrmProjectPlanList", finalList);
-
+	        model.addAttribute("allCompleted", allCompleted);
 	    return "dpr/addDPRNRMTarget :: cropOutcomeTable";
 	}
 	

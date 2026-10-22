@@ -693,7 +693,7 @@
 
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">
-               Add Details of DPR NRM Target
+               Add Details of DPR NRM Activity Target
             </h4>
         </div>
 		
@@ -799,7 +799,7 @@
 
 		                <center>
 
-		                    List of Added DPR NRM Target
+		                    List of Added DPR NRM Activity Target
 
 		                </center>
 
@@ -815,7 +815,7 @@
 		               style="min-width:1200px;">
 		            <thead class="table-primary">
 		            <tr>
-		                <th>Sl. No.  &nbsp; <input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" /> Select All</th>
+		                <th>Sl. No.  &nbsp; <input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" /> All</th>
 		                <th>District</th>
 		                <th>Project</th>
 		                <th>Head </th>
@@ -913,8 +913,8 @@
 		            </tr>
 					
 						<tr th:if="${#lists.size(dprNrmProjectPlanList) > 0}">
-							<td> <input type="button" class="btn btn-danger btn-sm" id="delete" name="delete" value="Delete" /> </td>
-							<td> <input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" /> </td>
+							<td> <input type="button" class="btn btn-danger btn-sm" id="delete" name="delete" value="Delete" th:disabled="${allCompleted}"/> </td>
+							<td> <input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" th:disabled="${allCompleted}"/> </td>
 						</tr>
 					
 
@@ -932,7 +932,7 @@
 					<div class="modal-dialog modal-xl">
 						<div class="modal-content">
 							<div class="modal-header bg-primary text-white">
-								<h5>Edit Details</h5>
+								<h5>Edit DPR NRM Activity Target</h5>
 								<button class="btn-close" data-bs-dismiss="modal"></button>
 							</div>
 							
@@ -944,7 +944,7 @@
 								
 									<div class="col-md-6">
 										<label class="form-label">
-											<b> District </b><span class="required">*</span>
+											<b> District </b>
 										</label>
 										<input type="text" name="district1" id="district1" class="form-control" readonly>
 										<div class="invalid-feedback">Please select a District.</div>
@@ -952,7 +952,7 @@
 								
 									<div class="col-md-6">
 										<label class="form-label">
-											<b> Project </b><span class="required">*</span>
+											<b> Project </b>
 										</label>
 										<input type="text" name="project1" id="project1" class="form-control" readonly>
 										<div class="invalid-feedback">Please select a Project.</div>
@@ -960,14 +960,14 @@
 								
 									<div class="col-md-6">
 										<label class="form-label">
-											<b> Name of Head </b><span class="required">*</span>
+											<b> Name of Head </b>
 										</label>
 										<input type="text" name="head1" id="head1" class="form-control" readonly>
 										<div class="invalid-feedback">Please select a Head.</div>
 									</div>
 									<div class="col-md-6">
-										<label class="form-label">activity
-											<b> Name of Activity</b> <span class="required">*</span>
+										<label class="form-label">
+											<b> Name of Activity</b>
 										</label>
 										<input type="text" name="activity1" id="activity1" class="form-control" readonly>
 										<div class="invalid-feedback">Please select Activity</div>
