@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         </div>
 		
-						<div class="table-responsive" th:if="${#lists.size(ppr1List) > 0}">
+					<!--	<div class="table-responsive" th:if="${#lists.size(ppr1List) > 0}">
 		                    <table class="table table-bordered">
 								<h4>
 								      <b> <centre> List of  Institutional Structure </centre>  </b>
@@ -228,8 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
 									<th class="table-primary">Action</th>
 		                        </tr>
 								</tbody>
-		                       <!--  <tr th:each="user : ${ppr1List}">
-		                           <td th:text="${user[2]}"></td>-->
+		                         <tr th:each="user : ${ppr1List}">
+		                           <td th:text="${user[2]}"></td>
 									
 								   <tr th:each="user, stat : ${ppr1List}">
 								       	<td th:text="${stat.first ? user[2] : ''}"></td>
@@ -274,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
 										</td>
 		                        </tr>
 		                    </table>
-		                </div>
+		                </div>-->
 
     </div>
 

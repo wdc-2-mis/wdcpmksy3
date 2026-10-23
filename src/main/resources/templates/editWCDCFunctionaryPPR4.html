@@ -2094,7 +2094,7 @@
          EXISTING RECORDS
     ========================================================== -->
 
-    <div class="table-responsive mt-4"
+  <!--  <div class="table-responsive mt-4"
          th:if="${#lists.size(functionariesList) > 0}">
 
 
@@ -2172,118 +2172,118 @@
             <tr th:each="row, stat : ${functionariesList}">
 
 
-                <!-- SL NO -->
+                 SL NO 
 
                 <td th:text="${row[20]}">
                 </td>
 
 
-                <!-- DISTRICT -->
+                 DISTRICT 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[19] : ''}">
                 </td>
 
 
-                <!-- FIRST NAME -->
+                 FIRST NAME 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[5] : ''}">
                 </td>
 
 
-                <!-- LAST NAME -->
+                 LAST NAME 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[6] : ''}">
                 </td>
 
 
-                <!-- DESIGNATION -->
+                 DESIGNATION 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[2] : ''}">
                 </td>
 
 
-                <!-- QUALIFICATION -->
+                 QUALIFICATION 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[4] : ''}">
                 </td>
 
 
-                <!-- WORK ALLOCATION -->
+                 WORK ALLOCATION 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[7] : ''}">
                 </td>
 
 
-                <!-- SL RECURRING -->
+                 SL RECURRING 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[8] : ''}">
                 </td>
 
 
-                <!-- SL NON RECURRING -->
+                 SL NON RECURRING 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[9] : ''}">
                 </td>
 
 
-                <!-- DOLR RECURRING -->
+                 DOLR RECURRING 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[10] : ''}">
                 </td>
 
 
-                <!-- DOLR NON RECURRING -->
+                 DOLR NON RECURRING 
 
                 <td th:text="${(stat.first || row[0] != functionariesList[stat.index-1][0]) ? row[11] : ''}">
                 </td>
 
 
-                <!-- OFFICE -->
+                 OFFICE 
 
                 <td th:text="${row[14]}">
                 </td>
 
 
-                <!-- ADDRESS -->
+                 ADDRESS 
 
                 <td th:text="${row[15]}">
                 </td>
 
 
-                <!-- YEAR -->
+                 YEAR 
 
                 <td th:text="${row[16]}">
                 </td>
 
 
-                <!-- DAY -->
+                 DAY 
 
                 <td th:text="${row[17]}">
                 </td>
 
 
-                <!-- WORK DETAILS -->
+                 WORK DETAILS 
 
                 <td th:text="${row[18]}">
                 </td>
 
 
-                <!-- ACTION -->
+                 ACTION 
 
                 <td th:if="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
 
                     &nbsp;&nbsp;
 
 
-                    <!-- DELETE -->
+                     DELETE 
 
-					<!--   <a th:if="${row[12] != null and row[12].toString().equals('D')}" title="Delete"
+					   <a th:if="${row[12] != null and row[12].toString().equals('D')}" title="Delete"
 					            th:href="@{/deleteWCDCFunctionariesPPR4B(id=${row[0]})}"
 					            class="btn btn-danger btn-sm"
 					            onclick="return confirm('Are you sure you want to delete this record?');">
 								 <i class="fas fa-trash"></i>
 
-					          </a>-->
+					          </a>
 									<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${row[12] != null and row[12].toString().equals('D')}"
 										title="Delete"
 										th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteWCDCFunctionariesPPR4B?id=' + ${row[0]} + '\'; }); return false;'">
@@ -2295,7 +2295,7 @@
 									&nbsp;&nbsp;
 									
 									
-									<!-- EDIT -->
+									 EDIT 
 									
 									<a th:if="${row[12] != null and row[12].toString().equals('D')}" title="Edit"
 										th:href="@{/editWCDCFunctionariesPPR4B(id=${row[0]})}" class="btn btn-primary btn-sm"
@@ -2309,9 +2309,9 @@
 									&nbsp;&nbsp;
 									
 									
-									<!-- COMPLETE -->
+									 COMPLETE 
 									
-									<!--  <a th:if="${row[12] != null and row[12].toString().equals('D')}"
+									  <a th:if="${row[12] != null and row[12].toString().equals('D')}"
 														                      title="Complete"
 														                      th:href="@{/completeWCDCFunctionariesPPR4B(id=${row[0]})}"
 														                      class="btn btn-success btn-sm"
@@ -2319,7 +2319,7 @@
 									
 														                       <i class="fas fa-check"></i>
 									
-														                   </a>-->
+														                   </a>
 									
 									<a href="javascript:void(0)" class="btn btn-success btn-sm"
 										th:if="${row[12] != null and row[12].toString().equals('D')}" title="Complete"
@@ -2329,7 +2329,7 @@
 									</a>
 
 
-                    <!-- COMPLETED -->
+                     COMPLETED 
 
                     <span
                         th:if="${row[12] != null and row[12].toString().equals('C')}"
@@ -2344,7 +2344,7 @@
                 </td>
 
 
-                <!-- EMPTY ACTION FOR SAME GROUP -->
+                 EMPTY ACTION FOR SAME GROUP 
 
                 <td
                     th:unless="${stat.first || row[0] != functionariesList[stat.index-1][0]}">
@@ -2358,7 +2358,7 @@
 
         </table>
 
-    </div>
+    </div>-->
 
 
 </div>
