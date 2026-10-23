@@ -1,6 +1,7 @@
 package gov.dolr.wdcpmksy3.PPR.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -49,6 +50,7 @@ public interface PprTransactionRepository extends JpaRepository<PprTransaction, 
     		+ "ORDER BY p.projectName")
     List<MPpr> findPprByDcodeAndActionA(@Param("dcode") Integer dcode);
 
-    
+    Optional<PprTransaction>
+    findTopByPpr_PprIdOrderBySentonDescTranxIdDesc(Integer pprId);
     
 }

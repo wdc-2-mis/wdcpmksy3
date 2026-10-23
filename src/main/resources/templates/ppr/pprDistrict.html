@@ -176,57 +176,154 @@ document.addEventListener("DOMContentLoaded", function () {
     const district = document.getElementById("district");
     const fyear = document.getElementById("fyear");
     const projectName = document.getElementById("projectName");
+    const recordsBody = document.getElementById("pprRecordsBody");
+    const districtError = document.getElementById("districtError");
 
     district.addEventListener("change", function () {
 
-        // Financial year must be selected first
-        if (!fyear.value) {
+    const dcode = district.value;
+    const finYrCd = fyear.value;
 
-            alert("Please select Financial Year first.");
+    // Hide both validation messages first.
+    districtError.style.display = "none";
+    districtRequiredError.style.display = "none";
+    district.classList.remove("is-invalid");
 
-            district.value = "";
+    // If the district is cleared, show only the required message.
+    if (!dcode) {
+        projectName.value = "";
+
+        district.classList.add("is-invalid");
+        districtRequiredError.style.display = "block";
+
+        return;
+    }
+
+    // If financial year is missing, show only this message.
+    if (!finYrCd) {
+        districtError.textContent =
+            "Please select Financial Year first.";
+
+        districtError.style.display = "block";
+
+        // Clear the district without triggering another change event.
+        district.value = "";
+        projectName.value = "";
+
+        fyear.focus();
+        return;
+    }
+
+    // Both fields are valid: filter records for the selected district.
+    loadDistrictRecords(dcode);
+
+    // Generate the project name.
+    fetch('/nextProjectName?dcode='
+            + encodeURIComponent(dcode)
+            + '&fyear='
+            + encodeURIComponent(finYrCd))
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to generate project name");
+            }
+            return response.json();
+        })
+        .then(data => {
+            projectName.value = data.projectName || "";
+        })
+        .catch(error => {
+            console.error("Project name error:", error);
             projectName.value = "";
-
-            fyear.focus();
-
-            return;
-        }
-
-        const dcode = district.value;
-        const finYrCd = fyear.value;
-
-        if (!dcode) {
-            projectName.value = "";
-            return;
-        }
-
-        fetch('/nextProjectName?dcode=' + dcode + '&fyear=' + finYrCd)
-            .then(response => {
-
-                if (!response.ok) {
-                    throw new Error("Failed to generate project name");
-                }
-
-                return response.json();
-            })
-            .then(data => {
-
-                console.log("Generated project name:", data.projectName);
-
-                projectName.value = data.projectName;
-
-            })
-            .catch(error => {
-
-                console.error("Error:", error);
-
-                projectName.value = "";
-
-            });
-    });
-
+        });
 });
 
+
+    function loadDistrictRecords(dcode) {
+
+        fetch("/getPPRDistrictRecords?dcode="
+                + encodeURIComponent(dcode))
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to load district records.");
+                }
+                return response.json();
+            })
+            .then(records => {
+
+                // Remove the old state-wise rows.
+                recordsBody.replaceChildren();
+
+                if (!records || records.length === 0) {
+                    const row = recordsBody.insertRow();
+                    const cell = row.insertCell();
+
+                    cell.colSpan = 7;
+                    cell.className = "text-center";
+                    cell.textContent = "Data not found!";
+
+                    return;
+                }
+
+                records.forEach(rec => {
+
+                    const row = recordsBody.insertRow();
+
+                    // Financial Year
+                    addCell(row, rec.finYear?.finYrDesc ?? rec.finYear);
+
+                    // District
+                    addCell(row, rec.district?.distName ?? rec.district);
+
+                    // PPR Id
+                    addCell(row, rec.pprName);
+
+                    // Project Name
+                    addCell(row, rec.projectName);
+
+                    // Micro-Watershed
+                    const microCell = row.insertCell();
+                    const list = document.createElement("ul");
+
+                    (rec.microWatersheds || []).forEach(mw => {
+                        const item = document.createElement("li");
+
+                        item.textContent =
+                            mw.microWatershed?.mwName
+                            ?? mw.mwName
+                            ?? "";
+
+                        list.appendChild(item);
+                    });
+
+                    microCell.appendChild(list);
+                    addCell(row, rec.pprStatus || "PPR in Draft Mode");
+                    
+
+                    // Actions column
+                    const actionCell = row.insertCell();
+
+                    if (rec.status === "C") {
+                        const badge = document.createElement("span");
+                        badge.className = "badge bg-success";
+                        badge.textContent = "Data Completed";
+                        actionCell.appendChild(badge);
+                    } else {
+                        actionCell.textContent = "Draft";
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("District records error:", error);
+            });
+    }
+
+
+    function addCell(row, value) {
+        const cell = row.insertCell();
+        cell.textContent = value ?? "";
+    }
+
+});
 </script>
 
 </head>
@@ -301,9 +398,14 @@ document.addEventListener("DOMContentLoaded", function () {
 										<option th:value="${dist.dcode}" th:text="${dist.distName}"> </option>
 										</th:block>
 									    </select>
-                                  <div class="invalid-feedback">
-            Please select a District.
-        </div>
+                                  <div id="districtError" class="text-danger small mt-1"
+     style="display: none;">
+    Please select Financial Year first.
+</div>
+
+<div id="districtRequiredError" class="invalid-feedback">
+    Please select a District.
+</div>
 
        <!-- when district alert message showing
         <div id="districtCompletedAlert"
@@ -372,10 +474,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th class="table-primary">PPR Id</th>
                     <th class="table-primary">Project Name</th>
                     <th class="table-primary">Micro-Watershed</th>
+                    <th class="table-primary">PPR Status</th>
                     <th class="table-primary">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="pprRecordsBody">
                 <tr th:each="rec : ${records}">
                     <td th:text="${rec.finYear.finYrDesc}"></td>
                     <td th:text="${rec.district.distName}"></td>
@@ -387,6 +490,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                 th:text="${mw.microWatershed.mwName}"></li>
                         </ul>
                     </td>
+                    
+                    <td>
+    <span th:text="${pprStatusMap[rec.pprId]}">
+        PPR in Draft Mode
+    </span>
+</td>
                     <td>
                         <!-- Conditional buttons -->
                         <div th:if="${rec.status == 'C'}">

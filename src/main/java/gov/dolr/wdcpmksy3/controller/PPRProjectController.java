@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.PPR.service.FinYearService;
 import gov.dolr.wdcpmksy3.PPR.service.MicroWatershedService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRDistrictService;
@@ -42,6 +43,8 @@ public class PPRProjectController {
 	@Autowired
 	private MPprRepository pprRepo;
 	
+	@Autowired
+	private PprTransactionRepository pprTransactionRepository;
 	
 	@GetMapping("/pprDistrict")
 	public String ppr1(HttpSession session,
@@ -88,9 +91,109 @@ public class PPRProjectController {
 	    model.addAttribute("stcode", stcode);
 
 	    List<MPpr> records = pprRepo.findByStateOrdered(stcode);
+	    
+	    Map<Integer, String> pprStatusMap = new HashMap<>();
+
+	    for (MPpr rec : records) {
+	        pprStatusMap.put(
+	            rec.getPprId(),
+	            getPprStatus(rec.getPprId())
+	        );
+	    }
+	    
 	    model.addAttribute("records", records);
+	    model.addAttribute("pprStatusMap", pprStatusMap);
 
 	    return "ppr/pprDistrict";
+	}
+	
+	private String getPprStatus(Integer pprId) {
+
+	    return pprTransactionRepository
+	            .findTopByPpr_PprIdOrderBySentonDescTranxIdDesc(pprId)
+	            .map(transaction -> {
+
+	                Character action = transaction.getAction();
+
+	                if (action == null) {
+	                    return "PPR in Draft Mode";
+	                }
+
+	                switch (action) {
+	                    case 'F':
+	                        return "Forwarded to DoLR";
+
+	                    case 'A':
+	                        return "PPR Approved";
+
+	                    case 'B':
+	                        return "Refer Back";
+
+	                    default:
+	                        return "PPR in Draft Mode";
+	                }
+	            })
+	            .orElse("PPR in Draft Mode");
+	}
+	
+	@GetMapping("/getPPRDistrictRecords")
+	@ResponseBody
+	public List<Map<String, Object>> getPPRDistrictRecords(
+	        @RequestParam Integer dcode,
+	        HttpSession session) {
+
+	    Object userid = session.getAttribute("userid");
+
+	    if (userid == null) {
+	        return List.of();
+	    }
+
+	    Integer stcode = Integer.parseInt(
+	            session.getAttribute("stcode").toString());
+
+	    // Verify that the selected district belongs to the user's state.
+	    boolean validDistrict = districtService
+	            .findCompletedDistrictsByState(stcode)
+	            .stream()
+	            .anyMatch(d -> d.getDcode().equals(dcode));
+
+	    if (!validDistrict) {
+	        return List.of();
+	    }
+
+	    List<MPpr> records = pprRepo.findByDistrictOrdered(dcode);
+
+	    return records.stream().map(rec -> {
+	        Map<String, Object> map = new HashMap<>();
+
+	        map.put("pprId", rec.getPprId());
+	        map.put("finYear",
+	                rec.getFinYear() != null
+	                        ? rec.getFinYear().getFinYrDesc() : "");
+	        map.put("dcode", rec.getDistrict().getDcode());
+	        map.put("district", rec.getDistrict().getDistName());
+	        map.put("pprName", rec.getPprName());
+	        map.put("projectName", rec.getProjectName());
+	        map.put("status", rec.getStatus());
+	        map.put("pprStatus", getPprStatus(rec.getPprId()));
+	        map.put("microWatersheds",
+	                rec.getMicroWatersheds() == null
+	                        ? List.of()
+	                        : rec.getMicroWatersheds().stream()
+	                            .map(mw -> {
+	                                Map<String, Object> micro = new HashMap<>();
+	                                micro.put("mwId",
+	                                        mw.getMicroWatershed().getMwId());
+	                                micro.put("mwName",
+	                                        mw.getMicroWatershed().getMwName());
+	                                return micro;
+	                            })
+	                            .toList());
+
+	        map.put("microIdsCsv", rec.getMicroIdsCsv());
+
+	        return map;
+	    }).toList();
 	}
 	
 	@GetMapping("/checkDistrictCompleted")

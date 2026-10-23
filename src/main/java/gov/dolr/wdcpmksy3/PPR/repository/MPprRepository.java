@@ -48,5 +48,17 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
             Integer stCode,
             String status
     );
+	
+	
+	@Query("""
+		    SELECT p
+		    FROM MPpr p
+		    WHERE p.district.dcode = :dcode
+		    ORDER BY
+		        CASE WHEN p.status = 'C' THEN 1 ELSE 0 END,
+		        p.pprId ASC
+		    """)
+		List<MPpr> findByDistrictOrdered(@Param("dcode") Integer dcode);
+	
 }
 
