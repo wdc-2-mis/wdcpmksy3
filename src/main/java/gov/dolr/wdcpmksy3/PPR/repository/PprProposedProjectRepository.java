@@ -42,7 +42,7 @@ public interface PprProposedProjectRepository extends JpaRepository<PprProposedP
 			+ "sum(ppp.treatedArea) as treatedArea, "
 			+ "sum(ppp.proposedCost)) as proposedCost "
 			+ "from PprProposedProject ppp "
-			+ "where ppp.ppr = :ppr and ppp.status = 'C' "
+			+ "where ppp.ppr = :ppr and ppp.status in('C', 'S') "
 			+ "group by ppp.ppr.pprId, ppp.ppr.projectName, "
 			+ "ppp.ppr.district.distName, ppp.ppr.finYear.finYrDesc "
 			+ "order by ppp.ppr.projectName, ppp.ppr.district.distName")
