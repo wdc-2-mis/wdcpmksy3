@@ -193,7 +193,7 @@ public class PPRSoilErosionService {
     
     public List<PPRSoilErosion> getByPprId(Integer pprId) {
     	
-        return soilErosionRepository.findByPprPprId(pprId);
+        return soilErosionRepository.findByPprPprIdOrderByStatusDesc(pprId);
         
     }
 

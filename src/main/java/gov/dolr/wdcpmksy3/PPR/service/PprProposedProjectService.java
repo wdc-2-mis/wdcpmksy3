@@ -85,7 +85,7 @@ public class PprProposedProjectService {
     }
     
     public List<PprProposedProject> getPprProposedProjectList(MPpr ppr){
-    	List<PprProposedProject> list = repository.getListOfPprProposedProjectsByPpr(ppr);
+    	List<PprProposedProject> list = repository.getListOfPprProposedProjectsByPprOrderByStatusDesc(ppr);
     	return list;
     }
 

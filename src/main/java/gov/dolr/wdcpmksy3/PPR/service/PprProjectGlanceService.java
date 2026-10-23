@@ -52,7 +52,7 @@ public class PprProjectGlanceService {
 	private PprVillageRepository pprVillageRepo;
 	
 	public List<PprProjectGlance> getPprProjectGlanceList(MPpr ppr){
-		return pprProjectGlanceRepo.getListOfPprProjectGlanceByPpr(ppr);
+		return pprProjectGlanceRepo.getListOfPprProjectGlanceByPprOrderByStatusDesc(ppr);
 	}
 	
 	@Transactional
