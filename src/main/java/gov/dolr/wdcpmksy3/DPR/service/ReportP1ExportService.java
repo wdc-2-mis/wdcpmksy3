@@ -21,6 +21,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
@@ -69,40 +72,82 @@ public class ReportP1ExportService {
 
     // ---------------- Excel ----------------
     public byte[] toExcel(List<ReportP1Row> rows, String filters) throws Exception {
-        try (Workbook wb = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sh = wb.createSheet("Report P1");
-            Font bold = wb.createFont(); bold.setBold(true);
-            Font white = wb.createFont(); white.setBold(true); white.setColor(IndexedColors.WHITE.getIndex());
+    	try (XSSFWorkbook wb = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+    	    Sheet sh = wb.createSheet("Report P1");
 
-            CellStyle head = wb.createCellStyle();
-            head.setFillForegroundColor(IndexedColors.TEAL.getIndex());
-            head.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            head.setFont(white);
-            head.setAlignment(HorizontalAlignment.CENTER);
-            head.setVerticalAlignment(VerticalAlignment.CENTER);
-            head.setWrapText(true);
+    	    XSSFColor navy  = new XSSFColor(new Color(0x0B, 0x1F, 0x8A), null);
+    	    XSSFColor blue  = new XSSFColor(new Color(0x3F, 0x66, 0xC2), null);
+    	    XSSFColor light = new XSSFColor(new Color(0x7F, 0xB8, 0xEA), null);
+    	    XSSFColor total = new XSSFColor(new Color(0xDC, 0xEB, 0xFA), null);
 
-            DataFormat df = wb.createDataFormat();
-            CellStyle dec2 = wb.createCellStyle(); dec2.setDataFormat(df.getFormat("#,##0.00"));
-            CellStyle dec4 = wb.createCellStyle(); dec4.setDataFormat(df.getFormat("#,##0.0000"));
-            CellStyle b2 = wb.createCellStyle(); b2.cloneStyleFrom(dec2); b2.setFont(bold);
-            CellStyle b4 = wb.createCellStyle(); b4.cloneStyleFrom(dec4); b4.setFont(bold);
+    	    // fonts
+    	    XSSFFont bold = wb.createFont(); bold.setBold(true);
+    	    XSSFFont white = wb.createFont(); white.setBold(true); white.setColor(IndexedColors.WHITE.getIndex());
+    	    XSSFFont titleFont = wb.createFont();
+    	    titleFont.setBold(true);
+    	    titleFont.setFontHeightInPoints((short) 16);              // bigger title
+    	    titleFont.setColor(IndexedColors.WHITE.getIndex());
+    	    XSSFFont darkBold = wb.createFont();
+    	    darkBold.setBold(true);
+    	    darkBold.setColor(new XSSFColor(new Color(0x0B, 0x1F, 0x8A), null));
 
-            int r = 0;
-            Row t = sh.createRow(r++);
-            Cell tc = t.createCell(0); tc.setCellValue(TITLE); tc.setCellStyle(head);
-            for (int i = 1; i < 10; i++) t.createCell(i).setCellStyle(head);
-            sh.addMergedRegion(new CellRangeAddress(0, 0, 0, 9));
-            sh.createRow(r++).createCell(0).setCellValue(filters);
-            sh.createRow(r++).createCell(0).setCellValue("Report as on: " + LocalDateTime.now().format(TS)
-                + "    (All amounts in Rs lakhs, All Area in Ha.)");
+    	    // title style (navy)
+    	    XSSFCellStyle titleStyle = wb.createCellStyle();
+    	    titleStyle.setFillForegroundColor(navy);
+    	    titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    	    titleStyle.setFont(titleFont);
+    	    titleStyle.setAlignment(HorizontalAlignment.CENTER);
+    	    titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+    	    titleStyle.setWrapText(true);
 
-            Row h = sh.createRow(r++);
-            for (int i = 0; i < HEAD.length; i++) { Cell c = h.createCell(i); c.setCellValue(HEAD[i]); c.setCellStyle(head); }
-            Row n = sh.createRow(r++);
-            for (int i = 0; i < 10; i++) { Cell c = n.createCell(i); c.setCellValue(i + 1); c.setCellStyle(head); }
-            sh.createFreezePane(0, r);
+    	    // column header style (blue)
+    	    XSSFCellStyle head = wb.createCellStyle();
+    	    head.setFillForegroundColor(blue);
+    	    head.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    	    head.setFont(white);
+    	    head.setAlignment(HorizontalAlignment.CENTER);
+    	    head.setVerticalAlignment(VerticalAlignment.CENTER);
+    	    head.setWrapText(true);
 
+    	    // number row style (light blue)
+    	    XSSFCellStyle numRow = wb.createCellStyle();
+    	    numRow.cloneStyleFrom(head);
+    	    numRow.setFillForegroundColor(light);
+    	    numRow.setFont(darkBold);
+
+    	    // filter line style (bold)
+    	    XSSFCellStyle filterStyle = wb.createCellStyle();
+    	    filterStyle.setFont(bold);
+
+    	    DataFormat df = wb.createDataFormat();
+    	    CellStyle dec2 = wb.createCellStyle(); dec2.setDataFormat(df.getFormat("#,##0.00"));
+    	    CellStyle dec4 = wb.createCellStyle(); dec4.setDataFormat(df.getFormat("#,##0.0000"));
+
+    	    // grand total styles (light blue + bold)
+    	    XSSFCellStyle b2 = wb.createCellStyle(); b2.cloneStyleFrom(dec2); b2.setFont(bold);
+    	    b2.setFillForegroundColor(total); b2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    	    XSSFCellStyle b4 = wb.createCellStyle(); b4.cloneStyleFrom(dec4); b4.setFont(bold);
+    	    b4.setFillForegroundColor(total); b4.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+    	    int r = 0;
+    	    Row t = sh.createRow(r++);
+    	    t.setHeightInPoints(34);                                   // room for the bigger title
+    	    Cell tc = t.createCell(0); tc.setCellValue(TITLE); tc.setCellStyle(titleStyle);
+    	    for (int i = 1; i < 10; i++) t.createCell(i).setCellStyle(titleStyle);
+    	    sh.addMergedRegion(new CellRangeAddress(0, 0, 0, 9));
+
+    	    Cell fc = sh.createRow(r++).createCell(0);                 // bold filter line
+    	    fc.setCellValue(filters);
+    	    fc.setCellStyle(filterStyle);
+
+    	    sh.createRow(r++).createCell(0).setCellValue("Report as on: " + LocalDateTime.now().format(TS)
+    	        + "    (All amounts in Rs lakhs, All Area in Ha.)");
+
+    	    Row h = sh.createRow(r++);
+    	    for (int i = 0; i < HEAD.length; i++) { Cell c = h.createCell(i); c.setCellValue(HEAD[i]); c.setCellStyle(head); }
+    	    Row n = sh.createRow(r++);
+    	    for (int i = 0; i < 10; i++) { Cell c = n.createCell(i); c.setCellValue(i + 1); c.setCellStyle(numRow); }
+    	    sh.createFreezePane(0, r);
             int sno = 1;
             for (ReportP1Row x : rows) {
                 Row row = sh.createRow(r++);
@@ -118,6 +163,7 @@ public class ReportP1ExportService {
                 num(row, 9, x.getStateShare(), dec2);
             }
             Row g = sh.createRow(r);
+            for (int i = 0; i < 10; i++) g.createCell(i).setCellStyle(b2);  
             Cell gl = g.createCell(5); gl.setCellValue("Grand Total"); gl.setCellStyle(b2);
             num(g, 6, service.sum(rows, ReportP1Row::getAreaSanctioned), b4);
             num(g, 7, service.sum(rows, ReportP1Row::getTotCost), b2);
@@ -144,13 +190,16 @@ public class ReportP1ExportService {
         PdfWriter.getInstance(doc, out);
         doc.open();
 
-        com.lowagie.text.Font tf = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11);
+        Color navy = new Color(0x0B, 0x1F, 0x8A);
+        com.lowagie.text.Font tf = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 15, navy);   // bigger title
         com.lowagie.text.Font nf = FontFactory.getFont(FontFactory.HELVETICA, 8);
+        com.lowagie.text.Font ff = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9);          // bold filter line
         com.lowagie.text.Font hf = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, Color.WHITE);
+        com.lowagie.text.Font nrf = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, navy);   // number row text
         com.lowagie.text.Font bf = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8);
 
         doc.add(new Paragraph(TITLE, tf));
-        doc.add(new Paragraph(filters, nf));
+        doc.add(new Paragraph(filters, ff));
         doc.add(new Paragraph("Report as on: " + LocalDateTime.now().format(TS)
             + "     All amounts (in Rs lakhs), All Area in Ha.", nf));
         doc.add(new Paragraph(" "));
@@ -158,14 +207,15 @@ public class ReportP1ExportService {
         PdfPTable t = new PdfPTable(new float[]{4, 12, 13, 8, 22, 10, 10, 8, 8, 8});
         t.setWidthPercentage(100);
         t.setHeaderRows(2);
-        Color teal = new Color(0x4A, 0x7C, 0x82);
-        for (String s : HEAD) t.addCell(cell(s, hf, teal, Element.ALIGN_CENTER));
-        for (int i = 1; i <= 10; i++) t.addCell(cell(String.valueOf(i), hf, teal, Element.ALIGN_CENTER));
+        Color blue  = new Color(0x3F, 0x66, 0xC2);
+        Color light = new Color(0x7F, 0xB8, 0xEA);
+        for (String s : HEAD) t.addCell(cell(s, hf, blue, Element.ALIGN_CENTER));
+        for (int i = 1; i <= 10; i++) t.addCell(cell(String.valueOf(i), nrf, light, Element.ALIGN_CENTER));
 
         DecimalFormat d2 = new DecimalFormat("#,##0.00"), d4 = new DecimalFormat("#,##0.0000");
         int sno = 1;
         for(ReportP1Row x : rows) {
-            Color bg = (sno % 2 == 1) ? new Color(0xCF, 0xE2, 0xE6) : Color.WHITE;
+        	Color bg = (sno % 2 == 1) ? new Color(0xEE, 0xF5, 0xFC) : Color.WHITE;
             t.addCell(cell(String.valueOf(sno++), nf, bg, Element.ALIGN_CENTER));
             t.addCell(cell(x.getStateName(), nf, bg, Element.ALIGN_LEFT));
             t.addCell(cell(x.getDistrictName(), nf, bg, Element.ALIGN_LEFT));
@@ -177,7 +227,7 @@ public class ReportP1ExportService {
             t.addCell(cell(fmt(d2, x.getCentralShare()), nf, bg, Element.ALIGN_RIGHT));
             t.addCell(cell(fmt(d2, x.getStateShare()), nf, bg, Element.ALIGN_RIGHT));
         }
-        Color gt = new Color(0xB8, 0xD9, 0xF8);
+        Color gt = new Color(0xDC, 0xEB, 0xFA);
         PdfPCell lbl = cell("Grand Total", bf, gt, Element.ALIGN_RIGHT);
         lbl.setColspan(6);
         t.addCell(lbl);
