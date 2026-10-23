@@ -85,7 +85,7 @@ public class PprProjectAtGlanceController {
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Project at a Glance.");
 		if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
-	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
+			List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatusOrderByProjectNameAsc(dcode,"C");
 	        if(!pprList.isEmpty()){
 	        	model.addAttribute("blockList", mBlockRepo.findByDistrict_DcodeOrderByBlockNameAsc(dcode));
 	        	model.addAttribute("pprList", pprList);

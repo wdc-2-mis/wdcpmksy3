@@ -77,7 +77,7 @@ public class PreliminaryPPR15AController {
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Migration Details.");
 	    if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
-	        List<MPpr> pprList = mPprRepo.findByDistrictDcode(dcode);
+			List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatusOrderByProjectNameAsc(dcode,"C");
 	        if(!pprList.isEmpty()){
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
