@@ -194,44 +194,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	    // Clear previous error
 	    errorDiv.textContent = "";
+	    errorDiv.style.display = "none";
+
+	    // Reset invalid state
+	    input.classList.remove("is-invalid");
 
 	    // No file selected
-	    if (input.files.length === 0) {
+	    if (!input.files || input.files.length === 0) {
 	        return true;
 	    }
 
 	    const file = input.files[0];
 	    const fileName = file.name;
 
-	    // File name validation
-	    // Allowed: letters, numbers, underscore, hyphen and .pdf
+	    // 1. Validate file name
+	    // Only letters, numbers, underscore, hyphen and .pdf
 	    const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
 
 	    if (!fileNamePattern.test(fileName)) {
 
 	        errorDiv.textContent =
-	            "File name should contain only letters, numbers, underscore (_) or hyphen (-).";
+	            "File name should contain only letters, numbers, underscore (_) or hyphen (-), and must end with .pdf.";
 
+	        errorDiv.style.display = "block";
+
+	        input.classList.add("is-invalid");
 	        input.value = "";
-	        input.focus();
 
 	        return false;
 	    }
 
-	    // PDF validation
-	    if (file.type !== "application/pdf" &&
-	        !fileName.toLowerCase().endsWith(".pdf")) {
+	    // 2. Validate PDF type
+	    // Some browsers may return an empty file.type,
+	    // so check the extension separately.
+	    if (
+	        !fileName.toLowerCase().endsWith(".pdf") ||
+	        (file.type !== "" && file.type !== "application/pdf")
+	    ) {
 
-	        errorDiv.textContent =
-	            "Only PDF files are allowed.";
+	        errorDiv.textContent = "Only PDF files are allowed.";
 
+	        errorDiv.style.display = "block";
+
+	        input.classList.add("is-invalid");
 	        input.value = "";
-	        input.focus();
 
 	        return false;
 	    }
 
-	    // Maximum 5 MB
+	    // 3. Validate maximum file size (5 MB)
 	    const maxSize = 5 * 1024 * 1024;
 
 	    if (file.size > maxSize) {
@@ -239,11 +250,16 @@ document.addEventListener("DOMContentLoaded", function () {
 	        errorDiv.textContent =
 	            "PDF file size must not be more than 5 MB.";
 
+	        errorDiv.style.display = "block";
+
+	        input.classList.add("is-invalid");
 	        input.value = "";
-	        input.focus();
 
 	        return false;
 	    }
+
+	    // File is valid
+	    input.classList.add("is-valid");
 
 	    return true;
 	}
@@ -325,132 +341,40 @@ document.addEventListener("DOMContentLoaded", function () {
 		    }
 		}
 
-	    notificationFile.addEventListener("change", function () {
-	        if (validatePDF(this)) {
-	            validateSameFile(this, mouFile);
-	        }
-	    });
+		// New Notification PDF
+		notificationFile.addEventListener("change", function () {
 
-	    mouFile.addEventListener("change", function () {
-	        if (validatePDF(this)) {
-	            validateSameFile(this, notificationFile);
-	        }
-	    });
-	
+		    if (validatePDF(this)) {
+		        validateSameFile(this, mouFile);
+		    }
+		});
+
+		// New MoU PDF
+		mouFile.addEventListener("change", function () {
+
+		    if (validatePDF(this)) {
+		        validateSameFile(this, notificationFile);
+		    }
+		});
+
+		// Edit Notification PDF
 		notificationFile1.addEventListener("change", function () {
-			if (validatePDF(this)) {
-				validateSameFile1(this, mouFile1);
-			}
+
+		    if (validatePDF(this)) {
+		        validateSameFile1(this, mouFile1);
+		    }
 		});
 
+		// Edit MoU PDF
 		mouFile1.addEventListener("change", function () {
-			if (validatePDF(this)) {
-				validateSameFile1(this, notificationFile1);
-			}
+
+		    if (validatePDF(this)) {
+		        validateSameFile1(this, notificationFile1);
+		    }
 		});
 	
 	
 	
-	
-
-    form.addEventListener("submit1", function (e) {
-
-        const slnaType = document.getElementsByName("slnaType")[0];
-        const notificationDate = document.getElementsByName("notificationDate")[0];
-        const mouDate = document.getElementsByName("mouDate")[0];
-        const notificationFile = document.getElementsByName("notificationFile")[0];
-        const mouFile = document.getElementsByName("mouFile")[0];
-		
-		// Validate Notification Date - Future date not allowed 
-		const today = new Date().toISOString().split("T")[0]; 
-		if (notificationDate.value > today) { 
-			alert("Notification Date cannot be a future date."); 
-			notificationDate.focus(); 
-			e.preventDefault(); 
-			return false; 
-		} 
-		// Validate MoU Date - Future date not allowed 
-		if (mouDate.value > today) { 
-			alert("MoU Date cannot be a future date."); 
-			mouDate.focus(); 
-			e.preventDefault(); 
-			return false; 
-		}
-
-        // Type of SLNA
-        if (slnaType.value.trim() === "") {
-            alert("Please enter Type of SLNA.");
-            slnaType.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // Notification Date
-        if (notificationDate.value === "") {
-            alert("Please select Date of Notification.");
-            notificationDate.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // Notification PDF
-        if (notificationFile.files.length === 0) {
-            alert("Please upload Notification PDF.");
-            notificationFile.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // MoU Date
-        if (mouDate.value === "") {
-            alert("Please select Date of MoU.");
-            mouDate.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // MoU PDF
-        if (mouFile.files.length === 0) {
-            alert("Please upload MoU PDF.");
-            mouFile.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // Validate PDF type
-        const file1 = notificationFile.files[0];
-        const file2 = mouFile.files[0];
-
-        if (!file1.name.toLowerCase().endsWith(".pdf")) {
-            alert("Notification file must be a PDF.");
-            notificationFile.value = "";
-            notificationFile.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        if (!file2.name.toLowerCase().endsWith(".pdf")) {
-            alert("MoU file must be a PDF.");
-            mouFile.value = "";
-            mouFile.focus();
-            e.preventDefault();
-            return false;
-        }
-
-        // Same file validation
-        if (file1.name.toLowerCase() === file2.name.toLowerCase()
-                && file1.size === file2.size) {
-
-            alert("Notification PDF and MoU PDF cannot be the same file.");
-
-            mouFile.value = "";
-            mouFile.focus();
-
-            e.preventDefault();
-            return false;
-        }
-
-    });
 
 });
 
@@ -584,6 +508,51 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+function clearInstitutionForm(formId) {
+
+    const form = document.getElementById(formId);
+
+    if (!form) {
+        return;
+    }
+
+    // Preserve State Name before clearing
+    const stateName = form.querySelector(
+        'input[name="stateName"], input[name="stateName1"]'
+    );
+
+    const savedStateName = stateName ? stateName.value : "";
+
+    // Preserve hidden record ID in edit form
+    const recordId = form.querySelector('input[name="pprid"]');
+    const savedRecordId = recordId ? recordId.value : "";
+
+    // Reset all form fields
+    form.reset();
+
+    // Restore State Name
+    if (stateName) {
+        stateName.value = savedStateName;
+    }
+
+    // Restore record ID so Update still targets the same record
+    if (recordId) {
+        recordId.value = savedRecordId;
+    }
+
+    // Clear custom validation messages and styling
+    form.querySelectorAll(".text-danger").forEach(function (errorDiv) {
+        errorDiv.textContent = "";
+        errorDiv.style.display = "none";
+    });
+
+    form.querySelectorAll(".is-invalid, .is-valid").forEach(function (field) {
+        field.classList.remove("is-invalid", "is-valid");
+    });
+
+    form.classList.remove("was-validated");
+}
+
 </script>
 
 </head>
@@ -697,7 +666,7 @@ document.addEventListener("DOMContentLoaded", function () {
 						       class="form-control"
 						       accept=".pdf,application/pdf"
 						       required>
-							   <div class="invalid-feedback">Please select a notification PDF within 5 MB. </div>
+							   <div class="invalid-feedback">Please select a notification PDF. </div>
                   <small class="form-text text-muted">Only PDF file is allowed.</small>
 				  <div id="notificationFileError" class="text-danger mt-1"></div>
                     </div>
@@ -724,7 +693,7 @@ document.addEventListener("DOMContentLoaded", function () {
 						       class="form-control"
 						       accept=".pdf,application/pdf"
 						       required>
-						<div class="invalid-feedback">Please select a MoU PDF within 5 MB. </div>	
+						<div class="invalid-feedback">Please select a MoU PDF. </div>	
 						<div id="mouFileError" class="text-danger mt-1"></div>		   
 						<small class="form-text text-muted">Only PDF file is allowed.</small>
                     </div>
@@ -742,6 +711,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         Save as Draft
 
                     </button>
+					&nbsp;&nbsp;&nbsp;
+					<button type="button"
+					           class="btn btn-secondary"
+					           onclick="clearInstitutionForm('institutionForm')">
+					       <i class="fas fa-eraser"></i>
+					       Clear
+					   </button>
 					</center>
 
                 </div>
@@ -894,7 +870,7 @@ document.addEventListener("DOMContentLoaded", function () {
 													</label>
 													<input type="file" id="notificationFile1" name="notificationFile1" class="form-control"
 														accept=".pdf,application/pdf" required>
-														<div class="invalid-feedback">Please select a notification PDF within 5 MB. </div>
+														<div class="invalid-feedback">Please select a notification PDF. </div>
 														<small class="form-text text-muted">Only PDF file is allowed.</small>
 														<div id="notificationFile1Error" class="text-danger mt-1"></div>
 												</div>
@@ -911,7 +887,7 @@ document.addEventListener("DOMContentLoaded", function () {
 													</label>
 													<input type="file" id="mouFile1" name="mouFile1" class="form-control" accept=".pdf,application/pdf" required>
 													<small class="form-text text-muted">Only PDF file is allowed.</small>
-													<div class="invalid-feedback">Please select a MoU PDF within 5 MB. </div>	
+													<div class="invalid-feedback">Please select a MoU PDF. </div>	
 													<div id="mouFile1Error" class="text-danger mt-1"></div>		   
 														
 												</div>
@@ -923,6 +899,15 @@ document.addEventListener("DOMContentLoaded", function () {
 													<i class="fas fa-save"></i>
 													Update
 												</button>
+												
+												&nbsp; &nbsp;&nbsp;
+
+												    <button type="button"
+												            class="btn btn-secondary"
+												            onclick="clearInstitutionForm('editForm')">
+												        <i class="fas fa-eraser"></i>
+												        Clear
+												    </button>
 											</div>
 										</form>
 									</div>
