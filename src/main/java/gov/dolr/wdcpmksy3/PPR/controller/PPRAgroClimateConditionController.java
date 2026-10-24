@@ -23,6 +23,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprAgroClimate;
 import gov.dolr.wdcpmksy3.PPR.entity.PprSlnaDetails;
 import gov.dolr.wdcpmksy3.PPR.repository.PPRLandPatternAreaRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprAgroClimateRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.VillageRepository;
 import gov.dolr.wdcpmksy3.PPR.service.CropTypeServices;
@@ -73,6 +74,9 @@ public class PPRAgroClimateConditionController {
     
     @Autowired
 	private PprTransactionRepository transrepo;
+    
+    @Autowired
+   	private PprProjectGlanceRepository pgrepo;
     
 	@GetMapping("/agroClimateConditionPPR10")
     public String agroClimateConditionPPR10(HttpSession session, Model model, @RequestParam(required = false) Integer pprid) 
@@ -190,12 +194,29 @@ public class PPRAgroClimateConditionController {
 	public String checkPPRTransctionExists(@RequestParam Integer pprid) {
 
 	    boolean exists = transrepo.existsActionAOrF(pprid);
-	    System.out.println("kdy"+exists);
+	 //   System.out.println("kdy"+exists);
 	    if (exists) {
 	        return "EXISTS";
 	    }
 
 	    return "NOT_EXISTS";
+	}
+	
+	@GetMapping("/checkProjectGlanceByPPRIDExists")
+	@ResponseBody
+	public String checkProjectGlanceByPPRIDExists(@RequestParam Integer pprid) {
+
+	    boolean exists = pgrepo.existsCompletedByPprId(pprid);
+	  //  System.out.println("kdy"+exists);
+	    if (exists) {
+	        return "EXISTS";
+	    }
+	    else {
+	    	
+	    	return "NOTEXISTS";
+	    }
+
+	    
 	}
 	
 	

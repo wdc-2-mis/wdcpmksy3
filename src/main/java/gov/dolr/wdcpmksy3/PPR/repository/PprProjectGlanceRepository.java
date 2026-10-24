@@ -29,5 +29,8 @@ public interface PprProjectGlanceRepository extends JpaRepository<PprProjectGlan
 	
 	@Query("select pg from PprProjectGlance pg WHERE pg.ppr.district.dcode = :dcode order by pg.status desc")
 	List<PprProjectGlance> findPprProjectGlanceBydcode(Integer dcode);
+	
+	@Query(" SELECT CASE WHEN COUNT(pg) > 0 THEN true ELSE false END FROM PprProjectGlance pg WHERE pg.ppr.pprId = :pprId AND pg.status = 'C'")
+	boolean existsCompletedByPprId(@Param("pprId") Integer pprId);
 
 }

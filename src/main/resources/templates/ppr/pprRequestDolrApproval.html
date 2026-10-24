@@ -75,10 +75,37 @@
 						states.classList.add("is-invalid"); 
 						isValid = false; 
 					} 
+					
+					// Check whether Total Cost = Central Share + State Share
+					const costValue = document.getElementById("cost").value.trim();
+					const centralValue = document.getElementById("central").value.trim();
+					const statesValue = document.getElementById("states").value.trim();
+
+					if (costValue !== "" && centralValue !== "" && statesValue !== "") {
+					    const cost = parseFloat(costValue);
+					    const central = parseFloat(centralValue);
+					    const states = parseFloat(statesValue);
+
+					    if (Math.abs(cost - (central + states)) > 0.00001) {
+					        document.getElementById("costError").textContent =
+					            "Sanction Total Cost must equal Central Share + State Share.";
+
+					        document.getElementById("cost").classList.add("is-invalid");
+					        isValid = false;
+					    }
+					}
+
+					// Keep this as the final validation check
+				/*	if (!isValid) {
+					    event.preventDefault();
+					    const firstInvalid = document.querySelector("#approveForm .is-invalid");
+					    if (firstInvalid) {
+					        firstInvalid.focus();
+					    }
+					} */ 
 					/* * Stop form submission if any field is blank */ 
 					if (!isValid) { 
 						event.preventDefault(); 
-						/* * Focus first invalid field */ 
 						const firstInvalid = formk.querySelector(".is-invalid"); 
 						if (firstInvalid) { 
 							firstInvalid.focus(); 

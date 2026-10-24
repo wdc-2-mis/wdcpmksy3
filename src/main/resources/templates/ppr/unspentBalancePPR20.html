@@ -357,12 +357,12 @@
 		       document.getElementById('pprUnspentBalanceId').value = Id;
 		       document.getElementById('district1').value = district;
 		       document.getElementById('project1').value = project;
-			   document.getElementById("totcost1").value =totCost;
-			   document.getElementById("state1").value =state;
-			   document.getElementById("dolr1").value =dolr;
-			   document.getElementById("interest1").value =interest;
-			   document.getElementById("total1").value =total;
-			   document.getElementById("balance1").value =balance;
+			   document.getElementById("totcost1").value =totCost.replace(/\.?0+$/, "");
+			   document.getElementById("state1").value =state.replace(/\.?0+$/, "");
+			   document.getElementById("dolr1").value =dolr.replace(/\.?0+$/, "");
+			   document.getElementById("interest1").value =interest.replace(/\.?0+$/, "");
+			   document.getElementById("total1").value =total.replace(/\.?0+$/, "");
+			   document.getElementById("balance1").value =balance.replace(/\.?0+$/, "");
 
 		   });
 		

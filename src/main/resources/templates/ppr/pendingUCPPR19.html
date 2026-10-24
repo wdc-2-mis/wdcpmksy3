@@ -478,16 +478,16 @@
 		       document.getElementById('project1').value = project;
 			   document.getElementById('fyear1').value = finyr;
 			   document.getElementById("installment1").value =install;
-			   document.getElementById("released1").value = released;
-			   document.getElementById("utilized1").value = utilized;
+			   document.getElementById("released1").value = released.replace(/\.?0+$/, "");
+			   document.getElementById("utilized1").value = utilized.replace(/\.?0+$/, "");
 			   document.getElementById("dueDate1").value = dueDate;
-			   document.getElementById("ucamount1").value = ucAmount;
+			   document.getElementById("ucamount1").value = ucAmount.replace(/\.?0+$/, "");
 			   document.getElementById("ucDate1").value = submissionDate;
-			   document.getElementById("ducamount1").value = submissionAmt;
+			   document.getElementById("ducamount1").value = submissionAmt.replace(/\.?0+$/, "");
 			   document.getElementById("reasion1").value = reason;
 			   document.getElementById("fromDate1").value = start;
 			   document.getElementById("toDate1").value = end;
-			   document.getElementById("pucamount1").value = penamt;
+			   document.getElementById("pucamount1").value = penamt.replace(/\.?0+$/, "");
 			   
 		   });
 		
@@ -1281,7 +1281,7 @@
 							
 									<div class="d-flex align-items-center gap-4">
 										<input type="text" name="pucamount1" id="pucamount1" class="form-control" style="height:40px; width: 300px;"
-											oninput="validateDecimal(this,11,5)">
+											  oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d{0,4}).*$/,'$1')">
 											<div class="invalid-feedback">Please enter Pending UC Amount (Rs in Lakh)</div>
 									</div>
 								</div>
