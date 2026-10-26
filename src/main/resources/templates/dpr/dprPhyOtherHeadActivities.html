@@ -446,7 +446,7 @@
 					</div>										
 
 					<div class="text-center mt-4">
-						<button type="submit" id="saveButton" name="action" value="D" class="btn btn-warning">
+						<button type="submit" id="saveButton" name="action" value="D" class="btn btn-warning" th:disabled="${!pprApproved}">
 					         <i class="fas fa-save"></i>
 					          Save As Draft
 					     </button>

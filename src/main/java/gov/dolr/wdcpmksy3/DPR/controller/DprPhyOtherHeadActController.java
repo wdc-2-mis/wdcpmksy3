@@ -68,8 +68,8 @@ public class DprPhyOtherHeadActController {
         }
 		boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "A");
         model.addAttribute("pprApproved", pprApproved);
-//	    if (!pprApproved) 
-//	        model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR Other Activity Target.");
+	    if (!pprApproved) 
+	        model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR Other Activity Target.");
 		if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
 	        List<MPpr> pprList = pprTransactionRepo.findPprByDcodeAndActionA(dcode);

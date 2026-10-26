@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gov.dolr.wdcpmksy3.DPR.entity.DprOtherDtl;
 import gov.dolr.wdcpmksy3.PPR.dto.PPRSoilErosionDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MErosion;
 import gov.dolr.wdcpmksy3.PPR.entity.MErosionType;
@@ -208,6 +209,13 @@ public class PPRSoilErosionService {
         soilErosionRepository.deleteById(id);
         
     }
+    
+    public void completePPRSoilErosion(Integer id) {
+    	PPRSoilErosion dtl = soilErosionRepository.findById(id).orElseThrow(() -> new RuntimeException("Record not found"));
+		dtl.setStatus('C');
+		soilErosionRepository.save(dtl);
+	}
+    
     @Transactional
 	public int changeStatusByPprId(Integer pprId) {
 	    return soilErosionRepository.changeStatusByPprId(pprId);

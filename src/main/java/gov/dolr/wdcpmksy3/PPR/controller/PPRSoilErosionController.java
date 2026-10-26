@@ -82,6 +82,7 @@ public class PPRSoilErosionController {
         model.addAttribute("monthList", soilErosionService.getAllMonths());
         model.addAttribute("yearList", soilErosionService.getAllYears());
         model.addAttribute("soilErosionList",pprSoilErosionList);
+        model.addAttribute("statusCheck", pprSoilErosionList != null && pprSoilErosionList.stream().anyMatch(dtl -> dtl.getStatus() != null && dtl.getStatus() == 'D'));
 
         return "ppr/pprSoilErosion";
     }
@@ -165,19 +166,20 @@ public class PPRSoilErosionController {
 	}
 	
 	@GetMapping("/completePPRSoilErosion")
-	public String complete(@RequestParam Integer id, HttpSession session, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	public String complete(@RequestParam(required = false) Integer id,
+	        @RequestParam(required = false) List<Integer> ids, HttpSession session, HttpServletRequest request, RedirectAttributes redirectAttributes) {
 	    try {
-	        PPRSoilErosion entity = soilErosionService.getById(id);
-	        if (entity == null) {
-	            redirectAttributes.addFlashAttribute("error", "Record not found.");
-	            return "redirect:/pprSoilErosion";
+	    	if (id != null) {
+	    		soilErosionService.completePPRSoilErosion(id);
+	        	redirectAttributes.addFlashAttribute("success", "Record completed successfully.");
 	        }
-	        entity.setStatus('C');
-	        entity.setUpdatedBy(session.getAttribute("userid").toString());
-	        entity.setUpdatedDate(java.time.LocalDate.now());
-	        entity.setRequestIp(request.getRemoteAddr());
-	        soilErosionService.save(entity);
-	        redirectAttributes.addFlashAttribute("success", "Record completed.");
+	        else if (ids != null && !ids.isEmpty()) {
+	            for (Integer selectedId : ids) {
+	            	soilErosionService.completePPRSoilErosion(selectedId);
+	            }
+	            redirectAttributes.addFlashAttribute("success", "All Records completed successfully.");
+	        } else 
+	            redirectAttributes.addFlashAttribute("error", "No record selected.");
 	    } catch (Exception e) {
 	        redirectAttributes.addFlashAttribute("error", "Unable to complete.");
 	    }

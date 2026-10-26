@@ -417,6 +417,49 @@ document.addEventListener("DOMContentLoaded", function () {
 			window.location.href = "/livelihoodSummaryPPR13?dcode=" + encodeURIComponent(dcode);
 		});
 	}
+	
+	const selectAll = document.getElementById('chkSelectAllkd');
+	if (selectAll) {
+		selectAll.addEventListener('change', function () {
+			document.querySelectorAll('.chkIndividualkd').forEach(function (checkbox) {
+				checkbox.checked = selectAll.checked;
+			});
+		});
+	}
+
+	// Individual checkbox changes
+	document.addEventListener('change', function (event) {
+		if (event.target.classList.contains('chkIndividualkd')) {
+			const checkboxes = document.querySelectorAll('.chkIndividualkd');
+			const checkedBoxes = document.querySelectorAll('.chkIndividualkd:checked');
+
+			if (selectAll) {
+				selectAll.checked =
+					checkboxes.length > 0 &&
+					checkboxes.length === checkedBoxes.length;
+			}
+		}
+	});
+					
+	// Complete all selected records
+	const completeBtn = document.getElementById("complete");
+	if (completeBtn) {
+	    completeBtn.addEventListener("click", function () {
+	        const selectedIds = [];
+	        document.querySelectorAll(".chkIndividualkd:checked").forEach(function (checkbox) {
+	            selectedIds.push(checkbox.value);
+	        });
+	        if (selectedIds.length === 0) {
+	            latestAlert("Please select at least one record to complete.");
+	            return;
+	        }
+	        completeAlert("Are you sure you want to complete all selected records?",function () {
+				const url = /*[[@{/completePPRSoilErosion}]]*/ "/completePPRSoilErosion";
+				window.location.href = url + "?ids=" + encodeURIComponent(selectedIds.join(","));
+	            }
+	        );
+	    });
+	}
 });
 
 </script>
@@ -575,6 +618,10 @@ document.addEventListener("DOMContentLoaded", function () {
 				<table class="table table-bordered table-striped table-hover">
 					<thead class="table-primary">
 						<tr>
+							<th class="table-primary">
+							    <input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" th:if="${statusCheck}" />
+							</th>
+							<th>S.No. </th>
 							<th class="table-primary">District</th>
 							<th class="table-primary">Project Name</th>
 							<th class="table-primary">Erosion</th>
@@ -588,7 +635,9 @@ document.addEventListener("DOMContentLoaded", function () {
 						</tr>
 					</thead>
 					<tbody id="soilErosionTableBody">
-						<tr th:each="data : ${soilErosionList}">
+						<tr th:each="data, stat : ${soilErosionList}">
+							<td><input type="checkbox" class="chkIndividualkd" th:value="${data.id}" th:if="${data.status != null and #strings.trim(data.status) == 'D'}"/></td>
+							<td th:text="${stat.count}"></td>
 							<td th:text="${data.ppr.district.distName}"></td>
 							<td th:text="${data.ppr.projectName}"></td>
 							<td>
@@ -629,8 +678,13 @@ document.addEventListener("DOMContentLoaded", function () {
 								</div>
 							</td>
 						</tr>
+						<tr th:if="${statusCheck}">
+							<td colspan="12" class="text-center">
+							    <input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" />
+							</td>
+						</tr>
 						<tr th:if="${#lists.isEmpty(soilErosionList)}">
-							<td colspan="10" class="text-center text-danger">
+							<td colspan="12" class="text-center text-danger">
 								No records found.
 							</td>
 						</tr>
