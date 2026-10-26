@@ -21,6 +21,7 @@ import gov.dolr.wdcpmksy3.PPR.dto.PprSlnaDetailsDto;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprAgroClimate;
 import gov.dolr.wdcpmksy3.PPR.entity.PprSlnaDetails;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PPRLandPatternAreaRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprAgroClimateRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
@@ -52,7 +53,7 @@ public class PPRAgroClimateConditionController {
     private CropTypeServices cropser;
     
     @Autowired
-    private MPprService pprService;
+    private MPprRepository mppr;
 	
     @Autowired
     private VillageService villageService;
@@ -224,7 +225,7 @@ public class PPRAgroClimateConditionController {
 	@ResponseBody
 	public List<Map<String, Object>> getProjectsByDistrict(@RequestParam Integer dcode, Model model) {
 
-	    List<MPpr> projects = pprService.getProjectsByDistrict(dcode);
+	    List<MPpr> projects = mppr.findByDistrict_DcodeAndStatus(dcode);
 
 	    return projects.stream().map(p -> {
 	        Map<String, Object> map = new HashMap<>();

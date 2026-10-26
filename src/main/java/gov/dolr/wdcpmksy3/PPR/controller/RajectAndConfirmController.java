@@ -52,7 +52,8 @@ public class RajectAndConfirmController {
     }
 	
 	@GetMapping("/modifyPprTransaction")
-    public String modifyPprTransaction(HttpSession session, Model model, @RequestParam("tranxId") Integer pprid) 
+    public String modifyPprTransaction(HttpSession session, Model model, @RequestParam("tranxId") Integer pprid, 
+    		@RequestParam("projectname") String projectName) 
 	{
 		Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 		String userid=(String)session.getAttribute("userid");
@@ -61,9 +62,10 @@ public class RajectAndConfirmController {
             return "redirect:/login";
         }
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
-        List<WdcpmksySubmenu> submenuList =submenuRepository.findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc("Preliminary Project Report Details");
+        List<WdcpmksySubmenu> submenuList =submenuRepository.findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc("Preliminary Project Report Details", "/pprDistrict");
         model.addAttribute("submenuList", submenuList);
         model.addAttribute("pprid", pprid);
+        model.addAttribute("projectname", projectName);
         return "ppr/rajectAndConfirm1";
     }
 	

@@ -829,7 +829,8 @@
 		               style="min-width:1200px;">
 		            <thead class="table-primary">
 		            <tr>
-		                <th>Sl. No.  &nbsp; <input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" th:disabled="${allCompleted}" /> All</th>
+						<th><input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" th:disabled="${allCompleted}" /></th>
+		                <th>Sl. No. </th>
 		                <th>District</th>
 		                <th>Project</th>
 		                <th>Head </th>
@@ -841,17 +842,13 @@
 		            </thead>
 		            <tbody>
 		            <tr th:each="row, stat : ${dprNrmProjectPlanList}">
-		                <!-- SL NO 
-		                <td th:text="${row[14]}"></td> -->
+		                
+						<td> <input type="checkbox" class="chkIndividualkd" th:id="${row[4]}" th:name="${row[4]}" th:value="${row[4]}" th:if="${row[5] != null and row[5].toString().equals('D')}"/></td>
 						
 						<td style="text-align: left;">
 						    <span th:text="${stat.count}"></span>
 						    &nbsp;
-						    <input type="checkbox"
-						           class="chkIndividualkd"
-						           th:id="${row[4]}"
-						           th:name="${row[4]}"
-						           th:value="${row[4]}" th:if="${row[5] != null and row[5].toString().equals('D')}"/>
+						    
 						</td>
 		                <!-- ACTION -->
 		               

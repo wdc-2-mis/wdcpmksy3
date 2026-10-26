@@ -166,7 +166,7 @@
 
                     <td>
 
-                        <a th:href="@{/modifyPprTransaction(tranxId=${rec.ppr.pprId})}"
+                        <a th:href="@{/modifyPprTransaction(tranxId=${rec.ppr.pprId}, projectname=${rec.ppr.projectName})}"
                            class="btn btn-primary btn-sm"
                            onclick="return confirm('Do you want to Modify Rejected PPR.');">
 

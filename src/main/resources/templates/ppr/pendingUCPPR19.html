@@ -1089,15 +1089,15 @@
 								<td th:text="${rec.ppr.projectName}"></td>
 								<td th:text="${rec.finYear != null ? rec.finYear.finYrDesc : ''}"></td>
 								<td th:text="${rec.installmentNo}"></td>
-								<td th:text="${rec.releasedAmount}"></td>
-								<td th:text="${rec.utilizedAmount}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.releasedAmount, 1, 2)}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.utilizedAmount, 1, 2)}"></td>
 								<td th:text="${#temporals.format(rec.dueDate, 'dd/MM/yyyy')}"></td>
-								<td th:text="${rec.ucAmount}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.ucAmount, 1, 2)}"></td>
 								<td th:text="${#temporals.format(rec.ucSubmissionDate, 'dd/MM/yyyy')}"></td>
-								<td th:text="${rec.ucSubmissionAmt}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.ucSubmissionAmt, 1, 2)}"></td>
 								<td th:text="${rec.reasonNotSubmitted}"></td>
 								<td ><span th:text="${#temporals.format(rec.pendingStart, 'dd/MM/yyyy')}" /> &nbsp; To &nbsp;<span th:text="${#temporals.format(rec.pendingEnd, 'dd/MM/yyyy')}" /></td>
-								<td th:text="${rec.pendingAmount}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.pendingAmount, 1, 2)}"></td>
 								
 							 
 			                   

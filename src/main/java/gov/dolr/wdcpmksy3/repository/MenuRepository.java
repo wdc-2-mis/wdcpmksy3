@@ -19,4 +19,7 @@ public interface MenuRepository extends JpaRepository<WdcpmksySubmenu, Integer> 
     List<Object[]> getUserMenus(@Param("reg_id") int reg_id);
     
     List<WdcpmksySubmenu> findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc(String menuName);
+    
+    @Query("SELECT s FROM WdcpmksySubmenu s WHERE s.menu.menuName = :menuName AND s.target not in( :target ) AND s.isActive = true ORDER BY s.seqNo ASC")
+    List<WdcpmksySubmenu> findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc( @Param("menuName") String menuName, @Param("target") String target);
 }

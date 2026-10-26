@@ -1216,19 +1216,36 @@
 							
 							</td>
 							<td th:unless="${stat.first || row[0] != agroClimateList[stat.index-1][0]}"></td>
-							   
-			                   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[2] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[6] : ''}"> </td>
-			                   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[5] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[7] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[4] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[8] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[9] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[15] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[16] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[12] : ''}"> </td>
-							   <td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[13] : ''}"> </td>
-							   
+							
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[2] : ''}"> </td>
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0])
+											? #numbers.formatDecimal(row[6], 1, 2) : ''}">
+							</td>
+							
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[5] : ''}"> </td>
+							
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0])
+											? #numbers.formatDecimal(row[7], 1, 2) : ''}">
+							</td>
+							
+							
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[4] : ''}"> </td>
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[8] : ''}"> </td>
+							
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0])
+											? #numbers.formatDecimal(row[9], 1, 2) : ''}">
+							</td>
+							
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[15] : ''}"> </td>
+							
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0])
+											? #numbers.formatDecimal(row[16], 1, 2) : ''}">
+							</td>
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0]) ? row[12] : ''}"> </td>
+							
+							<td th:text="${(stat.first || row[0] != agroClimateList[stat.index-1][0])
+											? #numbers.formatDecimal(row[13], 1, 2) : ''}">
+							</td>
 							   
 			                   
 			               </tr>

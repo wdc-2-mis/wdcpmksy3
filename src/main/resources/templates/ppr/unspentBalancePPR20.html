@@ -792,14 +792,13 @@
 							
 								<td th:text="${rec.ppr.district.distName}"></td>
 								<td th:text="${rec.ppr.projectName}"></td>
-								<td th:text="${rec.totCost}"></td>
-								<td th:text="${rec.stReleasedFund}"></td>
-								<td th:text="${rec.dolrReleasedFund}"></td>
-								<td th:text="${rec.interest}"></td>
-								<td th:text="${rec.total}"></td>
-								<td th:text="${rec.unspendBalance}"></td>
-								
-							  
+								<td th:text="${#numbers.formatDecimal(rec.totCost, 1, 2)}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.stReleasedFund, 1, 2)}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.dolrReleasedFund, 1, 2)}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.interest, 1, 2)}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.total, 1, 2)}"></td>
+								<td th:text="${#numbers.formatDecimal(rec.unspendBalance, 1, 2)}"></td>
+															  
 			               </tr>
 			               <tr th:if="${#lists.isEmpty(records)}">
 			                   <td colspan="8" class="text-center text-muted">
