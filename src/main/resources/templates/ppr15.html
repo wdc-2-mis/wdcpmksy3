@@ -127,6 +127,34 @@
 				return true;
 			}
 			
+			const migrationReason = document.getElementById("migrationReason");
+			const editMigrationReason = document.getElementById("editMigrationReason");
+			if (migrationReason) {
+			    migrationReason.addEventListener("blur", function () {
+			        validateMigrationReason(this);
+			    });
+			}
+			if (editMigrationReason) {
+			    editMigrationReason.addEventListener("blur", function () {
+			        validateMigrationReason(this);
+			    });
+			}
+			function validateMigrationReason(field) {
+				const value = field.value.trim();
+				if (value === "") {
+					showFieldError(field, "Please enter Major reason for Migration.");
+					//					field.focus();
+					return false;
+				}
+				if (value.length < 4) {
+					showFieldError(field, "Length of the Migration Reason should be more than 3 Characters.");
+					field.value = "";
+					return false;
+				}
+				clearFieldError(field);
+				return true;
+			}
+			
 			const watershed = document.getElementById("watershed");
 			const village = document.getElementById("village");
 			const projectElement = document.getElementById("project");
@@ -207,7 +235,7 @@
 					return;
 				}
 				// 7. Major reason(s) for Migration
-				if (!validateRequiredField(migrationReason, "Please enter Major reason for Migration.")) {
+				if (!validateMigrationReason(migrationReason)) {
 					return;
 				}
 				// 8. Expected reduction
@@ -235,7 +263,7 @@
 					return;
 				}
 				// 3. Major reason(s) for Migration
-				if (!validateRequiredField(migrationReason, "Please enter Major reason for Migration.")) {
+				if (!validateMigrationReason(migrationReason)) {
 					return;
 				}
 				// 4. Expected reduction
