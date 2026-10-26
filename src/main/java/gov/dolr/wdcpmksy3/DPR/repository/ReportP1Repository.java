@@ -29,8 +29,8 @@ public interface ReportP1Repository extends JpaRepository<MPpr, Integer> {
                s.central_share_amt  AS "centralShare",
                s.state_share_amt    AS "stateShare"
         FROM public.m_ppr p
-        JOIN public.m_sanction s
-              ON s.sanction_id = (SELECT MAX(s2.sanction_id) FROM public.m_sanction s2
+        JOIN public.m_sanction_project s
+              ON s.sanction_id = (SELECT MAX(s2.sanction_id) FROM public.m_sanction_project s2
                                   WHERE s2.ppr_id = p.ppr_id)
         JOIN public.m_district d ON d.dcode = p.dcode
         JOIN public.m_state st   ON st.st_code = d.st_code
@@ -78,8 +78,8 @@ public interface ReportP1Repository extends JpaRepository<MPpr, Integer> {
                    SUM(s.central_share_amt)      AS "centralShare",
                    SUM(s.state_share_amt)        AS "stateShare"
             FROM public.m_ppr p
-            JOIN public.m_sanction s
-                  ON s.sanction_id = (SELECT MAX(s2.sanction_id) FROM public.m_sanction s2
+            JOIN public.m_sanction_project s
+                  ON s.sanction_id = (SELECT MAX(s2.sanction_id) FROM public.m_sanction_project s2
                                       WHERE s2.ppr_id = p.ppr_id)
             JOIN public.m_district d ON d.dcode = p.dcode
             JOIN public.m_state st   ON st.st_code = d.st_code

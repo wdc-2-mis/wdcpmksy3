@@ -306,8 +306,10 @@ public class PPRViewController {
 
         Map<String, Object> data = new LinkedHashMap<>();
         List<String> statuses = List.of("C", "S");
+        List<String> statusppr = List.of("C", "A", "B");
         // ---- PPR-1 ----
-        List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus(dcode, project, finYrCd, "C");
+      //  List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus(dcode, project, finYrCd, "C");
+        List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatusIn(dcode, project, finYrCd, statusppr);
         data.put("records", records);
 
         List<PprWatershedCoveredArea> areaRecords =

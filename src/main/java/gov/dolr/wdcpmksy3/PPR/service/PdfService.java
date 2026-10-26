@@ -38,30 +38,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprWaterOutcome;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
 
-/**
- * Builds the PPR-1..PPR-20 report PDF from the SAME data map that
- * PPRViewController.fetchReportData() produces for the on-screen view,
- * so the PDF and the web page can never drift apart.
- *
- * Layout approach
- * ----------------
- * - A4 LANDSCAPE for the whole document (the widest tables, e.g. PPR-2 and
- *   PPR-4, need it; switching orientation per-section is unreliable in
- *   OpenPDF so the whole report uses landscape, as you asked for as the
- *   fallback).
- * - Every page gets the Ashoka Stambh + Government of India header and a
- *   "Page X of Y" footer via PdfHeaderFooterPageEvent (a PdfPageEventHelper),
- *   registered on the PdfWriter BEFORE document.open().
- * - Each PPR section's title is embedded as the FIRST ROW of that section's
- *   own PdfPTable (colspan = number of columns), and table.setHeaderRows(n)
- *   marks the title row + column-header row(s) as "header rows". OpenPDF's
- *   PdfPTable will not split a table's header rows away from at least one
- *   body row: if there isn't room for the header + a first data row, the
- *   WHOLE table (title included) moves to the next page automatically. That
- *   gives you "keep heading with its table" and "don't orphan a heading at
- *   the bottom of a page" without manual space bookkeeping, and the column
- *   headers repeat automatically on every page the table spans.
- */
+
 @Service
 public class PdfService {
 
@@ -126,10 +103,10 @@ public class PdfService {
                 addRow(t3,
                         safe(d.getPpr().getDistrict().getDistName()),
                         safe(d.getPpr().getProjectName()),
-                        safe(d.getMicroWatershed().getMwName()),
-                        safe(d.getMicroWatershed().getMwCode()),
+                        safe(d.getMicroWatershed() != null ? d.getMicroWatershed().getMwName(): null),
+                        safe(d.getMicroWatershed() != null ? d.getMicroWatershed().getMwCode(): null),
                         safe(d.getTreatedArea()),
-                        safe(d.getProjectType().getProjectType()),
+                        safe(d.getProjectType() != null ? d.getProjectType().getProjectType(): null),
                         safe(d.getProposedCost()));
             }
         }

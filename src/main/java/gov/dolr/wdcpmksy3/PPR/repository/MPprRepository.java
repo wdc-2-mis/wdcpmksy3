@@ -45,6 +45,8 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 	
 	List<MPpr> findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus( Integer dcode,   Integer pprId,  Integer finYrCd, String status);
 	
+	List<MPpr> findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatusIn(Integer dcode, Integer pprId, Integer finYrCd, List<String> statusppr);
+	
 	List<MPpr> findByPprIdAndStatus(Integer pprId, String status);
 	
 	boolean existsByDistrict_State_StCodeAndStatus(

@@ -3,6 +3,7 @@ package gov.dolr.wdcpmksy3.PPR.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,6 +94,8 @@ public class PprTransactionService {
 		pprTran.setSenton(LocalDateTime.now());
 		
 		pprTransactionRepo.save(pprTran);
+		
+		
 	}
 	
 	public boolean approveSlnaReqFromDolr(Integer pprId, BigDecimal areap, BigDecimal cost, BigDecimal central,
@@ -129,6 +132,10 @@ public class PprTransactionService {
 			pprTran.setSenton(LocalDateTime.now());
 			
 			pprTransactionRepo.save(pprTran);
+			
+			mp.setStatus("A");
+			mp.setUpdatedDate(new Date());
+			mPprRepo.save(mp);
 			
 			status=true;
 			

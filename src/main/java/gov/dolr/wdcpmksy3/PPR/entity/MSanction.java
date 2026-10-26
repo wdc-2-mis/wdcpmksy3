@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
-@Table(name = "m_sanction", schema = "public")
+@Table(name = "m_sanction_project", schema = "public")
 public class MSanction {
 
     @Id
