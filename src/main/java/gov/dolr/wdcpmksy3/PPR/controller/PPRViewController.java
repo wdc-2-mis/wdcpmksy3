@@ -188,6 +188,9 @@ public class PPRViewController {
 
         List<WdcpmksyUserReg> users = ur.findDLUsersByStateAndRole(stcode);
         model.addAttribute("userList", users);
+        model.addAttribute("transactionHistory", buildTransactionHistory(project));
+        model.addAttribute("alreadyForwarded", isAlreadyForwarded(project));
+        model.addAttribute("latestBackForwarded", isLatestBackForwarded(project));
 
         return "viewPPR";
     }
@@ -491,6 +494,106 @@ public class PPRViewController {
 
         return data;
     }
+    // ---------- Transaction history (read-only display) ----------
+
+    private List<Map<String, String>> buildTransactionHistory(Integer pprId) {
+
+        List<Map<String, String>> rows = new ArrayList<>();
+
+        if (pprId == null) {
+            return rows;
+        }
+
+        List<PprTransaction> list = trans.findByPprPprIdOrderBySentonDesc(pprId);
+
+        if (list == null) {
+            return rows;
+        }
+
+        for (PprTransaction t : list) {
+
+            Map<String, String> row = new LinkedHashMap<>();
+
+            row.put("sentFrom", displayUser(t.getSentFrom() != null ? t.getSentFrom().getUserId() : null));
+            row.put("sentTo",   displayUser(t.getSentTo()   != null ? t.getSentTo().getUserId()   : null));
+            row.put("action",   displayAction(t.getAction()));
+            row.put("remarks",  (t.getRemarks() == null || t.getRemarks().toString().trim().isEmpty())
+                                    ? "-" : t.getRemarks().toString());
+            row.put("sentOn",   formatSentOn(t.getSenton()));
+
+            rows.add(row);
+        }
+
+        return rows;
+    }
+    
+    // true when the newest transaction is Back Forwarded (B)
+    private boolean isLatestBackForwarded(Integer pprId) {
+        if (pprId == null) {
+            return false;
+        }
+        List<PprTransaction> list = trans.findByPprPprIdOrderBySentonDesc(pprId);
+        if (list == null || list.isEmpty()) {
+            return false;
+        }
+        Object action = list.get(0).getAction();
+        return action != null && "B".equals(action.toString());
+    }
+    
+    // true when the newest transaction is Forwarded (F) or Approved (A)
+    private boolean isAlreadyForwarded(Integer pprId) {
+        if (pprId == null) {
+            return false;
+        }
+        List<PprTransaction> list = trans.findByPprPprIdOrderBySentonDesc(pprId);
+        if (list == null || list.isEmpty()) {
+            return false;
+        }
+        Object action = list.get(0).getAction();
+        if (action == null) {
+            return false;
+        }
+        String a = action.toString();
+        return "F".equals(a) || "A".equals(a);
+    }
+
+    private String displayUser(String userId) {
+        if (userId == null || userId.isEmpty()) {
+            return "-";
+        }
+        return userId.startsWith("DL") ? "DoLR" : userId;
+    }
+
+    private String displayAction(Object action) {
+        if (action == null || action.toString().isEmpty()) {
+            return "-";
+        }
+        switch (action.toString()) {
+            case "F": return "Forwarded";
+            case "R": return "Reject";
+            case "A": return "Approved";
+            case "B": return "Back Forwarded";
+            default:  return action.toString();
+        }
+    }
+
+    private String formatSentOn(Object value) {
+        if (value == null) {
+            return "-";
+        }
+        String out;
+        if (value instanceof java.time.LocalDateTime ldt) {
+            out = ldt.format(java.time.format.DateTimeFormatter
+                    .ofPattern("dd/MM/yyyy, hh:mm a", java.util.Locale.ENGLISH));
+        } else if (value instanceof java.util.Date d) {   // also covers java.sql.Timestamp
+            out = new java.text.SimpleDateFormat("dd/MM/yyyy, hh:mm a", java.util.Locale.ENGLISH).format(d);
+        } else {
+            return value.toString();
+        }
+        return out.toLowerCase();   // "26/10/2026, 10:41 am", same as the modal
+    }
+    
+    
     
     @PostMapping("/forwardViewPPR")
     public String forwardViewPPR(HttpSession session, Model model, HttpServletRequest request,
@@ -508,6 +611,13 @@ public class PPRViewController {
 
 		            return "redirect:/login";
 		     }
+			 
+
+				if (isAlreadyForwarded(pprid)) {
+					redirectAttributes.addFlashAttribute("error",
+							"This PPR has already been forwarded/approved and cannot be forwarded again.");
+					return "redirect:/viewPPR";
+				}
 			boolean save=false;
 	    	
 			save=pprService.forwardViewPPR(loginregid, pprdcode, pprid, regid, CommonFunctions.getClientIpAddr(request));

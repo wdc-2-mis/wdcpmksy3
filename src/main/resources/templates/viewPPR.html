@@ -62,27 +62,7 @@
 
 	<script>
 
-		function checkProjectForwarded() {
-
-			let project = document.getElementById("project").value;
-
-			if (project === "") {
-				return;
-			}
-			fetch('/checkTransPPRExists?pprid=' + project)
-				.then(response => response.text())
-				.then(result => {
-					console.log(result);
-					if (result === "EXISTS") {
-						latestAlert("This PPR Data already Forwarded/Approved. Please select different PPR");
-
-						document.getElementById("project").value = "";
-						document.getElementById("project").focus();
-					}
-
-				})
-				.catch(error => console.error(error));
-		}
+		
 
 
 		document.addEventListener("DOMContentLoaded", function () {
@@ -169,6 +149,15 @@
 		document.addEventListener("DOMContentLoaded", function () {
 
 			document.getElementById("district").addEventListener("change", function () {
+				// old district's data must not stay on screen
+				let results = document.getElementById("resultsSection");
+				if (results) {
+					results.style.display = "none";
+				}
+				let pdfBtn = document.getElementById("downloadPdfBtn");
+				if (pdfBtn) {
+					pdfBtn.style.display = "none";
+				}
 				loadProjectsForDistrict(this.value, null);
 			});
 
@@ -251,7 +240,7 @@
 
 					<div class="col-md-4">
 						<label><b>Project</b></label><span class="required">*</span>
-						<select class="form-control" id="project" name="project" onchange="checkProjectForwarded()">
+						<select class="form-control" id="project" name="project">
 							<option value="">--Select Project--</option>
 							<option th:if="${selectedProject != null}" th:value="${selectedProject}"
 								th:text="${selectedProjectName}" selected="selected"></option>
@@ -277,14 +266,13 @@
 						Get Data
 					</button>
 
-					<button type="submit" formaction="/downloadPPRPdf" class="btn btn-success" th:if="${searched}">
+					<button type="submit" formaction="/downloadPPRPdf" id="downloadPdfBtn" class="btn btn-success" th:if="${searched}">
 						<i class="fas fa-file-pdf"></i> Download PDF
 					</button>
 				</div>
 			</form>
 
-			<div th:if="${searched}">
-
+		<div th:if="${searched}" id="resultsSection">
 				<!-- ====================================================== -->
 				<!-- PPR 1 -->
 				<!-- ====================================================== -->
@@ -2163,8 +2151,57 @@
 						</tbody>
 					</table>
 				</div> <!-- closes th:if="${searched}" -->
+				<!-- ================= PPR TRANSACTION HISTORY (READ-ONLY) ================= -->
+				<div class="mt-4" th:if="${transactionHistory != null}">
 
+					<h4 class="bg-primary text-white p-2">
+						PPR Transaction History
+					</h4>
 
+					<div class="table-responsive" th:if="${!#lists.isEmpty(transactionHistory)}">
+						<table class="table table-bordered table-striped table-hover text-center align-middle">
+							<thead class="table-primary">
+								<tr>
+									<th>S.No.</th>
+									<th>Sent From</th>
+									<th>Sent To</th>
+									<th>Action</th>
+									<th>Remarks</th>
+									<th>Sent On</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="tx, stat : ${transactionHistory}">
+									<td th:text="${stat.count}"></td>
+									<td th:text="${tx.sentFrom}"></td>
+									<td th:text="${tx.sentTo}"></td>
+									<td th:text="${tx.action}"></td>
+									<td th:text="${tx.remarks}"></td>
+									<td th:text="${tx.sentOn}"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="alert alert-info" th:if="${#lists.isEmpty(transactionHistory)}">
+						No transaction history available.
+					</div>
+
+				</div>
+
+				<!-- Shown only when the latest transaction is Back Forwarded -->
+								<div class="text-center mb-3" th:if="${latestBackForwarded}">
+									<div class="alert alert-warning">
+										<i class="fas fa-exclamation-triangle"></i>
+										DoLR has back forwarded this PPR. Please modify the data as per the remarks, then forward it again.
+									</div>
+								<a th:href="@{/modifyPprTransaction(tranxId=${selectedProject},projectname=${selectedProjectName})}"
+									   class="btn btn-warning"
+									   onclick="return confirm('Do you want to Modify Rejected PPR.');">
+										<i class="fas fa-edit"></i> Modify PPR
+									</a>
+							
+								</div>
 
 				<form id="forwardPPRForm" th:action="@{/forwardViewPPR}" method="post">
 
@@ -2176,6 +2213,12 @@
 						Please complete all PPR sections (PPR-1 to PPR-20) before forwarding this project.
 					</div>-->
 
+					<div th:if="${alreadyForwarded}" class="alert alert-info">
+						<i class="fas fa-info-circle"></i>
+						This PPR has already been forwarded/approved, so it cannot be forwarded again.
+						You can still view the data, the transaction history and download the PDF.
+					</div>
+
 					<div class="row mb-3 align-items-center">
 
 						<div class="col-md-2">
@@ -2184,7 +2227,7 @@
 							</label>
 						</div>
 						<div class="col-md-4">
-							<select class="form-select" id="userid" name="userid" th:disabled="${!allSectionsFilled}" required>
+							<select class="form-select" id="userid" name="userid" th:disabled="${!allSectionsFilled or alreadyForwarded}" required>
 								<option value="">--Select User-ID--</option>
 								<option th:each="u : ${userList}" th:value="${u.regId}" th:text="${u.userId}">
 								</option>
@@ -2192,7 +2235,7 @@
 							<div class="invalid-feedback">Please select User-ID.</div>
 						</div>
 						<div class="col-md-4">
-							<button type="submit" class="btn btn-primary" th:disabled="${!allSectionsFilled}">
+							<button type="submit" class="btn btn-primary" th:disabled="${!allSectionsFilled or alreadyForwarded}">
 								Forward
 							</button>
 						</div>
