@@ -71,4 +71,15 @@ public interface CropOutcomeRepository extends JpaRepository<PprCropOutcome, Int
 
 	
 
+	@Query("""
+		    SELECT c
+		    FROM PprCropOutcome c
+		    WHERE c.pprCropOutcomeId IN :ids
+		      AND c.status = 'D'
+		      AND c.ppr.district.state.stCode = :stcode
+		    """)
+		List<PprCropOutcome> findDraftCropOutcomesByIdsAndState(
+		        @Param("ids") List<Integer> ids,
+		        @Param("stcode") Integer stcode);
+	
 }

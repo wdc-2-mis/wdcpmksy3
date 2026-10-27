@@ -282,4 +282,28 @@ public class PprCropOutcomeService {
 	    );
 	}
 	
+	
+	@Transactional
+	public int completeSelectedCropOutcomes(
+	        List<Integer> selectedIds, Integer stcode) {
+
+	    if (selectedIds == null || selectedIds.isEmpty()) {
+	        return 0;
+	    }
+
+	    List<PprCropOutcome> records =
+	            pprCropOutcomeRepo.findDraftCropOutcomesByIdsAndState(
+	                    selectedIds, stcode);
+
+	    for (PprCropOutcome record : records) {
+	        record.setStatus('C');
+	    }
+
+	    pprCropOutcomeRepo.saveAll(records);
+
+	    return records.size();
+	}
+	
+	
+	
 }

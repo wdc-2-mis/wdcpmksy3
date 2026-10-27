@@ -1551,143 +1551,82 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+
 form.addEventListener("submit", function (event) {
 
-        event.preventDefault();
+    event.preventDefault();
 
-        console.log("Save Draft clicked");
+    let firstInvalidField = null;
+    let isValid = true;
 
-   form.querySelectorAll(".is-invalid").forEach(function (field) {
-            field.classList.remove("is-invalid");
-        });
+    // Remove previous validation messages before checking again.
+    form.querySelectorAll(".is-invalid").forEach(function (field) {
+        field.classList.remove("is-invalid");
+    });
 
+    // Check every required input and dropdown.
+    const requiredFields = form.querySelectorAll(
+        "input[required], select[required]"
+    );
 
-        let firstInvalidField = null;
-        let validationMessage = "";
+    requiredFields.forEach(function (field) {
 
-
-        const district = document.getElementById("district");
-        const project = document.getElementById("project");
-     
-        if (!district || !district.value) {
-
-            district.classList.add("is-invalid");
-
-            validationMessage = "Please select a District.";
-
-            firstInvalidField = district;
-        }
-        
-        if (!project || !project.value) {
-
-            project.classList.add("is-invalid");
-
-            validationMessage = "Please select a Project.";
-
-            firstInvalidField = project;
-        }
-
-
-        if (!firstInvalidField) {
-
-            const mw = document.getElementById("mw");
-
-            if (!mw || !mw.value) {
-
-                mw.classList.add("is-invalid");
-
-                validationMessage =
-                    "Please select a Micro-Watershed.";
-
-                firstInvalidField = mw;
-            }
-        }
-
-
-        if (!firstInvalidField) {
-
-            const requiredFields =
-                form.querySelectorAll(
-                    'input[name^="scheme["][required]'
-                );
-
-            for (const field of requiredFields) {
-
-                if (!field.value.trim()) {
-
-                    field.classList.add("is-invalid");
-
-                    const feedback =
-                        field.parentElement.querySelector(
-                            ".invalid-feedback"
-                        );
-
-                    if (feedback) {
-                        validationMessage =
-                            feedback.innerText.trim();
-                    } else {
-                        validationMessage =
-                            "Please fill all required fields.";
-                    }
-
-                    firstInvalidField = field;
-
-                    break;
-                }
-            }
-        }
-
-
-        if (firstInvalidField) {
-
-            console.log(
-                "Validation failed:",
-                validationMessage
-            );
-
-            document.getElementById(
-                "validationMessage"
-            ).innerText = validationMessage;
-
-
-            const validationModalElement =
-                document.getElementById("validationModal");
-
-
-            if (validationModalElement) {
-
-                const validationModal =
-                    new bootstrap.Modal(
-                        validationModalElement
-                    );
-
-                validationModal.show();
-
-
-                validationModalElement.addEventListener(
-                    "shown.bs.modal",
-                    function () {
-
-                        firstInvalidField.focus();
-
-                    },
-                    { once: true }
-                );
-
-            } else {
-
-                alert(validationMessage);
-
-                firstInvalidField.focus();
-            }
-
+        // Skip readonly fields because they are populated automatically.
+        if (field.readOnly || field.disabled) {
             return;
         }
 
-        
-        
-       form.submit();
+        if (field.value.trim() === "") {
+
+            field.classList.add("is-invalid");
+            isValid = false;
+
+            // Remember the first blank field for scrolling.
+            if (!firstInvalidField) {
+                firstInvalidField = field;
+            }
+        }
     });
+
+    // If any required field is blank, show all its validation messages.
+    if (!isValid) {
+
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+
+            firstInvalidField.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+
+        return;
+    }
+
+    // All required fields are filled, so submit the form normally.
+    form.submit();
+});
+
+const fieldsToValidate = form.querySelectorAll(
+    "input[required], select[required]"
+);
+
+fieldsToValidate.forEach(function (field) {
+
+    function clearValidationWhenFilled() {
+
+        if (field.value.trim() !== "") {
+            field.classList.remove("is-invalid");
+        }
+    }
+
+    // For text and number fields.
+    field.addEventListener("input", clearValidationWhenFilled);
+
+    // For dropdowns.
+    field.addEventListener("change", clearValidationWhenFilled);
+});
+
 
 
    

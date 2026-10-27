@@ -28,7 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
 let seasonAlreadyExists = false;
 let existingSeasonStatus = null;
     
-    function loadCropOutcomeRecords(districtId, projectId) {
+    
+function loadCropOutcomeRecords(districtId, projectId) {
 
     const params = new URLSearchParams();
 
@@ -43,18 +44,104 @@ let existingSeasonStatus = null;
     fetch("/getCropOutcomesByDistrict?" + params.toString())
         .then(response => {
             if (!response.ok) {
-                throw new Error("Crop outcome API error: " + response.status);
+                throw new Error(
+                    "Crop outcome API error: " + response.status
+                );
             }
 
             return response.text();
         })
         .then(html => {
-            document.getElementById("savedCropOutcomes").innerHTML = html;
+
+            const savedContainer =
+                document.getElementById("savedCropOutcomes");
+
+            if (!savedContainer) {
+                console.error("savedCropOutcomes container not found");
+                return;
+            }
+
+            // Replace the saved crop outcome table
+            savedContainer.innerHTML = html;
+
+            // Refresh Select All and Complete button states
+            if (typeof window.updateBulkCropCompleteButton === "function") {
+                window.updateBulkCropCompleteButton();
+            }
         })
         .catch(error => {
             console.error("Crop Outcome Loading Error:", error);
         });
 }
+    
+
+
+
+function updateBulkCropCompleteButton() {
+
+    const checkboxes = document.querySelectorAll(
+        "#savedCropOutcomes .cropOutcomeCheckbox"
+    );
+
+    const checkedBoxes = document.querySelectorAll(
+        "#savedCropOutcomes .cropOutcomeCheckbox:checked"
+    );
+
+    const completeButton = document.getElementById(
+        "bulkCropCompleteBtn"
+    );
+
+    const selectAllCheckbox = document.getElementById(
+        "selectAllCropOutcomes"
+    );
+
+    // Keep the Complete button visible.
+    // Enable it only when at least one checkbox is selected.
+    if (completeButton) {
+        completeButton.disabled = checkedBoxes.length === 0;
+    }
+
+    // Update Select All checkbox state.
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked =
+            checkboxes.length > 0 &&
+            checkedBoxes.length === checkboxes.length;
+
+        selectAllCheckbox.indeterminate =
+            checkedBoxes.length > 0 &&
+            checkedBoxes.length < checkboxes.length;
+    }
+}
+
+
+window.updateBulkCropCompleteButton =
+    updateBulkCropCompleteButton;
+
+// Delegated listener also works after the table is reloaded
+document.addEventListener("change", function (event) {
+
+    if (event.target.id === "selectAllCropOutcomes") {
+
+        document.querySelectorAll(
+            "#savedCropOutcomes .cropOutcomeCheckbox"
+        ).forEach(function (checkbox) {
+            checkbox.checked = event.target.checked;
+        });
+
+        updateBulkCropCompleteButton();
+    }
+
+    if (event.target.classList.contains("cropOutcomeCheckbox")) {
+        updateBulkCropCompleteButton();
+    }
+});
+
+// Set the initial state
+updateBulkCropCompleteButton();
+
+
+
+
     
     const form = document.getElementById("cropRelatedOutcome"); 
 
@@ -474,6 +561,53 @@ function checkExistingCropSeason() {
 });
 
 
+
+function bulkCompleteCropOutcomes() {
+
+    const selected = document.querySelectorAll(
+        "#savedCropOutcomes .cropOutcomeCheckbox:checked"
+    );
+
+    if (selected.length === 0) {
+        latestAlert("Please select at least one record to complete.");
+        return;
+    }
+
+    const form = document.getElementById("bulkCropOutcomeForm");
+
+    if (!form) {
+        console.error("bulkCropOutcomeForm not found");
+        return;
+    }
+
+    // Remove previously generated selected IDs
+    form.querySelectorAll('input[name="selectedIds"]').forEach(
+        function (input) {
+            input.remove();
+        }
+    );
+
+    // Add the selected record IDs to the form
+    selected.forEach(function (checkbox) {
+
+        const input = document.createElement("input");
+
+        input.type = "hidden";
+        input.name = "selectedIds";
+        input.value = checkbox.value;
+
+        form.appendChild(input);
+    });
+
+    completeAlert(
+        "Are you sure you want to complete selected records?",
+        function () {
+            form.submit();
+        }
+    );
+}
+
+
 document.addEventListener("click", function (e) {
 
     const button = e.target.closest(".edit-crop-btn");
@@ -815,6 +949,9 @@ document.addEventListener("click", function (e) {
 
             <thead class="table-light">
                 <tr>
+                <th class="table-primary">
+            <input type="checkbox" id="selectAllCropOutcomes" />
+        </th>
                     <th class="table-primary">S.No</th>
                     <th class="table-primary">District</th>
                     <th class="table-primary">Project</th>
@@ -830,7 +967,13 @@ document.addEventListener("click", function (e) {
 
             <tbody>
                 <tr th:each="rec, iterStat : ${cropOutcomes}">
-
+<td class="text-center">
+    <input type="checkbox"
+           class="cropOutcomeCheckbox"
+           name="selectedIds"
+           th:value="${rec.pprCropOutcomeId}"
+           th:if="${#strings.equals(rec.status, 'D')}"/>
+</td>
                     <td th:text="${iterStat.index + 1}"></td>
                     <td th:text="${rec.ppr.district.distName}"></td>
                     <td th:text="${rec.ppr.projectName}"></td>
@@ -916,6 +1059,25 @@ document.addEventListener("click", function (e) {
 
 </div>
 
+
+<form th:action="@{/completeSelectedCropOutcomes}"
+      method="post"
+      id="bulkCropOutcomeForm">
+
+    <div class="text-center mt-3" id="bulkCropCompleteContainer">
+
+        <button type="button"
+                class="btn btn-warning"
+                id="bulkCropCompleteBtn"
+                disabled
+                onclick="bulkCompleteCropOutcomes()">
+
+            <i class="fas fa-check"></i> Complete
+
+        </button>
+
+    </div>
+</form>
 
 
 <div class="modal fade"

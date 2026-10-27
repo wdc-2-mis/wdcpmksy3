@@ -288,4 +288,44 @@ public class PPRCropRelatedOutcomeController {
          return "redirect:/viewPPR";
     }
 	
+	@PostMapping("/completeSelectedCropOutcomes")
+	public String completeSelectedCropOutcomes(
+	        @RequestParam(value = "selectedIds", required = false)
+	        List<Integer> selectedIds,
+	        HttpSession session,
+	        RedirectAttributes redirectAttributes) {
+
+	    Object userid = session.getAttribute("userid");
+
+	    if (userid == null) {
+	        return "redirect:/login";
+	    }
+
+	    try {
+	        Integer stcode = Integer.parseInt(
+	                session.getAttribute("stcode").toString());
+
+	        int completed = outcomeService.completeSelectedCropOutcomes(
+	                selectedIds, stcode);
+
+	        if (completed > 0) {
+	            redirectAttributes.addFlashAttribute(
+	                    "success",
+	                    completed + " Crop Outcome record(s) completed successfully.");
+	        } else {
+	            redirectAttributes.addFlashAttribute(
+	                    "error",
+	                    "No eligible draft records were selected.");
+	        }
+
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+
+	        redirectAttributes.addFlashAttribute(
+	                "error",
+	                "Failed to complete selected records.");
+	    }
+
+	    return "redirect:/pprCropOutcomes";
+	}
 }
