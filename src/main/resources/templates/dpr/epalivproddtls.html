@@ -573,7 +573,7 @@ function bulkCompleteAlert() {
 
 						</div>
 						
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label class="form-label">
 									<b>Target (<span id="unitDesc" class="fw-bold text-primary"></span>)</b> <span class="required">*</span>
 							</label>
@@ -611,7 +611,7 @@ function bulkCompleteAlert() {
         <thead>
             <tr>
                 <th class="table-primary">
-                    <input type="checkbox" id="selectAll" />
+                    <input type="checkbox" id="selectAll"  th:unless="${allCompleted}"/>
                 </th>
                 <th class="table-primary">S.No</th>
                 <th class="table-primary">District</th>
@@ -625,9 +625,9 @@ function bulkCompleteAlert() {
         </thead>
         <tbody>
             <tr th:each="row, stat : ${dprList}">
-                <td>
-                    <input type="checkbox" name="selectedIds" th:value="${row[4]}" class="recordCheckbox" />
-                </td>
+               <td>
+    <input type="checkbox" name="selectedIds" th:value="${row[4]}" class="recordCheckbox" th:if="${row[9] != null and !#strings.equalsIgnoreCase(row[9].toString(), 'C')  and !allCompleted}" />
+</td>
                 <td th:text="${stat.index + 1}"></td>
                 <td th:text="${row[3]}"></td>
                 <td th:text="${row[2]}"></td>
@@ -685,7 +685,7 @@ function bulkCompleteAlert() {
   
 <div class="text-center mt-3">
     <button type="button" class="btn btn-warning"
-            th:disabled="${allCompleted}"
+            th:unless="${allCompleted}"
             onclick="bulkCompleteAlert()">
         <i class="fas fa-check"></i> Complete
     </button>

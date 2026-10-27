@@ -330,4 +330,23 @@ public class PPREmploymentGenerationService {
 		// TODO Auto-generated method stub
 		return repository.getEmploymentGenerationByProject(pprId, stcode, dcode);
 	}
+	
+	@Transactional
+	public int completeSelected(
+	        List<Integer> ids,
+	        Integer stcode,
+	        String userId,
+	        HttpServletRequest request) {
+
+	    if (ids == null || ids.isEmpty()) {
+	        throw new IllegalArgumentException(
+	                "Please select at least one draft record.");
+	    }
+
+	    return repository.completeSelectedDrafts(
+	            ids,
+	            stcode,
+	            userId,
+	            request.getRemoteAddr());
+	}
 }

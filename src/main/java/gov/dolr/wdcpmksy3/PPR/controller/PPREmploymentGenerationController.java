@@ -297,6 +297,46 @@ public class PPREmploymentGenerationController {
     }
 
     
-    
+    @PostMapping("/completeSelectedPPREmployment")
+    public String completeSelected(
+            @RequestParam("ids") List<Integer> ids,
+            HttpSession session,
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes) {
+
+        Object userid = session.getAttribute("userid");
+        Object stateCode = session.getAttribute("stcode");
+
+        if (userid == null || stateCode == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Integer stcode = Integer.parseInt(stateCode.toString());
+
+            int completedCount = employmentService.completeSelected(
+                    ids,
+                    stcode,
+                    userid.toString(),
+                    request);
+
+            if (completedCount > 0) {
+                redirectAttributes.addFlashAttribute(
+                        "success",
+                        completedCount + " record(s) completed successfully.");
+            } else {
+                redirectAttributes.addFlashAttribute(
+                        "error",
+                        "No draft records were completed. Please refresh the table and try again.");
+            }
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "Unable to complete selected records.");
+        }
+
+        return "redirect:/pprEmploymentGeneration";
+    }
     
 }

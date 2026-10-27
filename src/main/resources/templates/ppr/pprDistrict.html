@@ -303,13 +303,51 @@ document.addEventListener("DOMContentLoaded", function () {
                     const actionCell = row.insertCell();
 
                     if (rec.status === "C") {
-                        const badge = document.createElement("span");
-                        badge.className = "badge bg-success";
-                        badge.textContent = "Data Completed";
-                        actionCell.appendChild(badge);
-                    } else {
-                        actionCell.textContent = "Draft";
-                    }
+    const badge = document.createElement("span");
+    badge.className = "badge bg-success";
+    badge.textContent = "Data Completed";
+    actionCell.appendChild(badge);
+} else if (rec.status === "D") {
+
+    // Edit button
+    const editBtn = document.createElement("a");
+    editBtn.href = "javascript:void(0)";
+    editBtn.className = "btn btn-primary btn-sm edit-btn";
+    editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+
+    editBtn.dataset.pprid = rec.pprId;
+    editBtn.dataset.finyear = rec.finYear?.finYrDesc ?? "";
+    editBtn.dataset.district = rec.district?.distName ?? "";
+    editBtn.dataset.ppr = rec.pprName ?? "";
+    editBtn.dataset.project = rec.projectName ?? "";
+    editBtn.dataset.micro = rec.microIdsCsv ?? "";
+
+    actionCell.appendChild(editBtn);
+
+    // Space between buttons
+    actionCell.appendChild(document.createTextNode("  "));
+
+    // Complete button
+    const completeBtn = document.createElement("a");
+    completeBtn.href = "javascript:void(0)";
+    completeBtn.className = "btn btn-success btn-sm";
+    completeBtn.innerHTML = '<i class="fas fa-check"></i>';
+
+    completeBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        completeAlert(
+            "Are you sure you want to complete this record?",
+            function () {
+                window.location.href =
+                    "/completePPRDistrict?id=" +
+                    encodeURIComponent(rec.pprId);
+            }
+        );
+    });
+
+    actionCell.appendChild(completeBtn);
+}
                 });
             })
             .catch(error => {

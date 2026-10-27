@@ -173,5 +173,27 @@ public interface PPREmploymentGenerationRepository extends JpaRepository<PPREmpl
     	        @Param("pprId") Integer pprId,
     	        @Param("stcode") Integer stcode,
     	        @Param("dcode") Integer dcode);
+    
+    
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE ppr_employment_generation e
+           SET status = 'C',
+               updated_by = :userId,
+               updated_date = CURRENT_DATE,
+               request_ip = :requestIp
+          FROM m_ppr p
+          JOIN m_district d ON p.dcode = d.dcode
+         WHERE e.ppr_id = p.ppr_id
+           AND d.st_code = :stcode
+           AND e.ppr_employment_id IN (:ids)
+           AND e.status = 'D'
+        """, nativeQuery = true)
+    int completeSelectedDrafts(
+            @Param("ids") List<Integer> ids,
+            @Param("stcode") Integer stcode,
+            @Param("userId") String userId,
+            @Param("requestIp") String requestIp);
 	
 }

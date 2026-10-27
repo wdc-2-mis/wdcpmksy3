@@ -64,9 +64,7 @@ public class DPRELPController {
 	  
 	    boolean allCompleted = list.stream()
 	    	    .allMatch(row -> "C".equals(String.valueOf(row[9])));
-
-        System.out.println("himanshu all completed:" +allCompleted);
-        
+  
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
         model.addAttribute("dprList", list);
         

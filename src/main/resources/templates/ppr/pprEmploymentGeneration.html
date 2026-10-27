@@ -24,13 +24,147 @@ document.addEventListener("DOMContentLoaded", function() {
 
  const formedit = document.getElementById("editForm");
 
+if (formedit) {
     formedit.addEventListener("submit", function (event) {
+
         if (!formedit.checkValidity()) {
             event.preventDefault();
             event.stopPropagation();
         }
+
         formedit.classList.add("was-validated");
+
     });
+}
+    
+    
+/* =========================================================
+   OPEN EDIT EMPLOYMENT MODAL
+   ========================================================= */
+
+document.addEventListener("click", function(event) {
+
+    const editButton = event.target.closest(".edit-btn");
+
+    if (!editButton) {
+        return;
+    }
+
+    event.preventDefault();
+
+    // Get the Bootstrap modal element.
+    const editModalElement = document.getElementById("editModal");
+
+    if (!editModalElement) {
+        console.error("Edit modal element not found.");
+        return;
+    }
+
+    // Get the record values from the Edit button.
+    document.getElementById("editId").value =
+        editButton.dataset.id || "";
+
+    document.getElementById("editDistrict").value =
+        editButton.dataset.district || "";
+
+    document.getElementById("editProject").value =
+        editButton.dataset.project || "";
+
+    document.getElementById("editWatershed").value =
+        editButton.dataset.watershed || "";
+
+    document.getElementById("editVillage").value =
+        editButton.dataset.village || "";
+
+    document.getElementById("editType").value =
+        editButton.dataset.type || "";
+
+    document.getElementById("editSc").value =
+        editButton.dataset.sc || "";
+
+    document.getElementById("editSt").value =
+        editButton.dataset.st || "";
+
+    document.getElementById("editOthers").value =
+        editButton.dataset.others || "";
+
+    document.getElementById("editWomen").value =
+        editButton.dataset.women || "";
+
+    // Calculate the total.
+    const sc = parseInt(document.getElementById("editSc").value, 10) || 0;
+    const st = parseInt(document.getElementById("editSt").value, 10) || 0;
+    const others = parseInt(document.getElementById("editOthers").value, 10) || 0;
+    const women = parseInt(document.getElementById("editWomen").value, 10) || 0;
+
+    document.getElementById("editTotal").value =
+        sc + st + others + women;
+
+    // Open the Bootstrap modal.
+    const editModal = bootstrap.Modal.getOrCreateInstance(editModalElement);
+
+    editModal.show();
+
+});
+    
+    
+    
+    const selectAll = document.getElementById("selectAll");
+const tableBody = document.getElementById("employmentTableBody");
+const bulkForm = document.getElementById("bulkCompleteForm");
+const selectedIdsContainer = document.getElementById("selectedEmploymentIds");
+const bulkButton = document.getElementById("bulkCompleteBtn");
+
+function updateBulkCompleteButton() {
+    const checkboxes = tableBody.querySelectorAll(".draft-record-checkbox");
+    const selected = tableBody.querySelectorAll(".draft-record-checkbox:checked");
+
+    selectAll.checked =
+        checkboxes.length > 0 && selected.length === checkboxes.length;
+
+    selectAll.indeterminate =
+        selected.length > 0 && selected.length < checkboxes.length;
+
+    bulkButton.disabled = selected.length === 0;
+}
+
+selectAll.addEventListener("change", function () {
+    tableBody.querySelectorAll(".draft-record-checkbox").forEach(function (checkbox) {
+        checkbox.checked = selectAll.checked;
+    });
+
+    updateBulkCompleteButton();
+});
+
+tableBody.addEventListener("change", function (event) {
+    if (event.target.classList.contains("draft-record-checkbox")) {
+        updateBulkCompleteButton();
+    }
+});
+
+bulkForm.addEventListener("submit", function (event) {
+    const selected = tableBody.querySelectorAll(
+        ".draft-record-checkbox:checked"
+    );
+
+    if (selected.length === 0) {
+        event.preventDefault();
+        latestAlert("Please select at least one draft record.");
+        return;
+    }
+
+    selectedIdsContainer.replaceChildren();
+
+    selected.forEach(function (checkbox) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "ids";
+        input.value = checkbox.value;
+        selectedIdsContainer.appendChild(input);
+    });
+
+    
+});
 
     const district = document.getElementById("district");
     const project = document.getElementById("project");
@@ -39,30 +173,83 @@ document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("employmentForm");
     const saveBtn = document.getElementById("saveBtn");
 
+
+let dropdownValidationAttempted = false;
+
+const requiredDropdowns = [
+    district,
+    project,
+    watershed,
+    village
+].filter(Boolean);
+
+/* Update dropdown validation when the user changes a selection */
+requiredDropdowns.forEach(function (field) {
+
+    field.addEventListener("change", function () {
+
+        if (field.value.trim() !== "") {
+
+            field.classList.remove("is-invalid");
+            field.classList.add("is-valid");
+
+        } else {
+
+            field.classList.remove("is-valid");
+
+            if (dropdownValidationAttempted) {
+                field.classList.add("is-invalid");
+            } else {
+                field.classList.remove("is-invalid");
+            }
+        }
+    });
+});
+
 const migrationBtn = document.getElementById("migrationDetailsBtn");
  function updateMigrationButton() {
-        const dcode = district.value;
 
-        if (dcode !== "") {
-            migrationBtn.href =
-                "/preliminaryPPR15?dcode=" + encodeURIComponent(dcode);
-            migrationBtn.style.display = "inline-block";
-        } else {
-            migrationBtn.style.display = "none";
-        }
+    if (!district || !migrationBtn) {
+        return;
     }
+
+    const dcode = district.value;
+
+    if (dcode !== "") {
+        migrationBtn.href =
+            "/preliminaryPPR15?dcode=" + encodeURIComponent(dcode);
+
+        migrationBtn.style.display = "inline-block";
+    } else {
+        migrationBtn.style.display = "none";
+    }
+}
     /* =========================================================
      CALCULATE TOTAL
      ========================================================= */
-    function calculateTotal(row) {
-        const sc = parseInt(row.querySelector('input[name$=".sc"]').value) || 0;
-        const st = parseInt(row.querySelector('input[name$=".st"]').value) || 0;
-        const others = parseInt(row.querySelector('input[name$=".others"]').value) || 0;
-        const women = parseInt(row.querySelector('input[name$=".women"]').value) || 0;
-        const total = sc + st + others + women;
-        row.querySelector('input[name$=".total"]').value = total;
-        return total;
-    }
+    
+function calculateTotal(row) {
+    if (!row) return;
+
+    const scField = row.querySelector('input[name$=".sc"]');
+    const stField = row.querySelector('input[name$=".st"]');
+    const othersField = row.querySelector('input[name$=".others"]');
+    const womenField = row.querySelector('input[name$=".women"]');
+
+    // Find the Total column in this row.
+    const cells = row.querySelectorAll("td");
+    const totalCell = cells[cells.length - 1];
+
+    if (!totalCell) return;
+
+    const sc = parseInt(scField?.value, 10) || 0;
+    const st = parseInt(stField?.value, 10) || 0;
+    const others = parseInt(othersField?.value, 10) || 0;
+    const women = parseInt(womenField?.value, 10) || 0;
+
+    totalCell.textContent = sc + st + others + women;
+}
+    
 
     /* =========================================================
      CLEAR ROW DATA
@@ -102,64 +289,109 @@ function clearDropdownValidation(field) {
     /* =========================================================
      CHECK EXISTING EMPLOYMENT TYPES FOR THE VILLAGE
      ========================================================= */
-    function checkExistingEmploymentTypes(pprId, vcode, mwId) {
+ 
+function checkExistingEmploymentTypes(pprId, vcode, mwId) {
+
     if (!pprId || !vcode || !mwId) {
+
         existingEmploymentTypeIds = [];
         existingStatus = null;
         saveBtn.disabled = false;
+
         document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
             clearRowData(row);
         });
+
         return;
     }
 
     saveBtn.disabled = true;
 
-    fetch("/getEmploymentVillageStatus?pprId=" + pprId + "&vcode=" + vcode + "&mwId=" + mwId)
-        .then(response => response.json())
-        .then(data => {
-            existingStatus = data.status;
-            
-            document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
-                clearRowData(row);
-            });
-            
-            if (data.status === "C") {
-                latestAlert("This village has already been completed. You cannot add new records.");
-                saveBtn.disabled = true;
-                existingEmploymentTypeIds = [];
-                // ✅ Reset village selection
-                document.getElementById("village").selectedIndex = 0;
-            } else if (data.status === "D") {
-                if (data.records && data.records.length > 0) {
-                    existingEmploymentTypeIds = data.records.map(r => r.employmentTypeId);
-                    const allTypes = [1, 2, 3];
-                    const missingTypes = allTypes.filter(id => !existingEmploymentTypeIds.includes(id));
-                    
-                    if (missingTypes.length === 0) {
-                        latestAlert("Draft already exists for all employment types. Please edit existing records.");
-                        saveBtn.disabled = true;
-                        // ✅ Reset village selection
-                        document.getElementById("village").selectedIndex = 0;
-                    } else {
-                        const typeNames = getTypeNames(missingTypes);
-                        latestAlert("Draft exists for some employment types. You can add data for: " + typeNames);
-                        saveBtn.disabled = true;
-                    }
+    fetch(
+        "/getEmploymentVillageStatus?pprId=" + encodeURIComponent(pprId) +
+        "&vcode=" + encodeURIComponent(vcode) +
+        "&mwId=" + encodeURIComponent(mwId)
+    )
+    .then(function(response) {
+
+        if (!response.ok) {
+            throw new Error("Failed to check existing employment records.");
+        }
+
+        return response.json();
+    })
+    .then(function(data) {
+
+        existingStatus = data.status;
+
+        document.querySelectorAll("#employmentEntryBody tr").forEach(function(row) {
+            clearRowData(row);
+        });
+
+        if (data.status === "C") {
+
+            latestAlert("This village has already been completed. You cannot add new records.");
+
+            saveBtn.disabled = true;
+            existingEmploymentTypeIds = [];
+
+            document.getElementById("village").selectedIndex = 0;
+
+        } else if (data.status === "D") {
+
+            if (data.records && data.records.length > 0) {
+
+                existingEmploymentTypeIds = data.records.map(function(record) {
+                    return Number(record.employmentTypeId);
+                });
+
+                const allTypes = [1, 2, 3];
+
+                const missingTypes = allTypes.filter(function(id) {
+                    return !existingEmploymentTypeIds.includes(id);
+                });
+
+                if (missingTypes.length === 0) {
+
+                    latestAlert("Draft already exists for all employment types. Please edit existing records.");
+
+                    saveBtn.disabled = true;
+                    document.getElementById("village").selectedIndex = 0;
+
                 } else {
-                    existingEmploymentTypeIds = [];
+
+                    const typeNames = getTypeNames(missingTypes);
+
+                     latestAlert(
+        "This Village data already in Draft mode. Kindly select other Village"
+    );
+
+                    // Keep the form disabled until we confirm
+                    // how missing employment types are handled.
                     saveBtn.disabled = true;
                 }
+
             } else {
+
                 existingEmploymentTypeIds = [];
-                saveBtn.disabled = false;
+                saveBtn.disabled = true;
             }
-        })
-        .catch(error => {
-            console.error("Village Status Check Error:", error);
-            saveBtn.disabled = true;
-        });
+
+        } else {
+
+            existingEmploymentTypeIds = [];
+            saveBtn.disabled = false;
+        }
+    })
+    .catch(function(error) {
+
+        console.error("Village Status Check Error:", error);
+        saveBtn.disabled = true;
+
+        latestAlert("Unable to check existing employment records. Please try again.");
+    });
 }
+ 
     
 
     /* =========================================================
@@ -177,6 +409,7 @@ function clearDropdownValidation(field) {
    
 district.addEventListener("change", function() {
     const districtId = this.value;
+    updateMigrationButton();
  
     // Load district-wise records, or state-wise if district is cleared.
     loadEmploymentTable(districtId, "");
@@ -311,283 +544,174 @@ project.addEventListener("change", function() {
    FORM SUBMIT VALIDATION
    ========================================================= */
 
-if (form) {
-
-    form.addEventListener("submit", function(e) {
-
-        e.preventDefault();
-
-       /* =========================================================
-   VALIDATE EMPLOYMENT ROW
-   ========================================================= */
-
 function validateFields(row) {
 
-    const scInput = row.querySelector('input[name$=".sc"]');
-    const stInput = row.querySelector('input[name$=".st"]');
-    const othersInput = row.querySelector('input[name$=".others"]');
-    const womenInput = row.querySelector('input[name$=".women"]');
-
-    let isValid = true;
+    if (!row) {
+        return false;
+    }
 
     const fields = [
-        scInput,
-        stInput,
-        othersInput,
-        womenInput
+        row.querySelector('input[name$=".sc"]'),
+        row.querySelector('input[name$=".st"]'),
+        row.querySelector('input[name$=".others"]'),
+        row.querySelector('input[name$=".women"]')
     ];
 
+    // Remove old validation messages.
     fields.forEach(function(field) {
 
         if (!field) {
             return;
         }
 
-        field.classList.remove("is-invalid");
+        field.classList.remove("is-invalid", "is-valid");
 
-        const oldFeedback =
-            field.parentElement.querySelector(".invalid-feedback");
+        const feedback = field.parentElement.querySelector(".invalid-feedback");
 
-        if (oldFeedback) {
-            oldFeedback.remove();
+        if (feedback) {
+            feedback.remove();
         }
     });
 
+    // Check whether at least one field contains data.
+    const rowHasData = fields.some(function(field) {
+        return field && field.value.trim() !== "";
+    });
 
-    /* =====================================================
-       CHECK ENTERED VALUES
-       ===================================================== */
+    // All four fields are empty: allow this row.
+    if (!rowHasData) {
+        return true;
+    }
+
+    // If any field has data, all four fields must be filled.
+    let isValid = true;
 
     fields.forEach(function(field) {
 
+        // A required field is missing from the row.
         if (!field) {
+            isValid = false;
             return;
         }
 
-        const value = field.value.trim();
+        if (field.value.trim() === "") {
 
-        /*
-         * Empty fields are allowed because the user only
-         * needs to enter data in at least one field/row.
-         */
+            field.classList.add("is-invalid");
 
-        if (value !== "") {
+            const feedback = document.createElement("div");
+            feedback.className = "invalid-feedback";
+            feedback.textContent =
+                "Please enter " +
+                field.name.split(".").pop().toUpperCase() +
+                " value.";
 
-            if (!/^\d+$/.test(value)) {
+            field.parentElement.appendChild(feedback);
 
-                field.classList.add("is-invalid");
+            isValid = false;
 
-                const feedback =
-                    document.createElement("div");
+        } else {
 
-                feedback.className = "invalid-feedback";
-
-                feedback.textContent =
-                    "Please enter a valid number.";
-
-                field.parentElement.appendChild(feedback);
-
-                isValid = false;
-            }
+            field.classList.add("is-valid");
         }
     });
 
     return isValid;
 }
 
-        const requiredFields = form.querySelectorAll("select[required]");
 
-        requiredFields.forEach(function(field) {
+if (form) {
 
-            field.classList.remove("is-invalid");
-            field.classList.remove("is-valid");
+    form.addEventListener("submit", function(e) {
 
-        });
+        e.preventDefault();
 
+        /* VALIDATE REQUIRED DROPDOWNS */
 
-        /* =====================================================
-           VALIDATE REQUIRED DROPDOWNS
-           ===================================================== */
+        dropdownValidationAttempted = true;
 
-        for (const field of requiredFields) {
+        let dropdownsValid = true;
+        let firstInvalidDropdown = null;
+
+        requiredDropdowns.forEach(function(field) {
+
+            field.classList.remove("is-invalid", "is-valid");
 
             if (field.value.trim() === "") {
 
                 field.classList.add("is-invalid");
+                dropdownsValid = false;
 
-                field.focus();
-
-                return;
-            }
-        }
-
-
-        /* =====================================================
-           VALIDATE EMPLOYMENT TABLE
-           ===================================================== */
-
-        const rows = document.querySelectorAll(
-            "#employmentEntryBody tr"
-        );
-
-        let hasValidData = false;
-
-        let duplicateTypesEntered = [];
-
-        let rowsToClear = [];
-
-
-        for (const row of rows) {
-
-            const typeIdInput =
-                row.querySelector(
-                    'input[name$=".employmentTypeId"]'
-                );
-
-            if (!typeIdInput) {
-                continue;
-            }
-
-
-            const typeId =
-                parseInt(typeIdInput.value);
-
-
-            const sc =
-                parseInt(
-                    row.querySelector(
-                        'input[name$=".sc"]'
-                    ).value
-                ) || 0;
-
-
-            const st =
-                parseInt(
-                    row.querySelector(
-                        'input[name$=".st"]'
-                    ).value
-                ) || 0;
-
-
-            const others =
-                parseInt(
-                    row.querySelector(
-                        'input[name$=".others"]'
-                    ).value
-                ) || 0;
-
-
-            const women =
-                parseInt(
-                    row.querySelector(
-                        'input[name$=".women"]'
-                    ).value
-                ) || 0;
-
-
-            const hasData =
-                sc > 0 ||
-                st > 0 ||
-                others > 0 ||
-                women > 0;
-
-
-            if (hasData) {
-
-                const isValid =
-                    validateFields(row);
-
-                if (!isValid) {
-
-                    return;
+                if (!firstInvalidDropdown) {
+                    firstInvalidDropdown = field;
                 }
 
-
-                hasValidData = true;
-
-
-                if (
-                    existingEmploymentTypeIds
-                        .includes(typeId)
-                ) {
-
-                    duplicateTypesEntered.push({
-                        typeId: typeId,
-                        row: row
-                    });
-
-                    rowsToClear.push(row);
-                }
+            } else {
+                field.classList.add("is-valid");
             }
-        }
-
-
-        /* =====================================================
-           CLEAR DUPLICATE ROW DATA
-           ===================================================== */
-
-        rowsToClear.forEach(function(row) {
-
-            clearRowData(row);
-
         });
 
-
-        /* =====================================================
-           AT LEAST ONE VALUE REQUIRED
-           ===================================================== */
-const employmentValidation =
-    document.getElementById("employmentValidation");
-    
-        if (!hasValidData) {
-
-           employmentValidation.style.setProperty(
-        "display",
-        "block",
-        "important"
-    );
-
-    return;
-        }
-employmentValidation.style.setProperty(
-    "display",
-    "none",
-    "important"
-);
-
-        /* =====================================================
-           DUPLICATE EMPLOYMENT TYPE
-           ===================================================== */
-
-        if (duplicateTypesEntered.length > 0) {
-
-            const typeNames =
-                duplicateTypesEntered.map(function(item) {
-
-                    const typeMap = {
-
-                        1: "Wage Employment (No. of Man-days)",
-
-                        2: "Self Employment (No. of Beneficiaries)",
-
-                        3: "Wage Employment (No. of Beneficiaries)"
-
-                    };
-
-                    return typeMap[item.typeId]
-                        || item.typeId;
-
-                }).join(", ");
-
-
-            latestalert(
-                "You cannot enter data for: "
-                + typeNames
-                + ". These types already have draft records. Please edit existing records instead."
-            );
-
+        if (!dropdownsValid) {
+            firstInvalidDropdown.focus();
             return;
         }
+
+        /* VALIDATE EMPLOYMENT ROWS */
+
+        const rows = document.querySelectorAll("#employmentEntryBody tr");
+
+        let atLeastOneRowHasData = false;
+        let allRowsValid = true;
+
+        rows.forEach(function(row) {
+
+            const fields = [
+                row.querySelector('input[name$=".sc"]'),
+                row.querySelector('input[name$=".st"]'),
+                row.querySelector('input[name$=".others"]'),
+                row.querySelector('input[name$=".women"]')
+            ].filter(Boolean);
+
+            const rowHasData = fields.some(function(field) {
+                return field.value.trim() !== "";
+            });
+
+            if (rowHasData) {
+
+                atLeastOneRowHasData = true;
+
+                if (!validateFields(row)) {
+                    allRowsValid = false;
+                }
+
+            } else {
+
+                // Clear validation messages for empty rows.
+                fields.forEach(function(field) {
+
+                    field.classList.remove("is-invalid", "is-valid");
+
+                    const feedback =
+                        field.parentElement.querySelector(".invalid-feedback");
+
+                    if (feedback) {
+                        feedback.remove();
+                    }
+                });
+            }
+        });
+
+        if (!atLeastOneRowHasData) {
+            latestAlert("Please enter employment details in at least one row.");
+            return;
+        }
+
+        if (!allRowsValid) {
+            return;
+        }
+
+    
+
+        
 
 
 
@@ -597,14 +721,33 @@ employmentValidation.style.setProperty(
 }
 
 
+
 function loadEmploymentTable(dcode, pprId) {
 
     const tableDiv = document.getElementById("employmentListDiv");
     const tableBody = document.getElementById("employmentTableBody");
+    const selectAllHeader = document.getElementById("selectAllHeader");
+    const selectAll = document.getElementById("selectAll");
+    const bulkContainer = document.getElementById("bulkCompleteContainer");
+    const bulkButton = document.getElementById("bulkCompleteBtn");
 
+    // Reset table controls before loading records.
     tableDiv.style.display = "block";
 
-    // Build the URL using the selected filters.
+    // IMPORTANT:
+    // Keep the first column visible to maintain table alignment.
+    selectAllHeader.style.display = "";
+
+    // Hide only the checkbox, not the table column.
+    selectAll.style.visibility = "hidden";
+
+    bulkContainer.style.display = "none";
+
+    selectAll.checked = false;
+    selectAll.indeterminate = false;
+    bulkButton.disabled = true;
+
+    // Build URL using the selected district and PPR ID.
     const params = new URLSearchParams();
 
     if (dcode) {
@@ -615,13 +758,16 @@ function loadEmploymentTable(dcode, pprId) {
         params.set("pprId", pprId);
     }
 
-    const url = "/getEmploymentGenerationByDistrict" +
+    const url =
+        "/getEmploymentGenerationByDistrict" +
         (params.toString() ? "?" + params.toString() : "");
 
-    // Show a loading message while records are fetched.
+    // Show loading message.
     tableBody.innerHTML = `
         <tr>
-            <td colspan="11" class="text-center">Loading records...</td>
+            <td colspan="12" class="text-center">
+                Loading records...
+            </td>
         </tr>
     `;
 
@@ -630,24 +776,39 @@ function loadEmploymentTable(dcode, pprId) {
             if (!response.ok) {
                 throw new Error("HTTP error: " + response.status);
             }
+
             return response.json();
         })
         .then(data => {
 
-            // Keep the table visible when there are no records.
-            if (!data || data.length === 0) {
+            // Handle empty or missing data.
+            if (!Array.isArray(data) || data.length === 0) {
+
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="11"
+                        <td colspan="12"
                             class="text-center text-muted fw-bold">
                             Data not Found
                         </td>
                     </tr>
                 `;
+
+                // Keep the first column visible.
+                selectAllHeader.style.display = "";
+
+                // Hide only the checkbox and bulk controls.
+                selectAll.style.visibility = "hidden";
+                bulkContainer.style.display = "none";
+
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+                bulkButton.disabled = true;
+
                 return;
             }
 
             let rows = "";
+
             let previousDistrict = "";
             let previousProject = "";
             let previousWatershed = "";
@@ -660,44 +821,77 @@ function loadEmploymentTable(dcode, pprId) {
                 const watershedName = item.mw_name || "";
                 const villageName = item.village_name || "";
 
+                // Display repeated hierarchy values only once.
                 const showDistrict =
                     districtName !== previousDistrict;
 
                 const showProject =
-                    showDistrict || projectName !== previousProject;
+                    showDistrict ||
+                    projectName !== previousProject;
 
                 const showWatershed =
-                    showProject || watershedName !== previousWatershed;
+                    showProject ||
+                    watershedName !== previousWatershed;
 
                 const showVillage =
-                    showWatershed || villageName !== previousVillage;
+                    showWatershed ||
+                    villageName !== previousVillage;
 
-                const sc = parseInt(item.sc) || 0;
-                const st = parseInt(item.st) || 0;
-                const others = parseInt(item.others) || 0;
-                const women = parseInt(item.women) || 0;
+                // Convert values into numbers safely.
+                const sc = parseInt(item.sc, 10) || 0;
+                const st = parseInt(item.st, 10) || 0;
+                const others = parseInt(item.others, 10) || 0;
+                const women = parseInt(item.women, 10) || 0;
+
                 const total = sc + st + others + women;
 
+                const recordId =
+                    encodeURIComponent(item.ppr_employment_id);
+
+                /*
+                 * Show a checkbox only for Draft records.
+                 * Completed and Skipped records have an empty
+                 * first cell, preserving the table alignment.
+                 */
+                let checkboxHtml = "";
+
+                if (item.status === "D") {
+                    checkboxHtml = `
+                        <input type="checkbox"
+                               class="draft-record-checkbox"
+                               value="${recordId}"
+                               aria-label="Select draft employment record">
+                    `;
+                }
+
+                // Build the Action column.
                 let actionHtml = "";
 
                 if (item.status === "S") {
+
+                    // Skipped record.
                     actionHtml = `
                         <span class="badge bg-warning text-dark">
                             <i class="fas fa-forward"></i> Skipped
                         </span>
+
                         <a href="javascript:void(0)"
                            class="btn btn-danger btn-sm"
                            onclick="deleteAlert(
                                'Are you sure you want to delete this record?',
                                function() {
                                    window.location.href =
-                                       '/deletePPREmployment?id=${encodeURIComponent(item.ppr_employment_id)}';
+                                       '/deletePPREmployment?id=${recordId}';
                                }
                            ); return false;">
+
                             <i class="fas fa-trash"></i>
                         </a>
                     `;
+
                 } else if (item.status === "D") {
+
+                    // Draft record: Delete, Edit and Complete.
                     actionHtml = `
                         <a href="javascript:void(0)"
                            class="btn btn-danger btn-sm"
@@ -705,15 +899,17 @@ function loadEmploymentTable(dcode, pprId) {
                                'Are you sure you want to delete this record?',
                                function() {
                                    window.location.href =
-                                       '/deletePPREmployment?id=${encodeURIComponent(item.ppr_employment_id)}';
+                                       '/deletePPREmployment?id=${recordId}';
                                }
-                           ); return false;">
+                           ); return false;"
+                           title="Delete">
+
                             <i class="fas fa-trash"></i>
                         </a>
 
                         <a href="javascript:void(0)"
                            class="btn btn-primary btn-sm edit-btn"
-                           data-id="${item.ppr_employment_id}"
+                           data-id="${recordId}"
                            data-district="${districtName}"
                            data-project="${projectName}"
                            data-watershed="${watershedName}"
@@ -724,6 +920,7 @@ function loadEmploymentTable(dcode, pprId) {
                            data-others="${others}"
                            data-women="${women}"
                            title="Edit">
+
                             <i class="fas fa-edit"></i>
                         </a>
 
@@ -733,106 +930,212 @@ function loadEmploymentTable(dcode, pprId) {
                                'Are you sure you want to complete this record?',
                                function() {
                                    window.location.href =
-                                       '/completePPREmployment?id=${encodeURIComponent(item.ppr_employment_id)}';
+                                       '/completePPREmployment?id=${recordId}';
                                }
-                           ); return false;">
+                           ); return false;"
+                           title="Complete">
+
                             <i class="fas fa-check"></i>
                         </a>
                     `;
+
                 } else {
+
+                    // Completed record.
                     actionHtml = `
                         <span class="badge bg-success">
-                            <i class="fas fa-check-circle"></i> Completed
+                            <i class="fas fa-check-circle"></i>
+                            Completed
                         </span>
                     `;
                 }
 
+                // Build the table row.
                 rows += `
                     <tr>
-                        <td>${showDistrict ? districtName : ""}</td>
-                        <td>${showProject ? projectName : ""}</td>
-                        <td>${showWatershed ? watershedName : ""}</td>
-                        <td>${showVillage ? villageName : ""}</td>
-                        <td>${item.employment_type_name || ""}</td>
+                        <td class="text-center">
+                            ${checkboxHtml}
+                        </td>
+
+                        <td>
+                            ${showDistrict ? districtName : ""}
+                        </td>
+
+                        <td>
+                            ${showProject ? projectName : ""}
+                        </td>
+
+                        <td>
+                            ${showWatershed ? watershedName : ""}
+                        </td>
+
+                        <td>
+                            ${showVillage ? villageName : ""}
+                        </td>
+
+                        <td>
+                            ${item.employment_type_name || ""}
+                        </td>
+
                         <td class="text-end">${sc}</td>
                         <td class="text-end">${st}</td>
                         <td class="text-end">${others}</td>
                         <td class="text-end">${women}</td>
                         <td class="text-end">${total}</td>
-                        <td class="text-center">${actionHtml}</td>
+
+                        <td class="text-center">
+                            ${actionHtml}
+                        </td>
                     </tr>
                 `;
 
+                // Remember the current hierarchy values.
                 previousDistrict = districtName;
                 previousProject = projectName;
                 previousWatershed = watershedName;
                 previousVillage = villageName;
             });
 
+            // Display the fetched records.
             tableBody.innerHTML = rows;
+
+            // Check whether any Draft records exist.
+            const draftCheckboxes =
+                tableBody.querySelectorAll(".draft-record-checkbox");
+
+            const hasDrafts = draftCheckboxes.length > 0;
+
+            /*
+             * IMPORTANT FIX:
+             * Never hide selectAllHeader.
+             * Hide/show its checkbox using visibility instead.
+             */
+            selectAllHeader.style.display = "";
+
+            selectAll.style.visibility =
+                hasDrafts ? "visible" : "hidden";
+
+            // Show bulk completion controls only when drafts exist.
+            bulkContainer.style.display =
+                hasDrafts ? "block" : "none";
+
+            // Reset selection after loading or changing filters.
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+            bulkButton.disabled = true;
+
         })
         .catch(error => {
-            console.error("Error loading employment:", error);
+
+            console.error(
+                "Error loading employment records:",
+                error
+            );
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="11" class="text-center text-danger">
+                    <td colspan="12"
+                        class="text-center text-danger">
                         Unable to load records.
                     </td>
                 </tr>
             `;
+
+            // Keep the first column visible even on errors.
+            selectAllHeader.style.display = "";
+            selectAll.style.visibility = "hidden";
+
+            // Hide bulk completion controls.
+            bulkContainer.style.display = "none";
+
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+            bulkButton.disabled = true;
         });
 }
+
 
     /* =========================================================
      EDIT BUTTON CLICK
      ========================================================= */
-    document.addEventListener("click", function(e) {
-        const btn = e.target.closest(".edit-btn");
-        if (!btn) return;
+   /* =========================================================
+   LIVE VALIDATION WHILE ENTERING EMPLOYMENT DATA
+   ========================================================= */
 
-        document.getElementById("editId").value = btn.dataset.id || "";
-        document.getElementById("editDistrict").value = btn.dataset.district || "";
-        document.getElementById("editProject").value = btn.dataset.project || "";
-        document.getElementById("editWatershed").value = btn.dataset.watershed || "";
-        document.getElementById("editVillage").value = btn.dataset.village || "";
-        document.getElementById("editType").value = btn.dataset.type || "";
-        document.getElementById("editSc").value = btn.dataset.sc || 0;
-        document.getElementById("editSt").value = btn.dataset.st || 0;
-        document.getElementById("editOthers").value = btn.dataset.others || 0;
-        document.getElementById("editWomen").value = btn.dataset.women || 0;
+document.addEventListener("input", function (e) {
 
-        const sc = parseInt(document.getElementById("editSc").value) || 0;
-        const st = parseInt(document.getElementById("editSt").value) || 0;
-        const others = parseInt(document.getElementById("editOthers").value) || 0;
-        const women = parseInt(document.getElementById("editWomen").value) || 0;
-        document.getElementById("editTotal").value = sc + st + others + women;
+    const field = e.target;
 
-        new bootstrap.Modal(document.getElementById("editModal")).show();
-    });
+    // Run only for SC, ST, Others and Women fields
+    if (!field.matches(
+        "#employmentEntryBody input[name$='.sc'], " +
+        "#employmentEntryBody input[name$='.st'], " +
+        "#employmentEntryBody input[name$='.others'], " +
+        "#employmentEntryBody input[name$='.women']"
+    )) {
+        return;
+    }
 
-    /* =========================================================
-     CALCULATE TOTAL IN EDIT MODAL
-     ========================================================= */
-    document.querySelectorAll('#editSc, #editSt, #editOthers, #editWomen').forEach(function(input) {
-        input.addEventListener('input', function() {
-            const sc = parseInt(document.getElementById('editSc').value) || 0;
-            const st = parseInt(document.getElementById('editSt').value) || 0;
-            const others = parseInt(document.getElementById('editOthers').value) || 0;
-            const women = parseInt(document.getElementById('editWomen').value) || 0;
-            document.getElementById('editTotal').value = sc + st + others + women;
-        });
-    });
+    const row = field.closest("tr");
 
-    document.addEventListener('input', function(e) {
-        if (e.target.matches('input[name$=".sc"], input[name$=".st"], input[name$=".others"], input[name$=".women"]')) {
-            const row = e.target.closest('tr');
-            if (row) {
-                calculateTotal(row);
-            }
+    if (row) {
+        validateFields(row);
+    }
+
+});
+
+
+/* =========================================================
+   EDIT MODAL TOTAL CALCULATION
+   ========================================================= */
+
+const editFields = document.querySelectorAll(
+    "#editSc, #editSt, #editOthers, #editWomen"
+);
+
+editFields.forEach(function (input) {
+
+    input.addEventListener("input", function () {
+
+        const sc =
+            parseInt(document.getElementById("editSc")?.value, 10) || 0;
+
+        const st =
+            parseInt(document.getElementById("editSt")?.value, 10) || 0;
+
+        const others =
+            parseInt(document.getElementById("editOthers")?.value, 10) || 0;
+
+        const women =
+            parseInt(document.getElementById("editWomen")?.value, 10) || 0;
+
+        const totalField = document.getElementById("editTotal");
+
+        if (totalField) {
+            totalField.value = sc + st + others + women;
         }
     });
-    
+});
+
+
+/* =========================================================
+   INITIALIZE EMPLOYMENT RECORDS TABLE
+   ========================================================= */
+
+  
+    document.addEventListener('input', function(e) {
+    if (e.target.matches(
+        'input[name$=".sc"], input[name$=".st"], ' +
+        'input[name$=".others"], input[name$=".women"]'
+    )) {
+        const row = e.target.closest('tr');
+
+        if (row) {
+            calculateTotal(row);
+        }
+    }
+});
+    updateMigrationButton();
     loadEmploymentTable("");
 
 });
@@ -840,6 +1143,7 @@ function loadEmploymentTable(dcode, pprId) {
 function validateNumber(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
 }
+
 
 </script>
 
@@ -1061,6 +1365,9 @@ function validateNumber(input) {
                 <table class="table table-bordered" id="employmentTable">
                     <thead>
                         <tr>
+                            <th class="table-primary text-center" id="selectAllHeader" style="display: none;">
+    <input type="checkbox" id="selectAll" title="Select all draft records">
+</th>
                             <th class="table-primary">District</th>
                             <th class="table-primary">Project</th>
                             <th class="table-primary">Micro Watershed</th>
@@ -1076,6 +1383,18 @@ function validateNumber(input) {
                     </thead>
                     <tbody id="employmentTableBody"></tbody>
                 </table>
+                <div class="text-center mt-3" id="bulkCompleteContainer" style="display: none;">
+    <form id="bulkCompleteForm"
+          th:action="@{/completeSelectedPPREmployment}"
+          method="post">
+
+        <div id="selectedEmploymentIds"></div>
+
+        <button type="submit" class="btn btn-success" id="bulkCompleteBtn" disabled>
+            <i class="fas fa-check-circle"></i> Complete
+        </button>
+    </form>
+</div>
             </div>
         </div>
 
