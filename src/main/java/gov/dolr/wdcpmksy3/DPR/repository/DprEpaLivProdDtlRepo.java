@@ -3,9 +3,11 @@ package gov.dolr.wdcpmksy3.DPR.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.DPR.entity.DprEpaLivProdDtl;
 
@@ -105,7 +107,10 @@ CASE WHEN elp.status = 'D' THEN 0 ELSE 1 END ASC;
 				""", nativeQuery = true)
 				List<Object[]> getDprELPProjectPlanListByProject(@Param("pprId") Integer pprId);
 
-
+				@Modifying
+			    @Transactional
+			    @Query("DELETE FROM DprEpaLivProdDtl n WHERE n.dpr.dprId IN ( SELECT d.dprId FROM DprDetails d  WHERE d.ppr.pprId = :pprId)")
+			    int deleteByPprId(@Param("pprId") Integer pprId);
 
 
 

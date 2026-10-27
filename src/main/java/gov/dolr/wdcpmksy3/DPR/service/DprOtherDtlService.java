@@ -19,6 +19,7 @@ import gov.dolr.wdcpmksy3.DPR.repository.MDprHeadRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherActivityRepository;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -104,5 +105,34 @@ public class DprOtherDtlService {
 		DprOtherDtl dtl = detailRepository.findById(id).orElseThrow(() -> new RuntimeException("Record not found"));
 		detailRepository.delete(dtl);
 	}
+	
+	public void skipDPROtherHeadActivities(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+ 		MPpr mp= mPprRepo.getReferenceById(pprid);
+		MDprHead dh=mDprHeadRepo.getReferenceById(2);
+ 		DprDetails pln = dprDetailsRepo.findByPprPprId(pprid).orElse(null);
+		
+		if (pln == null) {
+
+		    pln = new DprDetails();
+		    pln.setHeadType(dh);
+		    pln.setPpr(mp);
+		    pln.setStatus('D');
+		    pln.setCreatedby(userId);
+		    pln.setCreatedon(LocalDateTime.now());
+		  //  pln.setRequestIp(ip);
+		    dprDetailsRepo.save(pln);
+		}
+		
+		int deletedCount = detailRepository.deleteByPprId(pprid);
+		
+		DprOtherDtl plndtl = new DprOtherDtl();
+		plndtl.setDprDetails(pln);
+		plndtl.setStatus('S');
+		plndtl.setCreatedby(userId);
+		plndtl.setCreatedon(LocalDateTime.now());
+		//plndtl.setRequestIp(ip);
+		detailRepository.save(plndtl);
+    }
 
 }

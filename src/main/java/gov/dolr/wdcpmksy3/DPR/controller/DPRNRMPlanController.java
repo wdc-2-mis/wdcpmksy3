@@ -396,5 +396,19 @@ public class DPRNRMPlanController {
 
 	 	    return "redirect:/createDPRNRMPlan";
 	 	}
+	 	
+	 	@GetMapping("/skipDPRNRMTarget")
+	    public String skipDPRNRMTarget(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+	    		HttpSession session, RedirectAttributes redirectAttributes) {
+		  String userId = (String) session.getAttribute("userid");
+		  try {
+			  dprserv.skipDPRNRMTarget(pprid, userId, servletRequest);
+	            redirectAttributes.addFlashAttribute("success", " DPR NRM Target Skip successfully!");
+		    } 
+		  	catch (Exception ex) {
+		        redirectAttributes.addFlashAttribute("error", "Failed to Skip records: " + ex.getMessage());
+		    }
+	         return "redirect:/getViewConfirmDPRPlan";
+	    }
 
 }

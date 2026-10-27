@@ -218,5 +218,20 @@ public class DprPhyOtherHeadActController {
 
 	    return "redirect:/dprPhyOtherHeadActivities";
 	}
+	
+	@GetMapping("/skipDPROtherHeadActivities")
+    public String skipDPROtherHeadActivities(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  	dprOtherDtlService.skipDPROtherHeadActivities(pprid, userId, servletRequest);
+            redirectAttributes.addFlashAttribute("success", " DPR DPR Other Activity Target Skip successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to Skip records: " + ex.getMessage());
+	    }
+         return "redirect:/getViewConfirmDPRPlan";
+    }
+
 
 }

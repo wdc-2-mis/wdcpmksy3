@@ -89,8 +89,8 @@
 					console.log(result);
 					if (result === "EXISTS") {
 						latestAlert("This Project DPR Data already Approved. Please select different Project");
-						document.getElementById("project").value = "";
-						document.getElementById("project").focus();
+						//document.getElementById("project").value = "";
+						//document.getElementById("project").focus();
 					}
 
 				})
@@ -445,7 +445,7 @@
 				
 			</form>
 
-			<div >
+			<div th:if="${selectedProject != null and !#strings.isEmpty(selectedProject)}">
 
 				
 				<!-- ===================== DPR-1 ===================== -->
@@ -468,7 +468,8 @@
 						</thead>
 
 						<tbody>
-							<tr th:each="row, stat : ${dprNrmProjectPlanList}">
+							<tr th:each="row, stat : ${dprNrmProjectPlanList}" 
+										th:if="${row[5] != null and row[5] == T(java.lang.Character).valueOf('C')}">
 
 								<!-- DISTRICT -->
 								<td style="text-align: left;"
@@ -491,19 +492,43 @@
 								</td>
 							</tr>
 
-							<!--<tr th:if="${#lists.isEmpty(records)}">
-								<td colspan="4">
+							<tr th:if="${#lists.isEmpty(dprNrmProjectPlanList)}">
+								<td colspan="6">
 									<div class="d-flex justify-content-center align-items-center gap-3">
 										<span class="text-danger">No records found.</span>
 										<i class="fas fa-arrow-right arrow-blink"></i>
-										 TODO: confirm URL 
-										<a th:href="@{/pprDistrict}" class="btn btn-primary btn-sm btn-blink">
+										
+										<a th:href="@{/createDPRNRMPlan}" class="btn btn-primary btn-sm btn-blink">
+										
 											<i class="fas fa-plus"></i> Add Details
+										
+										</a>
+										
+										<a title="skip" th:href="@{/skipDPRNRMTarget(pprid=${selectedProject})}" class="btn btn-secondary"
+											onclick="return confirm('Do you want to skip Details of DPR NRM Target ?');">
+										
+											<i class="fas fa-skip"></i>
+											Skip
+										
 										</a>
 										
 									</div>
 								</td>
-							</tr>-->
+							</tr>
+							<tr th:if="${not #lists.isEmpty(dprNrmProjectPlanList) and
+							    !#lists.isEmpty(dprNrmProjectPlanList.?[
+							        #this[5] != null and
+							        #this[5] == T(java.lang.Character).valueOf('S')
+							    ])}">
+
+							    <td colspan="6">
+							        <div class="d-flex justify-content-center align-items-center gap-3">
+							            <span class="text-warning fw-bold">
+							                This DPR NRM has been skipped.
+							            </span>
+							        </div>
+							    </td>
+							</tr>
 						</tbody>
 					</table>
 
@@ -531,8 +556,8 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr th:each="row, stat : ${dprELPList}">
-									
+								<tr th:each="row, stat : ${dprELPList}" th:if="${row[9] != null and row[9] == T(java.lang.Character).valueOf('C')}">
+								
 									<td th:text="${row[3]}"></td>
 									<td th:text="${row[2]}"></td>
 									<td>
@@ -545,6 +570,40 @@
 									<td th:text="${row[7]}"></td>
 									<td th:text="${row[10]}"></td>
 									<td th:text="${row[8]}"></td>
+								</tr>
+								
+								<tr th:if="${#lists.isEmpty(dprELPList)}">
+									<td colspan="6">
+										<div class="d-flex justify-content-center align-items-center gap-3">
+											<span class="text-danger">No records found.</span>
+											<i class="fas fa-arrow-right arrow-blink"></i>
+								
+											<a th:href="@{/epalivproddetails}" class="btn btn-primary btn-sm btn-blink">
+								
+												<i class="fas fa-plus"></i> Add Details
+								
+											</a>
+								
+											<a title="skip" th:href="@{/skipDPRELPTarget(pprid=${selectedProject})}" class="btn btn-secondary"
+												onclick="return confirm('Do you want to skip Details EPA, Livelihood and Production Target ?');">
+								
+												<i class="fas fa-skip"></i>
+												Skip
+								
+											</a>
+								
+										</div>
+									</td>
+								</tr>
+								<tr th:if="${not #lists.isEmpty(dprNrmProjectPlanList) and !#lists.isEmpty(dprNrmProjectPlanList.?[
+											#this[9] != null and  #this[9] == T(java.lang.Character).valueOf('S')])}">
+									<td colspan="6">
+										<div class="d-flex justify-content-center align-items-center gap-3">
+											<span class="text-warning fw-bold">
+												This DPR NRM has been skipped.
+											</span>
+										</div>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -575,7 +634,8 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr th:each="data, stat : ${dprOtherTargetList}">
+								<tr th:each="data, stat : ${dprOtherTargetList}"
+											th:if="${data.status != null and data.status == T(java.lang.Character).valueOf('C')}">
 									
 									<td th:text="${data.dprDetails.ppr.district.distName}"></td>
 									<td th:text="${data.dprDetails.ppr.projectName}"></td>
@@ -592,6 +652,36 @@
 									</td>
 									<td th:text="${data.qtyPlanned}"></td>
 								</tr>
+								<tr th:if="${dprOtherTargetList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
+									<td colspan="6">
+										<div class="d-flex justify-content-center align-items-center gap-3">
+											<span class="text-warning fw-bold">
+												This DPR Other Activity Target has been skipped.
+											</span>
+										</div>
+									</td>
+								</tr>
+								<!-- No records -->
+								<tr th:if="${#lists.isEmpty(dprOtherTargetList)}">
+									<td colspan="6">
+										<div class="d-flex justify-content-center align-items-center gap-3">
+											<span class="text-danger">
+												No records found.
+											</span>
+											<i class="fas fa-arrow-right arrow-blink"></i>
+											<a th:href="@{/dprPhyOtherHeadActivities}" class="btn btn-primary btn-sm btn-blink">
+												<i class="fas fa-plus"></i> Add Details
+											</a>
+											<a title="skip" th:href="@{/skipDPROtherHeadActivities(pprid=${selectedProject})}" class="btn btn-secondary"
+												onclick="return confirm('Do you want to skip Details Other Activity Target ?');">
+												<i class="fas fa-skip"></i>
+												Skip
+											</a>
+										</div>
+									</td>
+								</tr>
+								
+								
 							</tbody>
 						</table>
 				
@@ -626,7 +716,7 @@
 							<div id="dprFileError" class="text-danger mt-1"></div>
 						</div>
 						<div class="col-md-6">
-							<button type="submit" class="btn btn-primary" >
+							<button type="submit" class="btn btn-primary" th:disabled="${existssl}">
 								Approve DPR
 							</button>
 						</div>

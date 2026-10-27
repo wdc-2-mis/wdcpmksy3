@@ -27,9 +27,11 @@ import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.entity.PprDrinkingWater;
 import gov.dolr.wdcpmksy3.PPR.entity.PprExistingLivelihoodActivity;
 import gov.dolr.wdcpmksy3.PPR.entity.PprLivelihood;
+import gov.dolr.wdcpmksy3.PPR.entity.PprPendingUc;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProjectLivelihoodIntervention;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.entity.MVillage;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @Service
@@ -213,5 +215,34 @@ public class DPRNRMPlanService {
 			return state;	
 			
 		}
+	 
+	 	public void skipDPRNRMTarget(Integer pprid, String userId, HttpServletRequest servletRequest) {
+	        
+	 		MPpr mp= mprep.getReferenceById(pprid);
+			MDprHead dh=mdprheadrepo.getReferenceById(2);
+	 		DprDetails pln = planrepo.findByPprPprId(pprid).orElse(null);
+			
+			if (pln == null) {
+
+			    pln = new DprDetails();
+			    pln.setHeadType(dh);
+			    pln.setPpr(mp);
+			    pln.setStatus('D');
+			    pln.setCreatedby(userId);
+			    pln.setCreatedon(LocalDateTime.now());
+			  //  pln.setRequestIp(ip);
+			    planrepo.save(pln);
+			}
+			
+			int deletedCount = plndtlrepo.deleteByPprId(pprid);
+			
+			DprNrmDtl plndtl = new DprNrmDtl();
+			plndtl.setDpr(pln);
+			plndtl.setStatus('S');
+			plndtl.setCreatedBy(userId);
+			plndtl.setCreatedOn(LocalDateTime.now());
+			//plndtl.setRequestIp(ip);
+            plndtlrepo.save(plndtl);
+	    }
 
 }

@@ -297,5 +297,18 @@ public class DPRELPController {
 	    return "redirect:/epalivproddetails";
 	}
 
+	@GetMapping("/skipDPRELPTarget")
+    public String skipDPRELPTarget(@RequestParam Integer pprid, Model model, HttpServletRequest servletRequest, 
+    		HttpSession session, RedirectAttributes redirectAttributes) {
+	  String userId = (String) session.getAttribute("userid");
+	  try {
+		  dprservice.skipDPRELPTarget(pprid, userId, servletRequest);
+            redirectAttributes.addFlashAttribute("success", " DPR EPA, Livelihood and Production Target Skip successfully!");
+	    } 
+	  	catch (Exception ex) {
+	        redirectAttributes.addFlashAttribute("error", "Failed to Skip records: " + ex.getMessage());
+	    }
+         return "redirect:/getViewConfirmDPRPlan";
+    }
 
 }

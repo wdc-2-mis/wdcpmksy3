@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.DPR.entity.DprNrmDtl;
 
@@ -27,4 +29,9 @@ public interface DprNrmDtlRepository extends JpaRepository<DprNrmDtl, Integer> {
     
     @Query(" select count(d) > 0 from DprNrmDtl d  WHERE d.dpr.ppr.pprId = :pprId AND d.activity.activityCode = :actId")
 	boolean existsByPprIdAndActivityId( @Param("pprId") Integer pprId, @Param("actId") Integer actId);
+    
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM DprNrmDtl n WHERE n.dpr.dprId IN ( SELECT d.dprId FROM DprDetails d  WHERE d.ppr.pprId = :pprId)")
+    int deleteByPprId(@Param("pprId") Integer pprId);
 }

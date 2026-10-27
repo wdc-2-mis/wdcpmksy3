@@ -101,14 +101,18 @@ public class ViewConfirmDPRPlan {
 	            previousId = currentId;
 	        }
 	    }
+		
+		boolean exists=false;
+	    exists=plan.existsApprovedDprByPprId(project);
+	    model.addAttribute("existssl", exists);
 	    model.addAttribute("dprNrmProjectPlanList", finalList);
-	    model.addAttribute("selectedDcode", district);
-        model.addAttribute("selectedProject", project);
         model.addAttribute("dprELPList", listelp);
         model.addAttribute("dprOtherTargetList", otheract);
         model.addAttribute("projList", tranrepo.findPprByDcodeAndActionA(district));
         }
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
+        model.addAttribute("selectedDcode", district);
+        model.addAttribute("selectedProject", project);
         
         return "dpr/viewConfirmDPRPlan";
     }

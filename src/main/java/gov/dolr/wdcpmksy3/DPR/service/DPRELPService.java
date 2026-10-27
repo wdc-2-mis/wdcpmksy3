@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import gov.dolr.wdcpmksy3.DPR.entity.DprDetails;
 import gov.dolr.wdcpmksy3.DPR.entity.DprEpaLivProdDtl;
+import gov.dolr.wdcpmksy3.DPR.entity.DprNrmDtl;
 import gov.dolr.wdcpmksy3.DPR.entity.MDprHead;
 import gov.dolr.wdcpmksy3.DPR.repository.DprDetailsRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.DprEpaLivProdDtlRepo;
@@ -173,5 +174,34 @@ public class DPRELPService {
 		// TODO Auto-generated method stub
 		return dprEpaLivProdDtlRepo.getDprELPProjectPlanListByProject(pprId);
 	}
+	
+	public void skipDPRELPTarget(Integer pprid, String userId, HttpServletRequest servletRequest) {
+        
+ 		MPpr mp= mprep.getReferenceById(pprid);
+		MDprHead dh=mdprheadrepo.getReferenceById(1);
+ 		DprDetails pln = dprRepo.findByPprPprId(pprid).orElse(null);
+		
+		if (pln == null) {
+
+		    pln = new DprDetails();
+		    pln.setHeadType(dh);
+		    pln.setPpr(mp);
+		    pln.setStatus('D');
+		    pln.setCreatedby(userId);
+		    pln.setCreatedon(LocalDateTime.now());
+		  //  pln.setRequestIp(ip);
+		    dprRepo.save(pln);
+		}
+		
+		int deletedCount = dprEpaLivProdDtlRepo.deleteByPprId(pprid);
+		
+		DprEpaLivProdDtl plndtl = new DprEpaLivProdDtl();
+		plndtl.setDpr(pln);
+		plndtl.setStatus('S');
+		plndtl.setCreatedBy(userId);
+		plndtl.setCreatedOn(LocalDateTime.now());
+		//plndtl.setRequestIp(ip);
+		dprEpaLivProdDtlRepo.save(plndtl);
+    }
 
 }
