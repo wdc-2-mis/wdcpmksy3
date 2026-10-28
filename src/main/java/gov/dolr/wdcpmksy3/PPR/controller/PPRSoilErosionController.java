@@ -61,7 +61,7 @@ public class PPRSoilErosionController {
         	soilErosionService.changeStatusByPprId(pprid);
         }
         if(dcode != null){
-        	List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatusOrderByProjectNameAsc(dcode,"C");
+        	List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatus(dcode);
         	if(!pprList.isEmpty()){
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {

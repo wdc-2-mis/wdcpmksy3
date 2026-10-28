@@ -91,7 +91,7 @@ public class PprProposedProjectController {
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Prioritized List of Proposed Project Details.");
 		if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
-	        List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatusOrderByProjectNameAsc(dcode,"C");
+			List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatus(dcode);
 	        if(!pprList.isEmpty()){
 	        	model.addAttribute("pprList", pprList);
 	            if(project != null) {
