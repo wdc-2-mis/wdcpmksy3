@@ -491,6 +491,13 @@
 									th:text="${row[11] == 'nos' ? T(java.lang.String).format('%.0f', row[13]) : row[13]}">
 								</td>
 							</tr>
+							<tr th:if="${not #lists.isEmpty(dprNrmProjectPlanList.?[#this[5] != null and #this[5] == T(java.lang.Character).valueOf('D')])}">
+								<td colspan="6" align="center">
+									<a th:href="@{/createDPRNRMPlan}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+							</tr>
 
 							<tr th:if="${#lists.isEmpty(dprNrmProjectPlanList)}">
 								<td colspan="6">
@@ -570,6 +577,15 @@
 									<td th:text="${row[7]}"></td>
 									<td th:text="${row[10]}"></td>
 									<td th:text="${row[8]}"></td>
+								</tr>
+								
+								<tr th:if="${not #lists.isEmpty(dprELPList.?[#this[9] != null and #this[9] == T(java.lang.Character).valueOf('D')])}">
+								    <td colspan="6" align="center">
+								        <a th:href="@{/epalivproddetails}"
+								           class="btn btn-success btn-sm">
+								            <i class="fas fa-check"></i> Complete Your Draft Data
+								        </a>
+								    </td>
 								</tr>
 								
 								<tr th:if="${#lists.isEmpty(dprELPList)}">
@@ -652,6 +668,18 @@
 									</td>
 									<td th:text="${data.qtyPlanned}"></td>
 								</tr>
+								
+								<tr th:if="${not #lists.isEmpty(dprOtherTargetList.?[
+								    status != null and status == T(java.lang.Character).valueOf('D')])}">
+								    <td colspan="6" align="center">
+								        <a th:href="@{/dprPhyOtherHeadActivities}"
+								           class="btn btn-success btn-sm">
+								            <i class="fas fa-check"></i> Complete Your Draft Data
+								        </a>
+								    </td>
+								</tr>
+								
+								
 								<tr th:if="${dprOtherTargetList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
 									<td colspan="6">
 										<div class="d-flex justify-content-center align-items-center gap-3">

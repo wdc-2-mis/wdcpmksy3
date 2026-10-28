@@ -29,7 +29,7 @@ public interface DprOtherDtlRepository extends JpaRepository<DprOtherDtl, Intege
 	@Query("select dp from DprOtherDtl dp WHERE dp.dprDetails.ppr.district.state.stCode = :stCode order by dp.status desc")
 	List<DprOtherDtl> findDprOtherDtlDataBystCode(Integer stCode);
 	
-	@Query("select dp from DprOtherDtl dp WHERE dp.dprDetails.ppr.pprId = :pprId and dp.status in('C','S') ")
+	@Query("select dp from DprOtherDtl dp WHERE dp.dprDetails.ppr.pprId = :pprId ")
 	List<DprOtherDtl> findCompletedOtherDtlByPprId(Integer pprId);
 	
 	@Modifying

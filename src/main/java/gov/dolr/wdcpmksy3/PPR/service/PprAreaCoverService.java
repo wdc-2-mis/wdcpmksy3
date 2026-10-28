@@ -430,7 +430,7 @@ public class PprAreaCoverService {
 	public boolean isPprCompleted(Integer stcode) {
 
 	    return pprRepo
-	            .existsByDistrict_State_StCodeAndStatus(stcode, "C");
+	            .existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("F","A","B","C"));
 	}
 
 	

@@ -54,7 +54,7 @@ public interface DprDetailsRepository extends JpaRepository<DprDetails, Integer>
 			+ "	activity_code, (select activity_desc from m_phy_activity where activity_code=dt.activity_code) as activity, "
 			+ "	(select unit_desc from m_phy_activity aa, m_unit u where aa.activity_code=dt.activity_code and aa.unit_code=u.unit_code) as unit, "
 			+ "	(select seq_no from m_phy_activity where activity_code=dt.activity_code) as aseq_no, qty_planned from dpr_details p, "
-			+ "	dpr_nrm_dtl dt, m_ppr m, m_district d where p.dpr_id=dt.dpr_id and m.ppr_id=p.ppr_id and m.dcode=d.dcode and dt.status in('C','S') and p.ppr_id=:project "
+			+ "	dpr_nrm_dtl dt, m_ppr m, m_district d where p.dpr_id=dt.dpr_id and m.ppr_id=p.ppr_id and m.dcode=d.dcode  and p.ppr_id=:project "
 			+ "	order by dist_name, project_name, seq_no, aseq_no", nativeQuery = true)
 	List<Object[]> getDprNrmProjectPlanComplitedList(@Param("project") int project);
 	
@@ -77,7 +77,7 @@ public interface DprDetailsRepository extends JpaRepository<DprDetails, Integer>
 		    LEFT JOIN m_unit mu_prod ON pa.unit_code = mu_prod.unit_code
 		    LEFT JOIN m_livelihood_activities la ON elp.level_head = 'L' AND elp.activity_id = la.livelihood_activity_id
 		    LEFT JOIN m_unit mu_liv ON la.unit_code = mu_liv.unit_code
-		    WHERE dp.ppr_id = :pprId and elp.status in('C','S')
+		    WHERE dp.ppr_id = :pprId 
 		    ORDER BY d.dist_name, project_name
 		""", nativeQuery = true)
 		List<Object[]> getDprELPProjectPlanCompletedList(@Param("pprId") Integer pprId);

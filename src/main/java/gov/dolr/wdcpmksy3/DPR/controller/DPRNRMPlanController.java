@@ -94,7 +94,7 @@ public class DPRNRMPlanController {
             previousId = currentId;
         }
         }
-        boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "A");
+        boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A"));
         model.addAttribute("pprApproved", pprApproved);
 	    if (pprApproved) 
 	        model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR NRM Activity Target.");
