@@ -24,6 +24,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprMicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PPRMigrationDetailsRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRLandPatternAreaService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRMigrationDetailsService;
 import gov.dolr.wdcpmksy3.PPR.service.VillageService;
@@ -57,6 +58,9 @@ public class PreliminaryPPR15AController {
 	@Autowired
 	private MicroWatershedRepository microWatershedRepo;
 	
+	@Autowired
+	private PprTransactionRepository transrepo;
+	
 	@GetMapping("/preliminaryPPR15")
 	public String preliminaryPPR15(@RequestParam(required = false) Integer dcode, HttpSession session, Model model, 
 			@RequestParam(required = false) Integer pprid, @RequestParam(required = false) Integer project) {
@@ -71,18 +75,23 @@ public class PreliminaryPPR15AController {
 	    if (pprid != null) {
 	    	migrationDetailsService.changeStatusByPprId(pprid);
         }
-	    boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "C");
+	    boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A","F","C","B"));
         model.addAttribute("pprCompleted", pprCompleted);
 	    if (!pprCompleted) 
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Migration Details.");
 	    if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
-			List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatusOrderByProjectNameAsc(dcode,"C");
+			List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatus(dcode);
 	        if(!pprList.isEmpty()){
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	        		pprMigrationDtlList = pprMigrationDetailsRepository.findByPprPprIdOrderByStatusDesc(project);
+	        		List<String> status = List.of("A","F");
+	        		boolean approvedOrForworded = mPprRepo.existsByPprIdAndStatusIn(project, status);
+	        		model.addAttribute("pprCompleted", !approvedOrForworded);
+	        	    if (approvedOrForworded) 
+	        	        model.addAttribute("approvedOrForworded", "This PPR data already Forward/Approved. Please select a different PPR Project.");
 	        		model.addAttribute("pprId", project);
 		            model.addAttribute("project", ppr.getProjectName());
 		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));

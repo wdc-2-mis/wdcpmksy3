@@ -85,7 +85,7 @@ public class PprProposedProjectController {
 		if (pprid != null) {
 			proposedProjectService.changeStatusByPprId(pprid);
         }
-		boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "C");
+		boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A","F","C","B"));
         model.addAttribute("pprCompleted", pprCompleted);
 	    if (!pprCompleted) 
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Prioritized List of Proposed Project Details.");

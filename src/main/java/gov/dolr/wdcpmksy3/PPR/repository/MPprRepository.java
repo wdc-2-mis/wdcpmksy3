@@ -25,7 +25,7 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 	
 	List<MPpr> findByDistrict_DcodeAndStatusOrderByProjectNameAsc(Integer dcode, String status);
 	
-	@Query("SELECT p FROM MPpr p WHERE p.district.dcode = :dcode AND p.status IN ('C', 'A', 'B')  ORDER BY p.projectName ASC")
+	@Query("SELECT p FROM MPpr p WHERE p.district.dcode = :dcode AND p.status IN ('C', 'A', 'B', 'F')  ORDER BY p.projectName ASC")
 	List<MPpr> findByDistrict_DcodeAndStatus(@Param("dcode") Integer dcode);
 	
 	@Query("SELECT p FROM MPpr p " +
@@ -49,10 +49,7 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 	
 	List<MPpr> findByPprIdAndStatus(Integer pprId, String status);
 	
-	boolean existsByDistrict_State_StCodeAndStatus(
-            Integer stCode,
-            String status
-    );
+	boolean existsByDistrict_State_StCodeAndStatusIn(Integer stCode,List<String> status);
 	
 	
 	@Query("""
@@ -64,6 +61,8 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 		        p.pprId ASC
 		    """)
 		List<MPpr> findByDistrictOrdered(@Param("dcode") Integer dcode);
+	
+	boolean existsByPprIdAndStatusIn(Integer pprId, List<String> statuses);
 	
 }
 

@@ -53,7 +53,7 @@ public class PPRSoilErosionController {
         if(userid==null){
             return "redirect:/login";
         }
-        boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "C");
+        boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A","F","C","B"));
         model.addAttribute("pprCompleted", pprCompleted);
 	    if (!pprCompleted) 
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering PPR Soil Erosion Details.");

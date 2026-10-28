@@ -45,7 +45,7 @@
 				}
 			});
 			project.addEventListener("change", function () {
-//				const proj =document.getElementById("project");
+				const proj =document.getElementById("project");
 				let village = document.getElementById("village");
 				if (this.value) {
 //					fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(this.value))
@@ -62,9 +62,12 @@
 					fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(this.value))
 					.then(response => response.text())
 					.then(result => {
+						const errorDiv = document.getElementById("villagePprError");
 						if (result === "NOTEXISTS") {
-							showFieldError(village, "This PPR Village Data not EXISTS in Project at a Glance form. ");
+							errorDiv.style.display = "block";
+							showFieldError(village, "This PPR Village Data not EXISTS in Project at a Glance form.");
 						} else {
+							errorDiv.style.display = "none";
 							clearFieldError(village);
 							window.location.href = "/preliminaryPPR15?dcode=" + district.value + "&&project=" + this.value;
 						}
@@ -362,6 +365,18 @@
 					<span th:text="${success}"></span>
 					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 				</div>
+				<div id="villagePprError"  class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
+					<i class="fas fa-exclamation-triangle me-2"></i>
+							
+								<strong>Action Required:</strong>
+								Village Data not EXISTS for Selected PPR
+								<a th:href="@{/pprProjectAtGlance}" class="btn btn-sm btn-primary ms-3">
+									Go to Project at a Glance
+								</a>
+							
+								<button type="button" class="btn-close" data-bs-dismiss="alert">
+								</button>
+				</div>
 				<div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
 					<i class="fas fa-exclamation-triangle me-2"></i>
 					<strong th:if="${!pprCompleted}">Action Required:</strong>
@@ -408,7 +423,7 @@
 									<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
 										th:selected="${pprId != null and pprId == p.pprId}"> </option>
 								</select>
-								<div class="field-error"></div>
+								<div class="field-error" th:text="${approvedOrForworded}"></div>
 							</div>
 							<div class="col-md-2">
 								<label class="form-label fw-semibold">Micro Watershed Name:</label><span
