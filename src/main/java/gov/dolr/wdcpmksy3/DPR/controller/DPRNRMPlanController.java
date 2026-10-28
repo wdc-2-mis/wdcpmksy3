@@ -71,9 +71,8 @@ public class DPRNRMPlanController {
         	
         List<Object[]> list=plan.getDprNrmProjectPlanList(stcode);
         
-        boolean allCompleted = list.stream()
-	    	    .allMatch(row -> "C".equals(String.valueOf(row[5])));
-        
+        boolean allCompleted = list.stream().allMatch(row -> "C".equals(String.valueOf(row[5])));
+     //   System.out.println("kdy"+allCompleted);
         if(list!=null && !list.isEmpty()) {
         int srNo = 1;
         Integer previousId = null;
@@ -94,10 +93,10 @@ public class DPRNRMPlanController {
             previousId = currentId;
         }
         }
-        boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A"));
-        model.addAttribute("pprApproved", pprApproved);
-	    if (pprApproved) 
-	        model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR NRM Activity Target.");
+     //   boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A"));
+    //    model.addAttribute("pprApproved", pprApproved);
+	//    if (pprApproved) 
+	 //       model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR NRM Activity Target.");
         model.addAttribute("selectedDistrict", dcode);
         model.addAttribute("dprNrmProjectPlanList", finalList);
         model.addAttribute("headList", head.findAllByOrderBySeqNoAsc());

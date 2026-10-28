@@ -75,13 +75,21 @@ public class ViewConfirmDPRPlan {
 
             return "redirect:/login";
         }
+        
+        boolean allnrm =false;
+        boolean allelp =false;
+        boolean alloth =false;
+        boolean exists=false;
         if(project!=null) {	
 		List<Object[]> list =plan.getDprNrmProjectPlanComplitedList(project);
-		
+		allnrm = list.stream().anyMatch(row -> "D".equals(String.valueOf(row[5])));
+		//System.out.println("kdy1"+allnrm);
 		List<Object[]> listelp =plan.getDprELPProjectPlanCompletedList(project);
-		
+		allelp = listelp.stream().anyMatch(row -> "D".equals(String.valueOf(row[9])));
+		//System.out.println("kdy2"+allelp);
 		List<DprOtherDtl> otheract=other.findCompletedOtherDtlByPprId(project);
-
+		alloth= otheract.stream().anyMatch(row -> "D".equals(String.valueOf(row.getStatus())));
+		//System.out.println("kdy3"+alloth);
 		if(list!=null && !list.isEmpty()) {
 	        int srNo = 1;
 	        Integer previousId = null;
@@ -103,14 +111,22 @@ public class ViewConfirmDPRPlan {
 	        }
 	    }
 		
-		boolean exists=false;
 	    exists=plan.existsApprovedDprByPprId(project);
+	 //   System.out.println("kdy4"+exists);
 	    model.addAttribute("existssl", exists);
 	    model.addAttribute("dprNrmProjectPlanList", finalList);
         model.addAttribute("dprELPList", listelp);
         model.addAttribute("dprOtherTargetList", otheract);
         model.addAttribute("projList", tranrepo.findPprByDcodeAndActionA(district));
         }
+        
+        boolean complete = false;
+        if (!allnrm && !allelp && !alloth && exists) {
+            complete = true;
+           // System.out.println("kdy5"+complete);
+        }
+
+        model.addAttribute("complete", complete);
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
         model.addAttribute("selectedDcode", district);
         model.addAttribute("selectedProject", project);
