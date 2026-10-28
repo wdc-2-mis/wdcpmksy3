@@ -62,9 +62,14 @@ public class DPRELPController {
 	    }
 	    List<Object[]> list=dprservice.getDprELPProjectPlanList(stcode);
 	  
-	    boolean allCompleted = list.stream()
-	    	    .allMatch(row -> "C".equals(String.valueOf(row[9])));
   
+	    boolean allCompleted = list.stream()
+	    	    .allMatch(row -> {
+	    	        String status = String.valueOf(row[9]);
+	    	        return "C".equals(status) || "S".equals(status);
+	    	    });
+
+	    
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
         model.addAttribute("dprList", list);
         

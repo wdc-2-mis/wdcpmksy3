@@ -466,11 +466,27 @@ project.addEventListener("change", function() {
 
     village.innerHTML =
         '<option value="">--Select Village--</option>';
+        
+        
 
     if (pprId === "") {
         return;
     }
 
+fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(pprId))
+				.then(response => response.text())
+				.then(result => {
+					const errorDiv = document.getElementById("villagePprError");
+					if (result === "NOTEXISTS") {
+						errorDiv.style.display = "block";
+						setInvalid(village, "This PPR Village Data not EXISTS in Project at a Glance form. ");
+					} else {
+						errorDiv.style.display = "none";
+						setValid(village);
+					}
+				})
+				.catch(error => console.error(error));
+				
     fetch("/getMicroWatershedsByProjectEmployment?pprId=" +
           encodeURIComponent(pprId))
         .then(response => {
@@ -1161,12 +1177,26 @@ function validateNumber(input) {
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+
             <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
                 <span th:text="${error}"></span>
                 <a th:if="${pprCompleted != null and !pprCompleted}" th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3"> Go to Preliminary Project Report </a>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
+<div id="villagePprError"  class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
+			<i class="fas fa-exclamation-triangle me-2"></i>
+					
+						<strong>Action Required:</strong>
+						Village Data not EXISTS for Selected PPR
+						<a th:href="@{/pprProjectAtGlance}" class="btn btn-sm btn-primary ms-3">
+							Go to Project at a Glance
+						</a>
+					
+						<button type="button" class="btn-close" data-bs-dismiss="alert">
+						</button>
+		</div>
+		
             <div class="card-body">
                 <form id="employmentForm" th:action="@{/savePPREmployment}" method="post" novalidate>
 
