@@ -68,7 +68,7 @@ public class DprPhyOtherHeadActController {
         }
 		boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "A");
         model.addAttribute("pprApproved", pprApproved);
-	    if (!pprApproved) 
+	    if (pprApproved) 
 	        model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR Other Activity Target.");
 		if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
@@ -225,7 +225,7 @@ public class DprPhyOtherHeadActController {
 	  String userId = (String) session.getAttribute("userid");
 	  try {
 		  	dprOtherDtlService.skipDPROtherHeadActivities(pprid, userId, servletRequest);
-            redirectAttributes.addFlashAttribute("success", " DPR DPR Other Activity Target Skip successfully!");
+            redirectAttributes.addFlashAttribute("success", "DPR Other Activity Target Skip successfully!");
 	    } 
 	  	catch (Exception ex) {
 	        redirectAttributes.addFlashAttribute("error", "Failed to Skip records: " + ex.getMessage());

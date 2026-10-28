@@ -45,8 +45,31 @@
 				}
 			});
 			project.addEventListener("change", function () {
+//				const proj =document.getElementById("project");
+				let village = document.getElementById("village");
 				if (this.value) {
-					window.location.href = "/preliminaryPPR15?dcode=" + district.value + "&&project=" + this.value;
+//					fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(this.value))
+//					.then(response => response.text())
+//					.then(result => {
+//						if (result === "EXISTS") {
+//							showFieldError(proj, "This PPR data already Forward/Approved. Please select a different PPR Project.");
+//						} else {
+//							clearFieldError(proj);
+//							window.location.href = "/preliminaryPPR15?dcode=" + district.value + "&&project=" + this.value;
+//						}
+//					})
+//					.catch(error => console.error(error));
+					fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(this.value))
+					.then(response => response.text())
+					.then(result => {
+						if (result === "NOTEXISTS") {
+							showFieldError(village, "This PPR Village Data not EXISTS in Project at a Glance form. ");
+						} else {
+							clearFieldError(village);
+							window.location.href = "/preliminaryPPR15?dcode=" + district.value + "&&project=" + this.value;
+						}
+					})
+					.catch(error => console.error(error));
 				} else {
 					window.location.href = "/preliminaryPPR15";
 				}
