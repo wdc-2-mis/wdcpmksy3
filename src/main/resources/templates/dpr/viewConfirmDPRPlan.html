@@ -419,7 +419,7 @@
 
 					<div class="col-md-4">
 						<label><b>Project</b></label><span class="required">*</span>
-						<select class="form-control" id="project" name="project" onchange="checkProjectForwarded()" required>
+						<select id="project" name="project" class="form-select" onchange="checkProjectForwarded()" required>
 							<option value="">--Select Project--</option>
 							<th:block th:each="proj : ${projList}">
 								<option th:value="${proj.pprId}" th:text="${proj.projectName}"
@@ -434,8 +434,8 @@
 							Get Data
 						</button>
 					&nbsp; &nbsp;
-						<button type="submit" formaction="/downloadDPRActivityPdf" class="btn btn-success" th:if="${selectedProject != null}">
-							<i class="fas fa-file-pdf"></i> Download PDF
+						<button type="submit" formaction="/downloadDPRActivityPdf"  th:if="${selectedProject != null}">
+							 <i class="fas fa-file-pdf text-danger" style="width: 50px; height: 30px; font-size: 30px;"></i>
 						</button>
 					</div>
 					
@@ -524,7 +524,7 @@
 							    <td colspan="6">
 							        <div class="d-flex justify-content-center align-items-center gap-3">
 							            <span class="text-warning fw-bold">
-							                This DPR NRM has been skipped.
+							                This DPR NRM Target has been skipped.
 							            </span>
 							        </div>
 							    </td>
@@ -595,12 +595,12 @@
 										</div>
 									</td>
 								</tr>
-								<tr th:if="${not #lists.isEmpty(dprNrmProjectPlanList) and !#lists.isEmpty(dprNrmProjectPlanList.?[
+								<tr th:if="${not #lists.isEmpty(dprELPList) and !#lists.isEmpty(dprELPList.?[
 											#this[9] != null and  #this[9] == T(java.lang.Character).valueOf('S')])}">
 									<td colspan="6">
 										<div class="d-flex justify-content-center align-items-center gap-3">
 											<span class="text-warning fw-bold">
-												This DPR NRM has been skipped.
+												This DPR EPA, Livelihood and Production Target has been skipped.
 											</span>
 										</div>
 									</td>

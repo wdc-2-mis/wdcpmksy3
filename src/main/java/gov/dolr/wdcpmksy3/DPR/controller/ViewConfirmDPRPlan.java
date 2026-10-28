@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.itextpdf.text.Rectangle;
 import com.lowagie.text.Document;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
@@ -167,9 +168,317 @@ public class ViewConfirmDPRPlan {
 				}
 				return "redirect:/getViewConfirmDPRPlan";	
 	    }
+	 
+	 @GetMapping("/downloadDPRActivityPdf")
+	 public ResponseEntity<byte[]> downloadPPRPdf(
+	         HttpSession session,
+	         @RequestParam(required = false) Integer project) {
+
+	     if (session.getAttribute("userid") == null) {
+	         return ResponseEntity.status(HttpStatus.FOUND)
+	                 .header(HttpHeaders.LOCATION, "/login")
+	                 .build();
+	     }
+
+	     if (project == null) {
+	         return ResponseEntity.badRequest().build();
+	     }
+
+	     try {
+	         // ---------- Fetch data ----------
+	         List<Object[]> nrm =
+	                 plan.getDprNrmProjectPlanComplitedList(project);
+
+	         List<Object[]> elp =
+	                 plan.getDprELPProjectPlanCompletedList(project);
+
+	         List<DprOtherDtl> oth =
+	                 other.findCompletedOtherDtlByPprId(project);
+
+	         String districtName = "";
+	         String projectName = "";
+
+	         // ---------- Get district and project name ----------
+	         if (nrm != null && !nrm.isEmpty()) {
+	             districtName = str(nrm.get(0)[3]);
+	             projectName = str(nrm.get(0)[2]);
+
+	         } else if (elp != null && !elp.isEmpty()) {
+	             districtName = str(elp.get(0)[3]);
+	             projectName = str(elp.get(0)[2]);
+
+	         } else if (oth != null && !oth.isEmpty()) {
+	             districtName = str(
+	                     oth.get(0).getDprDetails()
+	                             .getPpr().getDistrict().getDistName());
+
+	             projectName = str(
+	                     oth.get(0).getDprDetails()
+	                             .getPpr().getProjectName());
+	         }
+
+	         // =====================================================
+	         // DPR-1 : NRM
+	         // Status = row[5]
+	         // =====================================================
+	         List<String[]> r1 = new ArrayList<>();
+
+	         Object prevId = null;
+	         String prevHead = null;
+
+	         if (nrm != null) {
+	             for (Object[] row : nrm) {
+
+	                 boolean firstOfProject =
+	                         prevId == null || !prevId.equals(row[0]);
+
+	                 String status = str(row[5]);
+
+	                 if ("S".equals(status)) {
+
+	                     // Skip message after Project, merged across 4 columns
+	                     if (firstOfProject) {
+	                         r1.add(new String[]{
+	                                 str(row[3]),  // District
+	                                 str(row[2]),  // Project
+	                                 "This DPR NRM has been skipped.",
+	                                 "This DPR NRM has been skipped.",
+	                                 "This DPR NRM has been skipped.",
+	                                 "This DPR NRM has been skipped."
+	                         });
+	                     }
+
+	                 } else if ("C".equals(status)) {
+
+	                     String head = str(row[8]);
+
+	                     boolean sameHead =
+	                             !firstOfProject && head.equals(prevHead);
+
+	                     String unit = str(row[11]);
+
+	                     r1.add(new String[]{
+	                             firstOfProject ? str(row[3]) : "",
+	                             firstOfProject ? str(row[2]) : "",
+	                             sameHead ? "" : head,
+	                             str(row[10]),
+	                             unit,
+	                             fmtTarget(row[13], unit)
+	                     });
+
+	                     prevHead = head;
+	                 }
+
+	                 prevId = row[0];
+	             }
+	         }
+
+	         // =====================================================
+	         // DPR-2 : EPA, Livelihood and Production
+	         // Status = row[9]
+	         // =====================================================
+	         List<String[]> r2 = new ArrayList<>();
+
+	         if (elp != null) {
+	             for (Object[] row : elp) {
+
+	                 String status = str(row[9]);
+
+	                 if ("S".equals(status)) {
+
+	                     r2.add(new String[]{
+	                             str(row[3]),  // District
+	                             str(row[2]),  // Project
+	                             "This DPR EPA, Livelihood and Production has been skipped.",
+	                             "This DPR EPA, Livelihood and Production has been skipped.",
+	                             "This DPR EPA, Livelihood and Production has been skipped.",
+	                             "This DPR EPA, Livelihood and Production has been skipped."
+	                     });
+
+	                 } else if ("C".equals(status)) {
+
+	                     String code = str(row[6]);
+
+	                     String head = "L".equals(code)
+	                             ? "Livelihood"
+	                             : "P".equals(code)
+	                                     ? "Production"
+	                                     : "E".equals(code)
+	                                             ? "EPA"
+	                                             : code;
+
+	                     r2.add(new String[]{
+	                             str(row[3]),
+	                             str(row[2]),
+	                             head,
+	                             str(row[7]),
+	                             str(row[10]),
+	                             str(row[8])
+	                     });
+	                 }
+	             }
+	         }
+
+	         // =====================================================
+	         // DPR-3 : Other Activity
+	         // Status = d.getStatus()
+	         // =====================================================
+	         List<String[]> r3 = new ArrayList<>();
+
+	         if (oth != null) {
+	             for (DprOtherDtl d : oth) {
+
+	                 String status = d.getStatus() == null
+	                         ? ""
+	                         : d.getStatus().toString();
+
+	                 String dist = str(
+	                         d.getDprDetails().getPpr()
+	                                 .getDistrict().getDistName());
+
+	                 String proj = str(
+	                         d.getDprDetails().getPpr().getProjectName());
+
+	                 if ("S".equals(status)) {
+
+	                     r3.add(new String[]{
+	                             dist,
+	                             proj,
+	                             "This DPR Other Activity has been skipped.",
+	                             "This DPR Other Activity has been skipped.",
+	                             "This DPR Other Activity has been skipped.",
+	                             "This DPR Other Activity has been skipped."
+	                     });
+
+	                 } else if ("C".equals(status)) {
+
+	                     String head = "";
+	                     String act = "";
+	                     String unit = "";
+
+	                     if (d.getOtherActivity() != null) {
+
+	                         if (d.getOtherActivity().getOtherHeads() != null) {
+	                             head = str(
+	                                     d.getOtherActivity()
+	                                             .getOtherHeads()
+	                                             .getOtherHeadDesc());
+	                         }
+
+	                         act = str(
+	                                 d.getOtherActivity()
+	                                         .getOtherActivityDesc());
+
+	                         if (d.getOtherActivity().getUnit() != null) {
+	                             unit = str(
+	                                     d.getOtherActivity()
+	                                             .getUnit().getUnitDesc());
+	                         }
+	                     }
+
+	                     r3.add(new String[]{
+	                             dist,
+	                             proj,
+	                             head,
+	                             act,
+	                             unit,
+	                             str(d.getQtyPlanned())
+	                     });
+	                 }
+	             }
+	         }
+
+	         // =====================================================
+	         // Build PDF
+	         // =====================================================
+	         ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+	         Document doc = new Document(
+	                 PageSize.A4.rotate(), 30, 30, 30, 30);
+
+	         PdfWriter.getInstance(doc, out);
+	         doc.open();
+
+	         // ---------- PDF title ----------
+	         Font titleFont = FontFactory.getFont(
+	                 FontFactory.HELVETICA_BOLD, 15);
+
+	         Paragraph title = new Paragraph(
+	                 "Details of Project wise DPR Target", titleFont);
+
+	         title.setAlignment(Element.ALIGN_CENTER);
+	         title.setSpacingAfter(12);
+
+	         doc.add(title);
+
+	         // ---------- District and Project information ----------
+	         Font infoFont = FontFactory.getFont(
+	                 FontFactory.HELVETICA_BOLD, 11, Color.WHITE);
+
+	         PdfPTable info = new PdfPTable(1);
+	         info.setWidthPercentage(100);
+	         info.setSpacingAfter(0);
+
+	         PdfPCell infoCell = new PdfPCell(new Phrase(
+	                 "District : " + districtName
+	                         + "          Project : " + projectName,
+	                 infoFont));
+
+	         infoCell.setBackgroundColor(new Color(25, 135, 84));
+	         infoCell.setPadding(6);
+	         infoCell.setBorder(Rectangle.NO_BORDER);
+
+	         info.addCell(infoCell);
+	         doc.add(info);
+
+	         // ---------- Table headings ----------
+	         String[] heads = {
+	                 "District", "Project", "Head",
+	                 "Activity", "Unit", "Target"
+	         };
+
+	         float[] widths = {
+	                 1.2f, 2.2f, 3f, 2.6f, 0.8f, 1.2f
+	         };
+
+	         // ---------- Add sections ----------
+	         addSection(
+	                 doc,
+	                 "DPR-1 : Details of DPR NRM Target",
+	                 heads, widths, r1, 0);
+
+	         addSection(
+	                 doc,
+	                 "DPR-2 : Details of DPR EPA, Livelihood and Production Target",
+	                 heads, widths, r2, 10);
+
+	         addSection(
+	                 doc,
+	                 "DPR-3 : Details of DPR Other Activity Target",
+	                 heads, widths, r3, 10);
+
+	         doc.close();
+
+	         // ---------- Return PDF ----------
+	         return ResponseEntity.ok()
+	                 .contentType(MediaType.APPLICATION_PDF)
+	                 .header(
+	                         HttpHeaders.CONTENT_DISPOSITION,
+	                         "attachment; filename=\"DPR_Targets_"
+	                                 + project + ".pdf\"")
+	                 .body(out.toByteArray());
+
+	     } catch (Exception e) {
+	         e.printStackTrace();
+
+	         return ResponseEntity
+	                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                 .build();
+	     }
+	 }
 	
-	@GetMapping("/downloadDPRActivityPdf")
-	public ResponseEntity<byte[]> downloadPPRPdf(HttpSession session,
+	@GetMapping("/downloadDPRActivityPdf1")
+	public ResponseEntity<byte[]> downloadPPRPdf1(HttpSession session,
 	        @RequestParam(required = false) Integer project) {
 
 	    if (session.getAttribute("userid") == null) {
