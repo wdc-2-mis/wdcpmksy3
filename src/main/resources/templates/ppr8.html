@@ -750,7 +750,55 @@ const block = document.getElementById("block");
 
 });
 
+document.addEventListener("DOMContentLoaded", function () {
 
+    const project = document.getElementById("project");
+    const block   = document.getElementById("block");
+    const saveBtn = document.getElementById("saveDraftBtn");
+    const errDiv  = document.getElementById("glancePprError");
+
+    project.addEventListener("change", function () {
+
+        const pprId = this.value;
+
+        block.innerHTML = '<option value="">--Select Block--</option>';
+        block.classList.remove("is-invalid", "is-valid");
+        errDiv.style.display = "none";
+
+        if (!pprId) return;
+
+        fetch("/checkProjectGlanceByPPRIDExists?pprid=" + encodeURIComponent(pprId))
+            .then(r => r.text())
+            .then(result => {
+
+                if (result === "NOTEXISTS") {
+
+                    errDiv.style.display = "block";
+
+                    const fb = block.parentElement.querySelector(".invalid-feedback");
+                    if (fb) fb.textContent = "Project at a Glance data does not exist for this Project.";
+                    block.classList.add("is-invalid");
+
+                    if (saveBtn) saveBtn.disabled = true;
+                    return;
+                }
+
+                if (saveBtn) saveBtn.disabled = false;
+
+                return fetch("/getBlockByProjectPPR8?pprId=" + encodeURIComponent(pprId))
+                    .then(r => r.json())
+                    .then(list => {
+                        list.forEach(function (item) {
+                            const opt = document.createElement("option");
+                            opt.value = item.id;
+                            opt.textContent = item.name;
+                            block.appendChild(opt);
+                        });
+                    });
+            })
+            .catch(err => console.error(err));
+    });
+});
 
 		/* ==========================================================
 		   Load Block according to District
@@ -809,9 +857,10 @@ document.getElementById('nextBtnContainer').style.display = this.value ? 'block'
 
         });
         
-        block.innerHTML = '<option value="">--Select Block--</option>';
+		document.getElementById("block").innerHTML = '<option value="">--Select Block--</option>';
+		document.getElementById("glancePprError").style.display = "none";
 
-				fetch('/getBlocksByDistrictPPR13?dcode=' + encodeURIComponent(dcode))
+		 fetch('/getBlocksByDistrictPPR13?dcode=' + encodeURIComponent(dcode))
 					.then(response => response.json())
 					.then(data => {
 						data.forEach(function (item) {
@@ -823,7 +872,7 @@ document.getElementById('nextBtnContainer').style.display = this.value ? 'block'
 					})
 					.catch(error => {
 						console.error("Error:", error);
-					});
+					}); 
 
 });
 
@@ -992,6 +1041,17 @@ document.getElementById("proposedAreaOthers")
 				</button>
 
 			</div>
+			
+			<!-- ===== ADD THE NEW ALERT HERE ===== -->
+						<div id="glancePprError" class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none;">
+							<i class="fas fa-exclamation-triangle me-2"></i>
+							<strong>Action Required:</strong>
+							Project at a Glance is not completed for the selected Project. Blocks will not load until it is completed.
+							<a th:href="@{/pprProjectAtGlance}" class="btn btn-sm btn-primary ms-3">
+								Go to Project at a Glance
+							</a>
+							<button type="button" class="btn-close" onclick="document.getElementById('glancePprError').style.display='none'"></button>
+						</div>
 			
 			
 

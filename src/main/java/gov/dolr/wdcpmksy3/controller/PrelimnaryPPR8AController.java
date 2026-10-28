@@ -21,6 +21,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MScheme;
 import gov.dolr.wdcpmksy3.PPR.entity.PprWcdcUnspentBalance;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PprAreaCoverService;
 import gov.dolr.wdcpmksy3.entity.MBlock;
 import gov.dolr.wdcpmksy3.entity.MVillage;
@@ -61,6 +62,9 @@ public class PrelimnaryPPR8AController {
 	
 	@Autowired
 	private PprAreaCoverService pprAreaService;
+	
+	@Autowired
+	private PprProjectGlanceRepository pprProjectGlanceRepo;
 	
 	@GetMapping("/preliminaryPPR8")
     public String preliminaryPPR8(HttpSession session, Model model, @RequestParam(required = false) Integer pprid){
@@ -109,8 +113,8 @@ public class PrelimnaryPPR8AController {
 	public List<Map<String,Object>> getBlocksByProject(@RequestParam Integer pprId){
 		
 		  System.out.println("PPR ID = " + pprId);
-	    List<MBlock> block=blockRepository.getBlocksByProject(pprId);
-	    
+	  
+	    List<MBlock> block = blockRepository.getBlocksFromGlance(pprId);
 	  
 	    System.out.println("Blocks = " + block.size());
 
@@ -145,6 +149,11 @@ public class PrelimnaryPPR8AController {
 
 	    String userid = (String) session.getAttribute("userid");
 	    
+	    if (!pprProjectGlanceRepo.existsCompletedByPprId(pprId)) {
+	        redirectAttributes.addFlashAttribute("error",
+	            "Please complete Project at a Glance for this project first.");
+	        return "redirect:/preliminaryPPR8";
+	    }
 
 	    if (userid != null) {
 	    	
@@ -389,4 +398,6 @@ public class PrelimnaryPPR8AController {
 	    }
          return "redirect:/viewPPR";
     }
+	
+
 }

@@ -1,4 +1,4 @@
-package gov.dolr.wdcpmksy3.repository;
+package gov.dolr.wdcpmksy3.repository;
 
 import java.util.List;
 
@@ -22,6 +22,4 @@ public interface MBlockRepository extends JpaRepository<MBlock, Integer> {
 	
 	
 	  
-	 List<MBlock> findByDistrict_DcodeOrderByBlockNameAsc(Integer dcode);
-}
-
+	 List<MBlock> findByDistrict_DcodeOrderByBlockNameAsc(Integer dcode);	 	 	    @Query("select distinct b from PprProjectGlance g " +	            "join g.villages pv " +	            "join pv.village v " +	            "join v.gramPanchayat gp " +	            "join gp.block b " +	            "where g.ppr.pprId = :pprId and trim(g.status) = 'C' " +	            "order by b.blockName")	     List<MBlock> getBlocksFromGlance(@Param("pprId") Integer pprId);	 }	

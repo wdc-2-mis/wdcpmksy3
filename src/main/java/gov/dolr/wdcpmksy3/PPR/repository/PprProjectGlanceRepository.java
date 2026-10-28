@@ -32,5 +32,6 @@ public interface PprProjectGlanceRepository extends JpaRepository<PprProjectGlan
 	
 	@Query(" SELECT CASE WHEN COUNT(pg) > 0 THEN true ELSE false END FROM PprProjectGlance pg WHERE pg.ppr.pprId = :pprId AND pg.status = 'C'")
 	boolean existsCompletedByPprId(@Param("pprId") Integer pprId);
+	
 
 }
