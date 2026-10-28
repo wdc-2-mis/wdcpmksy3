@@ -26,6 +26,7 @@ import gov.dolr.wdcpmksy3.DPR.repository.MPhyHeadsRepository;
 import gov.dolr.wdcpmksy3.DPR.service.DPRNRMPlanService;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PprCropOutcome;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.entity.PprWcdcFunctionary;
@@ -34,6 +35,9 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class DPRNRMPlanController {
+	
+	@Autowired
+	private MPprRepository mPprRepo;
 	
 	@Autowired
     private PprTransactionRepository tranrepo;
@@ -90,6 +94,10 @@ public class DPRNRMPlanController {
             previousId = currentId;
         }
         }
+        boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatus(stcode, "A");
+        model.addAttribute("pprApproved", pprApproved);
+	    if (pprApproved) 
+	        model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR NRM Activity Target.");
         model.addAttribute("selectedDistrict", dcode);
         model.addAttribute("dprNrmProjectPlanList", finalList);
         model.addAttribute("headList", head.findAllByOrderBySeqNoAsc());
