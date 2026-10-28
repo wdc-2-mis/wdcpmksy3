@@ -277,7 +277,10 @@
 
 		    let districtId = this.value;
 		    let project = document.getElementById("project");
-			
+			const head = document.getElementById("head");
+			head.selectedIndex = 0;
+			const activity = document.getElementById("activity");
+			activity.selectedIndex = 0;
 		    // Clear existing options
 		    project.innerHTML = '<option value="">--Select Project--</option>';
 		    if (districtId === "") {
@@ -319,6 +322,10 @@
 
 			let project = this.value;
 			const proj =document.getElementById("project");
+			const head = document.getElementById("head");
+			head.selectedIndex = 0;
+			const activity = document.getElementById("activity");
+			activity.selectedIndex = 0;
 			fetch('/checkDPRProjectDataApproved?pprid=' + encodeURIComponent(project))
 				.then(response => response.text())
 				.then(result => {
