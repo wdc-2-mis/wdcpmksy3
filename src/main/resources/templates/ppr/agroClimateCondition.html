@@ -752,98 +752,105 @@
 
 		});
 		
+		let villageCheckRequest = 0;
+
 		document.getElementById("project").addEventListener("change", function () {
 
 		    let projectId = this.value;
 		    let village = document.getElementById("village");
-			const proj =document.getElementById("project");
-			
-			if (projectId === "") {
-				return;
-			}
-			fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(projectId))
-				.then(response => response.text())
-				.then(result => {
-					if (result === "EXISTS") {
-						this.value = "";
-						setInvalid(proj, "This PPR data already Forward/Approved. Please select a different PPR Project.");
-					} else {
-						setValid(proj);
-					}
-				})
-				.catch(error => console.error(error));
-			
-				fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(projectId))
-				.then(response => response.text())
-				.then(result => {
-					const errorDiv = document.getElementById("villagePprError");
-					if (result === "NOTEXISTS") {
-						errorDiv.style.display = "block";
-						setInvalid(village, "This PPR Village Data not EXISTS in Project at a Glance form. ");
-					} else {
-						errorDiv.style.display = "none";
-						setValid(village);
-					}
-				})
-				.catch(error => console.error(error));
-							
+		    const proj = document.getElementById("project");
+		    const errorDiv = document.getElementById("villagePprError");
 
-		    village.innerHTML =
-		        '<option value="">--Select Village--</option>';
+		    // Hide the message immediately when the project changes
+		    errorDiv.style.display = "none";
 
-		    if(projectId===""){
+		    if (projectId === "") {
+		        village.innerHTML = '<option value="">--Select Village--</option>';
+		        setValid(village);
 		        return;
 		    }
 
-		    fetch("/getVillagesByProjectPPR10?pprId="+projectId)
-		        .then(res=>res.json())
-		        .then(data=>{
+		    // Give each selection a unique request number
+		    const currentRequest = ++villageCheckRequest;
 
-		            data.forEach(function(item){
+		    fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(projectId))
+		        .then(response => response.text())
+		        .then(result => {
 
-		                let option=document.createElement("option");
+		            // Ignore results from an earlier project selection
+		            if (currentRequest !== villageCheckRequest) return;
 
-		                option.value=item.id;
-		                option.text=item.name;
-
-		                village.appendChild(option);
-
-		            });
-
+		            if (result.trim() === "EXISTS") {
+		                proj.value = "";
+		                setInvalid(proj,
+		                    "This PPR data already Forward/Approved. Please select a different PPR Project.");
+		            } else {
+		                setValid(proj);
+		            }
 		        })
-		        .catch(err=>console.log(err));
-				
-				document.getElementById("saveddprnrm").innerHTML = "";
-			fetch(
-				"/getAgroClimateConditionProject?projid=" +
-				encodeURIComponent(projectId)
-			)
+		        .catch(error => console.error(error));
 
-				.then(response => {
+		    fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(projectId))
+		        .then(response => response.text())
+		        .then(result => {
 
-					if (!response.ok) {
-						throw new Error(
-							"nrm data fetch error: " +
-							response.status
-						);
-					}
+		            // Ignore results from an earlier project selection
+		            if (currentRequest !== villageCheckRequest) return;
 
-					return response.text();
-				})
+		            if (result.trim() === "NOTEXISTS") {
+		                errorDiv.style.display = "block";
 
-				.then(html => {
+		                setInvalid(
+		                    village,
+		                    "This PPR Village Data does not exist in Project at a Glance form."
+		                );
+		            } else {
+		                errorDiv.style.display = "none";
+		                setValid(village);
+		            }
+		        })
+		        .catch(error => {
+		            if (currentRequest === villageCheckRequest) {
+		                errorDiv.style.display = "none";
+		                console.error("Project at a Glance check error:", error);
+		            }
+		        });
 
-					document.getElementById(
-						"saveddprnrm"
-					).innerHTML = html;
+		    // Reset village dropdown
+		    village.innerHTML = '<option value="">--Select Village--</option>';
 
-				})
+		    fetch("/getVillagesByProjectPPR10?pprId=" + encodeURIComponent(projectId))
+		        .then(response => response.json())
+		        .then(data => {
 
-				.catch(error =>
-					console.error(
-						"dpr nrm Loading Error:",
-						error
-				));	
+		            if (currentRequest !== villageCheckRequest) return;
+
+		            data.forEach(function (item) {
+		                let option = document.createElement("option");
+		                option.value = item.id;
+		                option.text = item.name;
+		                village.appendChild(option);
+		            });
+		        })
+		        .catch(error => console.error("Village loading error:", error));
+
+		    // Reset and reload DPR NRM data
+		    document.getElementById("saveddprnrm").innerHTML = "";
+
+		    fetch("/getAgroClimateConditionProject?projid=" + encodeURIComponent(projectId))
+		        .then(response => {
+		            if (!response.ok) {
+		                throw new Error("NRM data fetch error: " + response.status);
+		            }
+		            return response.text();
+		        })
+		        .then(html => {
+
+		            if (currentRequest !== villageCheckRequest) return;
+
+		            document.getElementById("saveddprnrm").innerHTML = html;
+		        })
+		        .catch(error => console.error("DPR NRM loading error:", error));
 
 		});
 

@@ -790,6 +790,7 @@
 
 		});
 		
+		let villageCheckRequest = 0;
 		document.getElementById("project").addEventListener("change", function () {
 
 		    let projectId = this.value;
@@ -797,13 +798,19 @@
 			let watershed = document.getElementById("watershed");
 			
 			const proj = document.getElementById("project");
+			const errorDiv = document.getElementById("villagePprError");
+
+			// Hide the message immediately when the project changes
+			errorDiv.style.display = "none";
 
 			if (projectId === "") {
 				return;
 			}
+			const currentRequest = ++villageCheckRequest;
 			fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(projectId))
 				.then(response => response.text())
 				.then(result => {
+					if (currentRequest !== villageCheckRequest) return;
 					if (result === "EXISTS") {
 						this.value = "";
 						setInvalid(proj, "This PPR data already Forward/Approved. Please select a different PPR Project.");
@@ -816,16 +823,28 @@
 				fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(projectId))
 				.then(response => response.text())
 				.then(result => {
-					const errorDiv = document.getElementById("villagePprError");
-					if (result === "NOTEXISTS") {
+
+					// Ignore results from an earlier project selection
+					if (currentRequest !== villageCheckRequest) return;
+
+					if (result.trim() === "NOTEXISTS") {
 						errorDiv.style.display = "block";
-						setInvalid(village, "This PPR Village Data not EXISTS in Project at a Glance form. ");
+
+						setInvalid(
+							village,
+							"This PPR Village Data does not exist in Project at a Glance form."
+						);
 					} else {
 						errorDiv.style.display = "none";
 						setValid(village);
 					}
 				})
-				.catch(error => console.error(error));	
+				.catch(error => {
+					if (currentRequest === villageCheckRequest) {
+						errorDiv.style.display = "none";
+						console.error("Project at a Glance check error:", error);
+					}
+				});
 			
 			
 		    village.innerHTML ='<option value="">--Select Village--</option>';
