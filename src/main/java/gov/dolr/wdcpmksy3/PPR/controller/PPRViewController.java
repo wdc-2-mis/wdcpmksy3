@@ -232,20 +232,32 @@ public class PPRViewController {
     
     private boolean isAllSectionsFilled(Map<String, Object> data) {
 
-        for (Map.Entry<String, Object> entry : data.entrySet()) 
-        {
-            // Watershed list is optional
-            if ("watershedList".equals(entry.getKey())) {
-                continue;
-            }
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
 
-            if (entry.getValue() instanceof List<?> list && list.isEmpty()) {
-                return false;
+            if ("watershedList".equals(entry.getKey())) continue;
+
+            if (entry.getValue() instanceof List<?> list) {
+                if (list.isEmpty()) return false;
+                for (Object o : list) {
+                    if ("D".equals(statusOf(o))) return false;   // draft pending
+                }
             }
         }
-        return true;
+        return !Boolean.TRUE.equals(data.get("hasD"));           // PPR-2 draft
     }
-    
+
+    private String statusOf(Object o) {
+        try {
+            if (o instanceof Map<?, ?> m) {
+                Object s = m.get("status");
+                return s == null ? null : s.toString();
+            }
+            Object s = o.getClass().getMethod("getStatus").invoke(o);
+            return s == null ? null : s.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
     
 
     @PostMapping("/downloadPPRPdf")
@@ -266,8 +278,8 @@ public class PPRViewController {
             return ResponseEntity.status(302).header(HttpHeaders.LOCATION, "/viewPPR").build();
         }
 
-        Map<String, Object> data = fetchReportData(dcode, project, finYrCd);
-
+        Map<String, Object> data = fetchReportData(dcode, project, finYrCd, false); 
+        
         ByteArrayOutputStream baos = pdfService.generatePprReportPdf(data);
         byte[] pdfBytes = baos.toByteArray();
 
@@ -306,12 +318,19 @@ public class PPRViewController {
     }
 
     private Map<String, Object> fetchReportData(Integer dcode, Integer project, Integer finYrCd) {
+        return fetchReportData(dcode, project, finYrCd, true);
+    }
+
+    private Map<String, Object> fetchReportData(Integer dcode, Integer project, Integer finYrCd, boolean includeDraft) {
 
         Map<String, Object> data = new LinkedHashMap<>();
-        List<String> statuses = List.of("C", "S");
-        List<String> statusppr = List.of("C", "A", "B");
+
+        List<String> statuses   = includeDraft ? List.of("C", "S", "D") : List.of("C", "S");
+        List<Character> statuse = includeDraft ? List.of('C', 'S', 'D') : List.of('C', 'S');
+        List<String> statusppr  = List.of("C", "A", "B");   // PPR-1 unchanged
+        
         // ---- PPR-1 ----
-      //  List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus(dcode, project, finYrCd, "C");
+    
         List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatusIn(dcode, project, finYrCd, statusppr);
         data.put("records", records);
 
@@ -330,6 +349,9 @@ public class PPRViewController {
         // Send these flags to Thymeleaf
         data.put("hasC", hasC);
         data.put("hasS", hasS);
+        
+        boolean hasD = areaRecords.stream().anyMatch(row -> "D".equals(row.getStatus()));
+        data.put("hasD", hasD);
 
 
         Map<Integer, WatershedAreaBean> map = new LinkedHashMap<>();
@@ -431,7 +453,7 @@ public class PPRViewController {
         data.put("watershedList", new ArrayList<>(map.values()) );
 
         // ---- PPR-3 ----
-        List<Character> statuse = List.of('C', 'S');
+        List<Character> status = List.of('C', 'S');
         
         List<PprProposedProject> detailsOfListOfProposedProject = repository.findByPprPprIdAndStatusIn(project, statuse);
         data.put("detailsOfListOfProposedProject", detailsOfListOfProposedProject);

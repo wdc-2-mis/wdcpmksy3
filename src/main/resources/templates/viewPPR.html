@@ -12,7 +12,7 @@
 		.required {
 			color: red;
 		}
-		
+
 		.btn-pdf {
 			display: inline-flex;
 			align-items: center;
@@ -30,6 +30,7 @@
 		.btn-pdf i {
 			font-size: 26px;
 		}
+
 		.btn-pdf:hover {
 			background: #dc3545;
 			color: #fff;
@@ -86,7 +87,7 @@
 
 	<script>
 
-		
+
 
 
 		document.addEventListener("DOMContentLoaded", function () {
@@ -298,7 +299,7 @@
 				</div>
 			</form>
 
-		<div th:if="${searched}" id="resultsSection">
+			<div th:if="${searched}" id="resultsSection">
 				<!-- ====================================================== -->
 				<!-- PPR 1 -->
 				<!-- ====================================================== -->
@@ -337,13 +338,13 @@
 								<td colspan="4">
 									<div class="d-flex justify-content-center align-items-center gap-3">
 										<span class="text-danger">No records found.</span>
-									<!--	
+										<!--	
 										<i class="fas fa-arrow-right arrow-blink"></i>
 										
 										<a th:href="@{/pprDistrict}" class="btn btn-primary btn-sm btn-blink">
 											<i class="fas fa-plus"></i> Add Details
 										</a>-->
-										
+
 									</div>
 								</td>
 							</tr>
@@ -398,81 +399,90 @@
 							<tbody>
 								<tr th:each="row, stat : ${watershedList}">
 
-								    <td th:text="${stat.count}"></td>
+									<td th:text="${stat.count}"></td>
 
-								    <td th:text="${row.mwName}"></td>
+									<td th:text="${row.mwName}"></td>
 
-								    <td th:text="${row.preNo}"></td>
-								    <td th:text="${row.preArea}"></td>
+									<td th:text="${row.preNo}"></td>
+									<td th:text="${row.preArea}"></td>
 
-								    <td th:text="${row.dpapNo}"></td>
-								    <td th:text="${row.dpapArea}"></td>
+									<td th:text="${row.dpapNo}"></td>
+									<td th:text="${row.dpapArea}"></td>
 
-								    <td th:text="${row.ddpNo}"></td>
-								    <td th:text="${row.ddpArea}"></td>
+									<td th:text="${row.ddpNo}"></td>
+									<td th:text="${row.ddpArea}"></td>
 
-								    <td th:text="${row.iwdpNo}"></td>
-								    <td th:text="${row.iwdpArea}"></td>
+									<td th:text="${row.iwdpNo}"></td>
+									<td th:text="${row.iwdpArea}"></td>
 
-								    <td th:text="${row.iwmpNo}"></td>
-								    <td th:text="${row.iwmpArea}"></td>
+									<td th:text="${row.iwmpNo}"></td>
+									<td th:text="${row.iwmpArea}"></td>
 
-								    <td th:text="${row.pmksyNo}"></td>
-								    <td th:text="${row.pmksyArea}"></td>
+									<td th:text="${row.pmksyNo}"></td>
+									<td th:text="${row.pmksyArea}"></td>
 
-								    <td th:text="${row.otherNo}"></td>
-								    <td th:text="${row.otherArea}"></td>
+									<td th:text="${row.otherNo}"></td>
+									<td th:text="${row.otherArea}"></td>
+
+								</tr>
+
+								<tr th:if="${!hasC and !hasS and !hasD}">
+
+									<td colspan="16">
+
+										<div class="d-flex justify-content-center align-items-center gap-3">
+
+											<span class="text-danger">
+												No records found.
+											</span>
+
+											<i class="fas fa-arrow-right arrow-blink"></i>
+
+											<a th:href="@{/areaCoveredUnderWP}"
+												class="btn btn-primary btn-sm btn-blink">
+
+												<i class="fas fa-plus"></i>
+												Add Details
+
+											</a>
+
+											<a title="skip" th:href="@{/skipAreaCover(pprid=${selectedProject})}"
+												class="btn btn-secondary"
+												onclick="return confirm('Are you sure you want to skip Area Covered ?');">
+
+												<i class="fas fa-skip"></i>
+												Skip
+
+											</a>
+
+
+										</div>
+
+									</td>
 
 								</tr>
 
-								<tr th:if="${!hasC and !hasS}">
-
-								    <td colspan="16">
-
-								        <div class="d-flex justify-content-center align-items-center gap-3">
-
-								            <span class="text-danger">
-								                No records found.
-								            </span>
-
-								            <i class="fas fa-arrow-right arrow-blink"></i>
-
-								            <a th:href="@{/areaCoveredUnderWP}"
-								               class="btn btn-primary btn-sm btn-blink">
-
-								                <i class="fas fa-plus"></i>
-								                Add Details
-
-								            </a>
-
-								            <a title="skip"
-								               th:href="@{/skipAreaCover(pprid=${selectedProject})}"
-								               class="btn btn-secondary"
-								               onclick="return confirm('Are you sure you want to skip Area Covered ?');">
-
-								                <i class="fas fa-skip"></i>
-								                Skip
-
-								            </a>
-
-								        </div>
-
-								    </td>
-
+								<tr th:if="${hasD}">
+									<td colspan="16" align="center">
+										<a th:href="@{/areaCoveredUnderWP}" class="btn btn-success btn-sm">
+											<i class="fas fa-check"></i> Complete Your Draft Data
+										</a>
+									</td>
 								</tr>
+
 								<tr th:if="${hasS}">
 
-								    <td colspan="16">
+									<td colspan="16">
 
-								        <div class="d-flex justify-content-center align-items-center gap-3">
+										<div class="d-flex justify-content-center align-items-center gap-3">
 
-								            <span class="text-warning fw-bold">
-								                This PPR has been skipped.
-								            </span>
+											<span class="text-warning fw-bold">
+												This PPR has been skipped.
+											</span>
 
-								        </div>
+										</div>
 
-								    </td>
+									</td>
 
 								</tr>
 							</tbody>
@@ -505,83 +515,92 @@
 					<tbody>
 						<!-- ================= STATUS C : SHOW DATA ================= -->
 						<tr th:each="data : ${detailsOfListOfProposedProject}"
-						    th:if="${#strings.equals(data.status, 'C')}">
+							th:if="${#strings.equals(data.status, 'C')}">
 
-						    <td th:text="${data.ppr.district.distName}"></td>
-						    <td th:text="${data.ppr.projectName}"></td>
-						    <td th:text="${data.microWatershed.mwName}"></td>
-						    <td th:text="${data.microWatershed.mwCode}"></td>
-						    <td th:text="${data.treatedArea}"></td>
-						    <td th:text="${data.projectType.projectType}"></td>
-						    <td th:text="${data.proposedCost}"></td>
+							<td th:text="${data.ppr.district.distName}"></td>
+							<td th:text="${data.ppr.projectName}"></td>
+							<td th:text="${data.microWatershed.mwName}"></td>
+							<td th:text="${data.microWatershed.mwCode}"></td>
+							<td th:text="${data.treatedArea}"></td>
+							<td th:text="${data.projectType.projectType}"></td>
+							<td th:text="${data.proposedCost}"></td>
 
-						    <td class="text-center">
-						        <div class="col-md-8">
-						            <button type="button"
-						                    class="btn btn-primary btn-sm viewBtn"
-						                    th:data-id="${data.pprProposedProjectId}"
-						                    data-bs-toggle="modal"
-						                    data-bs-target="#viewCriteriaModal">
+							<td class="text-center">
+								<div class="col-md-8">
+									<button type="button" class="btn btn-primary btn-sm viewBtn"
+										th:data-id="${data.pprProposedProjectId}" data-bs-toggle="modal"
+										data-bs-target="#viewCriteriaModal">
 
-						                Total Marks: <span th:text="${data.details != null ? #aggregates.sum(data.details.![scoredMarks]) : 0}"> 0 </span>
+										Total Marks: <span
+											th:text="${data.details != null ? #aggregates.sum(data.details.![scoredMarks]) : 0}">
+											0 </span>
 
-						            </button>
-						        </div>
-						    </td>
+									</button>
+								</div>
+							</td>
 						</tr>
 
 
 						<!-- ================= STATUS S ================= -->
-						<tr th:if="${detailsOfListOfProposedProject.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
+						<tr
+							th:if="${detailsOfListOfProposedProject.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-						    <td colspan="8">
+							<td colspan="8">
 
-						        <div class="d-flex justify-content-center align-items-center gap-3">
+								<div class="d-flex justify-content-center align-items-center gap-3">
 
-						            <span class="text-warning fw-bold">
-						                This PPR has been skipped.
-						            </span>
+									<span class="text-warning fw-bold">
+										This PPR has been skipped.
+									</span>
 
-						        </div>
+								</div>
 
-						    </td>
+							</td>
+						</tr>
+						
+						<!-- ================= STATUS D : DRAFT ================= -->
+						<tr th:if="${not #lists.isEmpty(detailsOfListOfProposedProject.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
+
+							<td colspan="8" align="center">
+								<a th:href="@{/pprProposedProjectDetails}" class="btn btn-success btn-sm">
+									<i class="fas fa-check"></i> Complete Your Draft Data
+								</a>
+							</td>
 						</tr>
 
 
 						<!-- ================= NO RECORD ================= -->
 						<tr th:if="${#lists.isEmpty(detailsOfListOfProposedProject)}">
 
-						    <td colspan="8">
+							<td colspan="8">
 
-						        <div class="d-flex justify-content-center align-items-center gap-3">
+								<div class="d-flex justify-content-center align-items-center gap-3">
 
-						            <span class="text-danger">
-						                No records found.
-						            </span>
+									<span class="text-danger">
+										No records found.
+									</span>
 
-						            <i class="fas fa-arrow-right arrow-blink"></i>
+									<i class="fas fa-arrow-right arrow-blink"></i>
 
-						            <a th:href="@{/pprProposedProjectDetails}"
-						               class="btn btn-primary btn-sm btn-blink">
+									<a th:href="@{/pprProposedProjectDetails}" class="btn btn-primary btn-sm btn-blink">
 
-						                <i class="fas fa-plus"></i>
-						                Add Details
+										<i class="fas fa-plus"></i>
+										Add Details
 
-						            </a>
+									</a>
 
-						            <a title="skip"
-						               th:href="@{/skipProposedProjectDetails(pprid=${selectedProject})}"
-						               class="btn btn-secondary"
-						               onclick="return confirm('Are you sure you want to skip Prioritized of Proposed Projects ?');">
+									<a title="skip" th:href="@{/skipProposedProjectDetails(pprid=${selectedProject})}"
+										class="btn btn-secondary"
+										onclick="return confirm('Are you sure you want to skip Prioritized of Proposed Projects ?');">
 
-						                <i class="fas fa-skip"></i>
-						                Skip
+										<i class="fas fa-skip"></i>
+										Skip
 
-						            </a>
+									</a>
 
-						        </div>
+								</div>
 
-						    </td>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -658,100 +677,113 @@
 							<!-- ================= STATUS C : SHOW DATA ================= -->
 
 							<tr th:each="data : ${pprProjectAtGlanceList}"
-							    th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
+								th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
 
-							    <td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.district.distName}"></td>
 
-							    <td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
 
-							    <td th:text="${data.projectType.projectType}"></td>
+								<td th:text="${data.projectType.projectType}"></td>
 
-							    <td>
-							        <span th:if="${data.villages != null and !data.villages.isEmpty()}"
-							              th:text="${data.villages[0].village.gramPanchayat.block.blockName}">
-							        </span>
-							    </td>
+								<td>
+									<span th:if="${data.villages != null and !data.villages.isEmpty()}"
+										th:text="${data.villages[0].village.gramPanchayat.block.blockName}">
+									</span>
+								</td>
 
-							    <td>
-							        <span th:if="${data.villages != null and !data.villages.isEmpty()}"
-							              th:text="${data.villages[0].village.gramPanchayat.gramPanchayatName}">
-							        </span>
-							    </td>
+								<td>
+									<span th:if="${data.villages != null and !data.villages.isEmpty()}"
+										th:text="${data.villages[0].village.gramPanchayat.gramPanchayatName}">
+									</span>
+								</td>
 
-							    <td>
-							        <span th:each="pv,iter : ${data.villages}">
-							            <span th:text="${pv.village.villageName}"></span>
-							            <span th:if="${!iter.last}">, </span>
-							        </span>
-							    </td>
+								<td>
+									<span th:each="pv,iter : ${data.villages}">
+										<span th:text="${pv.village.villageName}"></span>
+										<span th:if="${!iter.last}">, </span>
+									</span>
+								</td>
 
-							    <td th:text="${data.microWatershed.mwCode}"></td>
+								<td th:text="${data.microWatershed.mwCode}"></td>
 
-							    <td th:text="${data.selectionReason}"></td>
+								<td th:text="${data.selectionReason}"></td>
 
-							    <td th:text="${data.projectArea}"></td>
+								<td th:text="${data.projectArea}"></td>
 
-							    <td th:text="${data.proposedArea}"></td>
+								<td th:text="${data.proposedArea}"></td>
 
-							    <td th:text="${data.projectCost}"></td>
+								<td th:text="${data.projectCost}"></td>
 
-							    <td th:text="${data.pia.piaName}"></td>
+								<td th:text="${data.pia.piaName}"></td>
 
-							    <td th:text="${data.pia.address}"></td>
+								<td th:text="${data.pia.address}"></td>
 
 							</tr>
 
 
 							<!-- ================= STATUS S : ONLY SKIP MESSAGE ================= -->
 
-							<tr th:if="${pprProjectAtGlanceList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
+							<tr
+								th:if="${pprProjectAtGlanceList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-							    <td colspan="14">
+								<td colspan="14">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
+							
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(pprProjectAtGlanceList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
+
+								<td colspan="13" align="center">
+									<a th:href="@{/pprProjectAtGlance}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+
+							</tr>
+							
+							
 							<tr th:if="${#lists.isEmpty(pprProjectAtGlanceList)}">
 
-							    <td colspan="14">
+								<td colspan="14">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/pprProjectAtGlance}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/pprProjectAtGlance}" class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i>
-							                Add Details
+											<i class="fas fa-plus"></i>
+											Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipProjectAtGlanceDetails(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Are you sure you want to skip Project at a Glance ?');">
+										<a title="skip"
+											th:href="@{/skipProjectAtGlanceDetails(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Are you sure you want to skip Project at a Glance ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 						</tbody>
@@ -786,29 +818,29 @@
 						<!-- ================= STATUS C : SHOW DATA ================= -->
 
 						<tr th:each="area : ${ppr8List}"
-								th:if="${area.status != null and area.status.equals(T(java.lang.Character).valueOf('C'))}">
+							th:if="${area.status != null and area.status.equals(T(java.lang.Character).valueOf('C'))}">
 
-						    <td th:text="${area.ppr.district.state.stName}"></td>
+							<td th:text="${area.ppr.district.state.stName}"></td>
 
-						    <td th:text="${area.ppr.district.distName}"></td>
+							<td th:text="${area.ppr.district.distName}"></td>
 
-						    <td th:text="${area.ppr.projectName}"></td>
+							<td th:text="${area.ppr.projectName}"></td>
 
-						    <td th:text="${area.block.blockName}"></td>
+							<td th:text="${area.block.blockName}"></td>
 
-						    <td th:text="${area.scheme.schemeName}"></td>
+							<td th:text="${area.scheme.schemeName}"></td>
 
-						    <td th:text="${area.projSanctionedNo}"></td>
+							<td th:text="${area.projSanctionedNo}"></td>
 
-						    <td th:text="${area.projSanctionedArea}"></td>
+							<td th:text="${area.projSanctionedArea}"></td>
 
-						    <td th:text="${area.netArea}"></td>
+							<td th:text="${area.netArea}"></td>
 
-						    <td th:text="${area.proposedArea}"></td>
+							<td th:text="${area.proposedArea}"></td>
 
-						    <td th:text="${area.proposedAreaOthers}"></td>
+							<td th:text="${area.proposedAreaOthers}"></td>
 
-						    <td th:text="${area.netBalArea}"></td>
+							<td th:text="${area.netBalArea}"></td>
 
 						</tr>
 
@@ -817,56 +849,63 @@
 
 						<tr th:if="${ppr8List.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-						    <td colspan="11">
+							<td colspan="11">
 
-						        <div class="d-flex justify-content-center align-items-center gap-3">
+								<div class="d-flex justify-content-center align-items-center gap-3">
 
-						            <span class="text-warning fw-bold">
-						                This PPR has been skipped.
-						            </span>
+									<span class="text-warning fw-bold">
+										This PPR has been skipped.
+									</span>
 
-						        </div>
+								</div>
 
-						    </td>
+							</td>
 
 						</tr>
+						<!-- ================= STATUS D : DRAFT ================= -->
+						<tr th:if="${not #lists.isEmpty(ppr8List.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+							<td colspan="11" align="center">
+								<a th:href="@{/preliminaryPPR8}" class="btn btn-success btn-sm">
+									<i class="fas fa-check"></i> Complete Your Draft Data
+								</a>
+							</td>
+
+						</tr>
 
 						<!-- ================= NO RECORD ================= -->
 
 						<tr th:if="${#lists.isEmpty(ppr8List)}">
 
-						    <td colspan="11">
+							<td colspan="11">
 
-						        <div class="d-flex justify-content-center align-items-center gap-3">
+								<div class="d-flex justify-content-center align-items-center gap-3">
 
-						            <span class="text-danger">
-						                No records found.
-						            </span>
+									<span class="text-danger">
+										No records found.
+									</span>
 
-						            <i class="fas fa-arrow-right arrow-blink"></i>
+									<i class="fas fa-arrow-right arrow-blink"></i>
 
-						            <a th:href="@{/preliminaryPPR8}"
-						               class="btn btn-primary btn-sm btn-blink">
+									<a th:href="@{/preliminaryPPR8}" class="btn btn-primary btn-sm btn-blink">
 
-						                <i class="fas fa-plus"></i>
-						                Add Details
+										<i class="fas fa-plus"></i>
+										Add Details
 
-						            </a>
+									</a>
 
-						            <a title="skip"
-						               th:href="@{/skipPreliminaryPPR8(pprid=${selectedProject})}"
-						               class="btn btn-secondary"
-						               onclick="return confirm('Are you sure you want to skip Area Proposed ?');">
+									<a title="skip" th:href="@{/skipPreliminaryPPR8(pprid=${selectedProject})}"
+										class="btn btn-secondary"
+										onclick="return confirm('Are you sure you want to skip Area Proposed ?');">
 
-						                <i class="fas fa-skip"></i>
-						                Skip
+										<i class="fas fa-skip"></i>
+										Skip
 
-						            </a>
+									</a>
 
-						        </div>
+								</div>
 
-						    </td>
+							</td>
 
 						</tr>
 					</tbody>
@@ -907,29 +946,29 @@
 						<tr th:each="data, stat : ${landPatternAreaList}"
 							th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
 
-						    <td th:text="${stat.count}"></td>
+							<td th:text="${stat.count}"></td>
 
-						    <td th:text="${data.pprId.district.distName}"></td>
+							<td th:text="${data.pprId.district.distName}"></td>
 
-						    <td th:text="${data.pprId.projectName}"></td>
+							<td th:text="${data.pprId.projectName}"></td>
 
-						    <td th:text="${data.microWatershed.mwName}"></td>
+							<td th:text="${data.microWatershed.mwName}"></td>
 
-						    <td th:text="${data.village.villageName}"></td>
+							<td th:text="${data.village.villageName}"></td>
 
-						    <td th:text="${data.villageArea}"></td>
+							<td th:text="${data.villageArea}"></td>
 
-						    <td th:text="${data.forestArea}"></td>
+							<td th:text="${data.forestArea}"></td>
 
-						    <td th:text="${data.agricultureLand}"></td>
+							<td th:text="${data.agricultureLand}"></td>
 
-						    <td th:text="${data.rainfedArea}"></td>
+							<td th:text="${data.rainfedArea}"></td>
 
-						    <td th:text="${data.pastures}"></td>
+							<td th:text="${data.pastures}"></td>
 
-						    <td th:text="${data.cultivableWastelandArea}"></td>
+							<td th:text="${data.cultivableWastelandArea}"></td>
 
-						    <td th:text="${data.nonCultivableWastelandArea}"></td>
+							<td th:text="${data.nonCultivableWastelandArea}"></td>
 
 						</tr>
 
@@ -938,56 +977,64 @@
 
 						<tr th:if="${landPatternAreaList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-						    <td colspan="12">
+							<td colspan="12">
 
-						        <div class="d-flex justify-content-center align-items-center gap-3">
+								<div class="d-flex justify-content-center align-items-center gap-3">
 
-						            <span class="text-warning fw-bold">
-						                This PPR has been skipped.
-						            </span>
+									<span class="text-warning fw-bold">
+										This PPR has been skipped.
+									</span>
 
-						        </div>
+								</div>
 
-						    </td>
+							</td>
 
 						</tr>
+						
+						<!-- ================= STATUS D : DRAFT ================= -->
+						<tr th:if="${not #lists.isEmpty(landPatternAreaList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+							<td colspan="12" align="center">
+								<a th:href="@{/pprLandPatternArea}" class="btn btn-success btn-sm">
+									<i class="fas fa-check"></i> Complete Your Draft Data
+								</a>
+							</td>
+
+						</tr>
 
 						<!-- ================= NO RECORD ================= -->
 
 						<tr th:if="${#lists.isEmpty(landPatternAreaList)}">
 
-						    <td colspan="12">
+							<td colspan="12">
 
-						        <div class="d-flex justify-content-center align-items-center gap-3">
+								<div class="d-flex justify-content-center align-items-center gap-3">
 
-						            <span class="text-danger">
-						                No records found.
-						            </span>
+									<span class="text-danger">
+										No records found.
+									</span>
 
-						            <i class="fas fa-arrow-right arrow-blink"></i>
+									<i class="fas fa-arrow-right arrow-blink"></i>
 
-						            <a th:href="@{/pprLandPatternArea}"
-						               class="btn btn-primary btn-sm btn-blink">
+									<a th:href="@{/pprLandPatternArea}" class="btn btn-primary btn-sm btn-blink">
 
-						                <i class="fas fa-plus"></i>
-						                Add Details
+										<i class="fas fa-plus"></i>
+										Add Details
 
-						            </a>
+									</a>
 
-						            <a title="skip"
-						               th:href="@{/skippprLandPatternArea(pprid=${selectedProject})}"
-						               class="btn btn-secondary"
-						               onclick="return confirm('Are you sure you want to skip Land Pattern Area ?');">
+									<a title="skip" th:href="@{/skippprLandPatternArea(pprid=${selectedProject})}"
+										class="btn btn-secondary"
+										onclick="return confirm('Are you sure you want to skip Land Pattern Area ?');">
 
-						                <i class="fas fa-skip"></i>
-						                Skip
+										<i class="fas fa-skip"></i>
+										Skip
 
-						            </a>
+									</a>
 
-						        </div>
+								</div>
 
-						    </td>
+							</td>
 
 						</tr>
 					</tbody>
@@ -1023,41 +1070,41 @@
 							<tr th:each="data : ${ppr10List}"
 								th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
 
-							    <td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.district.distName}"></td>
 
-							    <td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
 
-							    <td th:text="${data.village.villageName}"></td>
+								<td th:text="${data.village.villageName}"></td>
 
-							    <td th:text="${data.zoneName}"></td>
+								<td th:text="${data.zoneName}"></td>
 
-							    <td th:text="${data.topography}"></td>
+								<td th:text="${data.topography}"></td>
 
-							    <td th:text="${data.avgRainfall}"></td>
+								<td th:text="${data.avgRainfall}"></td>
 
-							    <td th:text="${data.area}"></td>
+								<td th:text="${data.area}"></td>
 
-							    <td th:text="${data.forestArea}"></td>
+								<td th:text="${data.forestArea}"></td>
 
-							    <td>
-							        <span th:each="s, iter : ${data.soilList}">
+								<td>
+									<span th:each="s, iter : ${data.soilList}">
 
-							            <span th:text="${s.soilType.soilName + ' (' + s.area + ' ha)'}"></span>
+										<span th:text="${s.soilType.soilName + ' (' + s.area + ' ha)'}"></span>
 
-							            <span th:if="${!iter.last}">, </span>
+										<span th:if="${!iter.last}">, </span>
 
-							        </span>
-							    </td>
+									</span>
+								</td>
 
-							    <td>
-							        <span th:each="c, iter : ${data.cropList}">
+								<td>
+									<span th:each="c, iter : ${data.cropList}">
 
-							            <span th:text="${c.cropType.cropName + ' (' + c.area + ' ha)'}"></span>
+										<span th:text="${c.cropType.cropName + ' (' + c.area + ' ha)'}"></span>
 
-							            <span th:if="${!iter.last}">, </span>
+										<span th:if="${!iter.last}">, </span>
 
-							        </span>
-							    </td>
+									</span>
+								</td>
 
 							</tr>
 
@@ -1066,56 +1113,65 @@
 
 							<tr th:if="${ppr10List.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-							    <td colspan="10">
+								<td colspan="10">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(ppr10List.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+								<td colspan="10" align="center">
+									<a th:href="@{/agroClimateConditionPPR10}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+
+							</tr>
 							<!-- ================= NO RECORD ================= -->
 
 							<tr th:if="${#lists.isEmpty(ppr10List)}">
 
-							    <td colspan="10">
+								<td colspan="10">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/agroClimateConditionPPR10}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/agroClimateConditionPPR10}"
+											class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i>
-							                Add Details
+											<i class="fas fa-plus"></i>
+											Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipAgroClimateConditionPPR10(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Are you sure you want to skip Agro-Climatic Condition ?');">
+										<a title="skip"
+											th:href="@{/skipAgroClimateConditionPPR10(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Are you sure you want to skip Agro-Climatic Condition ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 						</tbody>
@@ -1146,22 +1202,21 @@
 						<tbody>
 							<!-- ================= STATUS C : SHOW DATA ================= -->
 
-							<tr th:each="rec, iterStat : ${ppr11List}"
-							    th:if="${rec.status == 'C'}">
+							<tr th:each="rec, iterStat : ${ppr11List}" th:if="${rec.status == 'C'}">
 
-							    <td th:text="${iterStat.index + 1}"></td>
+								<td th:text="${iterStat.index + 1}"></td>
 
-							    <td th:text="${rec.vcode.villageName}"></td>
+								<td th:text="${rec.vcode.villageName}"></td>
 
-							    <td th:text="${rec.year.year}"></td>
+								<td th:text="${rec.year.year}"></td>
 
-							    <td th:text="${rec.month.monthName}"></td>
+								<td th:text="${rec.month.monthName}"></td>
 
-							    <td th:text="${rec.dtype.disasterName}"></td>
+								<td th:text="${rec.dtype.disasterName}"></td>
 
-							    <td th:text="${rec.periodicity == 'Q' ? 'Quarterly' : 'Annual'}"></td>
+								<td th:text="${rec.periodicity == 'Q' ? 'Quarterly' : 'Annual'}"></td>
 
-							    <td th:text="${rec.affected ? 'Yes' : 'No'}"></td>
+								<td th:text="${rec.affected ? 'Yes' : 'No'}"></td>
 
 							</tr>
 
@@ -1170,17 +1225,29 @@
 
 							<tr th:if="${!#lists.isEmpty(ppr11List) and !#lists.isEmpty(ppr11List.?[status == 'S'])}">
 
-							    <td colspan="7">
+								<td colspan="7">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
+
+							</tr>
+							
+							
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${!#lists.isEmpty(ppr11List) and !#lists.isEmpty(ppr11List.?[status == 'D'])}">
+
+								<td colspan="7" align="center">
+									<a th:href="@{/dtlFloodDroughtArea}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
 
 							</tr>
 
@@ -1189,37 +1256,35 @@
 
 							<tr th:if="${#lists.isEmpty(ppr11List)}">
 
-							    <td colspan="7">
+								<td colspan="7">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/dtlFloodDroughtArea}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/dtlFloodDroughtArea}" class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i>
-							                Add Details
+											<i class="fas fa-plus"></i>
+											Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipFloodDroughtArea(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Are you sure you want to skip Flood and Drought in Project Area ?');">
+										<a title="skip" th:href="@{/skipFloodDroughtArea(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Are you sure you want to skip Flood and Drought in Project Area ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 						</tbody>
@@ -1255,77 +1320,84 @@
 							<tr th:each="data : ${soilErosionList}"
 								th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
 
-							    <td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.district.distName}"></td>
 
-							    <td th:text="${data.month.monthName}"></td>
+								<td th:text="${data.month.monthName}"></td>
 
-							    <td th:text="${data.year.year}"></td>
+								<td th:text="${data.year.year}"></td>
 
-							    <td th:text="${data.erosionType.erosion.categoryType}"></td>
+								<td th:text="${data.erosionType.erosion.categoryType}"></td>
 
-							    <td th:text="${data.erosionType.erosionType}"></td>
+								<td th:text="${data.erosionType.erosionType}"></td>
 
-							    <td th:text="${data.affectedArea}"></td>
+								<td th:text="${data.affectedArea}"></td>
 
-							    <td th:text="${data.runoff}"></td>
+								<td th:text="${data.runoff}"></td>
 
-							    <td th:text="${data.avgSoilLoss}"></td>
+								<td th:text="${data.avgSoilLoss}"></td>
 
 							</tr>
 
 
 							<!-- ================= STATUS S : ONLY SKIP MESSAGE ================= -->
 							<tr th:if="${soilErosionList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
-							    <td colspan="8">
+								<td colspan="8">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(soilErosionList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+								<td colspan="8" align="center">
+									<a th:href="@{/pprSoilErosion}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+
+							</tr>
 							<!-- ================= NO RECORD ================= -->
 
 							<tr th:if="${#lists.isEmpty(soilErosionList)}">
 
-							    <td colspan="8">
+								<td colspan="8">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/pprSoilErosion}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/pprSoilErosion}" class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i>
-							                Add Details
+											<i class="fas fa-plus"></i>
+											Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipPprSoilErosion(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Are you sure you want to skip Soil Erosion Details ?');">
+										<a title="skip" th:href="@{/skipPprSoilErosion(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Are you sure you want to skip Soil Erosion Details ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -1356,97 +1428,108 @@
 							<!-- ================= STATUS C : SHOW DATA ================= -->
 
 							<tr th:each="data : ${pprLivelihoodSummaryList}"
-									th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
+								th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
 
-							    <td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.district.distName}"></td>
 
-							    <td th:text="${data.village.gramPanchayat.block.blockName}"></td>
+								<td th:text="${data.village.gramPanchayat.block.blockName}"></td>
 
-							    <td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
 
-							    <td th:text="${data.microWatershed.mwName}"></td>
+								<td th:text="${data.microWatershed.mwName}"></td>
 
-							    <td th:text="${data.village.villageName}"></td>
+								<td th:text="${data.village.villageName}"></td>
 
-							    <td>
-							        <span th:each="act, stat : ${data.existingLivelihoodActivities}">
+								<td>
+									<span th:each="act, stat : ${data.existingLivelihoodActivities}">
 
-							            <span th:text="${act.livelihoodActivity.livelihoodActivityName}"></span>
+										<span th:text="${act.livelihoodActivity.livelihoodActivityName}"></span>
 
-							            <span th:if="${!stat.last}">, </span>
+										<span th:if="${!stat.last}">, </span>
 
-							        </span>
-							    </td>
+									</span>
+								</td>
 
-							    <td>
-							        <span th:each="intv, stat : ${data.projectLivelihoodInterventions}">
+								<td>
+									<span th:each="intv, stat : ${data.projectLivelihoodInterventions}">
 
-							            <span th:text="${intv.livelihoodIntervention.livelihoodInterventionName}"></span>
+										<span
+											th:text="${intv.livelihoodIntervention.livelihoodInterventionName}"></span>
 
-							            <span th:if="${!stat.last}">, </span>
+										<span th:if="${!stat.last}">, </span>
 
-							        </span>
-							    </td>
+									</span>
+								</td>
 
-							    <td class="text-center" th:text="${data.migratedPeople}"></td>
+								<td class="text-center" th:text="${data.migratedPeople}"></td>
 
-							    <td th:text="${data.migrationReason}"></td>
+								<td th:text="${data.migrationReason}"></td>
 
 							</tr>
 
 
 							<!-- ================= STATUS S : ONLY SKIP MESSAGE ================= -->
-							<tr th:if="${pprLivelihoodSummaryList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
-							    <td colspan="9">
+							<tr
+								th:if="${pprLivelihoodSummaryList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
+								<td colspan="9">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(pprLivelihoodSummaryList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+								<td colspan="9" align="center">
+									<a th:href="@{/livelihoodSummaryPPR13}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+
+							</tr>
 							<!-- ================= NO RECORD ================= -->
 
 							<tr th:if="${#lists.isEmpty(pprLivelihoodSummaryList)}">
 
-							    <td colspan="9">
+								<td colspan="9">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/livelihoodSummaryPPR13}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/livelihoodSummaryPPR13}"
+											class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i>
-							                Add Details
+											<i class="fas fa-plus"></i>
+											Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipLivelihoodSummaryPPR13(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Are you sure you want to skip Livelihood Summary ?');">
+										<a title="skip"
+											th:href="@{/skipLivelihoodSummaryPPR13(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Are you sure you want to skip Livelihood Summary ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 						</tbody>
@@ -1484,84 +1567,95 @@
 							<!-- ================= STATUS C : SHOW DATA ================= -->
 
 							<tr th:each="data : ${pprEmploymentList}"
-									th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
+								th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
 
-							    <td th:text="${data.pprId.district.distName}"></td>
+								<td th:text="${data.pprId.district.distName}"></td>
 
-							    <td th:text="${data.pprId.projectName}"></td>
+								<td th:text="${data.pprId.projectName}"></td>
 
-							    <td th:text="${data.microWatershed.mwName}"></td>
+								<td th:text="${data.microWatershed.mwName}"></td>
 
-							    <td th:text="${data.village.villageName}"></td>
+								<td th:text="${data.village.villageName}"></td>
 
-							    <td th:text="${data.employmentType.employmentTypeName}"></td>
+								<td th:text="${data.employmentType.employmentTypeName}"></td>
 
-							    <td th:text="${data.sc}"></td>
+								<td th:text="${data.sc}"></td>
 
-							    <td th:text="${data.st}"></td>
+								<td th:text="${data.st}"></td>
 
-							    <td th:text="${data.others}"></td>
+								<td th:text="${data.others}"></td>
 
-							    <td th:text="${data.women}"></td>
+								<td th:text="${data.women}"></td>
 
-							    <td th:text="${(data.sc ?: 0) + (data.st ?: 0) + (data.others ?: 0) + (data.women ?: 0)}">
-							    </td>
+								<td
+									th:text="${(data.sc ?: 0) + (data.st ?: 0) + (data.others ?: 0) + (data.women ?: 0)}">
+								</td>
 
 							</tr>
 
 
 							<!-- ================= STATUS S : ONLY SKIP MESSAGE ================= -->
-							<tr th:if="${pprEmploymentList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
-							    <td colspan="10">
+							<tr
+								th:if="${pprEmploymentList.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
+								<td colspan="10">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
+							
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(pprEmploymentList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+								<td colspan="10" align="center">
+									<a th:href="@{/pprEmploymentGeneration}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+
+							</tr>
 
 							<!-- ================= NO RECORD ================= -->
 
 							<tr th:if="${#lists.isEmpty(pprEmploymentList)}">
 
-							    <td colspan="10">
+								<td colspan="10">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/pprEmploymentGeneration}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/pprEmploymentGeneration}"
+											class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i>
-							                Add Details
+											<i class="fas fa-plus"></i>
+											Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipEmploymentGeneration(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Are you sure you want to skip Employment Generation Details ?');">
+										<a title="skip" th:href="@{/skipEmploymentGeneration(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Are you sure you want to skip Employment Generation Details ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 						</tbody>
@@ -1595,36 +1689,46 @@
 						<tr th:each="item : ${ppr15List}"
 							th:if="${item['status'] != null and item['status'].equals(T(java.lang.Character).valueOf('C'))}">
 
-						    <td th:text="${item['dist_name']}"></td>
+							<td th:text="${item['dist_name']}"></td>
 
-						    <td th:text="${item['project_name']}"></td>
+							<td th:text="${item['project_name']}"></td>
 
-						    <td th:text="${item['mw_name']}"></td>
+							<td th:text="${item['mw_name']}"></td>
 
-						    <td th:text="${item['village_name']}"></td>
+							<td th:text="${item['village_name']}"></td>
 
-						    <td th:text="${item['migrating_people_count']}"></td>
+							<td th:text="${item['migrating_people_count']}"></td>
 
-						    <td th:text="${item['migration_days_per_year']}"></td>
+							<td th:text="${item['migration_days_per_year']}"></td>
 
-						    <td th:text="${item['migration_reason']}"></td>
+							<td th:text="${item['migration_reason']}"></td>
 
-						    <td th:text="${item['expected_reduction_migrating_people']}"></td>
+							<td th:text="${item['expected_reduction_migrating_people']}"></td>
 
 						</tr>
 						<tr th:if="${ppr15List.?[status == T(java.lang.Character).valueOf('S')].size() > 0}">
-						    <td colspan="8">
+							<td colspan="8">
 
-						        <div class="d-flex justify-content-center align-items-center gap-3">
+								<div class="d-flex justify-content-center align-items-center gap-3">
 
-						            <span class="text-warning fw-bold">
-						                This PPR has been skipped.
-						            </span>
+									<span class="text-warning fw-bold">
+										This PPR has been skipped.
+									</span>
 
-						        </div>
+								</div>
 
-						    </td>
+							</td>
 						</tr>
+						
+						<!-- ================= STATUS D : DRAFT ================= -->
+						<tr th:if="${not #lists.isEmpty(ppr15List.?[#this['status'] != null and #this['status'].toString() == 'D'])}">
+							<td colspan="8" align="center">
+								<a th:href="@{/preliminaryPPR15}" class="btn btn-success btn-sm">
+									<i class="fas fa-check"></i> Complete Your Draft Data
+								</a>
+							</td>
+						</tr>
+						
 						<tr th:if="${#lists.isEmpty(ppr15List)}">
 							<td colspan="8">
 								<div class="d-flex justify-content-center align-items-center gap-3">
@@ -1633,7 +1737,8 @@
 									<a th:href="@{/preliminaryPPR15}" class="btn btn-primary btn-sm btn-blink">
 										<i class="fas fa-plus"></i> Add Details
 									</a>
-									<a title="skip" th:href="@{/skipPreliminaryPPR15(pprid=${selectedProject})}" class="btn btn-secondary"
+									<a title="skip" th:href="@{/skipPreliminaryPPR15(pprid=${selectedProject})}"
+										class="btn btn-secondary"
 										onclick="return confirm('Are you sure you want to skip Migration Details ?');">
 										<i class="fas fa-skip"></i>
 										Skip
@@ -1669,7 +1774,7 @@
 
 						<tbody>
 
-							<tr th:each="data : ${pprWaterOutcomesList}" 
+							<tr th:each="data : ${pprWaterOutcomesList}"
 								th:if="${data.status != null and data.status.equals(T(java.lang.Character).valueOf('C'))}">
 
 								<td th:text="${data.ppr.district.distName}"></td>
@@ -1689,19 +1794,30 @@
 								<td th:text="${data.remarks}"></td>
 
 							</tr>
-							<tr th:if="${pprWaterOutcomesList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">	
+							<tr
+								th:if="${pprWaterOutcomesList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
 								<td colspan="8">
-							
+
 									<div class="d-flex justify-content-center align-items-center gap-3">
-							
+
 										<span class="text-warning fw-bold">
 											This PPR has been skipped.
 										</span>
-							
+
 									</div>
-							
+
 								</td>
 							</tr>
+							
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(pprWaterOutcomesList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
+								<td colspan="8" align="center">
+									<a th:href="@{/pprWaterOutcomes}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+							</tr>
+							
 							<tr th:if="${#lists.isEmpty(pprWaterOutcomesList)}">
 								<td colspan="8">
 									<div class="d-flex justify-content-center align-items-center gap-3">
@@ -1710,7 +1826,8 @@
 										<a th:href="@{/pprWaterOutcomes}" class="btn btn-primary btn-sm btn-blink">
 											<i class="fas fa-plus"></i> Add Details
 										</a>
-										<a title="skip" th:href="@{/skipPprWaterOutcomes(pprid=${selectedProject})}" class="btn btn-secondary"
+										<a title="skip" th:href="@{/skipPprWaterOutcomes(pprid=${selectedProject})}"
+											class="btn btn-secondary"
 											onclick="return confirm('Are you sure you want to skip Ground Water Table Details ?');">
 											<i class="fas fa-skip"></i>
 											Skip
@@ -1752,66 +1869,84 @@
 							<tbody>
 								<!-- Display C records -->
 								<tr th:each="data : ${pprDrinkingWaterList}"
-								    th:if="${data.status != null and data.status == T(java.lang.Character).valueOf('C')}">
+									th:if="${data.status != null and data.status == T(java.lang.Character).valueOf('C')}">
 
-								    <td th:text="${data.ppr.district.distName}"></td>
-								    <td th:text="${data.ppr.projectName}"></td>
-								    <td th:text="${data.microWatershed != null ? data.microWatershed.mwName : ''}"></td>
-								    <td th:text="${data.village != null ? data.village.villageName : ''}"></td>
-								    <td th:text="${data.preWaterAvailabilityMonths}"></td>
-								    <td th:text="${data.preWaterQuality != null ? data.preWaterQuality.waterQualityType : ''}"></td>
-								    <td th:text="${data.postWaterAvailabilityMonths}"></td>
-								    <td th:text="${data.postWaterQuality != null ? data.postWaterQuality.waterQualityType : ''}"></td>
+									<td th:text="${data.ppr.district.distName}"></td>
+									<td th:text="${data.ppr.projectName}"></td>
+									<td th:text="${data.microWatershed != null ? data.microWatershed.mwName : ''}"></td>
+									<td th:text="${data.village != null ? data.village.villageName : ''}"></td>
+									<td th:text="${data.preWaterAvailabilityMonths}"></td>
+									<td
+										th:text="${data.preWaterQuality != null ? data.preWaterQuality.waterQualityType : ''}">
+									</td>
+									<td th:text="${data.postWaterAvailabilityMonths}"></td>
+									<td
+										th:text="${data.postWaterQuality != null ? data.postWaterQuality.waterQualityType : ''}">
+									</td>
 
 								</tr>
 
 
 								<!-- Display only one Skip row if any S record exists -->
-								<tr th:if="${pprDrinkingWaterList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
+								<tr
+									th:if="${pprDrinkingWaterList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-								    <td colspan="8">
+									<td colspan="8">
 
-								        <div class="d-flex justify-content-center align-items-center gap-3">
+										<div class="d-flex justify-content-center align-items-center gap-3">
 
-								            <span class="text-warning fw-bold">
-								                This PPR has been skipped.
-								            </span>
+											<span class="text-warning fw-bold">
+												This PPR has been skipped.
+											</span>
 
-								        </div>
+										</div>
 
-								    </td>
+									</td>
 
 								</tr>
+								
+								
+								<!-- ================= STATUS D : DRAFT ================= -->
+								<tr th:if="${not #lists.isEmpty(pprDrinkingWaterList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+									<td colspan="8" align="center">
+										<a th:href="@{/drinkingWaterStatus}" class="btn btn-success btn-sm">
+											<i class="fas fa-check"></i> Complete Your Draft Data
+										</a>
+									</td>
+
+								</tr>
 
 								<!-- No records -->
 								<tr th:if="${#lists.isEmpty(pprDrinkingWaterList)}">
 
-								    <td colspan="8">
+									<td colspan="8">
 
-								        <div class="d-flex justify-content-center align-items-center gap-3">
+										<div class="d-flex justify-content-center align-items-center gap-3">
 
-								            <span class="text-danger">
-								                No records found.
-								            </span>
+											<span class="text-danger">
+												No records found.
+											</span>
 
-								            <i class="fas fa-arrow-right arrow-blink"></i>
+											<i class="fas fa-arrow-right arrow-blink"></i>
 
-								            <a th:href="@{/drinkingWaterStatus}"
-								               class="btn btn-primary btn-sm btn-blink">
+											<a th:href="@{/drinkingWaterStatus}"
+												class="btn btn-primary btn-sm btn-blink">
 
-								                <i class="fas fa-plus"></i> Add Details
+												<i class="fas fa-plus"></i> Add Details
 
-								            </a>
-											<a title="skip" th:href="@{/skipDrinkingWaterStatus(pprid=${selectedProject})}" class="btn btn-secondary"
+											</a>
+											<a title="skip"
+												th:href="@{/skipDrinkingWaterStatus(pprid=${selectedProject})}"
+												class="btn btn-secondary"
 												onclick="return confirm('Are you sure you want to skip Drinking Water Status ?');">
 												<i class="fas fa-skip"></i>
 												Skip
 											</a>
 
-								        </div>
+										</div>
 
-								    </td>
+									</td>
 
 								</tr>
 							</tbody>
@@ -1858,76 +1993,85 @@
 
 							<!-- C = Completed / Display Crop Outcome Data -->
 							<tr th:each="rec, iterStat : ${cropOutcomes}"
-							    th:if="${rec.status != null and rec.status == T(java.lang.Character).valueOf('C')}">
+								th:if="${rec.status != null and rec.status == T(java.lang.Character).valueOf('C')}">
 
-							    <td th:text="${iterStat.index + 1}"></td>
+								<td th:text="${iterStat.index + 1}"></td>
 
-							    <td th:text="${rec.season.seasonName}"></td>
+								<td th:text="${rec.season.seasonName}"></td>
 
-							    <td th:text="${rec.cropType.cropName}"></td>
+								<td th:text="${rec.cropType.cropName}"></td>
 
-							    <td th:text="${rec.currentArea}"></td>
+								<td th:text="${rec.currentArea}"></td>
 
-							    <td th:text="${rec.currentProd}"></td>
+								<td th:text="${rec.currentProd}"></td>
 
-							    <td th:text="${rec.expectedArea}"></td>
+								<td th:text="${rec.expectedArea}"></td>
 
-							    <td th:text="${rec.expectedProd}"></td>
+								<td th:text="${rec.expectedProd}"></td>
 
 							</tr>
 
 
 							<!-- S = Skipped -->
-							<tr th:if="${cropOutcomes.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
+							<tr
+								th:if="${cropOutcomes.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-							    <td colspan="7">
+								<td colspan="7">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(cropOutcomes.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+								<td colspan="7" align="center">
+									<a th:href="@{/pprCropOutcomes}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+
+							</tr>
+							
 							<!-- No records -->
 							<tr th:if="${#lists.isEmpty(cropOutcomes)}">
 
-							    <td colspan="7">
+								<td colspan="7">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/pprCropOutcomes}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/pprCropOutcomes}" class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i> Add Details
+											<i class="fas fa-plus"></i> Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipPprCropOutcomes(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Are you sure you want to skip Major Crops Grown and Their Productivity ?');">
+										<a title="skip" th:href="@{/skipPprCropOutcomes(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Are you sure you want to skip Major Crops Grown and Their Productivity ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 
@@ -1979,90 +2123,100 @@
 
 							<!-- C = Completed / Display Pending UC Data -->
 							<tr th:each="data : ${pendingUCList}"
-							    th:if="${data.status != null and data.status == T(java.lang.Character).valueOf('C')}">
+								th:if="${data.status != null and data.status == T(java.lang.Character).valueOf('C')}">
 
-							    <td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
 
-							    <td th:text="${data.finYear.finYrDesc}"></td>
+								<td th:text="${data.finYear.finYrDesc}"></td>
 
-							    <td th:text="${data.installmentNo}"></td>
+								<td th:text="${data.installmentNo}"></td>
 
-							    <td th:text="${data.releasedAmount}"></td>
+								<td th:text="${data.releasedAmount}"></td>
 
-							    <td th:text="${data.utilizedAmount}"></td>
+								<td th:text="${data.utilizedAmount}"></td>
 
-							    <td th:text="${#temporals.format(data.dueDate,'dd/MM/yyyy')}"></td>
+								<td th:text="${#temporals.format(data.dueDate,'dd/MM/yyyy')}"></td>
 
-							    <td th:text="${data.ucAmount}"></td>
+								<td th:text="${data.ucAmount}"></td>
 
-							    <td th:text="${#temporals.format(data.ucSubmissionDate,'dd/MM/yyyy')}"></td>
+								<td th:text="${#temporals.format(data.ucSubmissionDate,'dd/MM/yyyy')}"></td>
 
-							    <td th:text="${data.ucSubmissionAmt}"></td>
+								<td th:text="${data.ucSubmissionAmt}"></td>
 
-							    <td th:text="${data.reasonNotSubmitted}"></td>
+								<td th:text="${data.reasonNotSubmitted}"></td>
 
-							    <td>
-							        <span th:text="${#temporals.format(data.pendingStart,'dd/MM/yyyy')}"></span>
-							        &nbsp;To&nbsp;
-							        <span th:text="${#temporals.format(data.pendingEnd,'dd/MM/yyyy')}"></span>
-							    </td>
+								<td>
+									<span th:text="${#temporals.format(data.pendingStart,'dd/MM/yyyy')}"></span>
+									&nbsp;To&nbsp;
+									<span th:text="${#temporals.format(data.pendingEnd,'dd/MM/yyyy')}"></span>
+								</td>
 
-							    <td th:text="${data.pendingAmount}"></td>
+								<td th:text="${data.pendingAmount}"></td>
 
 							</tr>
 
 
 							<!-- S = Skipped -->
-							<tr th:if="${pendingUCList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
+							<tr
+								th:if="${pendingUCList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-							    <td colspan="13">
+								<td colspan="13">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
+							
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(pendingUCList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+								<td colspan="12" align="center">
+									<a th:href="@{/pendingUCPPR19}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+
+							</tr>
+							
 
 							<!-- No records -->
 							<tr th:if="${#lists.isEmpty(pendingUCList)}">
 
-							    <td colspan="13">
+								<td colspan="13">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/pendingUCPPR19}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/pendingUCPPR19}" class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i> Add Details
+											<i class="fas fa-plus"></i> Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipPendingUCPPR19(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Do you want to skip Details of Pending UC`s ?');">
+										<a title="skip" th:href="@{/skipPendingUCPPR19(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Do you want to skip Details of Pending UC`s ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 
@@ -2076,7 +2230,7 @@
 
 
 					<h4 class="bg-primary text-white p-2 mt-4">
-						PPR-20 :  Details of Unspent balance as on date
+						PPR-20 : Details of Unspent balance as on date
 					</h4>
 
 
@@ -2099,78 +2253,86 @@
 
 							<!-- C = Completed / Display Data -->
 							<tr th:each="data : ${draftList}"
-							    th:if="${data.status != null and data.status == T(java.lang.Character).valueOf('C')}">
+								th:if="${data.status != null and data.status == T(java.lang.Character).valueOf('C')}">
 
-							    <td th:text="${data.ppr.district.distName}"></td>
+								<td th:text="${data.ppr.district.distName}"></td>
 
-							    <td th:text="${data.ppr.projectName}"></td>
+								<td th:text="${data.ppr.projectName}"></td>
 
-							    <td th:text="${data.totCost}"></td>
+								<td th:text="${data.totCost}"></td>
 
-							    <td th:text="${data.stReleasedFund}"></td>
+								<td th:text="${data.stReleasedFund}"></td>
 
-							    <td th:text="${data.dolrReleasedFund}"></td>
+								<td th:text="${data.dolrReleasedFund}"></td>
 
-							    <td th:text="${data.interest}"></td>
+								<td th:text="${data.interest}"></td>
 
-							    <td th:text="${data.total}"></td>
+								<td th:text="${data.total}"></td>
 
-							    <td th:text="${data.unspendBalance}"></td>
+								<td th:text="${data.unspendBalance}"></td>
 
 							</tr>
 
 
 							<!-- S = Skipped -->
-							<tr th:if="${draftList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
+							<tr
+								th:if="${draftList.?[status != null and status == T(java.lang.Character).valueOf('S')].size() > 0}">
 
-							    <td colspan="8">
+								<td colspan="8">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-warning fw-bold">
-							                This PPR has been skipped.
-							            </span>
+										<span class="text-warning fw-bold">
+											This PPR has been skipped.
+										</span>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
+							<!-- ================= STATUS D : DRAFT ================= -->
+							<tr th:if="${not #lists.isEmpty(draftList.?[status != null and status == T(java.lang.Character).valueOf('D')])}">
 
+								<td colspan="8" align="center">
+									<a th:href="@{/unspentBalancePPR20}" class="btn btn-success btn-sm">
+										<i class="fas fa-check"></i> Complete Your Draft Data
+									</a>
+								</td>
+
+							</tr>
 
 							<!-- No records -->
 							<tr th:if="${#lists.isEmpty(draftList)}">
 
-							    <td colspan="8">
+								<td colspan="8">
 
-							        <div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex justify-content-center align-items-center gap-3">
 
-							            <span class="text-danger">
-							                No records found.
-							            </span>
+										<span class="text-danger">
+											No records found.
+										</span>
 
-							            <i class="fas fa-arrow-right arrow-blink"></i>
+										<i class="fas fa-arrow-right arrow-blink"></i>
 
-							            <a th:href="@{/unspentBalancePPR20}"
-							               class="btn btn-primary btn-sm btn-blink">
+										<a th:href="@{/unspentBalancePPR20}" class="btn btn-primary btn-sm btn-blink">
 
-							                <i class="fas fa-plus"></i> Add Details
+											<i class="fas fa-plus"></i> Add Details
 
-							            </a>
+										</a>
 
-							            <a title="skip"
-							               th:href="@{/skipUnspentBalancePPR20(pprid=${selectedProject})}"
-							               class="btn btn-secondary"
-							               onclick="return confirm('Do you want to skip Unspent balance as on date ?');">
+										<a title="skip" th:href="@{/skipUnspentBalancePPR20(pprid=${selectedProject})}"
+											class="btn btn-secondary"
+											onclick="return confirm('Do you want to skip Unspent balance as on date ?');">
 
-							                <i class="fas fa-skip"></i>
-							                Skip
+											<i class="fas fa-skip"></i>
+											Skip
 
-							            </a>
+										</a>
 
-							        </div>
+									</div>
 
-							    </td>
+								</td>
 
 							</tr>
 
@@ -2216,18 +2378,18 @@
 				</div>
 
 				<!-- Shown only when the latest transaction is Back Forwarded -->
-								<div class="text-center mb-3" th:if="${latestBackForwarded}">
-									<div class="alert alert-warning">
-										<i class="fas fa-exclamation-triangle"></i>
-										DoLR has back forwarded this PPR. Please modify the data as per the remarks, then forward it again.
-									</div>
-								<a th:href="@{/modifyPprTransaction(tranxId=${selectedProject},projectname=${selectedProjectName})}"
-									   class="btn btn-warning"
-									   onclick="return confirm('Do you want to Modify Rejected PPR.');">
-										<i class="fas fa-edit"></i> Modify PPR
-									</a>
-							
-								</div>
+				<div class="text-center mb-3" th:if="${latestBackForwarded}">
+					<div class="alert alert-warning">
+						<i class="fas fa-exclamation-triangle"></i>
+						DoLR has back forwarded this PPR. Please modify the data as per the remarks, then forward it
+						again.
+					</div>
+					<a th:href="@{/modifyPprTransaction(tranxId=${selectedProject},projectname=${selectedProjectName})}"
+						class="btn btn-warning" onclick="return confirm('Do you want to Modify Rejected PPR.');">
+						<i class="fas fa-edit"></i> Modify PPR
+					</a>
+
+				</div>
 
 				<form id="forwardPPRForm" th:action="@{/forwardViewPPR}" method="post">
 
@@ -2253,7 +2415,8 @@
 							</label>
 						</div>
 						<div class="col-md-4">
-							<select class="form-select" id="userid" name="userid" th:disabled="${!allSectionsFilled or alreadyForwarded}" required>
+							<select class="form-select" id="userid" name="userid"
+								th:disabled="${!allSectionsFilled or alreadyForwarded}" required>
 								<option value="">--Select User-ID--</option>
 								<option th:each="u : ${userList}" th:value="${u.regId}" th:text="${u.userId}">
 								</option>
@@ -2261,7 +2424,8 @@
 							<div class="invalid-feedback">Please select User-ID.</div>
 						</div>
 						<div class="col-md-4">
-							<button type="submit" class="btn btn-primary" th:disabled="${!allSectionsFilled or alreadyForwarded}">
+							<button type="submit" class="btn btn-primary"
+								th:disabled="${!allSectionsFilled or alreadyForwarded}">
 								Forward
 							</button>
 						</div>
