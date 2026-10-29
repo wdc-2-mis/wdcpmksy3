@@ -772,7 +772,7 @@
 
 		    // Give each selection a unique request number
 		    const currentRequest = ++villageCheckRequest;
-
+			const draftBtn = document.getElementById("saveDraftBtn");
 		    fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(projectId))
 		        .then(response => response.text())
 		        .then(result => {
@@ -781,11 +781,11 @@
 		            if (currentRequest !== villageCheckRequest) return;
 
 		            if (result.trim() === "EXISTS") {
-		                proj.value = "";
-		                setInvalid(proj,
-		                    "This PPR data already Forward/Approved. Please select a different PPR Project.");
+						draftBtn.disabled = true;
+		                setInvalid(proj, "This PPR data already Forward/Approved. Please select a different PPR Project.");
 		            } else {
 		                setValid(proj);
+						draftBtn.disabled = false;
 		            }
 		        })
 		        .catch(error => console.error(error));
@@ -1096,7 +1096,7 @@
 							</div>
 							
 						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning" th:disabled="${!existssl}">
+							<button type="submit" name="action" id="saveDraftBtn" value="D" class="btn btn-warning" th:disabled="${!existssl}">
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>

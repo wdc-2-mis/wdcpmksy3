@@ -83,13 +83,13 @@ public class ViewConfirmDPRPlan {
         if(project!=null) {	
 		List<Object[]> list =plan.getDprNrmProjectPlanComplitedList(project);
 		allnrm = list.stream().anyMatch(row -> "D".equals(String.valueOf(row[5])));
-		//System.out.println("kdy1"+allnrm);
+		System.out.println("kdy1"+allnrm);
 		List<Object[]> listelp =plan.getDprELPProjectPlanCompletedList(project);
 		allelp = listelp.stream().anyMatch(row -> "D".equals(String.valueOf(row[9])));
-		//System.out.println("kdy2"+allelp);
+		System.out.println("kdy2"+allelp);
 		List<DprOtherDtl> otheract=other.findCompletedOtherDtlByPprId(project);
 		alloth= otheract.stream().anyMatch(row -> "D".equals(String.valueOf(row.getStatus())));
-		//System.out.println("kdy3"+alloth);
+		System.out.println("kdy3"+alloth);
 		if(list!=null && !list.isEmpty()) {
 	        int srNo = 1;
 	        Integer previousId = null;
@@ -112,7 +112,7 @@ public class ViewConfirmDPRPlan {
 	    }
 		
 	    exists=plan.existsApprovedDprByPprId(project);
-	 //   System.out.println("kdy4"+exists);
+	    System.out.println("kdy4"+exists);
 	    model.addAttribute("existssl", exists);
 	    model.addAttribute("dprNrmProjectPlanList", finalList);
         model.addAttribute("dprELPList", listelp);
@@ -120,12 +120,18 @@ public class ViewConfirmDPRPlan {
         model.addAttribute("projList", tranrepo.findPprByDcodeAndActionA(district));
         }
         
-        boolean complete = false;
-        if (!allnrm && !allelp && !alloth && exists) {
-            complete = true;
-           // System.out.println("kdy5"+complete);
+        boolean complete = true;
+        if (!allnrm && !allelp && !alloth) {
+        	if(!exists) {
+        		complete = false;
+        		System.out.println("kdy5"+complete);
+        	}
+        	else {
+        		complete = true;
+        		System.out.println("kdy6"+complete);
+        	}
         }
-
+        
         model.addAttribute("complete", complete);
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
         model.addAttribute("selectedDcode", district);
