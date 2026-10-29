@@ -85,6 +85,7 @@
     <div class="invalid-feedback">
         Please select Project.
     </div>
+    <div id="projectAlert" class="text-danger mt-2"></div>
 
 </div>
 
@@ -265,7 +266,7 @@
 
 <!-- Save Button -->
 <div class="text-center mt-4">
-    <button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted}">
+    <button type="submit" name="action" value="D" id = "saveBtn" class="btn btn-warning" th:disabled="${!pprCompleted}">
         <i class="fas fa-save"></i> Save As Draft
     </button>
 </div>
@@ -860,6 +861,8 @@ function filterFloodDroughtRecords() {
 }
 
 function loadVillages(projectId) {
+const projAlert = document.getElementById("projectAlert");
+const saveBtn = document.getElementById("saveBtn");
 
     village.innerHTML =
         '<option value="">--Select Village--</option>';
@@ -877,6 +880,25 @@ function loadVillages(projectId) {
         "Loading villages for Project ID:",
         projectId
     );
+    
+    fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(projectId))
+    .then(response => response.text())
+    .then(result => {
+        console.log("Response:", result);
+
+        result = result.trim();
+
+        if (result === "EXISTS") {
+            this.value = "";
+            projAlert.textContent =
+                "This PPR data already Forward/Approved. Please select a different PPR Project";
+            saveBtn.disabled = true;
+        } else {
+            projAlert.textContent = "";
+            saveBtn.disabled = false;
+        }
+    })
+    .catch(error => console.error(error));
 
 fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(projectId))
 				.then(response => response.text())
@@ -891,6 +913,9 @@ fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(projectId))
 					}
 				})
 				.catch(error => console.error(error));
+				
+				
+				
 				
 
     fetch(

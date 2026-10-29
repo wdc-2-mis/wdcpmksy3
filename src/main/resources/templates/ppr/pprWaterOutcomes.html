@@ -408,7 +408,7 @@ district.addEventListener("change", function () {
     // =========================================================
 
     fetch(
-        "/getProjectsByDistrictLandPattern?dcode=" +
+        "/getProjectsByDistrictPPR10?dcode=" +
         encodeURIComponent(districtId)
     )
 
@@ -492,6 +492,28 @@ district.addEventListener("change", function () {
         if (pprId === "") {
             return;
         }
+
+const projAlert = document.getElementById("projectAlert");
+const saveBtn = document.getElementById("saveDraftButton");
+
+ fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(pprId))
+    .then(response => response.text())
+    .then(result => {
+        console.log("Response:", result);
+
+        result = result.trim();
+
+        if (result === "EXISTS") {
+            this.value = "";
+            projAlert.textContent =
+                "This PPR data already Forward/Approved. Please select a different PPR Project";
+            saveBtn.disabled = true;
+        } else {
+            projAlert.textContent = "";
+            saveBtn.disabled = false;
+        }
+    })
+    .catch(error => console.error(error));
 
 fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(pprId))
 				.then(response => response.text())
@@ -1020,6 +1042,8 @@ loadWaterOutcomeRecords("");
     <div class="invalid-feedback">
         Please select Project.
     </div>
+    
+    <div id="projectAlert" class="text-danger mt-2"></div>
 </div>
 				</div>
 				

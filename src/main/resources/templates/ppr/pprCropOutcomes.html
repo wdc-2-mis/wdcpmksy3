@@ -217,7 +217,7 @@ function updatePendingUCButton() {
 loadCropOutcomeRecords(districtId, "");
 updatePendingUCButton();
 
-       fetch("/getProjectsByDistrictLandPattern?dcode=" + districtId)
+       fetch("/getProjectsByDistrictPPR10?dcode=" + districtId)
 
         .then(response => {
 
@@ -467,12 +467,13 @@ function checkExistingCropSeason() {
     project.addEventListener("change", function () {
 
     const projectId = this.value;
-
+const saveBtn = document.getElementById("saveDraftBtn");
     console.log("Project selected:", projectId);
 
     const existingRow = cropTable.querySelector("tr");
     loadCropOutcomeRecords(district.value, projectId);
     checkExistingCropSeason();
+    const projAlert = document.getElementById("projectAlert");
 
     if (!existingRow) {
         console.error("Crop row not found");
@@ -512,6 +513,41 @@ function checkExistingCropSeason() {
 
         return;
     }
+    
+    
+    fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(projectId))
+    .then(response => response.text())
+    .then(result => {
+        console.log("Response:", result);
+
+        result = result.trim();
+
+        if (result === "EXISTS") {
+            
+            projAlert.textContent =
+                "This PPR data already Forward/Approved. Please select a different PPR Project";
+            saveBtn.disabled = true;
+            return;
+        } else {
+            projAlert.textContent = "";
+            saveBtn.disabled = false;
+        }
+    })
+    .catch(error => console.error(error));
+    
+    fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(projectId))
+				.then(response => response.text())
+				.then(result => {
+					const errorDiv = document.getElementById("villagePprError");
+					if (result === "NOTEXISTS") {
+						errorDiv.style.display = "block";
+						setInvalid(village, "This PPR Village Data not EXISTS in Project at a Glance form. ");
+					} else {
+						errorDiv.style.display = "none";
+						setValid(village);
+					}
+				})
+				.catch(error => console.error(error));
 
   fetch("/getUsedCropsByPpr?pprId=" + encodeURIComponent(projectId))
         .then(response => {
@@ -820,6 +856,20 @@ document.addEventListener("click", function (e) {
 			<a th:if="${pprCompleted != null and !pprCompleted}" th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3"> Go to Preliminary Project Report </a>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
+		
+		<div id="villagePprError"  class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
+			<i class="fas fa-exclamation-triangle me-2"></i>
+					
+						<strong>Action Required:</strong>
+						Village Data not EXISTS for Selected PPR
+						<a th:href="@{/pprProjectAtGlance}" class="btn btn-sm btn-primary ms-3">
+							Go to Project at a Glance
+						</a>
+					
+						<button type="button" class="btn-close" data-bs-dismiss="alert">
+						</button>
+		</div>
+		
 
 		<div class="card-body">
 
@@ -849,6 +899,7 @@ document.addEventListener("click", function (e) {
 							   <option value="">--Select Project--</option>
 						</select>
 						<div class="invalid-feedback">Please select Project.</div>
+						<div id="projectAlert" class="text-danger mt-2"></div>
 					</div>
 				</div>
 		

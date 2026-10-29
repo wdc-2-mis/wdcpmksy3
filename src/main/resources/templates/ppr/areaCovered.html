@@ -102,6 +102,7 @@
         <div class="invalid-feedback">
             Please select a Project.
         </div>
+        <div id="projectAlert" class="text-danger mt-2"></div>
     </div>
 
 </div>
@@ -235,7 +236,7 @@
                 </div>	
 				
 				<div class="text-center mt-4">
-								<button type="submit" name="action"  value="D"  class="btn btn-warning" th:disabled="${!pprCompleted}">
+								<button type="submit" name="action"  value="D" id = "saveBtn" class="btn btn-warning" th:disabled="${!pprCompleted}">
 								      <i class="fas fa-save"></i>
 								      Save as Draft
 								</button>
@@ -554,15 +555,7 @@ function loadProjects(districtId, projectToSelect = null) {
         return;
     }
 
-    console.log(
-        "Loading projects for district:",
-        districtId
-    );
-
-    console.log(
-        "Project to auto-select:",
-        projectToSelect
-    );
+    
 
     fetch(
         '/getProjectsByDistrictPPR10?dcode=' +
@@ -603,16 +596,11 @@ function loadProjects(districtId, projectToSelect = null) {
                 return;
             }
 
-            /*
-             * Clear existing project options
-             */
+        
             project.innerHTML =
                 '<option value="">--Select Project--</option>';
 
 
-            /*
-             * Populate Project dropdown
-             */
             data.forEach(function (item) {
 
                 const option =
@@ -629,10 +617,6 @@ function loadProjects(districtId, projectToSelect = null) {
             });
 
 
-            /*
-             * Automatically select Project
-             * when coming from previous page
-             */
             if (
                 projectToSelect !== null &&
                 projectToSelect !== undefined &&
@@ -648,13 +632,6 @@ function loadProjects(districtId, projectToSelect = null) {
                 );
 
 
-                /*
-                 * Load Project statistics
-                 *
-                 * This will populate:
-                 * Total Micro-Watershed
-                 * Micro-Watershed dropdown
-                 */
                 if (
                     project.value ===
                     String(projectToSelect)
@@ -1658,6 +1635,28 @@ let validationMessage = "";
 
 function loadProjectStats(pprId) {
 
+const projAlert = document.getElementById("projectAlert");
+const saveBtn = document.getElementById("saveBtn");
+
+ fetch('/checkPPRTransctionExists?pprid=' + encodeURIComponent(pprId))
+    .then(response => response.text())
+    .then(result => {
+        console.log("Response:", result);
+
+        result = result.trim();
+
+        if (result === "EXISTS") {
+            this.value = "";
+            projAlert.textContent =
+                "This PPR data already Forward/Approved. Please select a different PPR Project";
+            saveBtn.disabled = true;
+        } else {
+            projAlert.textContent = "";
+            saveBtn.disabled = false;
+        }
+    })
+    .catch(error => console.error(error));
+		        
     fetch('/projectStats/' + encodeURIComponent(pprId))
         .then(response => {
 

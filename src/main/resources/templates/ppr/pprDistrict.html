@@ -515,7 +515,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 </div>
-                        <div th:if="${rec.status != 'C'}">
+                        <div th:if="${rec.status != 'C' and pprStatusMap[rec.pprId] != 'PPR Approved'}">
 
     <!-- Edit -->
     <a href="javascript:void(0)"
