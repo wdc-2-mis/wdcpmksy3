@@ -326,14 +326,18 @@
 			head.selectedIndex = 0;
 			const activity = document.getElementById("activity");
 			activity.selectedIndex = 0;
+			const draftBtn = document.getElementById("saveDraftBtn");
+			
 			fetch('/checkDPRProjectDataApproved?pprid=' + encodeURIComponent(project))
 				.then(response => response.text())
 				.then(result => {
 					if (result === "EXISTS") {
 						this.value = "";
+						draftBtn.disabled = true;
 						setInvalid(proj, "This Project DPR NRM Activity already Approved. Please select a different Project.");
 					} else {
 						setValid(proj);
+						draftBtn.disabled = false;
 					}
 				})
 				.catch(error => console.error(error));
@@ -718,6 +722,10 @@
 			<span th:text="${success}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
+		<div th:if="${warning}" class="alert alert-warning alert-dismissible fade show" role="alert">
+			<span th:text="${warning}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
 		    <span th:text="${error}"></span>
 		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -784,19 +792,9 @@
 							<div id="targetError" class="text-danger"></div>
 							
 						</div>
-				       	
-					<!--	<div class="col-md-6">
-							<input type="text" name="target" id="target" class="form-control" style="height:40px; width: 300px;"
-								 inputmode="decimal" maxlength="10" required>
-							<div class="invalid-feedback">Please Enter Target</div>
-							<div id="targetError" class="text-danger"></div>
-						</div>-->
-				       			 
-						 	
 				</div>
-				
 						<div class="text-center mt-4">
-							<button type="submit" name="action"  value="D" class="btn btn-warning" >
+							<button type="submit" name="action" id="saveDraftBtn" value="D" class="btn btn-warning" th:disabled="${!pprApproved}">
 							      <i class="fas fa-save"></i>
 							      Save as Draft
 							</button>

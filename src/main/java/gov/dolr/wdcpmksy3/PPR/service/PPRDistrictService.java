@@ -282,15 +282,17 @@ return "Error updating record: " + e.getMessage();
 			MPpr mp= pprRepo.getReferenceById(pprid);
 			WdcpmksyUserReg regfrm=ur.getReferenceById(loginregid.longValue());
 			WdcpmksyUserReg regto=ur.getReferenceById(regid.longValue());
-			PprTransaction ub=new PprTransaction();
 			
+			PprTransaction ub=new PprTransaction();
 			ub.setPpr(mp);
 			ub.setAction('F');
 			ub.setSentFrom(regfrm);
 			ub.setSentTo(regto);
 			ub.setSenton(LocalDateTime.now());
-			
 			trans.save(ub);
+			
+			mp.setStatus("F");
+			pprRepo.save(mp);
 			
 			st=true;
 			

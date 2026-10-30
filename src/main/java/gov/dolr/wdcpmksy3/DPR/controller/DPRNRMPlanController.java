@@ -93,10 +93,10 @@ public class DPRNRMPlanController {
             previousId = currentId;
         }
         }
-     //   boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A"));
-    //    model.addAttribute("pprApproved", pprApproved);
-	//    if (pprApproved) 
-	 //       model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR NRM Activity Target.");
+        boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A"));
+        model.addAttribute("pprApproved", pprApproved);
+	    if (!pprApproved) 
+	        model.addAttribute("warning", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR NRM Activity Target.");
         model.addAttribute("selectedDistrict", dcode);
         model.addAttribute("dprNrmProjectPlanList", finalList);
         model.addAttribute("headList", head.findAllByOrderBySeqNoAsc());
@@ -204,7 +204,7 @@ public class DPRNRMPlanController {
 	public ResponseEntity<String> getUnitDescByActivity(@RequestParam("actId") Integer actId) {
 
 	    String unitDesc = actrepo.findUnitDescByActivityCode(actId);
-	    System.out.println("kdy"+unitDesc);
+	  //  System.out.println("kdy"+unitDesc);
 	    if (unitDesc == null) {
 	        return ResponseEntity.notFound().build();
 	    }
