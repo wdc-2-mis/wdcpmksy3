@@ -40,9 +40,7 @@
 					window.location.href = "/pprProjectAtGlance";
 				}
 			});
-		});
-		
-	document.addEventListener("DOMContentLoaded", function () {
+
 		const blockElement = document.getElementById("block");
 		const gpElement = document.getElementById("grampanchayat");
 		const villageElement = document.getElementById("villages");
@@ -162,11 +160,7 @@
 				        console.error("Error loading villages:", error);
 				    });
 			});
-		});
-	
-	
-	
-	document.addEventListener("DOMContentLoaded", function () {
+			
 	    document.querySelectorAll(".editBtn").forEach(function (btn) {
 	        btn.addEventListener("click", function () {
 	            const id = this.getAttribute("data-id");
@@ -182,7 +176,7 @@
 	                    console.log("Edit data:", data);
 	                    // Basic values
 	                    document.getElementById("editPprProjectGlanceId").value = data.pprProjectGlanceId;
-	                    document.getElementById("editPprId").value = data.pprId;
+	                    document.getElementById("pprId").value = data.pprId;
 						document.getElementById("editProject").value = data.project;
 						document.getElementById("editBlock").value = data.block;
 	                    document.getElementById("editSelectionReason").value = data.selectionReason;
@@ -321,12 +315,7 @@
 	            console.error("Error loading villages:", error);
 	        });
 	    }
-	});
 	
-	// =========================
-	// FORM VALIDATION
-	// =========================
-	document.addEventListener("DOMContentLoaded", function () {
 		const selectionReason = document.getElementById("selectionReason");
 		const editSelectionReason = document.getElementById("editSelectionReason");
 		if (selectionReason) {
@@ -565,24 +554,72 @@
 	            }
 	        });
 	    }
-	});
-	
-	document.addEventListener("DOMContentLoaded", function () {
-			document.getElementById("villages").addEventListener("change", function () {
-				const selectedNames = Array.from(this.selectedOptions).map(option => option.text).join(", ");
-				document.getElementById("villagesDisplay").textContent = selectedNames;
+		const watershed = document.getElementById("mwId");
+		const editWatershed = document.getElementById("editMicroWatershed");
+		const villagesElement = document.getElementById("villages");
+		const projectElement = document.getElementById("project");
+		const editVillageElement = document.getElementById("editVillage");
+		
+		async function checkProjectGlanceExists(changedField) {
+			const mwId = watershed.value;
+			const villages = Array.from(villagesElement.selectedOptions).map(option => option.value);
+			const pprid = document.getElementById("pprId").value;
+			// Check only when all three values are selected
+			if (!mwId || !villages) {
+				removeError(watershed);
+				removeError(villagesElement);
+				return;
+			}
+			const params = new URLSearchParams();
+			params.append("pprid", pprid);
+			params.append("mwId", mwId);
+			villages.forEach(village => {
+				params.append("villages", village);
 			});
-		});
-
-	document.addEventListener("DOMContentLoaded", function () {
-		document.getElementById("editVillage").addEventListener("change", function () {
-			const selectedNames = Array.from(this.selectedOptions).map(option => option.text).join(", ");
-			document.getElementById("editVillageDisplay").textContent = selectedNames;
-		});
-	});
-
-	
-	document.addEventListener("DOMContentLoaded", function () {
+			fetch('/checkMwIdAndVcodesExistsInProjectGlance?' + params.toString())
+				.then(response => {
+					if (!response.ok) {
+						throw new Error("Request failed: " + response.status);
+					}
+					return response.text();
+				})
+				.then(result => {
+					if (result.trim() === "EXISTS") {
+						watershed.value = "";
+						villagesElement.selectedIndex = -1;
+						showError(changedField, "This Micro Watershed and Village combination is already saved for this project. Please select a different combination.");
+					} else {
+						removeError(watershed);
+						removeError(villagesElement);
+					}
+				})
+				.catch(error => console.error(error));
+		}
+			if (villagesElement) {
+				villagesElement.addEventListener("change", function () {
+					const selectedNames = Array.from(this.selectedOptions).map(option => option.text).join(", ");
+					document.getElementById("villagesDisplay").textContent = selectedNames;
+					checkProjectGlanceExists(villagesElement);
+				});
+			}
+			if (watershed) {
+				watershed.addEventListener("change", function () {
+					checkProjectGlanceExists(watershed);
+				});
+			}
+			if(editVillageElement){
+				editVillageElement.addEventListener("change", function () {
+					const selectedNames = Array.from(this.selectedOptions).map(option => option.text).join(", ");
+					document.getElementById("editVillageDisplay").textContent = selectedNames;
+					checkProjectGlanceExists(editVillageElement);
+				});
+			}
+			if(editWatershed){
+				editWatershed.addEventListener("change", function () {
+					checkProjectGlanceExists(editWatershed);
+				});
+			}
+			
 			const nextBtn = document.getElementById("nextBtn");
 			if (nextBtn) {
 				nextBtn.addEventListener("click", function () {
@@ -888,7 +925,7 @@
 		                    <!-- ID -->
 		                    <input type="hidden" id="editPprProjectGlanceId" name="pprProjectGlanceId">
 		                    <!-- PPR ID -->
-		                    <input type="hidden" id="editPprId" name="pprId">
+		                    <input type="hidden" id="pprId" name="pprId">
 		                    <!-- Project -->
 		                    <div class="row mb-3 align-items-center">
 		                        <label class="col-md-4 fw-bold"> Name of the Project </label>

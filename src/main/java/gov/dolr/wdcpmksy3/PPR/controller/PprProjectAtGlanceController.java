@@ -2,6 +2,9 @@ package gov.dolr.wdcpmksy3.PPR.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +24,7 @@ import gov.dolr.wdcpmksy3.PPR.dto.VillageDropdownDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.MicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.entity.PprProjectGlance;
+import gov.dolr.wdcpmksy3.PPR.entity.PprVillage;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
@@ -233,6 +237,34 @@ public class PprProjectAtGlanceController {
 	    }
          return "redirect:/viewPPR";
     }
+	
+	@GetMapping("/checkMwIdAndVcodesExistsInProjectGlance")
+	@ResponseBody
+	public String checkMwIdAndVcodesExistsInProjectGlance(@RequestParam("pprid") Integer pprid, 
+			@RequestParam(required = false) Integer mwId, @RequestParam(required = false) List<Integer> villages) {
+		if (pprid == null || mwId == null || villages == null) 
+	        return "NOT_EXISTS";
+		MPpr ppr = mPprRepo.getById(pprid);
+		List<PprProjectGlance> pprProjectGlanceList = pprProjectGlanceRepo.getListOfPprProjectGlanceByPprOrderByStatusDesc(ppr);
+		boolean exists = false;	
+//		boolean anyExists = false;
+//		for(Integer vcode : villages){
+//			anyExists = pprProjectGlanceList.stream().filter(Objects::nonNull).anyMatch(obj -> obj.getVillages() != null && obj.getVillages().contains(vcode) 
+//					&& obj.getMicroWatershed() != null && mwId.equals(obj.getMicroWatershed().getMwId()));
+//			if(anyExists)
+//				exists = anyExists;
+//		}
+		exists = pprProjectGlanceList.stream().filter(Objects::nonNull).anyMatch(obj -> {
+			        if (obj.getMicroWatershed() == null || !Objects.equals(mwId, obj.getMicroWatershed().getMwId()) || obj.getVillages() == null) {
+			            return false;
+			        }
+			        Set<Integer> existingVcodes = obj.getVillages().stream().filter(Objects::nonNull).map(PprVillage::getVillage)
+			        		.filter(Objects::nonNull).map(MVillage::getVcode).filter(Objects::nonNull).collect(Collectors.toSet());
+			        return existingVcodes.containsAll(villages);
+			    });
+
+	    return exists ? "EXISTS" : "NOT_EXISTS";
+	}
 	
 
 }

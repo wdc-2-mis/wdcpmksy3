@@ -171,11 +171,11 @@ public class PprProposedProjectService {
 	    criteriaDetailsRepo.saveAll(criteriaDetails);
 	}
 	
-	public boolean existsByDistrictAndMicroWatershed(
-	        String district,
+	public boolean existsByProjectAndMicroWatershed(
+	        Integer project,
 	        Integer microWatershed) {
 
-	    return repository.existsByPprDistrictDcodeAndMicroWatershedMwId(district,microWatershed);
+	    return repository.existsByPprPprIdAndMicroWatershedMwId(project,microWatershed);
 	}
 	
 	@Transactional

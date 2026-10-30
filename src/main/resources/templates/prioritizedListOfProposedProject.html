@@ -51,10 +51,12 @@
 	
 	document.addEventListener("DOMContentLoaded", function () {
 	    const districtElement = document.getElementById("district");
+		const projectElement = document.getElementById("project");
 	    const microWatershedElement = document.getElementById("microWatershed");
 	    const microWatershedCodeElement = document.getElementById("microWatershedCode");
 	    microWatershedElement.addEventListener("change", function () {
 	        const district = districtElement.value;
+			const project = projectElement.value;
 	        const mwId = this.value;
 	        if (!mwId) {
 	            microWatershedCodeElement.value = "";
@@ -70,7 +72,7 @@
 	        .then(code => {
 	            // Set Micro-watershed code
 	            microWatershedCodeElement.value = code || "";
-	            return fetch("/checkPprProposedProjectExists" +"?district=" + encodeURIComponent(district) + "&microWatershed=" + encodeURIComponent(mwId));
+	            return fetch("/checkPprProposedProjectExists" +"?project=" + encodeURIComponent(project) + "&microWatershed=" + encodeURIComponent(mwId));
 	        })
 	        .then(response => {
 	            if (!response.ok) {
@@ -84,7 +86,7 @@
 						microWatershedElement.classList.add("is-invalid");
 						const error = document.createElement("div");
 						error.className = "validation-error";
-						error.innerText = "This Micro-watershed is already saved for the selected District.";
+						error.innerText = "This Micro-watershed is already saved for the selected Project.";
 						microWatershedElement.parentNode.appendChild(error);
 						microWatershedElement.focus();
 						//	                alert("This Micro-watershed is already saved for the selected District.");

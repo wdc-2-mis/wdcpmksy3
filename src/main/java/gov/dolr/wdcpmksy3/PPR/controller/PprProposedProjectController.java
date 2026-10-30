@@ -249,8 +249,8 @@ public class PprProposedProjectController {
 
 	@GetMapping("/checkPprProposedProjectExists")
 	@ResponseBody
-	public Map<String, Object> checkPprProposedProjectExists(@RequestParam String district, @RequestParam Integer microWatershed) {
-	    boolean exists = proposedProjectService.existsByDistrictAndMicroWatershed(district, microWatershed);
+	public Map<String, Object> checkPprProposedProjectExists(@RequestParam Integer project, @RequestParam Integer microWatershed) {
+	    boolean exists = proposedProjectService.existsByProjectAndMicroWatershed(project, microWatershed);
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("exists", exists);
 	    return response;
