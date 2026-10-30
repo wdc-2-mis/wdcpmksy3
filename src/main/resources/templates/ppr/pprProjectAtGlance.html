@@ -327,6 +327,34 @@
 	// FORM VALIDATION
 	// =========================
 	document.addEventListener("DOMContentLoaded", function () {
+		const selectionReason = document.getElementById("selectionReason");
+		const editSelectionReason = document.getElementById("editSelectionReason");
+		if (selectionReason) {
+		    selectionReason.addEventListener("blur", function () {
+		        validateSelectionReason(this);
+		    });
+		}
+		if (editSelectionReason) {
+		    editSelectionReason.addEventListener("blur", function () {
+		        validateSelectionReason(this);
+		    });
+		}
+		function validateSelectionReason(field) {
+			const value = field.value.trim();
+			if (value === "") {
+				showError(field, "Please enter Reason for Selection of watershed.");
+				//					field.focus();
+				return false;
+			}
+			if (value.length < 4) {
+				showError(field, "Length of the Reason for Selection of watershed should be more than 3 Characters.");
+				field.value = "";
+				return false;
+			}
+			removeError(field);
+			return true;
+		}
+		
 	    function showError(field, message) {
 	        if (!field) {
 	            return;
@@ -453,7 +481,7 @@
 	        if (!validateSelect(document.getElementById("mwId"), "Please select Micro-Watershed.")) {
 	            return false;
 	        }
-	        if (!validateRequiredField(document.getElementById("selectionReason"), "Please enter Reason for Selection of Watershed.")) {
+	        if (!validateSelectionReason(document.getElementById("selectionReason"))) {
 	            return false;
 	        }
 	        if (!validateDecimalField(document.getElementById("projectArea"), "Please enter Area of Project.")) {
@@ -493,7 +521,7 @@
 	        if (!validateSelect(document.getElementById("editMicroWatershed"), "Please select Micro-Watershed.")) {
 	            return false;
 	        }
-	        if (!validateRequiredField(document.getElementById("editSelectionReason"), "Please enter Reason for Selection of Watershed.")) {
+	        if (!validateSelectionReason(document.getElementById("editSelectionReason"))) {
 	            return false;
 	        }
 	        if (!validateDecimalField(document.getElementById("editProjectArea"), "Please enter Area of Project.")) {
@@ -627,6 +655,7 @@
 								<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
 									th:selected="${pprId != null and pprId == p.pprId}"> </option>
 							</select>
+							<div class ="validation-error text-danger small mt-1" th:text="${approvedOrForwordedMsg}"></div>
 						</div>
 					</div>
 
@@ -733,7 +762,7 @@
 					</div>
 
 					<div class="text-center mt-4">
-						<button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted}">
+						<button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted || approvedOrForworded}">
 					         <i class="fas fa-save"></i>
 					          Save As Draft
 					     </button>

@@ -24,6 +24,7 @@ import gov.dolr.wdcpmksy3.PPR.entity.PprMicroWatershed;
 import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.MicroWatershedRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PPRMigrationDetailsRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.PprProjectGlanceRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.PPR.service.PPRLandPatternAreaService;
 import gov.dolr.wdcpmksy3.PPR.service.PPRMigrationDetailsService;
@@ -59,7 +60,7 @@ public class PreliminaryPPR15AController {
 	private MicroWatershedRepository microWatershedRepo;
 	
 	@Autowired
-	private PprTransactionRepository transrepo;
+	private PprProjectGlanceRepository pgrepo;
 	
 	@GetMapping("/preliminaryPPR15")
 	public String preliminaryPPR15(@RequestParam(required = false) Integer dcode, HttpSession session, Model model, 
@@ -79,6 +80,8 @@ public class PreliminaryPPR15AController {
         model.addAttribute("pprCompleted", pprCompleted);
 	    if (!pprCompleted) 
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Migration Details.");
+	    boolean approvedOrForworded = false;
+	    boolean projectGlanceCompleted = true;
 	    if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
 			List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatus(dcode);
@@ -88,10 +91,17 @@ public class PreliminaryPPR15AController {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	        		pprMigrationDtlList = pprMigrationDetailsRepository.findByPprPprIdOrderByStatusDesc(project);
 	        		List<String> status = List.of("A","F");
-	        		boolean approvedOrForworded = mPprRepo.existsByPprIdAndStatusIn(project, status);
-	        		model.addAttribute("pprCompleted", !approvedOrForworded);
+	        		approvedOrForworded = mPprRepo.existsByPprIdAndStatusIn(project, status);
+	        		
 	        	    if (approvedOrForworded) 
-	        	        model.addAttribute("approvedOrForworded", "This PPR data already Forward/Approved. Please select a different PPR Project.");
+	        	        model.addAttribute("approvedOrForwordedMsg", "This PPR data already Forward/Approved. Please select a different PPR Project.");
+	        	    projectGlanceCompleted  = pgrepo.existsCompletedByPprId(project);
+	        	    if(!projectGlanceCompleted) {
+	        	    	model.addAttribute("error", "Village Data not EXISTS for Selected PPR. First Complete Project at a Glance Data");
+	        	    	model.addAttribute("pgCompletedMsg", "This PPR Village Data not EXISTS in Project at a Glance form.");
+	        	    }
+	        	    	
+	        	    model.addAttribute("projectGlanceCompleted", projectGlanceCompleted);
 	        		model.addAttribute("pprId", project);
 		            model.addAttribute("project", ppr.getProjectName());
 		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
@@ -102,6 +112,8 @@ public class PreliminaryPPR15AController {
 	    }
 	    if(dcode == null && project == null)
 	    	pprMigrationDtlList = pprMigrationDetailsRepository.findPPRMigrationDetailsBystCode(stcode);
+	    model.addAttribute("approvedOrForworded", approvedOrForworded);
+	    model.addAttribute("projectGlanceCompleted", projectGlanceCompleted);
 	    model.addAttribute("statename", statename);
 	    model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
 	    model.addAttribute("draftList", pprMigrationDtlList);

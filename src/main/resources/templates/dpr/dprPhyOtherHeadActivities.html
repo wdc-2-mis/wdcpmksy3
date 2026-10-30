@@ -410,7 +410,7 @@
 								<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
 									th:selected="${pprId != null and pprId == p.pprId}"> </option>
 							</select>
-							<div class="validation-error" data-error-for="project"></div>
+							<div class="validation-error" data-error-for="project" th:text="${approvedDprMsg}"></div>
 						</div>
 					</div>
 
@@ -446,7 +446,7 @@
 					</div>										
 
 					<div class="text-center mt-4">
-						<button type="submit" id="saveButton" name="action" value="D" class="btn btn-warning" th:disabled="${!pprApproved}">
+						<button type="submit" id="saveButton" name="action" value="D" class="btn btn-warning" th:disabled="${!pprApproved || approvedDpr}">
 					         <i class="fas fa-save"></i>
 					          Save As Draft
 					     </button>

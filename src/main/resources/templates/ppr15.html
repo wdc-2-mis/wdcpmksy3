@@ -47,20 +47,7 @@
 			project.addEventListener("change", function () {
 				let village = document.getElementById("village");
 				if (this.value) {
-					fetch('/checkProjectGlanceByPPRIDExists?pprid=' + encodeURIComponent(this.value))
-					.then(response => response.text())
-					.then(result => {
-						const errorDiv = document.getElementById("villagePprError");
-						if (result === "NOTEXISTS") {
-							errorDiv.style.display = "block";
-							showFieldError(village, "This PPR Village Data not EXISTS in Project at a Glance form.");
-						} else {
-							errorDiv.style.display = "none";
-							clearFieldError(village);
-							window.location.href = "/preliminaryPPR15?dcode=" + district.value + "&&project=" + this.value;
-						}
-					})
-					.catch(error => console.error(error));
+					window.location.href = "/preliminaryPPR15?dcode=" + district.value + "&&project=" + this.value;
 				} else {
 					window.location.href = "/preliminaryPPR15";
 				}
@@ -353,24 +340,16 @@
 					<span th:text="${success}"></span>
 					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 				</div>
-				<div id="villagePprError"  class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
-					<i class="fas fa-exclamation-triangle me-2"></i>
-							
-								<strong>Action Required:</strong>
-								Village Data not EXISTS for Selected PPR
-								<a th:href="@{/pprProjectAtGlance}" class="btn btn-sm btn-primary ms-3">
-									Go to Project at a Glance
-								</a>
-							
-								<button type="button" class="btn-close" data-bs-dismiss="alert">
-								</button>
-				</div>
 				<div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
 					<i class="fas fa-exclamation-triangle me-2"></i>
 					<strong th:if="${!pprCompleted}">Action Required:</strong>
+					<strong th:if="${!projectGlanceCompleted}" >Action Required:</strong>
 					<span th:text="${error}"></span>
 					<a th:href="@{/pprDistrict}" class="btn btn-sm btn-primary ms-3" th:if="${!pprCompleted}">
 						Go to Preliminary Project Report
+					</a>
+					<a th:href="@{/pprProjectAtGlance}" class="btn btn-sm btn-primary ms-3" th:if="${!projectGlanceCompleted}">
+						Go to Project at a Glance
 					</a>
 					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 				</div>
@@ -411,7 +390,7 @@
 									<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
 										th:selected="${pprId != null and pprId == p.pprId}"> </option>
 								</select>
-								<div class="field-error" th:text="${approvedOrForworded}"></div>
+								<div class="field-error" th:text="${approvedOrForwordedMsg}"></div>
 							</div>
 							<div class="col-md-2">
 								<label class="form-label fw-semibold">Micro Watershed Name:</label><span
@@ -435,7 +414,7 @@
 								    <option value="">--Select Village--</option>
 									<option th:each="v : ${villageList}" th:value="${v.vcode}" th:text="${v.villageName}"></option>
 								</select>
-								<div class="field-error"></div>
+								<div class="field-error" th:text="${pgCompletedMsg}"></div>
 							</div>
 						</div>
 						<!-- Row 3 -->
@@ -467,7 +446,7 @@
 								<label class="form-label fw-semibold">Major reason for Migration<span class="text-danger">*</span></label>
 							</div>
 							<div class="col-md-4">
-								<input type="text" class="form-control form-control-sm" id="migrationReason" name="migrationReason" maxlength="255" minlength="4" autocomplete="off" required>>
+								<input type="text" class="form-control form-control-sm" id="migrationReason" name="migrationReason" maxlength="255">
 								<div class="field-error"></div>
 							</div>
 						</div>
@@ -483,7 +462,7 @@
 							</div>
 						</div>
 						<div class="text-center mt-4">
-							<button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted}">
+							<button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted || approvedOrForworded || !projectGlanceCompleted}">
 								<i class="fas fa-save"></i>
 								Save As Draft
 							</button>

@@ -83,6 +83,7 @@ public class PprProjectAtGlanceController {
         model.addAttribute("pprCompleted", pprCompleted);
 	    if (!pprCompleted) 
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Project at a Glance.");
+	    boolean approvedOrForworded = false;
 		if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
 			List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatus(dcode);
@@ -92,6 +93,9 @@ public class PprProjectAtGlanceController {
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	        		pprProjectGlanceList = pprProjectGlanceRepo.getListOfPprProjectGlanceByPprOrderByStatusDesc(ppr);
+	        		approvedOrForworded = mPprRepo.existsByPprIdAndStatusIn(project, List.of("A","F"));
+	        	    if (approvedOrForworded) 
+	        	        model.addAttribute("approvedOrForwordedMsg", "This PPR data already Forward/Approved. Please select a different PPR Project.");
 	        		model.addAttribute("pprId", project);
 		            model.addAttribute("project", ppr.getProjectName());
 		            model.addAttribute("microWatershedList", microWatershedRepo.getListOfMicroWatershedbyMwIds(ppr.getPprId()));
@@ -102,6 +106,7 @@ public class PprProjectAtGlanceController {
 	    }
 		if(dcode == null && project == null)
 			pprProjectGlanceList = pprProjectGlanceRepo.findPprProjectGlanceBystCode(stcode);
+		model.addAttribute("approvedOrForworded", approvedOrForworded);
 		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());
 		model.addAttribute("state", statename);

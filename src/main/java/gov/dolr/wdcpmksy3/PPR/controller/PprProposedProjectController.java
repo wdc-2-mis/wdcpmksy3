@@ -87,6 +87,7 @@ public class PprProposedProjectController {
         }
 		boolean pprCompleted = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A","F","C","B"));
         model.addAttribute("pprCompleted", pprCompleted);
+        boolean approvedOrForworded = false;
 	    if (!pprCompleted) 
 	        model.addAttribute("error", "Please complete the Preliminary Project Report First before entering Prioritized List of Proposed Project Details.");
 		if(dcode != null){
@@ -97,6 +98,9 @@ public class PprProposedProjectController {
 	            if(project != null) {
 	            	MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	            	pprProposedProjectList = pprProposedProjectRepo.getListOfPprProposedProjectsByPprOrderByStatusDesc(ppr);
+	            	approvedOrForworded = mPprRepo.existsByPprIdAndStatusIn(project, List.of("A","F"));
+	        	    if (approvedOrForworded) 
+	        	        model.addAttribute("approvedOrForwordedMsg", "This PPR data already Forward/Approved. Please select a different PPR Project.");
 	 	            model.addAttribute("pprId", project);
 	 	            model.addAttribute("microWatershedList", microWatershedServ.getListOfMicroWatershedByPprId(project));
 	            }else {
@@ -106,6 +110,7 @@ public class PprProposedProjectController {
 	    }
 		if(dcode == null && project == null)
 			pprProposedProjectList = pprProposedProjectRepo.findPprProposedProjectBystCode(stcode);
+		model.addAttribute("approvedOrForworded", approvedOrForworded);
 		model.addAttribute("detailsOfListOfProposedProject", pprProposedProjectList);
 		model.addAttribute("districtList", districtService.getPPRDistrictsByState(stcode));
 		model.addAttribute("projectTypeList", projectTypeServ.getProjectType());

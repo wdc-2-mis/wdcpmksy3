@@ -515,14 +515,8 @@ document.addEventListener("DOMContentLoaded", function () {
 								<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
 									th:selected="${pprId != null and pprId == p.pprId}"> </option>
 							</select>
-							<div class="validation-error" data-error-for="project"></div>
+							<div class="validation-error" data-error-for="project" th:text="${approvedOrForwordedMsg}"></div>
 						</div>
-<!--						<div class="col-md-3">-->
-<!--							<input type="text" id="districtName" class="form-control form-control-sm"-->
-<!--								th:value="${not #lists.isEmpty(distList) ? distList[0].distName : ''}" readonly> -->
-<!--							<input type="hidden" id="dcode" name="dcode"-->
-<!--								th:value="${not #lists.isEmpty(distList) ? distList[0].dcode : ''}">-->
-<!--						</div>-->
 					</div>
 					<div class="row mb-4">
 						<div class="col-md-2">
@@ -596,7 +590,7 @@ document.addEventListener("DOMContentLoaded", function () {
 					</div>
 					<!-- SAVE -->
 					<div class="text-center mt-4">
-						<button type="submit" id="saveSoilErosionBtn" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted}">
+						<button type="submit" id="saveSoilErosionBtn" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted || approvedOrForworded}">
 							<i class="fas fa-save"></i> Save as Draft
 						</button>
 					</div>

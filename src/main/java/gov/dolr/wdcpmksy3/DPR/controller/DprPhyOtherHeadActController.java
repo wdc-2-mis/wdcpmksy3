@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.DPR.entity.DprDetails;
 import gov.dolr.wdcpmksy3.DPR.entity.DprNrmDtl;
 import gov.dolr.wdcpmksy3.DPR.entity.DprOtherDtl;
+import gov.dolr.wdcpmksy3.DPR.repository.DprDetailsRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.DprOtherDtlRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherActivityRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.MOtherHeadsRepository;
@@ -54,6 +56,9 @@ public class DprPhyOtherHeadActController {
 	@Autowired
 	private DprOtherDtlRepository dprOtherDtlRepo;
 	
+	@Autowired
+    private DprDetailsRepository dprDetailsRepo;
+	
 	@GetMapping("/dprPhyOtherHeadActivities")
     public String dprPhyOtherHeadActivities(@RequestParam(required = false) Integer dcode, HttpSession session, 
     		Model model, @RequestParam(required = false) Integer project, @RequestParam(required = false) Integer head) {
@@ -70,12 +75,18 @@ public class DprPhyOtherHeadActController {
         model.addAttribute("pprApproved", pprApproved);
 	    if (!pprApproved) 
 	        model.addAttribute("error", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR Other Activity Target.");
+	    boolean approvedDpr = false;
 		if(dcode != null){
 			model.addAttribute("selectedDistrict", dcode);
 	        List<MPpr> pprList = pprTransactionRepo.findPprByDcodeAndActionA(dcode);
 	        if(!pprList.isEmpty()){
 	        	model.addAttribute("pprList", pprList);
 	        	if(project != null) {
+	        		List<DprDetails> records = dprDetailsRepo.findByPprPprIdandStatus(project);
+	        		if (records != null && !records.isEmpty()) {
+	        			approvedDpr = true;
+	        			model.addAttribute("approvedDprMsg","This Project DPR NRM Activity already Approved. Please select a different Project.");
+	        		}
 	        		dprOtherDtlList = dprOtherDtlRepo.getListOfDprOtherDtlByPprIdOrderByStatusDesc(project);
 	        		model.addAttribute("pprId", project);
 	        		model.addAttribute("headList", mOtherHeadsRepo.findAllByOrderBySeqNoAsc());
@@ -90,6 +101,7 @@ public class DprPhyOtherHeadActController {
 		}
 		if(dcode == null && project == null)
 			dprOtherDtlList = dprOtherDtlRepo.findDprOtherDtlDataBystCode(stcode);
+		model.addAttribute("approvedDpr", approvedDpr);
 		model.addAttribute("dprOtherTargetList", dprOtherDtlList);
 		model.addAttribute("districtList", pprTransactionRepo.findDistrictsByStCodeAndActionA(stcode));
 		model.addAttribute("state", statename);

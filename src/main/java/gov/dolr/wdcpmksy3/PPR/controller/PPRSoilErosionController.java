@@ -60,6 +60,7 @@ public class PPRSoilErosionController {
         if (pprid != null) {
         	soilErosionService.changeStatusByPprId(pprid);
         }
+        boolean approvedOrForworded = false;
         if(dcode != null){
         	List<MPpr> pprList = mPprRepo.findByDistrict_DcodeAndStatus(dcode);
         	if(!pprList.isEmpty()){
@@ -67,6 +68,9 @@ public class PPRSoilErosionController {
 	        	if(project != null) {
 	        		MPpr ppr = pprList.stream().filter(s-> s.getPprId().equals(project)).findFirst().orElse(null);
 	        		pprSoilErosionList = pprSoilErosionRepo.findByPprPprIdOrderByStatusDesc(project);
+	        		approvedOrForworded = mPprRepo.existsByPprIdAndStatusIn(project, List.of("A","F"));
+	        	    if (approvedOrForworded) 
+	        	        model.addAttribute("approvedOrForwordedMsg", "This PPR data already Forward/Approved. Please select a different PPR Project.");
 	        		model.addAttribute("pprId", project);
 	        	}else
 	        		pprSoilErosionList = pprSoilErosionRepo.findPPRSoilErosionBydcode(dcode);
@@ -76,7 +80,7 @@ public class PPRSoilErosionController {
         List<MErosion> erosionList = soilErosionService.getErosionList();
         if(dcode == null && project == null)
         	pprSoilErosionList = pprSoilErosionRepo.findPPRSoilErosionBystCode(stcode);
-        
+        model.addAttribute("approvedOrForworded", approvedOrForworded);
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
         model.addAttribute("erosionList", erosionList);
         model.addAttribute("monthList", soilErosionService.getAllMonths());
