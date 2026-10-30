@@ -3,10 +3,11 @@ package gov.dolr.wdcpmksy3.PPR.entity;
 
 import java.time.LocalDate;
 
+import gov.dolr.wdcpmksy3.entity.WdcpmksySubmenu;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ppr_referback_menu")
+@Table(name = "ppr_referback_menu", schema = "public")
 public class PprReferbackMenu {
 
     @Id
@@ -14,11 +15,15 @@ public class PprReferbackMenu {
     @Column(name = "referback_id")
     private Integer referbackId;
 
-    @Column(name = "ppr_id", nullable = false)
-    private Integer pprId;
+    // Relationship with m_ppr
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ppr_id", nullable = false)
+    private MPpr ppr;
 
-    @Column(name = "submenu_id")
-    private Integer submenuId;
+    // Relationship with m_submenu
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "submenu_id")
+    private WdcpmksySubmenu submenu;
 
     @Column(name = "submenu_name", nullable = false, length = 400)
     private String submenuName;
@@ -37,78 +42,90 @@ public class PprReferbackMenu {
 
     @Column(name = "request_ip", length = 20)
     private String requestIp;
+    
+    
+    @Column(name = "referback_round", nullable = false)
+    private Integer referbackRound;
 
-    // Getters and Setters
+	public Integer getReferbackId() {
+		return referbackId;
+	}
 
-    public Integer getReferbackId() {
-        return referbackId;
-    }
+	public void setReferbackId(Integer referbackId) {
+		this.referbackId = referbackId;
+	}
 
-    public void setReferbackId(Integer referbackId) {
-        this.referbackId = referbackId;
-    }
+	public MPpr getPpr() {
+		return ppr;
+	}
 
-    public Integer getPprId() {
-        return pprId;
-    }
+	public void setPpr(MPpr ppr) {
+		this.ppr = ppr;
+	}
 
-    public void setPprId(Integer pprId) {
-        this.pprId = pprId;
-    }
+	public WdcpmksySubmenu getSubmenu() {
+		return submenu;
+	}
 
-    public Integer getSubmenuId() {
-        return submenuId;
-    }
+	public void setSubmenu(WdcpmksySubmenu submenu) {
+		this.submenu = submenu;
+	}
 
-    public void setSubmenuId(Integer submenuId) {
-        this.submenuId = submenuId;
-    }
+	public String getSubmenuName() {
+		return submenuName;
+	}
 
-    public String getSubmenuName() {
-        return submenuName;
-    }
+	public void setSubmenuName(String submenuName) {
+		this.submenuName = submenuName;
+	}
 
-    public void setSubmenuName(String submenuName) {
-        this.submenuName = submenuName;
-    }
+	public String getTarget() {
+		return target;
+	}
 
-    public String getTarget() {
-        return target;
-    }
+	public void setTarget(String target) {
+		this.target = target;
+	}
 
-    public void setTarget(String target) {
-        this.target = target;
-    }
+	public String getRemark() {
+		return remark;
+	}
 
-    public String getRemark() {
-        return remark;
-    }
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
+	public String getCreatedBy() {
+		return createdBy;
+	}
 
-    public String getCreatedBy() {
-        return createdBy;
-    }
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
+	public LocalDate getCreatedDate() {
+		return createdDate;
+	}
 
-    public LocalDate getCreatedDate() {
-        return createdDate;
-    }
+	public void setCreatedDate(LocalDate createdDate) {
+		this.createdDate = createdDate;
+	}
 
-    public void setCreatedDate(LocalDate createdDate) {
-        this.createdDate = createdDate;
-    }
+	public String getRequestIp() {
+		return requestIp;
+	}
 
-    public String getRequestIp() {
-        return requestIp;
-    }
+	public void setRequestIp(String requestIp) {
+		this.requestIp = requestIp;
+	}
 
-    public void setRequestIp(String requestIp) {
-        this.requestIp = requestIp;
-    }
+	public Integer getReferbackRound() {
+		return referbackRound;
+	}
+
+	public void setReferbackRound(Integer referbackRound) {
+		this.referbackRound = referbackRound;
+	}
+
+    
 }

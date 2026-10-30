@@ -93,6 +93,11 @@ public void referBackSlnaReqFromDolr(
 
     MPpr mp = mPprRepo.getReferenceById(
             originalTran.getPpr().getPprId());
+    
+    Integer lastRound =
+            pprReferbackMenuRepo.getLastReferbackRound(mp.getPprId());
+
+    Integer currentRound = lastRound + 1;
 
     WdcpmksyUserReg regfrm =
             userRepo.getReferenceById(regId.longValue());
@@ -164,8 +169,9 @@ public void referBackSlnaReqFromDolr(
 
         PprReferbackMenu record = new PprReferbackMenu();
 
-        record.setPprId(mp.getPprId());
-        record.setSubmenuId(submenu.getSubmenuId());
+        record.setPpr(mp);
+        record.setSubmenu(submenu);
+        record.setReferbackRound(currentRound);
         record.setSubmenuName(submenu.getSubmenuName());
         record.setTarget(submenu.getTarget());
         record.setRemark(item.getRemark().trim());
