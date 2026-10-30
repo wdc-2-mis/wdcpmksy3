@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.MenuRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
 @Transactional
@@ -205,54 +207,54 @@ public void referBackSlnaReqFromDolr(
 		
 		
 	}
-	
-	public boolean approveSlnaReqFromDolr(Integer pprId, BigDecimal areap, BigDecimal cost, BigDecimal central,
-			BigDecimal state, Integer regid, String userid, String ip, LocalDate sanctiondt) {
-		
-		boolean status=false;
-		
-		try {
-			
-			PprTransaction rejPprTran = pprTransactionRepo.getById(pprId);
-			MPpr mp= mPprRepo.getReferenceById(rejPprTran.getPpr().getPprId());
-			WdcpmksyUserReg regfrm=userRepo.getReferenceById(regid.longValue());
-			WdcpmksyUserReg regto=userRepo.getReferenceById(regid.longValue());
-			
-			
-			MSanction san=new MSanction();
-			
-			san.setPpr(mp);
-			san.setSanctionDate(sanctiondt);
-			san.setAreaProposed(areap);
-			san.setTotCost(cost);
-			san.setCentralShareAmt(central);
-			san.setStateShareAmt(state);
-			san.setCreatedBy(userid);
-			san.setRequestIp(ip);
-			msanrepo.save(san);
-			
-			PprTransaction pprTran = new PprTransaction();
-			
-			pprTran.setPpr(mp);
-			pprTran.setAction('A');
-			pprTran.setSentFrom(regfrm);
-			pprTran.setSentTo(regto);
-			pprTran.setSenton(LocalDateTime.now());
-			
-			pprTransactionRepo.save(pprTran);
-			
-			mp.setStatus("A");
-			mp.setUpdatedDate(new Date());
-			mPprRepo.save(mp);
-			
-			status=true;
-			
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			status=false;
-		}
-		return status;
+
+	@Transactional
+	public boolean approveSlnaReqFromDolr(Integer pprId, BigDecimal areap, BigDecimal cost, BigDecimal central, BigDecimal state,
+	        Integer regid, String userid, String ip, LocalDate sanctiondt) {
+
+	    try {
+
+	        PprTransaction rejPprTran = pprTransactionRepo.findById(pprId).orElseThrow(() -> new RuntimeException("Transaction not found"));
+	        Integer actualPprId = rejPprTran.getPpr().getPprId();
+	        MPpr mp = mPprRepo.findById(actualPprId).orElseThrow(() -> new RuntimeException("PPR not found"));
+	        WdcpmksyUserReg regfrm = userRepo.findById(regid.longValue()).orElseThrow(() -> new RuntimeException("User not found"));
+	        WdcpmksyUserReg regto = userRepo.findById(regid.longValue()).orElseThrow(() -> new RuntimeException("User not found"));
+
+	        // 5. Delete existing sanction using actual PPR ID
+	        int deleted = msanrepo.deleteByPprId(actualPprId);
+	        MSanction san = new MSanction();
+
+	        san.setPpr(mp);
+	        san.setSanctionDate(sanctiondt);
+	        san.setAreaProposed(areap);
+	        san.setTotCost(cost);
+	        san.setCentralShareAmt(central);
+	        san.setStateShareAmt(state);
+	        san.setCreatedBy(userid);
+	        san.setRequestIp(ip);
+	        msanrepo.saveAndFlush(san);
+
+	        PprTransaction pprTran = new PprTransaction();
+	        pprTran.setPpr(mp);
+	        pprTran.setAction('A');
+	        pprTran.setSentFrom(regfrm);
+	        pprTran.setSentTo(regto);
+	        pprTran.setSenton(LocalDateTime.now());
+	        pprTransactionRepo.save(pprTran);
+
+	        mp.setStatus("A");
+	        mp.setUpdatedDate(new Date());
+	        mPprRepo.save(mp);
+
+	        return true;
+
+	    } 
+	    catch (Exception e) 
+	    {
+	        e.printStackTrace();
+	        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+	        return false;
+	    }
 	}
 
 }

@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import gov.dolr.wdcpmksy3.PPR.dto.PprTransactionDto;
 import gov.dolr.wdcpmksy3.PPR.entity.PprDrinkingWater;
+import gov.dolr.wdcpmksy3.PPR.entity.PprReferbackMenu;
 import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
+import gov.dolr.wdcpmksy3.PPR.repository.PprReferbackMenuRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import gov.dolr.wdcpmksy3.entity.WdcpmksySubmenu;
 import gov.dolr.wdcpmksy3.repository.MenuRepository;
@@ -34,6 +36,9 @@ public class RajectAndConfirmController {
 	
 	@Autowired
 	private MenuRepository submenuRepository;
+	
+	@Autowired
+	private PprReferbackMenuRepository rbmenu;
 	
 	@GetMapping("/rajectAndConfirm")
     public String rajectAndConfirm(HttpSession session, Model model) 
@@ -62,7 +67,8 @@ public class RajectAndConfirmController {
             return "redirect:/login";
         }
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
-        List<WdcpmksySubmenu> submenuList =submenuRepository.findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc("Preliminary Project Report Details", "/pprDistrict");
+       // List<WdcpmksySubmenu> submenuList =submenuRepository.findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc("Preliminary Project Report Details", "/pprDistrict");
+        List<PprReferbackMenu> submenuList= rbmenu.getListPprReferbackMenu(pprid);
         model.addAttribute("submenuList", submenuList);
         model.addAttribute("pprid", pprid);
         model.addAttribute("projectname", projectName);

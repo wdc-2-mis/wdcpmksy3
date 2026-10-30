@@ -263,6 +263,7 @@ public String referBackPprReqForAprov(
 				Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 				Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
 				String userid=(String)session.getAttribute("userid");
+				System.out.println("kdy"+pprid);
 				try {
 					
 					 if(userid==null){
@@ -274,7 +275,7 @@ public String referBackPprReqForAprov(
 							 userid, CommonFunctions.getClientIpAddr(request), sanctiondt);
 					
 					if(save)
-						redirectAttributes.addFlashAttribute( "success", "PPR Request Approved Successfully.");
+						redirectAttributes.addFlashAttribute( "success", "PPR Approved Successfully.");
 					else
 						redirectAttributes.addFlashAttribute("error", "Unable to Approve PPR Request.");
 				}

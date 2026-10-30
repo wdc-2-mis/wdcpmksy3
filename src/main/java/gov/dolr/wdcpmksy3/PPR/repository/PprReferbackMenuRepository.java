@@ -23,4 +23,10 @@ public interface PprReferbackMenuRepository
     List<PprReferbackMenu> findByPpr_PprIdAndReferbackRoundOrderByReferbackIdAsc(
             Integer pprId, Integer referbackRound);
     
+    @Query("SELECT m FROM PprReferbackMenu m WHERE m.ppr.pprId = :pprId AND m.referbackRound= (select max(m1.referbackRound) "
+    		+ "from PprReferbackMenu m1  where m1.ppr.pprId = m.ppr.pprId) order by referbackId")
+    List<PprReferbackMenu> getListPprReferbackMenu(@Param("pprId") Integer pprId);
+    
+    
+    
 }

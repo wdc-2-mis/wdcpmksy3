@@ -327,7 +327,7 @@ public class PPRViewController {
 
         List<String> statuses   = includeDraft ? List.of("C", "S", "D") : List.of("C", "S");
         List<Character> statuse = includeDraft ? List.of('C', 'S', 'D') : List.of('C', 'S');
-        List<String> statusppr  = List.of("C", "A", "B");   // PPR-1 unchanged
+        List<String> statusppr  = List.of("F","C", "A", "B");   // PPR-1 unchanged
         
         // ---- PPR-1 ----
     
