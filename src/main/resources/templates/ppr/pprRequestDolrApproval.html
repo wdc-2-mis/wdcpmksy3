@@ -269,6 +269,159 @@
 					
 					
 	});
+	
+	
+document.addEventListener("DOMContentLoaded", function () {
+
+    const referBackForm = document.getElementById("referBackForm");
+    const referBackError = document.getElementById("referBackError");
+
+    // Show or hide remarks when a submenu is selected.
+    document.querySelectorAll(".refer-menu-checkbox").forEach(function (checkbox) {
+
+        checkbox.addEventListener("change", function () {
+
+            const container = checkbox.closest(".form-check");
+            const textarea = container.querySelector(".refer-menu-remark");
+
+            if (checkbox.checked) {
+
+                textarea.style.display = "block";
+
+            } else {
+
+                textarea.style.display = "none";
+                textarea.value = "";
+                textarea.classList.remove("is-invalid");
+
+            }
+
+            referBackError.textContent = "";
+        });
+
+    });
+
+    // Submit Refer Back form.
+    referBackForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        referBackError.textContent = "";
+
+        // Remove previously generated hidden fields.
+        referBackForm.querySelectorAll(".generated-refer-field")
+            .forEach(function (field) {
+                field.remove();
+            });
+
+        const selectedMenus = document.querySelectorAll(
+            ".refer-menu-checkbox:checked"
+        );
+
+        if (selectedMenus.length === 0) {
+
+            referBackError.textContent =
+                "Please select at least one PPR section.";
+
+            return;
+        }
+
+        let isValid = true;
+        let firstInvalidField = null;
+
+        selectedMenus.forEach(function (checkbox) {
+
+            const container = checkbox.closest(".form-check");
+
+            const textarea = container.querySelector(
+                ".refer-menu-remark"
+            );
+
+            const remark = textarea.value.trim();
+
+            textarea.classList.remove("is-invalid");
+
+            if (remark === "") {
+
+                textarea.classList.add("is-invalid");
+
+                isValid = false;
+
+                if (firstInvalidField === null) {
+                    firstInvalidField = textarea;
+                }
+
+            }
+
+        });
+
+        if (!isValid) {
+
+            referBackError.textContent =
+                "Please enter remarks for every selected PPR section.";
+
+            firstInvalidField.focus();
+
+            return;
+        }
+
+        // Create indexed request parameters for Spring MVC.
+        selectedMenus.forEach(function (checkbox, index) {
+
+            const container = checkbox.closest(".form-check");
+
+            const textarea = container.querySelector(
+                ".refer-menu-remark"
+            );
+
+            const submenuIdField = document.createElement("input");
+
+            submenuIdField.type = "hidden";
+            submenuIdField.name = "items[" + index + "].submenuId";
+            submenuIdField.value = checkbox.value;
+            submenuIdField.className = "generated-refer-field";
+
+            referBackForm.appendChild(submenuIdField);
+
+            const remarkField = document.createElement("input");
+
+            remarkField.type = "hidden";
+            remarkField.name = "items[" + index + "].remark";
+            remarkField.value = textarea.value.trim();
+            remarkField.className = "generated-refer-field";
+
+            referBackForm.appendChild(remarkField);
+
+        });
+
+        referBackForm.submit();
+
+    });
+
+});
+
+
+function openReferBackModal(element) {
+
+    const tranId = element.getAttribute("data-tranid");
+    const projectName = element.getAttribute("data-projectname");
+
+    document.getElementById("referBackTranId").value = tranId;
+
+    document.getElementById("referBackProjectName").textContent =
+        projectName || "";
+
+    // Keep your existing checkbox and remarks reset code here.
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("referBackModal")
+    );
+
+    modal.show();
+}
+	
+	
+	
 				
 				function openRemarksModal(element, action) {
 						const tranId = element.getAttribute("data-tranid");
@@ -479,10 +632,15 @@
 										onclick="openRemarksModal(this, 'reject')" class="btn btn-danger btn-sm">
 										Reject
 									</a>
-									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}, data-ppr=${data.projectName}"
-										onclick="openRemarksModal(this, 'refer')" class="btn btn-primary btn-sm">
-										Refer
-									</a>
+									<button type="button"
+        class="btn btn-warning btn-sm"
+        th:attr="data-tranid=${data.tranId},data-projectname=${data.projectName}"
+        onclick="openReferBackModal(this)">
+
+    <i class="fas fa-reply me-1"></i>
+    Refer Back
+
+</button>
 									
 									<a href="javascript:void(0);" th:attr="data-tranid=${data.tranId}, data-district=${data.districtName}, data-ppr=${data.projectName}, data-finyr=${data.finYear}" 
 											onclick="openApprovalModal(this, 'A')"
@@ -528,6 +686,114 @@
 						</div>
 					</div>
 				</div>
+				
+				
+<div class="modal fade" id="referBackModal" tabindex="-1"
+     aria-labelledby="referBackModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+
+                <h5 class="modal-title">
+   Project Name: <span id="referBackProjectName"></span> 
+</h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <form id="referBackForm"
+                  th:action="@{/referBackPprReqForAprov}"
+                  method="post">
+
+                <div class="modal-body">
+
+                    <input type="hidden"
+                           id="referBackTranId"
+                           name="tranId">
+
+                    <div class="alert alert-info">
+                        Select the PPR sections that require correction
+                        and enter remarks for each selected section.
+                    </div>
+
+                    <div id="referBackItems">
+
+                        <div class="form-check border rounded p-3 mb-2"
+                             th:each="menu : ${submenuList}">
+
+                            <div class="d-flex align-items-start">
+
+                                <input type="checkbox"
+                                       class="form-check-input me-2 mt-1 refer-menu-checkbox"
+                                       th:value="${menu.submenuId}"
+                                       th:id="'referMenu_' + ${menu.submenuId}">
+
+                                <div class="flex-grow-1">
+
+                                    <label class="form-check-label fw-semibold"
+                                           th:for="'referMenu_' + ${menu.submenuId}"
+                                           th:text="${menu.submenuName}">
+                                    </label>
+
+                                    <textarea
+                                        class="form-control mt-2 refer-menu-remark"
+                                        rows="2"
+                                        maxlength="1000"
+                                        placeholder="Enter remarks for this section..."
+                                        style="display:none;">
+                                    </textarea>
+
+                                    <div class="invalid-feedback">
+                                        Please enter remarks for this section.
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    
+                    
+
+                    <div id="referBackError"
+                         class="text-danger mt-2">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i>
+                        Submit Refer Back
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+				
 				<!-- ========================= -->
 				<!-- Approve PPR DETAILS  -->
 				<!-- ========================= -->

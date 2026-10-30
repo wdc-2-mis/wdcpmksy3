@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.PPR.dto.PprRequestDolrApprovalDto;
+import gov.dolr.wdcpmksy3.PPR.dto.ReferBackRequest;
 import gov.dolr.wdcpmksy3.PPR.dto.WatershedAreaBean;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.entity.PPREmploymentGeneration;
@@ -52,8 +54,10 @@ import gov.dolr.wdcpmksy3.PPR.service.PprProposedProjectService;
 import gov.dolr.wdcpmksy3.PPR.service.PprTransactionService;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import gov.dolr.wdcpmksy3.entity.PprProposedArea;
+import gov.dolr.wdcpmksy3.entity.WdcpmksySubmenu;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.CropOutcomeRepository;
+import gov.dolr.wdcpmksy3.repository.MenuRepository;
 import gov.dolr.wdcpmksy3.repository.PprDrinkingWaterRepository;
 import gov.dolr.wdcpmksy3.repository.PprProposedAreaRepository;
 import gov.dolr.wdcpmksy3.repository.ProfileProjection;
@@ -131,6 +135,9 @@ public class PprDolrApprovalController {
 	@Autowired
     private MPprRepository pprRepo;
 	
+	@Autowired
+	private MenuRepository submenuRepository;
+	
 	@GetMapping("/pprRequestDolrApproval")
 	public String pprRequestDolrApproval(@RequestParam(required = false) Integer state,
 			HttpSession session, Model model) {
@@ -159,8 +166,17 @@ public class PprDolrApprovalController {
 			model.addAttribute("userid", userid);
 			model.addAttribute("pprRequestDolrApprovalList", pprRequestDolrApprovalList);
 		}
+		List<WdcpmksySubmenu> submenuList =
+		        submenuRepository
+		        .findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc(
+		                "Preliminary Project Report Details",
+		                "/pprDistrict");
+
+		model.addAttribute("submenuList", submenuList);
 		return "ppr/pprRequestDolrApproval";
 	}
+	
+	 
 	
 	@GetMapping("/rejPprReqForAprov")
 	public String rejPprReqForAprov(@RequestParam("id") Integer tranId, @RequestParam("remarks") String remarks, 
@@ -176,20 +192,48 @@ public class PprDolrApprovalController {
 		return "redirect:/pprRequestDolrApproval";
 	}
 	
-	@GetMapping("/referBackPprReqForAprov")
-	public String referBackPprReqForAprov(@RequestParam("id") Integer tranId, @RequestParam("remarks") String remarks, 
-			HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 
-		try {
-			Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
-			pprTransactionServ.referBackSlnaReqFromDolr(tranId, remarks, regid);
-			redirectAttributes.addFlashAttribute("success", "PPR Request Refered Back to SLNA Successfully.");
-		}catch (Exception e) {
-	        redirectAttributes.addFlashAttribute("error", "Unable to Refer Back PPR Request to SLNA.");
-	    }
+@PostMapping("/referBackPprReqForAprov")
+public String referBackPprReqForAprov(
+        @ModelAttribute ReferBackRequest referBackRequest,
+        HttpSession session,
+        HttpServletRequest request,
+        RedirectAttributes redirectAttributes) {
 
-		return "redirect:/pprRequestDolrApproval";
-	}
+    try {
+
+        String userid = (String) session.getAttribute("userid");
+
+        if (userid == null) {
+            return "redirect:/login";
+        }
+
+        Integer regid = Integer.parseInt(
+                session.getAttribute("regid").toString());
+
+        pprTransactionServ.referBackSlnaReqFromDolr(
+                referBackRequest.getTranId(),
+                referBackRequest.getItems(),
+                regid,
+                userid,
+                CommonFunctions.getClientIpAddr(request));
+
+        redirectAttributes.addFlashAttribute(
+                "success",
+                "PPR Request Refered Back to SLNA Successfully.");
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        redirectAttributes.addFlashAttribute(
+                "error",
+                "Unable to Refer Back PPR Request: " + e.getMessage());
+    }
+
+    return "redirect:/pprRequestDolrApproval";
+}
+
 	
 	@GetMapping("/approvePprReqForAprov1")
 	public String approvePprReqForAprov(@RequestParam("id") Integer tranId,

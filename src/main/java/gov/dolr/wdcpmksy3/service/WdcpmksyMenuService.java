@@ -11,9 +11,9 @@ import gov.dolr.wdcpmksy3.entity.WdcpmksyMenu;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyRoleMenuMap;
 import gov.dolr.wdcpmksy3.entity.WdcpmksySubmenu;
 import gov.dolr.wdcpmksy3.repository.MRoleRepository;
+import gov.dolr.wdcpmksy3.repository.MenuRepository;
 import gov.dolr.wdcpmksy3.repository.WdcpmksyMenuRepository;
 import gov.dolr.wdcpmksy3.repository.WdcpmksyRoleMenuMapRepository;
-import gov.dolr.wdcpmksy3.repository.WdcpmksySubmenuRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class WdcpmksyMenuService {
 	@Autowired
 	private WdcpmksyMenuRepository menuRepository;
 	@Autowired
-	private WdcpmksySubmenuRepository submenuRepository;
+	private MenuRepository submenuRepository;
 	@Autowired
 	private WdcpmksyRoleMenuMapRepository roleMenuMapRepository;
 	@Autowired
@@ -34,7 +34,7 @@ public class WdcpmksyMenuService {
 
     public WdcpmksyMenuService(
             WdcpmksyMenuRepository menuRepository,
-            WdcpmksySubmenuRepository submenuRepository,
+            MenuRepository submenuRepository,
             WdcpmksyRoleMenuMapRepository roleMenuMapRepository,
             MRoleRepository roleRepository) {
 
