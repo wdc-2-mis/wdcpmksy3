@@ -220,10 +220,8 @@ public void referBackSlnaReqFromDolr(
 	        WdcpmksyUserReg regfrm = userRepo.findById(regid.longValue()).orElseThrow(() -> new RuntimeException("User not found"));
 	        WdcpmksyUserReg regto = userRepo.findById(regid.longValue()).orElseThrow(() -> new RuntimeException("User not found"));
 
-	        // 5. Delete existing sanction using actual PPR ID
 	        int deleted = msanrepo.deleteByPprId(actualPprId);
 	        MSanction san = new MSanction();
-
 	        san.setPpr(mp);
 	        san.setSanctionDate(sanctiondt);
 	        san.setAreaProposed(areap);
