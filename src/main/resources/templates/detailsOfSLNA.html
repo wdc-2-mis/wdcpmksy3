@@ -35,11 +35,14 @@
 
 	// Restrict dates before 2025
 	document.addEventListener("DOMContentLoaded", function () {
+		const today = new Date().toISOString().split("T")[0]; 
 		const appointmentDate = document.getElementsByName("appointmentDate")[0];
 		appointmentDate.setAttribute("min", "2026-01-01");
-		
-		const today = new Date().toISOString().split("T")[0]; 
-			appointmentDate.setAttribute("max", today); 
+		appointmentDate.setAttribute("max", today); 
+			
+		const appointmentDateEdit = document.getElementById("appointmentDate");
+		appointmentDateEdit.setAttribute("min", "2026-01-01");
+		appointmentDateEdit.setAttribute("max", today); 
 	});
 	
 //	document.addEventListener("DOMContentLoaded", function () {
@@ -86,18 +89,13 @@
 
 							document.getElementById("qualification").value = data.qualificationId;
 
-							const appointmentDateInput =
-    document.getElementById("appointmentDate");
+							const appointmentDateInput = document.getElementById("appointmentDate");
 
-if (appointmentDateInput._flatpickr) {
-    appointmentDateInput._flatpickr.setDate(
-        data.appointmentDate,
-        false,
-        "Y-m-d"
-    );
-} else {
-    appointmentDateInput.value = data.appointmentDate || "";
-}
+							if (appointmentDateInput._flatpickr) {
+								appointmentDateInput._flatpickr.setDate(data.appointmentDate, false, "Y-m-d");
+							} else {
+								appointmentDateInput.value = data.appointmentDate || "";
+							}
 
 							document.getElementById("tenure").value = data.tenurePeriodYr;
 
@@ -534,7 +532,7 @@ if (appointmentDateInput._flatpickr) {
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold">Appointment Date <span class="required">*</span></label>
 	                    <div class="col-md-4">
-	                        <input type="date" class="form-control" name="appointmentDate" min="2026-01-01" placeholder="DD/MM/YYYY" th:value="${appointmentDate}" onkeydown="return false;">
+	                        <input type="date" class="form-control" name="appointmentDate" min="2026-01-01" placeholder="DD/MM/YYYY" onkeydown="return false;">
 							<div class="field-error" data-error-for="appointmentDate"></div>
 	                    </div>
 	                </div>
@@ -623,7 +621,7 @@ if (appointmentDateInput._flatpickr) {
 		            <td th:text="${data.firstName+' '+data.lastName}"></td>
 		            <td th:text="${data.designation.designationName}"></td>
 		            <td th:text="${data.qualification.qualificationName}"></td>
-		            <td th:text="${data.appointmentDate}"></td>
+		            <td th:text="${data.appointmentDate != null ? #temporals.format(data.appointmentDate, 'dd/MM/yyyy') : ''}"></td>
 		            <td th:text="${data.joiningType == 'F' ? 'Full Time' : 'Part Time'}"></td>
 		            <td th:text="${data.tenurePeriodYr}"></td>
 		            <td th:text="${data.phoneNo}"></td>
@@ -722,8 +720,7 @@ if (appointmentDateInput._flatpickr) {
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold">Appointment Date <span class="required">*</span></label>
 							<div class="col-md-4">
-								<input type="date" id="appointmentDate" class="form-control" name="appointmentDate" placeholder="DD/MM/YYYY" min="2026-01-01"
-									th:value="${appointmentDate}" required>
+								<input type="date" id="appointmentDate" class="form-control" name="appointmentDate" placeholder="DD/MM/YYYY" min="2026-01-01" onkeydown="return false;">
 									<div class="field-error" data-error-for="appointmentDate"></div>
 							</div>
 						</div>
