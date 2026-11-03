@@ -40,7 +40,39 @@
 
 	label{
 	    font-weight:600;
-	}	
+	}
+	
+	
+	/* Smaller date fields */
+.date-small,
+.flatpickr-input.date-small {
+    width: 180px !important;
+    max-width: 100%;
+    height: 38px !important;
+}
+
+/* Pending UC date range */
+.pending-date-range {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pending-date-range .date-small {
+    width: 165px !important;
+}
+
+/* Keep amount field aligned with Pending UC period */
+.pending-amount-input {
+    width: 250px !important;
+    height: 38px !important;
+}
+
+/* Keep date and amount sections aligned */
+.pending-section-row {
+    align-items: flex-start;
+}	
 </style>
 
 
@@ -75,6 +107,22 @@
 		ucDate.setAttribute("max", today);
 		fromDate.setAttribute("max", today); 
 		toDate.setAttribute("max", today);
+		
+		const dueDate1 = document.getElementsByName("dueDate1")[0];
+		const ucDate1 = document.getElementsByName("ucDate1")[0];
+		const fromDate1 = document.getElementsByName("fromDate1")[0];
+		const toDate1 = document.getElementsByName("toDate1")[0];
+
+		dueDate1.setAttribute("min", "2026-01-01");
+		ucDate1.setAttribute("min", "2026-01-01");
+		fromDate1.setAttribute("min", "2026-01-01");
+		toDate1.setAttribute("min", "2026-01-01");
+			
+		
+		dueDate1.setAttribute("max", today); 
+		ucDate1.setAttribute("max", today);
+		fromDate1.setAttribute("max", today); 
+		toDate1.setAttribute("max", today);
 		
 		const form1 = document.getElementById("pendinguc");
 
@@ -480,13 +528,40 @@
 			   document.getElementById("installment1").value =install;
 			   document.getElementById("released1").value = released.replace(/\.?0+$/, "");
 			   document.getElementById("utilized1").value = utilized.replace(/\.?0+$/, "");
-			   document.getElementById("dueDate1").value = dueDate;
+			   
+			   // Helper function to populate date fields with Flatpickr
+function setEditDate(id, dateValue) {
+
+    const dateInput = document.getElementById(id);
+
+    if (!dateInput) {
+        return;
+    }
+
+    if (dateInput._flatpickr) {
+
+        dateInput._flatpickr.setDate(
+            dateValue || "",
+            false,
+            "Y-m-d"
+        );
+
+    } else {
+
+        dateInput.value = dateValue || "";
+
+    }
+}
+
+// Populate Edit popup dates
+setEditDate("dueDate1", dueDate);
+setEditDate("ucDate1", submissionDate);
+setEditDate("fromDate1", start);
+setEditDate("toDate1", end);
+			   
 			   document.getElementById("ucamount1").value = ucAmount.replace(/\.?0+$/, "");
-			   document.getElementById("ucDate1").value = submissionDate;
 			   document.getElementById("ducamount1").value = submissionAmt.replace(/\.?0+$/, "");
 			   document.getElementById("reasion1").value = reason;
-			   document.getElementById("fromDate1").value = start;
-			   document.getElementById("toDate1").value = end;
 			   document.getElementById("pucamount1").value = penamt.replace(/\.?0+$/, "");
 			   
 		   });
@@ -623,8 +698,39 @@
 
 		});
 		
+		const selectionReason = document.getElementById("reasion");
+		const editSelectionReason = document.getElementById("reasion1");
+		if (selectionReason) {
+		    selectionReason.addEventListener("blur", function () {
+		        validateSelectionReason(this);
+		    });
+		}
+		if (editSelectionReason) {
+		    editSelectionReason.addEventListener("blur", function () {
+		        validateSelectionReason(this);
+		    });
+		}
+	
+	function validateSelectionReason(field) {
+			const value = field.value.trim();
+			if (value === "") {
+				setInvalid(field, "Please enter Reason for Reason for not Submitting.");
+				//					field.focus();
+				return false;
+			}
+			if (value.length < 4) {
+				setInvalid(field, "Length of the Reason for not Submitting should be more than 3 Characters.");
+				field.value = "";
+				return false;
+			}
+			setValid(field);
+			return true;
+		}
+		
 	
 	});
+	
+	
 	
 	function submitSkipForm() {
 
@@ -856,7 +962,7 @@
 							</label>
 							
 							<div class="d-flex align-items-center gap-4">
-								<input type="date" name="dueDate" id="dueDate" class="form-control" min="2026-01-01" style="height:40px; width: 300px;"
+								<input type="date" name="dueDate" id="dueDate" class="form-control date-small" min="2026-01-01" style="height:40px; width: 200px;" placeholder="DD/MM/YYYY"
 											onkeydown="return false;" required>
 							<div class="invalid-feedback">Please select  Submission of UC Due Date </div>
 							</div>
@@ -889,7 +995,7 @@
 								Date
 							</label>
 							<div class="d-flex align-items-center gap-4">
-								<input type="date" name="ucDate" id="ucDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
+								<input type="date" name="ucDate" id="ucDate" class="form-control date-small" min="2026-01-01" placeholder="DD/MM/YYYY" onkeydown="return false;" required
 									style="height:40px; width: 300px;">
 									<div class="invalid-feedback">Please select Date of Submission of UC Date</div>	
 							</div>
@@ -911,46 +1017,87 @@
 								Reason for not Submitting
 							</label>
 							<textarea name="reasion" id="reasion" class="form-control" rows="2" required></textarea>
-							<div class="invalid-feedback">Please enter Reason for not Submitting</div>
-						</div>
-						<div class="col-md-12">
-						
-							<label class="form-label fs-5">
-								<b>Pending UC`s</b> <span class="required">*</span>
-							</label>
-						
-						</div>
-						
-						<div class="col-md-6">
-							<label class="form-label">
-								Period of pending UC 
-							</label>
-							<div class="d-flex align-items-center gap-6">
-								<input type="date" name="fromDate" id="fromDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
-									style="height:40px; width: 300px;"  onchange="validateDateRange()"> 
-								<div class="invalid-feedback">Please select Period of pending UC from Date</div>
-								<div id="fromDateError" class="text-danger mt-1"></div>
-									&nbsp; To &nbsp;
-								<input type="date" name="toDate" id="toDate" class="form-control" min="2026-01-01" onkeydown="return false;" required
-									style="height:40px; width: 300px;"  onchange="validateDateRange()">
-									<div class="invalid-feedback">Please select Period of pending UC To Date</div>
-									<div id="toDateError" class="text-danger mt-1"></div>
-							</div>
+							<div class="invalid-feedback">Please enter Reason for not Submitting</div>	
 							
 						</div>
-						<div class="col-md-6">
-							<label class="form-label">
-								Amount (Rs in Lakh)
-							</label>
-						
-							<div class="d-flex align-items-center gap-4">
-								<input type="text" name="pucamount" id="pucamount" class="form-control" style="height:40px; width: 300px;"
-									oninput="validateDecimal(this,11,5)">
-									<div class="invalid-feedback">Please enter Pending UC Amount (Rs in Lakh)</div>
-							</div>
-						</div>
-						 	
-				</div>
+						<div class="col-md-12">
+    <label class="form-label fs-5">
+        <b>Pending UC's</b>
+        <span class="required">*</span>
+    </label>
+</div>
+
+<div class="row g-3 pending-section-row">
+
+    <!-- Period of Pending UC -->
+    <div class="col-md-6">
+
+        <label class="form-label">
+            Period of pending UC
+        </label>
+
+        <div class="pending-date-range">
+
+            <div>
+                <input type="date"
+                       name="fromDate"
+                       id="fromDate"
+                       class="form-control date-small"
+                       min="2026-01-01"
+                       onkeydown="return false;"
+                       required
+                       onchange="validateDateRange()" placeholder="DD/MM/YYYY">
+
+                <div class="invalid-feedback">
+                    Please select Period of pending UC From Date.
+                </div>
+
+                <div id="fromDateError" class="text-danger mt-1"></div>
+            </div>
+&nbsp;
+            <span>To</span>
+            &nbsp;
+            <div>
+                <input type="date"
+                       name="toDate"
+                       id="toDate"
+                       class="form-control date-small"
+                       min="2026-01-01"
+                       onkeydown="return false;"
+                       required
+                       onchange="validateDateRange()" placeholder="DD/MM/YYYY">
+
+                <div class="invalid-feedback">
+                    Please select Period of pending UC To Date.
+                </div>
+
+                <div id="toDateError" class="text-danger mt-1"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Pending UC Amount -->
+    <div class="col-md-6">
+
+        <label class="form-label">
+            Amount (Rs in Lakh)
+        </label>
+
+        <input type="text"
+               name="pucamount"
+               id="pucamount"
+               class="form-control pending-amount-input"
+               oninput="validateDecimal(this,11,5)">
+
+        <div class="invalid-feedback">
+            Please enter Pending UC Amount (Rs in Lakh).
+        </div>
+
+    </div>
+
+</div>
 				
 						<div class="text-center mt-4">
 							<button type="submit" name="action" id="saveDraftBtn" value="D" class="btn btn-warning" th:disabled="${!existssl}">
@@ -1106,7 +1253,7 @@
 			                   
 			               </tr>
 			               <tr th:if="${#lists.isEmpty(records)}">
-			                   <td colspan="8" class="text-center text-muted">
+			                   <td colspan="13" class="text-center text-muted">
 			                       Data Not Found
 			                   </td>
 			               </tr>
@@ -1194,7 +1341,7 @@
 									</label>
 							
 									<div class="d-flex align-items-center gap-4">
-										<input type="date" name="dueDate1" id="dueDate1" class="form-control" min="2026-01-01"
+										<input type="date" name="dueDate1" id="dueDate1" class="form-control" min="2026-01-01" placeholder="DD/MM/YYYY"
 											style="height:40px; width: 300px;">
 											<div class="invalid-feedback">Please select  Submission of UC Due Date </div>
 									</div>
@@ -1227,7 +1374,7 @@
 										Date
 									</label>
 									<div class="d-flex align-items-center gap-4">
-										<input type="date" name="ucDate1" id="ucDate1" class="form-control" min="2026-01-01"
+										<input type="date" name="ucDate1" id="ucDate1" class="form-control" min="2026-01-01" placeholder="DD/MM/YYYY"
 											style="height:40px; width: 300px;">
 											<div class="invalid-feedback">Please select Date of Submission of UC Date</div>	
 									</div>
@@ -1264,13 +1411,13 @@
 										Period of pending UC
 									</label>
 									<div class="d-flex align-items-center gap-4">
-										<input type="date" name="fromDate1" id="fromDate1" class="form-control" min="2026-01-01"
+										<input type="date" name="fromDate1" id="fromDate1" class="form-control" min="2026-01-01" placeholder="DD/MM/YYYY"
 											style="height:40px; width: 300px;" onchange="validateDateRange1();"> 
 											<div class="invalid-feedback">Please select Period of pending UC from Date</div>
 											<div id="fromDate1Error" class="text-danger mt-1"></div>
 
 											&nbsp; To &nbsp;
-										<input type="date" name="toDate1" id="toDate1" class="form-control" min="2026-01-01"
+										<input type="date" name="toDate1" id="toDate1" class="form-control" min="2026-01-01" placeholder="DD/MM/YYYY"
 											style="height:40px; width: 300px;" onchange="validateDateRange1();">
 											<div class="invalid-feedback">Please select Period of pending UC To Date</div>
 											<div id="toDate1Error" class="text-danger mt-1"></div>
