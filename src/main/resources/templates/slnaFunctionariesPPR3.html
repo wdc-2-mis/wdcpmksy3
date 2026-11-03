@@ -188,11 +188,23 @@
                     }
 
                     const address = row.querySelector("input[name='address[]']");
-                    const addressError = row.querySelector(".addressError");
-                    if (address && address.value.trim() === "") {
-                        addError(address, addressError,
-                            "Please enter Address in Row " + rowNo + ".");
-                    }
+const addressError = row.querySelector(".addressError");
+
+if (address) {
+
+    const addressValue = address.value.trim();
+
+    if (addressValue === "") {
+
+        addError(address, addressError,
+            "Please enter Address in Row " + rowNo + ".");
+
+    } else if (addressValue.length < 10) {
+
+        addError(address, addressError,
+            "Address must contain at least 10 characters in Row " + rowNo + ".");
+    }
+}
 
                     const year = row.querySelector("input[name='yr[]']");
                     const yearError = row.querySelector(".yearError");
@@ -314,6 +326,42 @@
                             errorDiv.style.display = "none";
                         }
                         field.classList.remove("field-invalid");
+                        // ADDRESS: minimum 10 characters
+if (field.matches("input[name='address[]']")) {
+
+    const errorDiv = row ? row.querySelector(".addressError") : null;
+    const value = field.value.trim();
+
+    if (value === "") {
+
+        if (errorDiv) {
+            errorDiv.textContent = "Please enter Address.";
+            errorDiv.style.display = "block";
+        }
+
+        field.classList.add("field-invalid");
+
+    } else if (value.length < 10) {
+
+        if (errorDiv) {
+            errorDiv.textContent = "Address must contain at least 10 characters.";
+            errorDiv.style.display = "block";
+        }
+
+        field.classList.add("field-invalid");
+
+    } else {
+
+        if (errorDiv) {
+            errorDiv.textContent = "";
+            errorDiv.style.display = "none";
+        }
+
+        field.classList.remove("field-invalid");
+    }
+
+    return;
+}
                     }
                     return;
                 }

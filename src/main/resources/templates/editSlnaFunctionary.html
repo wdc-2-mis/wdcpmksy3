@@ -888,39 +888,43 @@
 
 
 
-                    if (
+                    /* ---------------------------------------------
+   ADDRESS
+   REQUIRED + MINIMUM 10 CHARACTERS
+--------------------------------------------- */
 
-                        address &&
+if (address) {
 
-                        address.value.trim() === ""
+    const addressValue = address.value.trim();
 
-                    ) {
+    if (addressValue === "") {
 
+        showRowError(
+            address,
+            "Please enter Address in Row " + rowNo + "."
+        );
 
+        if (valid) {
+            address.focus();
+        }
 
-                        showRowError(
+        valid = false;
 
-                            address,
+    } else if (addressValue.length < 10) {
 
-                            "Please enter Address in Row "
+        showRowError(
+            address,
+            "Address must contain at least 10 characters in Row "
+            + rowNo + "."
+        );
 
-                            + rowNo + "."
+        if (valid) {
+            address.focus();
+        }
 
-                        );
-
-
-
-                        if (valid) {
-
-                            address.focus();
-
-                        }
-
-
-
-                        valid = false;
-
-                    }
+        valid = false;
+    }
+}
 
 
 
@@ -1275,58 +1279,31 @@
 
 
                     if (
+    e.target.matches(
+        "input[name='officename[]'], " +
+        "input[name='address[]'], " +
+        "input[name='yr[]'], " +
+        "input[name='day[]'], " +
+        "textarea[name='workdetail[]']"
+    )
+) {
 
-                        e.target.matches(
+    const errorDiv =
+        e.target.parentElement.querySelector(
+            ".row-field-error"
+        );
 
-                            "input[name='officename[]'], " +
+    if (errorDiv) {
 
-                            "input[name='address[]'], " +
+        errorDiv.textContent = "";
+        errorDiv.remove();
 
-                            "input[name='yr[]'], " +
+    }
 
-                            "input[name='day[]'], " +
-
-                            "textarea[name='workdetail[]']"
-
-                        )
-
-                    ) {
-
-
-
-                        const errorDiv =
-
-                            e.target.parentElement.querySelector(
-
-                                ".row-field-error"
-
-                            );
-
-
-
-
-
-                        if (errorDiv) {
-
-
-
-                            errorDiv.textContent = "";
-
-                            errorDiv.remove();
-
-
-
-                        }
-
-
-
-                        e.target.classList.remove(
-
-                            "is-invalid"
-
-                        );
-
-                    }
+    e.target.classList.remove(
+        "is-invalid"
+    );
+}
 
 
 
