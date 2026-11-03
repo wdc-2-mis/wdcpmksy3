@@ -61,6 +61,22 @@
 		}
 			
 	document.addEventListener("DOMContentLoaded", function () {
+		
+		["reason", "reason1"].forEach(function(id) {
+
+		    const field = document.getElementById(id);
+
+		    if (field) {
+
+		        field.addEventListener("input", function() {
+
+		            validateReasonField(field);
+
+		        });
+
+		    }
+
+		});
 
 		const forme = document.getElementById("editForm");
 				       
@@ -168,6 +184,10 @@
 						       validateTextField(
 						           document.getElementById("reason1")
 						       );
+							   
+							   if (!validateReasonField(document.getElementById("reason1"))) {
+							       isValid = false;
+							   }
 
 						       // ==========================================
 						       // Stop form submission if invalid
@@ -388,6 +408,9 @@
 				       validateTextField(
 				           document.getElementById("reason")
 				       );
+					   if (!validateReasonField(document.getElementById("reason"))) {
+					       isValid = false;
+					   }
 
 				       // ==========================================
 				       // Stop form submission if invalid
@@ -963,6 +986,34 @@
 		
 	});
 	
+	function validateReasonField(element) {
+
+	    const value = element.value.trim();
+
+	    if (value.length < 5) {
+
+	        element.classList.add("is-invalid");
+	        element.classList.remove("is-valid");
+
+	        const feedback = element.parentElement.querySelector(".invalid-feedback");
+
+	        if (feedback) {
+	            feedback.textContent =
+	                value.length === 0
+	                ? "This field cannot be blank."
+	                : "Please enter at least 5 characters.";
+	        }
+
+	        return false;
+
+	    } else {
+
+	        element.classList.remove("is-invalid");
+	        element.classList.add("is-valid");
+
+	        return true;
+	    }
+	}
 	
 
 </script>
@@ -1125,7 +1176,7 @@
 				               <label class="form-label">
 				                  <b>Main reason of Migration</b> <span class="required">*</span>
 				               </label>
-							  <textarea name="reason" id="reason" class="form-control" rows="2" required></textarea>
+							  <textarea name="reason" id="reason" class="form-control" rows="2" minlength="5" required></textarea>
 							  <div class="invalid-feedback">Please Enter Main reason of Migration</div>
 				        </div>
 						 
@@ -1402,7 +1453,7 @@
 									<label class="form-label">
 										<b>Main reason of Migration</b> <span class="required">*</span>
 									</label>
-									<textarea name="reason1" id="reason1" class="form-control" rows="2"></textarea>
+									<textarea name="reason1" id="reason1" class="form-control" rows="2" minlength="5"></textarea>
 									<div class="invalid-feedback">Please Enter Main reason of Migration</div>
 								</div>
 							
