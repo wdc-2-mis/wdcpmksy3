@@ -4,916 +4,1175 @@
       layout:decorate="~{layout/layout}">
 
 <head>
-<meta charset="UTF-8">
-<title>Institutional Structure</title>
-
-<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
-<style>
-	.required{
-	    color:red;
-	}
-
-	
-</style>
-
-
-<script>
-
-// Restrict dates before 2026
-document.addEventListener("DOMContentLoaded", function () {
-
-    const notificationDate = document.getElementsByName("notificationDate")[0];
-    const mouDate = document.getElementsByName("mouDate")[0];
-
-    notificationDate.setAttribute("min", "2026-01-01");
-    mouDate.setAttribute("min", "2026-01-01");
-	
-	const today = new Date().toISOString().split("T")[0]; 
-	notificationDate.setAttribute("max", today); 
-	mouDate.setAttribute("max", today);
-	
-	const notificationDate1 = document.getElementsByName("notificationDate1")[0];
-	const mouDate1 = document.getElementsByName("mouDate1")[0];
-
-	notificationDate1.setAttribute("min", "2026-01-01");
-	mouDate1.setAttribute("min", "2026-01-01");
-
-	notificationDate1.setAttribute("max", today);
-	mouDate1.setAttribute("max", today);
-	
-	const form = document.getElementById("institutionForm");
-	const formedit = document.getElementById("editForm");
-	
-	if (formedit) {
-
-	    const slnaType1 = document.getElementById("slnaType1");
-		const notificationFile1 = document.getElementById("notificationFile1");
-		const mouFile1 = document.getElementById("mouFile1");
-
-	    if (slnaType1) {
-
-	        slnaType1.addEventListener("blur", function () {
-
-	            if (!slnaType1.value.trim()) {
-	                slnaType1.classList.add("is-invalid");
-	                slnaType1.classList.remove("is-valid");
-	            } else {
-	                slnaType1.classList.remove("is-invalid");
-	                slnaType1.classList.add("is-valid");
-	            }
-
-	        });
-
-	        formedit.addEventListener("submit", function (event) {
-
-	            if (!slnaType1.value.trim()) {
-
-	                event.preventDefault();
-
-	                slnaType1.classList.add("is-invalid");
-	                slnaType1.classList.remove("is-valid");
-
-	                slnaType1.focus();
-	            } else {
-
-	                slnaType1.classList.remove("is-invalid");
-	                slnaType1.classList.add("is-valid");
-	            }
-				
-				if (!notificationDate1.value.trim()) {
-
-					event.preventDefault();
-
-					notificationDate1.classList.add("is-invalid");
-					notificationDate1.classList.remove("is-valid");
-
-					notificationDate1.focus();
-				} else {
-
-					notificationDate1.classList.remove("is-invalid");
-					notificationDate1.classList.add("is-valid");
-				}
-				if (!mouDate1.value.trim()) {
-
-					event.preventDefault();
-
-					mouDate1.classList.add("is-invalid");
-					mouDate1.classList.remove("is-valid");
-
-					mouDate1.focus();
-				} else {
-
-					mouDate1.classList.remove("is-invalid");
-					mouDate1.classList.add("is-valid");
-				}
-
-	        });
-	    }
-	}
-
-	   if (form) {
-
-	       const inputs =
-	           form.querySelectorAll("input[required], select[required]");
-
-	       inputs.forEach(function (input) {
-
-	           input.addEventListener("blur", function () {
-
-	               if (!input.value) {
-
-	                   input.classList.add("is-invalid");
-	                   input.classList.remove("is-valid");
-
-	               } else {
-
-	                   input.classList.remove("is-invalid");
-	                   input.classList.add("is-valid");
-
-	               }
-
-	           });
-
-	       });
-
-
-	       form.addEventListener("submit", function (event) {
-
-	           if (!form.checkValidity()) {
-
-	               event.preventDefault();
-	               event.stopPropagation();
-
-	           }
-
-	           form.classList.add("was-validated");
-
-	       });
-
-	   }
-
-});
-
-// Allow only PDF files
-document.addEventListener("DOMContentLoaded", function () {
-	
-				var editModal = document.getElementById('editModal');
-			   	editModal.addEventListener('show.bs.modal', function (event) {
-			       var button = event.relatedTarget;
-				   
-			       // Get data attributes  
-			       var Id = button.getAttribute('data-id');
-			       var stname = button.getAttribute('data-stname');
-			       var stid = button.getAttribute('data-stid');
-			       var sltype = button.getAttribute('data-sltype');
-				   var notificationd = button.getAttribute('data-notificationd');
-				   var moud = button.getAttribute('data-moud');
-				  
-			       // Populate modal fields  pprUnspentBalanceId
-			       document.getElementById('pprid').value = Id;
-			       document.getElementById('stateName1').value = stname;
-				   document.getElementById("slnaType1").value =sltype;
-				   document.getElementById("notificationDate1").value =notificationd;
-				   document.getElementById("mouDate1").value =moud;
-				  
-			   });
-	
-	
-	
-
-    const form = document.getElementById("institutionForm");
-	const notificationFile = document.getElementById("notificationFile");
-	const mouFile = document.getElementById("mouFile");
-	
-	const notificationFile1 = document.getElementById("notificationFile1");
-	const mouFile1 = document.getElementById("mouFile1");
-
-	function validatePDF(input) {
-
-	    const errorDiv = document.getElementById(input.id + "Error");
-
-	    // Clear previous error
-	    errorDiv.textContent = "";
-	    errorDiv.style.display = "none";
-
-	    // Reset invalid state
-	    input.classList.remove("is-invalid");
-
-	    // No file selected
-	    if (!input.files || input.files.length === 0) {
-	        return true;
-	    }
-
-	    const file = input.files[0];
-	    const fileName = file.name;
-
-	    // 1. Validate file name
-	    // Only letters, numbers, underscore, hyphen and .pdf
-	    const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
-
-	    if (!fileNamePattern.test(fileName)) {
-
-	        errorDiv.textContent =
-	            "File name should contain only letters, numbers, underscore (_) or hyphen (-), and must end with .pdf.";
-
-	        errorDiv.style.display = "block";
-
-	        input.classList.add("is-invalid");
-	        input.value = "";
-
-	        return false;
-	    }
-
-	    // 2. Validate PDF type
-	    // Some browsers may return an empty file.type,
-	    // so check the extension separately.
-	    if (
-	        !fileName.toLowerCase().endsWith(".pdf") ||
-	        (file.type !== "" && file.type !== "application/pdf")
-	    ) {
-
-	        errorDiv.textContent = "Only PDF files are allowed.";
-
-	        errorDiv.style.display = "block";
-
-	        input.classList.add("is-invalid");
-	        input.value = "";
-
-	        return false;
-	    }
-
-	    // 3. Validate maximum file size (5 MB)
-	    const maxSize = 5 * 1024 * 1024;
-
-	    if (file.size > maxSize) {
-
-	        errorDiv.textContent =
-	            "PDF file size must not be more than 5 MB.";
-
-	        errorDiv.style.display = "block";
-
-	        input.classList.add("is-invalid");
-	        input.value = "";
-
-	        return false;
-	    }
-
-	    // File is valid
-	    input.classList.add("is-valid");
-
-	    return true;
-	}
-
-	    function validateSameFile1(changedInput, otherInput) {
-
-			document.getElementById("notificationFile1Error").style.display = "none";
-			document.getElementById("notificationFile1Error").innerText = "";
-
-			document.getElementById("mouFile1Error").style.display = "none";
-			document.getElementById("mouFile1Error").innerText = "";
-
-			if (changedInput.files.length === 0 || otherInput.files.length === 0) {
-				return;
-			}
-
-			const file1 = changedInput.files[0];
-			const file2 = otherInput.files[0];
-
-			if (
-				file1.name.toLowerCase() === file2.name.toLowerCase() &&
-				file1.size === file2.size
-			) {
-
-				const errorDiv =
-					changedInput.id === "notificationFile1"
-						? document.getElementById("notificationFile1Error")
-						: document.getElementById("mouFile1Error");
-
-				errorDiv.innerText =
-					"Notification PDF and MoU PDF cannot be the same file.";
-
-				errorDiv.style.display = "block";
-
-				// Remove selected file
-				changedInput.value = "";
-
-				// Focus the field
-				changedInput.focus();
-	        }
-	    }
-		
-		function validateSameFile(changedInput, otherInput) {
-
-		    // Clear previous messages
-		    document.getElementById("notificationFileError").style.display = "none";
-		    document.getElementById("notificationFileError").innerText = "";
-
-		    document.getElementById("mouFileError").style.display = "none";
-		    document.getElementById("mouFileError").innerText = "";
-
-		    if (changedInput.files.length === 0 || otherInput.files.length === 0) {
-		        return;
-		    }
-
-		    const file1 = changedInput.files[0];
-		    const file2 = otherInput.files[0];
-
-		    if (
-		        file1.name.toLowerCase() === file2.name.toLowerCase() &&
-		        file1.size === file2.size
-		    ) {
-
-		        const errorDiv =
-		            changedInput.id === "notificationFile"
-		                ? document.getElementById("notificationFileError")
-		                : document.getElementById("mouFileError");
-
-		        errorDiv.innerText =
-		            "Notification PDF and MoU PDF cannot be the same file.";
-
-		        errorDiv.style.display = "block";
-
-		        // Remove selected file
-		        changedInput.value = "";
-
-		        // Focus the field
-		        changedInput.focus();
-		    }
-		}
-
-		// New Notification PDF
-		notificationFile.addEventListener("change", function () {
-
-		    if (validatePDF(this)) {
-		        validateSameFile(this, mouFile);
-		    }
-		});
-
-		// New MoU PDF
-		mouFile.addEventListener("change", function () {
-
-		    if (validatePDF(this)) {
-		        validateSameFile(this, notificationFile);
-		    }
-		});
-
-		// Edit Notification PDF
-		notificationFile1.addEventListener("change", function () {
-
-		    if (validatePDF(this)) {
-		        validateSameFile1(this, mouFile1);
-		    }
-		});
-
-		// Edit MoU PDF
-		mouFile1.addEventListener("change", function () {
-
-		    if (validatePDF(this)) {
-		        validateSameFile1(this, notificationFile1);
-		    }
-		});
-	
-	
-	
-
-});
-
-let mouBlobUrl = null;
-
-function clearMouFrame() {
-
-    const frame = document.getElementById("mouFrame");
-
-    frame.removeAttribute("src");
-    frame.classList.add("d-none");
-
-    if (mouBlobUrl) {
-        URL.revokeObjectURL(mouBlobUrl);
-        mouBlobUrl = null;
-    }
-}
-
-function openMouPdf(id, type) {
-
-    const frame = document.getElementById("mouFrame");
-    const msg = document.getElementById("mouMsg");
-    const dl = document.getElementById("mouDownload");
-
-    // Clear previous PDF
-    clearMouFrame();
-
-    // Show loading message
-    msg.textContent = "Loading PDF...";
-    msg.classList.remove("d-none");
-
-    // Build URL according to controller
-    const pdfUrl =
-        "/viewPdfInstitutionalStructure"
-        + "?id=" + encodeURIComponent(id)
-        + "&type=" + encodeURIComponent(type);
-
-    // Download URL
-    const downloadUrl =
-        "/viewPdfInstitutionalStructure"
-        + "?id=" + encodeURIComponent(id)
-        + "&type=" + encodeURIComponent(type)
-        + "&download=true";
-
-    // Set download link
-    dl.href = downloadUrl;
-
-    // Open modal
-    bootstrap.Modal
-        .getOrCreateInstance(document.getElementById("mouModal"))
-        .show();
-
-    // Fetch PDF
-    fetch(pdfUrl)
-        .then(function (response) {
-
-            if (!response.ok) {
-                throw new Error("HTTP " + response.status);
+    <meta charset="UTF-8">
+    <title>Institutional Structure</title>
+
+    <style>
+        .required {
+            color: red;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const today = new Date().toISOString().split("T")[0];
+
+            // Date restrictions
+            [
+                "notificationDate",
+                "mouDate",
+                "notificationDate1",
+                "mouDate1"
+            ].forEach(function (name) {
+
+                const dateInput = document.getElementsByName(name)[0];
+
+                if (dateInput) {
+                    dateInput.setAttribute("min", "2026-01-01");
+                    dateInput.setAttribute("max", today);
+                }
+            });
+
+            // New form validation
+            const form = document.getElementById("institutionForm");
+
+            if (form) {
+
+                const inputs = form.querySelectorAll(
+                    "input[required], select[required]"
+                );
+
+                inputs.forEach(function (input) {
+
+                    input.addEventListener("blur", function () {
+
+                        if (!input.value) {
+                            input.classList.add("is-invalid");
+                            input.classList.remove("is-valid");
+                        } else {
+                            input.classList.remove("is-invalid");
+                            input.classList.add("is-valid");
+                        }
+                    });
+                });
+
+                form.addEventListener("submit", function (event) {
+
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add("was-validated");
+                });
             }
 
-            return response.blob();
-        })
-        .then(function (blob) {
+            // Edit modal population
+            const editModal = document.getElementById("editModal");
 
-            // Check that response is actually PDF
-            if (blob.type !== "application/pdf") {
-                throw new Error("Response is not a PDF");
+            if (editModal) {
+
+                editModal.addEventListener("show.bs.modal", function (event) {
+
+                    const button = event.relatedTarget;
+
+                    document.getElementById("pprid").value =
+                        button.getAttribute("data-id");
+
+                    document.getElementById("stateName1").value =
+                        button.getAttribute("data-stname");
+
+                    document.getElementById("slnaType1").value =
+                        button.getAttribute("data-sltype");
+
+                    document.getElementById("notificationDate1").value =
+                        button.getAttribute("data-notificationd");
+
+                    document.getElementById("mouDate1").value =
+                        button.getAttribute("data-moud");
+
+                    // Clear previous file selections and errors
+                    clearUpdateFiles();
+                });
             }
 
-            // Create temporary blob URL
-            mouBlobUrl = URL.createObjectURL(blob);
+            // PDF validation
+            function validatePDF(input) {
 
-            // Display PDF
-            frame.src = mouBlobUrl;
-            frame.classList.remove("d-none");
+                const errorDiv =
+                    document.getElementById(input.id + "Error");
 
-            // Hide loading message
-            msg.classList.add("d-none");
-        })
-        .catch(function (error) {
+                errorDiv.textContent = "";
+                errorDiv.style.display = "none";
 
-            console.error("PDF loading error:", error);
+                input.classList.remove("is-invalid", "is-valid");
 
+                if (!input.files || input.files.length === 0) {
+                    return true;
+                }
+
+                const file = input.files[0];
+                const fileName = file.name;
+
+                const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
+
+                if (!fileNamePattern.test(fileName)) {
+
+                    errorDiv.textContent =
+                        "File name should contain only letters, numbers, underscore (_) or hyphen (-), and must end with .pdf.";
+
+                    errorDiv.style.display = "block";
+
+                    input.classList.add("is-invalid");
+                    input.value = "";
+
+                    return false;
+                }
+
+                if (
+                    !fileName.toLowerCase().endsWith(".pdf") ||
+                    (file.type !== "" && file.type !== "application/pdf")
+                ) {
+
+                    errorDiv.textContent = "Only PDF files are allowed.";
+
+                    errorDiv.style.display = "block";
+
+                    input.classList.add("is-invalid");
+                    input.value = "";
+
+                    return false;
+                }
+
+                const maxSize = 5 * 1024 * 1024;
+
+                if (file.size > maxSize) {
+
+                    errorDiv.textContent =
+                        "PDF file size must not be more than 5 MB.";
+
+                    errorDiv.style.display = "block";
+
+                    input.classList.add("is-invalid");
+                    input.value = "";
+
+                    return false;
+                }
+
+                input.classList.add("is-valid");
+
+                return true;
+            }
+
+            // Check duplicate PDF files
+            function validateSameFile(changedInput, otherInput) {
+
+                const notificationError =
+                    document.getElementById(
+                        changedInput.id.includes("1")
+                            ? "notificationFile1Error"
+                            : "notificationFileError"
+                    );
+
+                const mouError =
+                    document.getElementById(
+                        changedInput.id.includes("1")
+                            ? "mouFile1Error"
+                            : "mouFileError"
+                    );
+
+                notificationError.style.display = "none";
+                notificationError.textContent = "";
+
+                mouError.style.display = "none";
+                mouError.textContent = "";
+
+                if (
+                    changedInput.files.length === 0 ||
+                    otherInput.files.length === 0
+                ) {
+                    return;
+                }
+
+                const file1 = changedInput.files[0];
+                const file2 = otherInput.files[0];
+
+                if (
+                    file1.name.toLowerCase() ===
+                        file2.name.toLowerCase() &&
+                    file1.size === file2.size
+                ) {
+
+                    const errorDiv =
+                        changedInput.id.includes("notification")
+                            ? notificationError
+                            : mouError;
+
+                    errorDiv.textContent =
+                        "Notification PDF and MoU PDF cannot be the same file.";
+
+                    errorDiv.style.display = "block";
+
+                    changedInput.value = "";
+
+                    changedInput.classList.remove("is-valid");
+                    changedInput.classList.add("is-invalid");
+
+                    changedInput.focus();
+                }
+            }
+
+            // New Notification PDF
+            document.getElementById("notificationFile")
+                .addEventListener("change", function () {
+
+                    if (validatePDF(this)) {
+                        validateSameFile(
+                            this,
+                            document.getElementById("mouFile")
+                        );
+                    }
+                });
+
+            // New MoU PDF
+            document.getElementById("mouFile")
+                .addEventListener("change", function () {
+
+                    if (validatePDF(this)) {
+                        validateSameFile(
+                            this,
+                            document.getElementById("notificationFile")
+                        );
+                    }
+                });
+
+            // Edit Notification PDF
+            document.getElementById("notificationFile1")
+                .addEventListener("change", function () {
+
+                    if (validatePDF(this)) {
+                        validateSameFile(
+                            this,
+                            document.getElementById("mouFile1")
+                        );
+                    }
+                });
+
+            // Edit MoU PDF
+            document.getElementById("mouFile1")
+                .addEventListener("change", function () {
+
+                    if (validatePDF(this)) {
+                        validateSameFile(
+                            this,
+                            document.getElementById("notificationFile1")
+                        );
+                    }
+                });
+
+        });
+
+        // =====================================================
+        // UPDATE FORM CLEAR BUTTON
+        // Clears only the two selected PDF files
+        // =====================================================
+        function clearUpdateFiles() {
+
+            const notificationFile1 =
+                document.getElementById("notificationFile1");
+
+            const mouFile1 =
+                document.getElementById("mouFile1");
+
+            const notificationFile1Error =
+                document.getElementById("notificationFile1Error");
+
+            const mouFile1Error =
+                document.getElementById("mouFile1Error");
+
+            // Clear Notification PDF
+            notificationFile1.value = "";
+
+            // Clear MoU PDF
+            mouFile1.value = "";
+
+            // Remove validation styling
+            notificationFile1.classList.remove(
+                "is-invalid",
+                "is-valid"
+            );
+
+            mouFile1.classList.remove(
+                "is-invalid",
+                "is-valid"
+            );
+
+            // Clear Notification PDF error
+            notificationFile1Error.textContent = "";
+            notificationFile1Error.style.display = "none";
+
+            // Clear MoU PDF error
+            mouFile1Error.textContent = "";
+            mouFile1Error.style.display = "none";
+        }
+
+        // =====================================================
+        // NEW FORM CLEAR BUTTON
+        // Preserves State Name
+        // =====================================================
+        function clearInstitutionForm(formId) {
+
+            const form = document.getElementById(formId);
+
+            if (!form) {
+                return;
+            }
+
+            const stateName = form.querySelector(
+                'input[name="stateName"], input[name="stateName1"]'
+            );
+
+            const savedStateName =
+                stateName ? stateName.value : "";
+
+            const recordId =
+                form.querySelector('input[name="pprid"]');
+
+            const savedRecordId =
+                recordId ? recordId.value : "";
+
+            form.reset();
+
+            if (stateName) {
+                stateName.value = savedStateName;
+            }
+
+            if (recordId) {
+                recordId.value = savedRecordId;
+            }
+
+            form.querySelectorAll(".text-danger").forEach(
+                function (errorDiv) {
+                    errorDiv.textContent = "";
+                    errorDiv.style.display = "none";
+                }
+            );
+
+            form.querySelectorAll(".is-invalid, .is-valid").forEach(
+                function (field) {
+                    field.classList.remove(
+                        "is-invalid",
+                        "is-valid"
+                    );
+                }
+            );
+
+            form.classList.remove("was-validated");
+        }
+
+        // =====================================================
+        // PDF VIEW MODAL
+        // =====================================================
+        let mouBlobUrl = null;
+
+        function clearMouFrame() {
+
+            const frame =
+                document.getElementById("mouFrame");
+
+            frame.removeAttribute("src");
             frame.classList.add("d-none");
 
-            msg.textContent = "Unable to load the PDF.";
+            if (mouBlobUrl) {
+                URL.revokeObjectURL(mouBlobUrl);
+                mouBlobUrl = null;
+            }
+        }
+
+        function openMouPdf(id, type) {
+
+            const frame =
+                document.getElementById("mouFrame");
+
+            const msg =
+                document.getElementById("mouMsg");
+
+            const dl =
+                document.getElementById("mouDownload");
+
+            clearMouFrame();
+
+            msg.textContent = "Loading PDF...";
             msg.classList.remove("d-none");
+
+            const pdfUrl =
+                "/viewPdfInstitutionalStructure" +
+                "?id=" + encodeURIComponent(id) +
+                "&type=" + encodeURIComponent(type);
+
+            const downloadUrl =
+                "/viewPdfInstitutionalStructure" +
+                "?id=" + encodeURIComponent(id) +
+                "&type=" + encodeURIComponent(type) +
+                "&download=true";
+
+            dl.href = downloadUrl;
+
+            bootstrap.Modal
+                .getOrCreateInstance(
+                    document.getElementById("mouModal")
+                )
+                .show();
+
+            fetch(pdfUrl)
+                .then(function (response) {
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "HTTP " + response.status
+                        );
+                    }
+
+                    return response.blob();
+                })
+                .then(function (blob) {
+
+                    if (blob.type !== "application/pdf") {
+                        throw new Error(
+                            "Response is not a PDF"
+                        );
+                    }
+
+                    mouBlobUrl =
+                        URL.createObjectURL(blob);
+
+                    frame.src = mouBlobUrl;
+                    frame.classList.remove("d-none");
+
+                    msg.classList.add("d-none");
+                })
+                .catch(function (error) {
+
+                    console.error(
+                        "PDF loading error:",
+                        error
+                    );
+
+                    frame.classList.add("d-none");
+
+                    msg.textContent =
+                        "Unable to load the PDF.";
+
+                    msg.classList.remove("d-none");
+                });
+        }
+
+        // Notification / MoU View buttons
+        document.addEventListener("click", function (e) {
+
+            const link =
+                e.target.closest(".viewMouBtn");
+
+            if (!link) {
+                return;
+            }
+
+            e.preventDefault();
+
+            const id =
+                link.getAttribute("data-id");
+
+            const type =
+                link.getAttribute("data-type");
+
+            if (!id || !type) {
+                console.error(
+                    "Missing PDF id or type"
+                );
+
+                return;
+            }
+
+            openMouPdf(id, type);
         });
-}
 
-
-// Handle Notification / MoU View buttons
-document.addEventListener("click", function (e) {
-
-    const link = e.target.closest(".viewMouBtn");
-
-    if (!link) {
-        return;
-    }
-
-    e.preventDefault();
-
-    const id = link.getAttribute("data-id");
-    const type = link.getAttribute("data-type");
-
-    console.log("PDF ID:", id);
-    console.log("PDF Type:", type);
-
-    if (!id || !type) {
-        console.error("Missing PDF id or type");
-        return;
-    }
-
-    openMouPdf(id, type);
-});
-
-
-// Clear PDF when modal is closed
-document.addEventListener("DOMContentLoaded", function () {
-
-    const modal = document.getElementById("mouModal");
-
-    if (modal) {
-
-        modal.addEventListener(
-            "hidden.bs.modal",
+        // Clear PDF when modal is closed
+        document.addEventListener(
+            "DOMContentLoaded",
             function () {
-                clearMouFrame();
+
+                const modal =
+                    document.getElementById("mouModal");
+
+                if (modal) {
+
+                    modal.addEventListener(
+                        "hidden.bs.modal",
+                        function () {
+                            clearMouFrame();
+                        }
+                    );
+                }
             }
         );
-    }
-});
-
-function clearInstitutionForm(formId) {
-
-    const form = document.getElementById(formId);
-
-    if (!form) {
-        return;
-    }
-
-    // Preserve State Name before clearing
-    const stateName = form.querySelector(
-        'input[name="stateName"], input[name="stateName1"]'
-    );
-
-    const savedStateName = stateName ? stateName.value : "";
-
-    // Preserve hidden record ID in edit form
-    const recordId = form.querySelector('input[name="pprid"]');
-    const savedRecordId = recordId ? recordId.value : "";
-
-    // Reset all form fields
-    form.reset();
-
-    // Restore State Name
-    if (stateName) {
-        stateName.value = savedStateName;
-    }
-
-    // Restore record ID so Update still targets the same record
-    if (recordId) {
-        recordId.value = savedRecordId;
-    }
-
-    // Clear custom validation messages and styling
-    form.querySelectorAll(".text-danger").forEach(function (errorDiv) {
-        errorDiv.textContent = "";
-        errorDiv.style.display = "none";
-    });
-
-    form.querySelectorAll(".is-invalid, .is-valid").forEach(function (field) {
-        field.classList.remove("is-invalid", "is-valid");
-    });
-
-    form.classList.remove("was-validated");
-}
-
-</script>
+    </script>
 
 </head>
 
 <body>
 
-
-
-
-
 <div layout:fragment="content">
 
-			<!-- ===================== View file Modal ====================== -->
-	<div class="modal fade" id="mouModal" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-xl modal-dialog-centered">
-			<div class="modal-content">
+    <!-- View PDF Modal -->
+    <div class="modal fade"
+         id="mouModal"
+         tabindex="-1"
+         aria-hidden="true">
 
-				<div class="modal-header bg-primary text-white">
-					<h5 class="modal-title">View Document</h5>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-				</div>
+        <div class="modal-dialog modal-xl modal-dialog-centered">
 
-				<div class="modal-body p-0" style="height:75vh;">
-					<div id="mouMsg" class="text-center p-4">Loading PDF...</div>
-					<iframe id="mouFrame" class="d-none" style="width:100%;height:100%;border:0;"></iframe>
-				</div>
+            <div class="modal-content">
 
-				<div class="modal-footer">
-					<a id="mouDownload" href="#" class="btn btn-success">
-						<i class="fas fa-download"></i> Download
-					</a>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				</div>
+                <div class="modal-header bg-primary text-white">
 
-			</div>
-		</div>
-	</div>
+                    <h5 class="modal-title">
+                        View Document
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body p-0"
+                     style="height:75vh;">
+
+                    <div id="mouMsg"
+                         class="text-center p-4">
+                        Loading PDF...
+                    </div>
+
+                    <iframe id="mouFrame"
+                            class="d-none"
+                            style="width:100%;height:100%;border:0;">
+                    </iframe>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <a id="mouDownload"
+                       href="#"
+                       class="btn btn-success">
+
+                        <i class="fas fa-download"></i>
+                        Download
+
+                    </a>
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Close
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <div class="card shadow-sm border-0">
 
         <div class="card-header bg-primary text-white">
+
             <h4 class="mb-0">
-               Institutional Structure
+                Institutional Structure
             </h4>
+
         </div>
-		
-		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-			<span th:text="${success}"></span>
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
-		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-		    <span th:text="${error}"></span>
-		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
+
+        <div th:if="${success}"
+             class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            <span th:text="${success}"></span>
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+
+        <div th:if="${error}"
+             class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            <span th:text="${error}"></span>
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
 
         <div class="card-body">
 
-             <form id="institutionForm" th:action="@{/saveInstitutionalStructurePPR1}" method="post" enctype="multipart/form-data" novalidate>
+            <!-- NEW INSTITUTIONAL STRUCTURE FORM -->
+            <form id="institutionForm"
+                  th:action="@{/saveInstitutionalStructurePPR1}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  novalidate>
 
                 <div class="row g-4">
 
-                    <!-- State -->
-
+                    <!-- State Name -->
                     <div class="col-md-6">
 
                         <label class="form-label">
-                           <b> State Name </b><span class="required">*</span>
+                            <b>State Name</b>
+                            <span class="required">*</span>
                         </label>
 
-						<input type="text" class="form-control" name="stateName"  th:value="${statename}" readonly>
-											
-						<input type="hidden" name="stcode"  th:value="${stcode}" >
+                        <input type="text"
+                               class="form-control"
+                               name="stateName"
+                               th:value="${statename}"
+                               readonly>
+
+                        <input type="hidden"
+                               name="stcode"
+                               th:value="${stcode}">
 
                     </div>
 
                     <!-- Type of SLNA -->
-
                     <div class="col-md-6">
 
                         <label class="form-label">
-                           <b> Type of SLNA </b><span class="required">*</span>
+                            <b>Type of SLNA</b>
+                            <span class="required">*</span>
                         </label>
 
-						<input type="text" class="form-control"name="slnaType"
-						         placeholder="Enter Type of SLNA" required>
-								 <div class="invalid-feedback">Please enter type of SLNA</div>
+                        <input type="text"
+                               class="form-control"
+                               name="slnaType"
+                               placeholder="Enter Type of SLNA"
+                               required>
+
+                        <div class="invalid-feedback">
+                            Please enter type of SLNA
+                        </div>
+
                     </div>
 
-                    <!-- Date -->
-
+                    <!-- Notification Date -->
                     <div class="col-md-6">
 
                         <label class="form-label">
-                          <b>  Date of Notification </b><span class="required">*</span>
+                            <b>Date of Notification</b>
+                            <span class="required">*</span>
                         </label>
-						<input type="date" class="form-control" name="notificationDate"  min="2026-01-01"  required onkeydown="return false;">
-							<div class="invalid-feedback">Please select date of notification</div>
+
+                        <input type="date"
+                               class="form-control"
+                               name="notificationDate"
+                               min="2026-01-01"
+                               required
+                               onkeydown="return false;">
+
+                        <div class="invalid-feedback">
+                            Please select date of notification
+                        </div>
+
                     </div>
 
-                    <!-- Upload -->
-
+                    <!-- Notification PDF -->
                     <div class="col-md-6">
 
                         <label class="form-label">
-                           <b> Upload Notification </b> <span class="required">*</span>
+                            <b>Upload Notification</b>
+                            <span class="required">*</span>
                         </label>
 
-						<input type="file"
-						       id="notificationFile"
-						       name="notificationFile"
-						       class="form-control"
-						       accept=".pdf,application/pdf"
-						       required>
-							   <div class="invalid-feedback">Please select a notification PDF. </div>
-                  <small class="form-text text-muted">Only PDF file is allowed.</small>
-				  <div id="notificationFileError" class="text-danger mt-1"></div>
+                        <input type="file"
+                               id="notificationFile"
+                               name="notificationFile"
+                               class="form-control"
+                               accept=".pdf,application/pdf"
+                               required>
+
+                        <div class="invalid-feedback">
+                            Please select a notification PDF.
+                        </div>
+
+                        <small class="form-text text-muted">
+                            Only PDF file is allowed.
+                        </small>
+
+                        <div id="notificationFileError"
+                             class="text-danger mt-1">
+                        </div>
+
                     </div>
-                    
+
+                    <!-- MoU Date -->
                     <div class="col-md-6">
 
                         <label class="form-label">
-                          <b>  Date of MoU with DoLR </b> <span class="required">*</span>
+                            <b>Date of MoU with DoLR</b>
+                            <span class="required">*</span>
                         </label>
 
-						<input type="date" class="form-control" name="mouDate"
-						          min="2026-01-01"  onkeydown="return false;" required>
-								  <div class="invalid-feedback">Please select date of MoU with DoLR</div>
+                        <input type="date"
+                               class="form-control"
+                               name="mouDate"
+                               min="2026-01-01"
+                               onkeydown="return false;"
+                               required>
+
+                        <div class="invalid-feedback">
+                            Please select date of MoU with DoLR
+                        </div>
+
                     </div>
+
+                    <!-- MoU PDF -->
                     <div class="col-md-6">
 
                         <label class="form-label">
-                           <b> Upload MoU </b> <span class="required">*</span>
+                            <b>Upload MoU</b>
+                            <span class="required">*</span>
                         </label>
 
-						<input type="file"
-						       id="mouFile"
-						       name="mouFile"
-						       class="form-control"
-						       accept=".pdf,application/pdf"
-						       required>
-						<div class="invalid-feedback">Please select a MoU PDF. </div>	
-						<div id="mouFileError" class="text-danger mt-1"></div>		   
-						<small class="form-text text-muted">Only PDF file is allowed.</small>
+                        <input type="file"
+                               id="mouFile"
+                               name="mouFile"
+                               class="form-control"
+                               accept=".pdf,application/pdf"
+                               required>
+
+                        <div class="invalid-feedback">
+                            Please select a MoU PDF.
+                        </div>
+
+                        <div id="mouFileError"
+                             class="text-danger mt-1">
+                        </div>
+
+                        <small class="form-text text-muted">
+                            Only PDF file is allowed.
+                        </small>
+
                     </div>
 
                 </div>
 
                 <hr>
 
-                <div >
-					<center>
-					<button type="submit" name="action"  value="D" class="btn btn-warning" th:disabled="${ppr1ListSize > 0}">
+                <div class="text-center">
+
+                    <button type="submit"
+                            name="action"
+                            value="D"
+                            class="btn btn-warning"
+                            th:disabled="${ppr1ListSize > 0}">
 
                         <i class="fas fa-save"></i>
-
                         Save as Draft
 
                     </button>
-					&nbsp;&nbsp;&nbsp;
-					<button type="button"
-					           class="btn btn-secondary"
-					           onclick="clearInstitutionForm('institutionForm')">
-					       <i class="fas fa-eraser"></i>
-					       Clear
-					   </button>
-					</center>
+
+                    &nbsp;&nbsp;&nbsp;
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="clearInstitutionForm('institutionForm')">
+
+                        <i class="fas fa-eraser"></i>
+                        Clear
+
+                    </button>
 
                 </div>
 
             </form>
 
         </div>
-		
-						<div class="table-responsive" >
-		                    <table class="table table-bordered">
-								<h4>
-								      <b> <centre> List of Institutional Structure </centre>  </b>
-								 </h4>
-								 <br/>
-		                        <tbody>
-		                        <tr>
-		                            <th class="table-primary">State Name</th>
-		                            <th class="table-primary">Type of SLNA</th>
-									<th class="table-primary">Date of Notification</th>
-									<th class="table-primary">Uploaded Notification</th>
-									<th class="table-primary">Date of MoU with DoLR</th>
-									<th class="table-primary">Upload MoU</th>
-									<th class="table-primary">Action</th>
-		                        </tr>
-								</tbody>
-		                       <!--  <tr th:each="user : ${ppr1List}">
 
-		                           <td th:text="${user[2]}"></td>-->
-									
-								   <tr th:each="user, stat : ${ppr1List}">
-								       <td th:text="${stat.first ? user[2] : ''}"></td>
-									
-									
-		                            <td th:text="${user[3]}"></td>
-									<td th:text="${user[4]}"></td>
-								<!--	<td>
-										
-										<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]},type='notification')}" target="_blank">
-										    View Uploaded
-										</a>
-										
-									</td> -->
-									
-									<td>
-										<a href="#" class="viewMouBtn" th:attr="data-id=${user[0]}, data-type='notification'">View </a>
-									</td>
+        <!-- INSTITUTIONAL STRUCTURE LIST -->
+        <div class="table-responsive">
 
-									<td th:text="${user[6]}"></td>
-									
-									<td>
-										<a href="#" class="viewMouBtn" th:attr="data-id=${user[0]}, data-type='mou'">View </a>
-									</td>
+            <h4 class="p-3">
+                <b>List of Institutional Structure</b>
+            </h4>
 
-									<!--<td>
-										<a th:href="@{/viewPdfInstitutionalStructure(id=${user[0]}, type='mou')}" target="_blank">
-												View Uploaded
-										</a>
-									</td>-->
-									
-									<td>
-										<!--<a th:if="${user[8].toString().equals('D')}" title="Delete"
-										   th:href="@{/deleteInstitutionalStructurePPR1(id=${user[0]})}"
-										   class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">
-										     <i class="fas fa-trash"></i>
-										</a>-->
-										
-										<a href="javascript:void(0)" class="btn btn-danger btn-sm" th:if="${user[8].toString().equals('D')}" title="Delete"
-											th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteInstitutionalStructurePPR1?id=' + ${user[0]} + '\'; }); return false;'">
-										
-											<i class="fas fa-trash"></i>
-										</a>
-										
-										
-										&nbsp; &nbsp; 
-										<!--<a th:if="${user[8].toString().equals('D')}" title="Edit"
-										   th:href="@{/editInstitutionalStructurePPR1(id=${user[0]})}"
-										   class="btn btn-primary btn-sm"
-										   onclick="return confirm('Are you sure you want to edit this record?');">
-										     <i class="fas fa-edit"></i>
-										</a>-->
-										<button th:if="${user[8].toString().equals('D')}" type="button" title="Edit" class="btn btn-primary btn-sm editBtn" th:attr="data-id=${user[0]}, 
-										data-stname=${user[2]}, data-stid=${user[1]}, data-sltype=${user[3]}, data-notificationd=${user[9]}, data-moud=${user[10]}"
-											data-bs-toggle="modal" data-bs-target="#editModal">
-											<i class="fas fa-edit"></i>
-										</button>
-										&nbsp; &nbsp; 
-									   <!-- <a th:if="${user[8].toString().equals('D')}" title="Complete"
-										th:href="@{/completeInstitutionalStructurePPR1(id=${user[0]})}"
-									            class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to complete this record?');">
-									         <i class="fas fa-check"></i>
-									     </a>
-										 -->
-										<a href="javascript:void(0)" class="btn btn-success btn-sm" th:if="${user[8].toString().equals('D')}" title="Complete"
-											th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeInstitutionalStructurePPR1?id=' + ${user[0]} + '\'; }); return false;'">
-										
-											<i class="fas fa-check"></i>
-										</a>
-										 
-										 <span th:if="${user[8].toString().equals('C')}"
-										 				class="badge bg-success">
-										 		<i class="fas fa-check-circle"></i> Completed
-										 </span>	
-										 
-									</td>
-									
-		                        </tr>
+            <table class="table table-bordered">
 
-		                    </table>
+                <thead>
 
-		                </div>
-		
-						<div class="modal fade" id="editModal">
-							<div class="modal-dialog modal-xl">
-								<div class="modal-content">
-									<div class="modal-header bg-primary text-white">
-										<h5>Edit Details</h5>
-										<button class="btn-close" data-bs-dismiss="modal"></button>
-									</div>
-									<div class="modal-body">
-										<form id="editForm" th:action="@{/updateInstitutionalStructurePPR1}" method="post" enctype="multipart/form-data" novalidate>
-											<input type="hidden" id="pprid" name="pprid">
-											<!-- Member Details -->
-											<div class="row g-4">
-											
-												<!-- State -->
-											
-												<div class="col-md-6">
-													<label class="form-label">
-														<b> State Name </b>
-													</label>
-													<input type="text" class="form-control" name="stateName1" id="stateName1" readonly>
-												</div>
-												<div class="col-md-6">
-													<label class="form-label">
-														<b> Type of SLNA </b><span class="required">*</span>
-													</label>
-													<input type="text" class="form-control" name="slnaType1" id="slnaType1" placeholder="Enter Type of SLNA" required>
-													<div class="invalid-feedback">Please enter type of SLNA</div>
-												</div>
-												<div class="col-md-6">
-													<label class="form-label">
-														<b> Date of Notification </b><span class="required">*</span>
-													</label>
-													<input type="date" class="form-control" name="notificationDate1" id="notificationDate1" min="2026-01-01" onkeydown="return false;" required>
-													<div class="invalid-feedback">Please select Date of Notification</div>
-												</div>
-												<div class="col-md-6">
-													<label class="form-label">
-														<b> Upload Notification </b> 
-													</label>
-													<input type="file" id="notificationFile1" name="notificationFile1" class="form-control"
-														accept=".pdf,application/pdf" required>
-														<div class="invalid-feedback">Please select a notification PDF. </div>
-														<small class="form-text text-muted">Only PDF file is allowed.</small>
-														<div id="notificationFile1Error" class="text-danger mt-1"></div>
-												</div>
-												<div class="col-md-6">
-													<label class="form-label">
-														<b> Date of MoU with DoLR </b> <span class="required">*</span>
-													</label>
-													<input type="date" class="form-control" name="mouDate1" id="mouDate1" min="2026-01-01"  onkeydown="return false;" required>
-													<div class="invalid-feedback">Please select Date of MoU with DoLR</div>
-												</div>
-												<div class="col-md-6">
-													<label class="form-label">
-														<b> Upload MoU </b> 
-													</label>
-													<input type="file" id="mouFile1" name="mouFile1" class="form-control" accept=".pdf,application/pdf" required>
-													<small class="form-text text-muted">Only PDF file is allowed.</small>
-													<div class="invalid-feedback">Please select a MoU PDF. </div>	
-													<div id="mouFile1Error" class="text-danger mt-1"></div>		   
-														
-												</div>
-											
-											</div>
-						
-											<div class="text-center mt-4">
-												<button type="submit" name="updateAction" value="D" class="btn btn-warning">
-													<i class="fas fa-save"></i>
-													Update
-												</button>
-												
-												&nbsp; &nbsp;&nbsp;
+                    <tr>
 
-												    <button type="button"
-												            class="btn btn-secondary"
-												            onclick="clearInstitutionForm('editForm')">
-												        <i class="fas fa-eraser"></i>
-												        Clear
-												    </button>
-											</div>
-										</form>
-									</div>
-								</div>
-							</div>
-						</div>
+                        <th class="table-primary">
+                            State Name
+                        </th>
+
+                        <th class="table-primary">
+                            Type of SLNA
+                        </th>
+
+                        <th class="table-primary">
+                            Date of Notification
+                        </th>
+
+                        <th class="table-primary">
+                            Uploaded Notification
+                        </th>
+
+                        <th class="table-primary">
+                            Date of MoU with DoLR
+                        </th>
+
+                        <th class="table-primary">
+                            Upload MoU
+                        </th>
+
+                        <th class="table-primary">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="user, stat : ${ppr1List}">
+
+                        <td th:text="${stat.first ? user[2] : ''}">
+                        </td>
+
+                        <td th:text="${user[3]}">
+                        </td>
+
+                        <td th:text="${user[4]}">
+                        </td>
+
+                        <td>
+
+                            <a href="#"
+                               class="viewMouBtn"
+                               th:attr="data-id=${user[0]},
+                                        data-type='notification'">
+
+                                View
+
+                            </a>
+
+                        </td>
+
+                        <td th:text="${user[6]}">
+                        </td>
+
+                        <td>
+
+                            <a href="#"
+                               class="viewMouBtn"
+                               th:attr="data-id=${user[0]},
+                                        data-type='mou'">
+
+                                View
+
+                            </a>
+
+                        </td>
+
+                        <td>
+
+                            <!-- DELETE -->
+                            <a href="javascript:void(0)"
+                               class="btn btn-danger btn-sm"
+                               th:if="${user[8].toString().equals('D')}"
+                               title="Delete"
+                               th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteInstitutionalStructurePPR1?id=' + ${user[0]} + '\'; }); return false;'">
+
+                                <i class="fas fa-trash"></i>
+
+                            </a>
+
+                            &nbsp;&nbsp;
+
+                            <!-- EDIT -->
+                            <button th:if="${user[8].toString().equals('D')}"
+                                    type="button"
+                                    title="Edit"
+                                    class="btn btn-primary btn-sm editBtn"
+                                    th:attr="data-id=${user[0]},
+                                             data-stname=${user[2]},
+                                             data-stid=${user[1]},
+                                             data-sltype=${user[3]},
+                                             data-notificationd=${user[9]},
+                                             data-moud=${user[10]}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal">
+
+                                <i class="fas fa-edit"></i>
+
+                            </button>
+
+                            &nbsp;&nbsp;
+
+                            <!-- COMPLETE -->
+                            <a href="javascript:void(0)"
+                               class="btn btn-success btn-sm"
+                               th:if="${user[8].toString().equals('D')}"
+                               title="Complete"
+                               th:onclick="'completeAlert(\'Are you sure you want to complete this record?\', function() { window.location.href = \'/completeInstitutionalStructurePPR1?id=' + ${user[0]} + '\'; }); return false;'">
+
+                                <i class="fas fa-check"></i>
+
+                            </a>
+
+                            <!-- COMPLETED STATUS -->
+                            <span th:if="${user[8].toString().equals('C')}"
+                                  class="badge bg-success">
+
+                                <i class="fas fa-check-circle"></i>
+                                Completed
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- EDIT MODAL -->
+        <div class="modal fade"
+             id="editModal"
+             tabindex="-1"
+             aria-hidden="true">
+
+            <div class="modal-dialog modal-xl">
+
+                <div class="modal-content">
+
+                    <div class="modal-header bg-primary text-white">
+
+                        <h5 class="modal-title">
+                            Edit Details
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <form id="editForm"
+                              th:action="@{/updateInstitutionalStructurePPR1}"
+                              method="post"
+                              enctype="multipart/form-data"
+                              novalidate>
+
+                            <input type="hidden"
+                                   id="pprid"
+                                   name="pprid">
+
+                            <div class="row g-4">
+
+                                <!-- State Name -->
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+                                        <b>State Name</b>
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="stateName1"
+                                           id="stateName1"
+                                           readonly>
+
+                                </div>
+
+                                <!-- SLNA Type -->
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+                                        <b>Type of SLNA</b>
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="slnaType1"
+                                           id="slnaType1"
+                                           placeholder="Enter Type of SLNA"
+                                           required>
+
+                                    <div class="invalid-feedback">
+                                        Please enter type of SLNA
+                                    </div>
+
+                                </div>
+
+                                <!-- Notification Date -->
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+                                        <b>Date of Notification</b>
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    <input type="date"
+                                           class="form-control"
+                                           name="notificationDate1"
+                                           id="notificationDate1"
+                                           min="2026-01-01"
+                                           onkeydown="return false;"
+                                           required>
+
+                                    <div class="invalid-feedback">
+                                        Please select Date of Notification
+                                    </div>
+
+                                </div>
+
+                                <!-- Notification PDF -->
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+                                        <b>Upload Notification</b>
+                                    </label>
+
+                                    <input type="file"
+                                           id="notificationFile1"
+                                           name="notificationFile1"
+                                           class="form-control"
+                                           accept=".pdf,application/pdf"
+                                           required>
+
+                                    <div class="invalid-feedback">
+                                        Please select a notification PDF.
+                                    </div>
+
+                                    <small class="form-text text-muted">
+                                        Only PDF file is allowed.
+                                    </small>
+
+                                    <div id="notificationFile1Error"
+                                         class="text-danger mt-1">
+                                    </div>
+
+                                </div>
+
+                                <!-- MoU Date -->
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+                                        <b>Date of MoU with DoLR</b>
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    <input type="date"
+                                           class="form-control"
+                                           name="mouDate1"
+                                           id="mouDate1"
+                                           min="2026-01-01"
+                                           onkeydown="return false;"
+                                           required>
+
+                                    <div class="invalid-feedback">
+                                        Please select Date of MoU with DoLR
+                                    </div>
+
+                                </div>
+
+                                <!-- MoU PDF -->
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+                                        <b>Upload MoU</b>
+                                    </label>
+
+                                    <input type="file"
+                                           id="mouFile1"
+                                           name="mouFile1"
+                                           class="form-control"
+                                           accept=".pdf,application/pdf"
+                                           required>
+
+                                    <small class="form-text text-muted">
+                                        Only PDF file is allowed.
+                                    </small>
+
+                                    <div class="invalid-feedback">
+                                        Please select a MoU PDF.
+                                    </div>
+
+                                    <div id="mouFile1Error"
+                                         class="text-danger mt-1">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="text-center mt-4">
+
+                                <!-- UPDATE BUTTON -->
+                                <button type="submit"
+                                        name="updateAction"
+                                        value="D"
+                                        class="btn btn-warning">
+
+                                    <i class="fas fa-save"></i>
+                                    Update
+
+                                </button>
+
+                                &nbsp;&nbsp;&nbsp;
+
+                                <!-- CLEAR ONLY PDF FILES -->
+                                <button type="button"
+                                        class="btn btn-secondary"
+                                        onclick="clearUpdateFiles()">
+
+                                    <i class="fas fa-eraser"></i>
+                                    Reset
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
