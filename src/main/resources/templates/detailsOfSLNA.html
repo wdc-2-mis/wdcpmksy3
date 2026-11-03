@@ -156,6 +156,33 @@
 				if (error) error.textContent = "";
 			}
 
+			// Automatically hide errors when the user enters or selects a value
+			form.querySelectorAll("input:not([type='radio']), select, textarea").forEach(field => {
+			    field.addEventListener("input", function () {
+			        if (this.value.trim() !== "") {
+			            clearError(this);
+			        }
+			    });
+			    field.addEventListener("change", function () {
+			        if (this.value.trim() !== "") {
+			            clearError(this);
+			        }
+			    });
+			});
+
+			// Automatically hide radio button errors when selected
+			form.querySelectorAll("input[type='radio']").forEach(radio => {
+			    radio.addEventListener("change", function () {
+			        const radioName = this.name;
+			        const selected = form.querySelector(
+			            "input[name='" + radioName + "']:checked"
+			        );
+			        if (selected) {
+			            clearRadioError(radioName);
+			        }
+			    });
+			});
+			
 			function validateField(field) {
 				if (!field) return true;
 				const value = field.value.trim();
