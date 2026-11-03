@@ -59,13 +59,55 @@
 
                 form.addEventListener("submit", function (event) {
 
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
+    let isValid = true;
 
-                    form.classList.add("was-validated");
-                });
+    // Validate Notification Date
+    const notificationDate =
+        document.getElementById("notificationDate");
+
+    if (!notificationDate.value) {
+        notificationDate.classList.add("is-invalid");
+        notificationDate.classList.remove("is-valid");
+        isValid = false;
+    } else {
+        notificationDate.classList.remove("is-invalid");
+    }
+
+    // Validate MoU Date
+    const mouDate =
+        document.getElementById("mouDate");
+
+    if (!mouDate.value) {
+        mouDate.classList.add("is-invalid");
+        mouDate.classList.remove("is-valid");
+        isValid = false;
+    } else {
+        mouDate.classList.remove("is-invalid");
+    }
+
+    // Validate Notification PDF
+    if (!validatePDF(document.getElementById("notificationFile"))) {
+        isValid = false;
+    }
+
+    // Validate MoU PDF
+    if (!validatePDF(document.getElementById("mouFile"))) {
+        isValid = false;
+    }
+
+    // Validate remaining required fields
+    if (!form.checkValidity()) {
+        isValid = false;
+    }
+
+    if (!isValid) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    form.classList.add("was-validated");
+
+});
             }
 
             // Edit modal population
@@ -97,6 +139,17 @@ const notificationDate =
 
 const mouDate =
     button.getAttribute("data-moud");
+    
+    // Clear previous validation when Edit popup opens
+const editForm = document.getElementById("editForm");
+
+editForm.classList.remove("was-validated");
+
+[notificationDateInput, mouDateInput].forEach(function (input) {
+
+    input.classList.remove("is-invalid", "is-valid");
+
+});
 
 // Set Notification Date
 if (notificationDateInput._flatpickr) {
@@ -122,77 +175,93 @@ if (mouDateInput._flatpickr) {
 
                     // Clear previous file selections and errors
                     clearUpdateFiles();
+                    
+                    
+                    
                 });
             }
 
             // PDF validation
             function validatePDF(input) {
 
-                const errorDiv =
-                    document.getElementById(input.id + "Error");
+    const errorDiv = document.getElementById(input.id + "Error");
 
-                errorDiv.textContent = "";
-                errorDiv.style.display = "none";
+    errorDiv.textContent = "";
+    errorDiv.style.display = "none";
 
-                input.classList.remove("is-invalid", "is-valid");
+    input.classList.remove("is-invalid", "is-valid");
 
-                if (!input.files || input.files.length === 0) {
-                    return true;
-                }
+    // Check required file
+    if (!input.files || input.files.length === 0) {
 
-                const file = input.files[0];
-                const fileName = file.name;
+        if (input.required) {
 
-                const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
+            errorDiv.textContent = "Please select a PDF file.";
+            errorDiv.style.display = "block";
 
-                if (!fileNamePattern.test(fileName)) {
+            input.classList.add("is-invalid");
 
-                    errorDiv.textContent =
-                        "File name should contain only letters, numbers, underscore (_) or hyphen (-), and must end with .pdf.";
+            return false;
+        }
 
-                    errorDiv.style.display = "block";
+        return true;
+    }
 
-                    input.classList.add("is-invalid");
-                    input.value = "";
+    const file = input.files[0];
+    const fileName = file.name;
 
-                    return false;
-                }
+    const fileNamePattern = /^[a-zA-Z0-9_-]+\.pdf$/i;
 
-                if (
-                    !fileName.toLowerCase().endsWith(".pdf") ||
-                    (file.type !== "" && file.type !== "application/pdf")
-                ) {
+    // Filename validation
+    if (!fileNamePattern.test(fileName)) {
 
-                    errorDiv.textContent = "Only PDF files are allowed.";
+        errorDiv.textContent =
+            "File name should contain only letters, numbers, underscore (_) or hyphen (-), and must end with .pdf.";
 
-                    errorDiv.style.display = "block";
+        errorDiv.style.display = "block";
 
-                    input.classList.add("is-invalid");
-                    input.value = "";
+        input.value = "";
+        input.classList.add("is-invalid");
 
-                    return false;
-                }
+        return false;
+    }
 
-                const maxSize = 5 * 1024 * 1024;
+    // PDF type validation
+    if (
+        !fileName.toLowerCase().endsWith(".pdf") ||
+        (file.type !== "" && file.type !== "application/pdf")
+    ) {
 
-                if (file.size > maxSize) {
+        errorDiv.textContent = "Only PDF files are allowed.";
 
-                    errorDiv.textContent =
-                        "PDF file size must not be more than 5 MB.";
+        errorDiv.style.display = "block";
 
-                    errorDiv.style.display = "block";
+        input.value = "";
+        input.classList.add("is-invalid");
 
-                    input.classList.add("is-invalid");
-                    input.value = "";
+        return false;
+    }
 
-                    return false;
-                }
+    // File size validation
+    const maxSize = 5 * 1024 * 1024;
 
-                input.classList.add("is-valid");
+    if (file.size > maxSize) {
 
-                return true;
-            }
+        errorDiv.textContent =
+            "PDF file size must not be more than 5 MB.";
 
+        errorDiv.style.display = "block";
+
+        input.value = "";
+        input.classList.add("is-invalid");
+
+        return false;
+    }
+
+    input.classList.add("is-valid");
+
+    return true;
+}
             // Check duplicate PDF files
             function validateSameFile(changedInput, otherInput) {
 
@@ -298,6 +367,169 @@ if (mouDateInput._flatpickr) {
                         );
                     }
                 });
+                
+                
+                // =====================================================
+// EDIT FORM VALIDATION
+// =====================================================
+
+const editForm = document.getElementById("editForm");
+
+if (editForm) {
+
+    const notificationDate1 =
+        document.getElementById("notificationDate1");
+
+    const mouDate1 =
+        document.getElementById("mouDate1");
+
+    // Validate dates when user selects a date
+    [notificationDate1, mouDate1].forEach(function (input) {
+
+        input.addEventListener("change", function () {
+
+            if (this.value) {
+                this.classList.remove("is-invalid");
+                this.classList.add("is-valid");
+            } else {
+                this.classList.remove("is-valid");
+
+                if (editForm.classList.contains("was-validated")) {
+                    this.classList.add("is-invalid");
+                }
+            }
+        });
+    });
+
+    // Edit Form Submit
+    editForm.addEventListener("submit", function (event) {
+
+        let isValid = true;
+
+        // Validate Notification Date
+        if (!notificationDate1.value) {
+
+            notificationDate1.classList.add("is-invalid");
+            notificationDate1.classList.remove("is-valid");
+
+            isValid = false;
+
+        } else {
+
+            notificationDate1.classList.remove("is-invalid");
+            notificationDate1.classList.add("is-valid");
+        }
+
+        // Validate MoU Date
+        if (!mouDate1.value) {
+
+            mouDate1.classList.add("is-invalid");
+            mouDate1.classList.remove("is-valid");
+
+            isValid = false;
+
+        } else {
+
+            mouDate1.classList.remove("is-invalid");
+            mouDate1.classList.add("is-valid");
+        }
+
+        // Validate Notification PDF
+        if (!validatePDF(
+            document.getElementById("notificationFile1")
+        )) {
+            isValid = false;
+        }
+
+        // Validate MoU PDF
+        if (!validatePDF(
+            document.getElementById("mouFile1")
+        )) {
+            isValid = false;
+        }
+
+        // Validate remaining required fields
+        if (!editForm.checkValidity()) {
+            isValid = false;
+        }
+
+        editForm.classList.add("was-validated");
+
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+    });
+
+}
+
+function validateDateInput(input) {
+    if (!input) return;
+
+    const visibleInput = input._flatpickr?.altInput || input;
+
+    if (input.value && input.value.trim() !== "") {
+
+        input.classList.remove("is-invalid");
+        input.classList.add("is-valid");
+
+        visibleInput.classList.remove("is-invalid");
+        visibleInput.classList.add("is-valid");
+
+    } else {
+
+        input.classList.remove("is-valid");
+        visibleInput.classList.remove("is-valid");
+
+        const form = input.closest("form");
+
+        if (form && form.classList.contains("was-validated")) {
+            input.classList.add("is-invalid");
+            visibleInput.classList.add("is-invalid");
+        }
+    }
+}
+
+// New Form dates
+[
+    "notificationDate",
+    "mouDate",
+    "notificationDate1",
+    "mouDate1"
+].forEach(function (id) {
+
+    const input = document.getElementById(id);
+
+    if (input) {
+        input.addEventListener("change", function () {
+            validateDateInput(this);
+        });
+    }
+});
+
+
+function clearEditDateValidation() {
+
+    const editForm = document.getElementById("editForm");
+
+    if (!editForm) return;
+
+    // Remove previous Bootstrap validation state
+    editForm.classList.remove("was-validated");
+
+    ["notificationDate1", "mouDate1"].forEach(function (id) {
+
+        const input = document.getElementById(id);
+
+        if (!input) return;
+
+        const visibleInput = input._flatpickr?.altInput || input;
+
+        input.classList.remove("is-invalid", "is-valid");
+        visibleInput.classList.remove("is-invalid", "is-valid");
+    });
+}
 
         });
 
@@ -732,6 +964,7 @@ if (mouDateInput._flatpickr) {
                         </label>
 
                         <input type="date"
+                        id="notificationDate"
                                class="form-control"
                                name="notificationDate"
                                min="2026-01-01"
@@ -747,31 +980,28 @@ if (mouDateInput._flatpickr) {
                     <!-- Notification PDF -->
                     <div class="col-md-6">
 
-                        <label class="form-label">
-                            <b>Upload Notification</b>
-                            <span class="required">*</span>
-                        </label>
+    <label class="form-label">
+        <b>Upload Notification</b>
+        <span class="required">*</span>
+    </label>
 
-                        <input type="file"
-                               id="notificationFile"
-                               name="notificationFile"
-                               class="form-control"
-                               accept=".pdf,application/pdf"
-                               required>
+    <input type="file"
+           id="notificationFile"
+           name="notificationFile"
+           class="form-control"
+           accept=".pdf,application/pdf"
+           required>
 
-                        <div class="invalid-feedback">
-                            Please select a notification PDF.
-                        </div>
+    <small class="form-text text-muted">
+        Only PDF file is allowed.
+    </small>
 
-                        <small class="form-text text-muted">
-                            Only PDF file is allowed.
-                        </small>
+    <div id="notificationFileError"
+         class="text-danger mt-1"
+         style="display:none;">
+    </div>
 
-                        <div id="notificationFileError"
-                             class="text-danger mt-1">
-                        </div>
-
-                    </div>
+</div>
 
                     <!-- MoU Date -->
                     <div class="col-md-6">
@@ -782,6 +1012,7 @@ if (mouDateInput._flatpickr) {
                         </label>
 
                         <input type="date"
+                        id="mouDate"
                                class="form-control"
                                name="mouDate"
                                min="2026-01-01" placeholder="DD/MM/YYYY"
@@ -797,31 +1028,28 @@ if (mouDateInput._flatpickr) {
                     <!-- MoU PDF -->
                     <div class="col-md-6">
 
-                        <label class="form-label">
-                            <b>Upload MoU</b>
-                            <span class="required">*</span>
-                        </label>
+    <label class="form-label">
+        <b>Upload MoU</b>
+        <span class="required">*</span>
+    </label>
 
-                        <input type="file"
-                               id="mouFile"
-                               name="mouFile"
-                               class="form-control"
-                               accept=".pdf,application/pdf"
-                               required>
+    <input type="file"
+           id="mouFile"
+           name="mouFile"
+           class="form-control"
+           accept=".pdf,application/pdf"
+           required>
 
-                        <div class="invalid-feedback">
-                            Please select a MoU PDF.
-                        </div>
+    <small class="form-text text-muted">
+        Only PDF file is allowed.
+    </small>
 
-                        <div id="mouFileError"
-                             class="text-danger mt-1">
-                        </div>
+    <div id="mouFileError"
+         class="text-danger mt-1"
+         style="display:none;">
+    </div>
 
-                        <small class="form-text text-muted">
-                            Only PDF file is allowed.
-                        </small>
-
-                    </div>
+</div>
 
                 </div>
 
@@ -1116,7 +1344,7 @@ if (mouDateInput._flatpickr) {
                                            name="notificationFile1"
                                            class="form-control"
                                            accept=".pdf,application/pdf"
-                                           required>
+                                           >
 										   
 										<button type="button" class="btn btn-outline-danger" title="Remove selected Notification PDF"
 											onclick="clearSingleFile('notificationFile1')">
@@ -1126,9 +1354,7 @@ if (mouDateInput._flatpickr) {
 										</button>
 
 
-                                    <div class="invalid-feedback">
-                                        Please select a notification PDF.
-                                    </div>
+                                    
 
                                     <small class="form-text text-muted">
                                         Only PDF file is allowed.
@@ -1174,7 +1400,7 @@ if (mouDateInput._flatpickr) {
                                            name="mouFile1"
                                            class="form-control"
                                            accept=".pdf,application/pdf"
-                                           required>
+                                           >
 										<button type="button" class="btn btn-outline-danger" title="Remove selected MoU PDF"
 											onclick="clearSingleFile('mouFile1')">
 										
@@ -1185,9 +1411,7 @@ if (mouDateInput._flatpickr) {
                                         Only PDF file is allowed.
                                     </small>
 
-                                    <div class="invalid-feedback">
-                                        Please select a MoU PDF.
-                                    </div>
+                                  
 
                                     <div id="mouFile1Error"
                                          class="text-danger mt-1">
