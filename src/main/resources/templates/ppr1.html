@@ -86,11 +86,39 @@
                     document.getElementById("slnaType1").value =
                         button.getAttribute("data-sltype");
 
-                    document.getElementById("notificationDate1").value =
-                        button.getAttribute("data-notificationd");
+                    const notificationDateInput =
+    document.getElementById("notificationDate1");
 
-                    document.getElementById("mouDate1").value =
-                        button.getAttribute("data-moud");
+const mouDateInput =
+    document.getElementById("mouDate1");
+
+const notificationDate =
+    button.getAttribute("data-notificationd");
+
+const mouDate =
+    button.getAttribute("data-moud");
+
+// Set Notification Date
+if (notificationDateInput._flatpickr) {
+    notificationDateInput._flatpickr.setDate(
+        notificationDate,
+        false,
+        "Y-m-d"
+    );
+} else {
+    notificationDateInput.value = notificationDate || "";
+}
+
+// Set MOU Date
+if (mouDateInput._flatpickr) {
+    mouDateInput._flatpickr.setDate(
+        mouDate,
+        false,
+        "Y-m-d"
+    );
+} else {
+    mouDateInput.value = mouDate || "";
+}
 
                     // Clear previous file selections and errors
                     clearUpdateFiles();
@@ -707,7 +735,7 @@
                                class="form-control"
                                name="notificationDate"
                                min="2026-01-01"
-                               required
+                               required placeholder="DD/MM/YYYY"
                                onkeydown="return false;">
 
                         <div class="invalid-feedback">
@@ -756,7 +784,7 @@
                         <input type="date"
                                class="form-control"
                                name="mouDate"
-                               min="2026-01-01"
+                               min="2026-01-01" placeholder="DD/MM/YYYY"
                                onkeydown="return false;"
                                required>
 
@@ -1066,7 +1094,7 @@
                                            class="form-control"
                                            name="notificationDate1"
                                            id="notificationDate1"
-                                           min="2026-01-01"
+                                           min="2026-01-01" placeholder="DD/MM/YYYY"
                                            onkeydown="return false;"
                                            required>
 
@@ -1124,7 +1152,7 @@
                                            class="form-control"
                                            name="mouDate1"
                                            id="mouDate1"
-                                           min="2026-01-01"
+                                           min="2026-01-01" placeholder="DD/MM/YYYY"
                                            onkeydown="return false;"
                                            required>
 										   

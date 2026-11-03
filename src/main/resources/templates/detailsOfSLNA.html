@@ -86,7 +86,18 @@
 
 							document.getElementById("qualification").value = data.qualificationId;
 
-							document.getElementById("appointmentDate").value = data.appointmentDate;
+							const appointmentDateInput =
+    document.getElementById("appointmentDate");
+
+if (appointmentDateInput._flatpickr) {
+    appointmentDateInput._flatpickr.setDate(
+        data.appointmentDate,
+        false,
+        "Y-m-d"
+    );
+} else {
+    appointmentDateInput.value = data.appointmentDate || "";
+}
 
 							document.getElementById("tenure").value = data.tenurePeriodYr;
 
@@ -523,7 +534,7 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold">Appointment Date <span class="required">*</span></label>
 	                    <div class="col-md-4">
-	                        <input type="date" class="form-control" name="appointmentDate" min="2026-01-01" th:value="${appointmentDate}" onkeydown="return false;">
+	                        <input type="date" class="form-control" name="appointmentDate" min="2026-01-01" placeholder="DD/MM/YYYY" th:value="${appointmentDate}" onkeydown="return false;">
 							<div class="field-error" data-error-for="appointmentDate"></div>
 	                    </div>
 	                </div>
@@ -711,7 +722,7 @@
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold">Appointment Date <span class="required">*</span></label>
 							<div class="col-md-4">
-								<input type="date" id="appointmentDate" class="form-control" name="appointmentDate" min="2026-01-01"
+								<input type="date" id="appointmentDate" class="form-control" name="appointmentDate" placeholder="DD/MM/YYYY" min="2026-01-01"
 									th:value="${appointmentDate}" required>
 									<div class="field-error" data-error-for="appointmentDate"></div>
 							</div>
