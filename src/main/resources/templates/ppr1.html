@@ -516,6 +516,25 @@
                 }
             }
         );
+		
+		function clearSingleFile(fileId) {
+
+		    const fileInput = document.getElementById(fileId);
+
+		    const errorDiv = document.getElementById(fileId + "Error");
+
+		    // Clear only the selected file
+		    fileInput.value = "";
+
+		    // Remove validation classes
+		    fileInput.classList.remove("is-invalid", "is-valid");
+
+		    // Clear the associated error message
+		    if (errorDiv) {
+		        errorDiv.textContent = "";
+		        errorDiv.style.display = "none";
+		    }
+		}
     </script>
 
 </head>
@@ -1070,6 +1089,14 @@
                                            class="form-control"
                                            accept=".pdf,application/pdf"
                                            required>
+										   
+										<button type="button" class="btn btn-outline-danger" title="Remove selected Notification PDF"
+											onclick="clearSingleFile('notificationFile1')">
+										
+											<i class="fas fa-times"></i>
+										
+										</button>
+
 
                                     <div class="invalid-feedback">
                                         Please select a notification PDF.
@@ -1100,7 +1127,7 @@
                                            min="2026-01-01"
                                            onkeydown="return false;"
                                            required>
-
+										   
                                     <div class="invalid-feedback">
                                         Please select Date of MoU with DoLR
                                     </div>
@@ -1120,7 +1147,12 @@
                                            class="form-control"
                                            accept=".pdf,application/pdf"
                                            required>
-
+										<button type="button" class="btn btn-outline-danger" title="Remove selected MoU PDF"
+											onclick="clearSingleFile('mouFile1')">
+										
+											<i class="fas fa-times"></i>
+										
+										</button>
                                     <small class="form-text text-muted">
                                         Only PDF file is allowed.
                                     </small>
