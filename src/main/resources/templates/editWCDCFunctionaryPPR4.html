@@ -226,12 +226,29 @@ document.addEventListener("DOMContentLoaded", function () {
                 isValid = false;
             } else clearRowError(office);
 
-            if (!address || address.value.trim() === "") {
+       /*  if (!address || address.value.trim() === "") {
                 showRowError(address, "Please enter Address in Row " + rowNumber + ".");
                 if (!firstInvalidField) firstInvalidField = address;
                 isValid = false;
-            } else clearRowError(address);
-
+            } else clearRowError(address); */
+			
+			if (!address || address.value.trim() === "") {
+			    showRowError(address,"Please enter Address in Row " + rowNumber + ".");
+			    if (!firstInvalidField) {
+			        firstInvalidField = address;
+			    }
+			    isValid = false;
+			} 
+			else if (address.value.trim().length < 10) {
+			    showRowError(address,"Address must contain minimum 10 characters in Row " + rowNumber + ".");
+			    if (!firstInvalidField) {
+			        firstInvalidField = address;
+			    }
+			    isValid = false;
+			} 
+			else {
+			    clearRowError(address);
+			}
             if (!year || year.value.trim() === "") {
                 showYearError(year, "Please enter Experience Year in Row " + rowNumber + ".");
                 if (!firstInvalidField) firstInvalidField = year;

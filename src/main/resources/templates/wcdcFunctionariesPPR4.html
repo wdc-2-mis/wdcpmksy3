@@ -1415,55 +1415,40 @@
                 }
 
 
+				/* =================================================
+				   ADDRESS - MINIMUM 10 CHARACTERS
+				================================================= */
 
+				if (!address || address.value.trim() === "") {
 
+				    showRowError(
+				        address,
+				        "Please enter Address in Row " + rowNumber + "."
+				    );
 
-                /* =================================================
+				    if (!firstInvalidField) {
+				        firstInvalidField = address;
+				    }
 
-                   ADDRESS
+				    isValid = false;
 
-                ================================================= */
+				} else if (address.value.trim().length < 10) {
 
+				    showRowError(
+				        address,
+				        "Address must contain minimum 10 characters in Row " + rowNumber + "."
+				    );
 
+				    if (!firstInvalidField) {
+				        firstInvalidField = address;
+				    }
 
-                if (!address ||
+				    isValid = false;
 
-                    address.value.trim() === "") {
+				} else {
 
-
-
-                    showRowError(
-
-                        address,
-
-                        "Please enter Address in Row " +
-
-                        rowNumber + "."
-
-                    );
-
-
-
-                    if (!firstInvalidField) {
-
-                        firstInvalidField = address;
-
-                    }
-
-
-
-                    isValid = false;
-
-
-
-                } else {
-
-
-
-                    clearRowError(address);
-
-                }
-
+				    clearRowError(address);
+				}
 
 
 
