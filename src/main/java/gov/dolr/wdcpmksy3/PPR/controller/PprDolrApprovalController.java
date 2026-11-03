@@ -166,12 +166,7 @@ public class PprDolrApprovalController {
 			model.addAttribute("userid", userid);
 			model.addAttribute("pprRequestDolrApprovalList", pprRequestDolrApprovalList);
 		}
-		List<WdcpmksySubmenu> submenuList =
-		        submenuRepository
-		        .findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc(
-		                "Preliminary Project Report Details",
-		                "/pprDistrict");
-
+		List<WdcpmksySubmenu> submenuList = submenuRepository.findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc("Preliminary Project Report Details", "/pprDistrict");
 		model.addAttribute("submenuList", submenuList);
 		return "ppr/pprRequestDolrApproval";
 	}
@@ -180,10 +175,10 @@ public class PprDolrApprovalController {
 	
 	@GetMapping("/rejPprReqForAprov")
 	public String rejPprReqForAprov(@RequestParam("id") Integer tranId, @RequestParam("remarks") String remarks, 
-			HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+			HttpSession session, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
 		try {
 			Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
-			pprTransactionServ.rejectSlnaReqFromDolr(tranId, remarks, regid);
+			pprTransactionServ.rejectSlnaReqFromDolr(tranId, remarks, regid, CommonFunctions.getClientIpAddr(request));
 			redirectAttributes.addFlashAttribute("success", " PPR Request Rejected Successfully.");
 		}catch (Exception e) {
 	        redirectAttributes.addFlashAttribute("error", "Unable to Reject PPR Request.");
@@ -194,43 +189,20 @@ public class PprDolrApprovalController {
 	
 
 @PostMapping("/referBackPprReqForAprov")
-public String referBackPprReqForAprov(
-        @ModelAttribute ReferBackRequest referBackRequest,
-        HttpSession session,
-        HttpServletRequest request,
-        RedirectAttributes redirectAttributes) {
-
+public String referBackPprReqForAprov(@ModelAttribute ReferBackRequest referBackRequest,
+        HttpSession session, HttpServletRequest request, RedirectAttributes redirectAttributes) {
     try {
-
         String userid = (String) session.getAttribute("userid");
-
         if (userid == null) {
             return "redirect:/login";
         }
-
-        Integer regid = Integer.parseInt(
-                session.getAttribute("regid").toString());
-
-        pprTransactionServ.referBackSlnaReqFromDolr(
-                referBackRequest.getTranId(),
-                referBackRequest.getItems(),
-                regid,
-                userid,
-                CommonFunctions.getClientIpAddr(request));
-
-        redirectAttributes.addFlashAttribute(
-                "success",
-                "PPR Request Refered Back to SLNA Successfully.");
-
+        Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
+        pprTransactionServ.referBackSlnaReqFromDolr(referBackRequest.getTranId(), referBackRequest.getItems(), regid, userid, CommonFunctions.getClientIpAddr(request));
+        redirectAttributes.addFlashAttribute("success","PPR Request Refered Back to SLNA Successfully.");
     } catch (Exception e) {
-
         e.printStackTrace();
-
-        redirectAttributes.addFlashAttribute(
-                "error",
-                "Unable to Refer Back PPR Request: " + e.getMessage());
+        redirectAttributes.addFlashAttribute("error", "Unable to Refer Back PPR Request: " + e.getMessage());
     }
-
     return "redirect:/pprRequestDolrApproval";
 }
 
@@ -238,7 +210,6 @@ public String referBackPprReqForAprov(
 	@GetMapping("/approvePprReqForAprov1")
 	public String approvePprReqForAprov(@RequestParam("id") Integer tranId,
 			HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-
 		try {
 			Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
 			pprTransactionServ.approveSlnaReqFromDolr1(tranId, regid);
@@ -252,44 +223,31 @@ public String referBackPprReqForAprov(
 	
 	 @PostMapping("/approvePprReqForAprov")
 	 public String approvePprReqForAprov(HttpSession session, Model model, HttpServletRequest request,
-	    		@RequestParam Integer pprid,
-	    		@RequestParam java.time.LocalDate sanctiondt,
-	    		@RequestParam BigDecimal areap,
-	    		@RequestParam BigDecimal cost,
-	    		@RequestParam BigDecimal central,
-	    		@RequestParam BigDecimal states,
-	            RedirectAttributes redirectAttributes) {
-	   
+	    		@RequestParam Integer pprid, @RequestParam java.time.LocalDate sanctiondt, @RequestParam BigDecimal areap,
+	    		@RequestParam BigDecimal cost, @RequestParam BigDecimal central, @RequestParam BigDecimal states, RedirectAttributes redirectAttributes) {
 				Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
 				Integer regid = Integer.parseInt(session.getAttribute("regid").toString());
 				String userid=(String)session.getAttribute("userid");
 				System.out.println("kdy"+pprid);
 				try {
-					
-					 if(userid==null){
-	
-				            return "redirect:/login";
-				     }
-					boolean save=false;
-					save=pprTransactionServ.approveSlnaReqFromDolr(pprid, areap, cost, central, states, regid,
-							 userid, CommonFunctions.getClientIpAddr(request), sanctiondt);
-					
-					if(save)
-						redirectAttributes.addFlashAttribute( "success", "PPR Approved Successfully.");
+					if (userid == null)
+						return "redirect:/login";
+					boolean save = false;
+					save = pprTransactionServ.approveSlnaReqFromDolr(pprid, areap, cost, central, states, regid, userid,
+							CommonFunctions.getClientIpAddr(request), sanctiondt);
+					if (save)
+						redirectAttributes.addFlashAttribute("success", "PPR Approved Successfully.");
 					else
 						redirectAttributes.addFlashAttribute("error", "Unable to Approve PPR Request.");
-				}
-				catch (Exception e) {
-	
-						e.printStackTrace();
-				        redirectAttributes.addFlashAttribute("error", "Unable to Approve PPR Request.");
+				} catch (Exception e) {
+					e.printStackTrace();
+					redirectAttributes.addFlashAttribute("error", "Unable to Approve PPR Request.");
 				}
 				return "redirect:/pprRequestDolrApproval";	
 	    }
 	
 	@GetMapping("/viewPprRequest")
     public String viewPprRequest(HttpSession session, Model model,  @RequestParam("id") Integer pprId) {
-
         Integer stcode = Integer.parseInt(session.getAttribute("stcode").toString());
         Object userid = session.getAttribute("userid");
         if (userid == null) {
@@ -301,41 +259,31 @@ public String referBackPprReqForAprov(
 
 //        model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
 //        model.addAttribute("finYearList", finService.getFinYearCdAndDesc());
-        
         model.addAttribute("searched", true);
-
         model.addAttribute("selectedDcode", ppr.getDistrict().getDcode());
         model.addAttribute("selectedProject", pprId);
         model.addAttribute("selectedFinYrCd", ppr.getFinYear().getFinYrCd());
-        model.addAttribute("selectedProjectName", resolveProjectName(data, pprId));
-        
+        model.addAttribute("selectedProjectName", resolveProjectName(data, pprId));        
         List<WdcpmksyUserReg> users =ur.findDLUsersByStateAndRole(stcode);
         model.addAttribute("userList", users);
-
         return "ppr/pprRequestDolrApproval :: pprDetailsContent";
     }
 	
 	private Map<String, Object> fetchReportData(Integer dcode, Integer project, Integer finYrCd) {
-
         Map<String, Object> data = new LinkedHashMap<>();
         List<Character> statuses = List.of('C');
         List<String> status = List.of("C");
-
         // ---- PPR-1 ----
         List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus(dcode, project, finYrCd, "C");
         data.put("records", records);
-
         // ---- PPR-2 ----
         List<PprWatershedCoveredArea> areaRecords = area.findByPprPprIdAndStatus(project, "C");
-
         Map<Integer, WatershedAreaBean> map = new LinkedHashMap<>();
         for (PprWatershedCoveredArea row : areaRecords) {
-
             Integer mwId = row.getMicroWatershed().getMwId();
             WatershedAreaBean bean = map.getOrDefault(mwId, new WatershedAreaBean());
             bean.setMwId(mwId);
             bean.setMwName(row.getMicroWatershed().getMwName());
-
             Integer scheme = row.getScheme().getSchemeId();
             switch (scheme) {
                 case 1: bean.setPreNo(row.getNoMw()); bean.setPreArea(row.getAreaMw()); break;
@@ -349,67 +297,51 @@ public String referBackPprReqForAprov(
             map.put(mwId, bean);
         }
         data.put("watershedList", new ArrayList<>(map.values()));
-
         // ---- PPR-3 ----
         List<PprProposedProject> detailsOfListOfProposedProject = repository.findByPprPprIdAndStatus(project, 'C');
         data.put("detailsOfListOfProposedProject", detailsOfListOfProposedProject);
-
         // ---- PPR-4 ----
         List<PprProjectGlance> pprProjectAtGlanceList = pprProjectGlanceRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("pprProjectAtGlanceList", pprProjectAtGlanceList);
-
         // ---- PPR-8 ----
         List<PprProposedArea> ppr8List = pprProposedAreaRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("ppr8List", ppr8List);
-
         // ---- PPR-9 ----
         List<PPRLandPatternArea> landPatternAreaList = landPatternAreaRepo.findByPprIdPprIdAndStatus(project, 'C');
         data.put("landPatternAreaList", landPatternAreaList);
-
         // ---- PPR-10 ----
         List<PprAgroClimate> ppr10List = agroClimateRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("ppr10List", ppr10List);
-
         // ---- PPR-11 ----
         List<PprDisasterDetails> ppr11List = pprDisasterDetailsRepo.findByPprPprIdAndStatus(project, "C");
         data.put("ppr11List", ppr11List);
-
         // ---- PPR-12 ----
         List<PPRSoilErosion> soilErosionList = soilErosionRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("soilErosionList", soilErosionList);
-
         // ---- PPR-13 ----
         List<PprLivelihood> pprLivelihoodSummaryList = pprLivelihoodRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("pprLivelihoodSummaryList", pprLivelihoodSummaryList);
-
         // ---- PPR-14 ----
         List<PPREmploymentGeneration> pprEmploymentList = pprEmploymentRepo.findByPprIdPprIdAndStatus(project, 'C');
         data.put("pprEmploymentList", pprEmploymentList);
-
         // ---- PPR-15 ----
         List<Map<String, Object>> ppr15List = pprMigrationDetailsRepo.getMigrationDetailsByProjectAndStatus(project, statuses);
         data.put("ppr15List", ppr15List);
-
         // ---- PPR-16 ----
         List<PprWaterOutcome> pprWaterOutcomesList = pprWaterOutcomeRepo.findByPprIdAndStatusIn(project, statuses);
         data.put("pprWaterOutcomesList", pprWaterOutcomesList);
-
         // ---- PPR-17 ----
         List<PprDrinkingWater> pprDrinkingWaterList = pprDrinkingWaterRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("pprDrinkingWaterList", pprDrinkingWaterList);
-
         // ---- PPR-18 ----
         List<PprCropOutcome> cropOutcomes = cropOutcomeRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("cropOutcomes", cropOutcomes);
-
         // ---- PPR-19 ----
         List<PprPendingUc> pendingUCList = pprPendingUcRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("pendingUCList", pendingUCList);
-
         // ---- PPR-20 ----
         List<PprWcdcUnspentBalance> draftList = pprUnspentBalanceRepo.findByPprPprIdAndStatus(project, 'C');
         data.put("draftList", draftList);
-
         return data;
     }
 	

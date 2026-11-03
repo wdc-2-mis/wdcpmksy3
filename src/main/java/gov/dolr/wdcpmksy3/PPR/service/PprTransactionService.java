@@ -56,7 +56,7 @@ public class PprTransactionService {
     private MenuRepository submenuRepository;
 
 	
-	public void rejectSlnaReqFromDolr(Integer tranId, String remarks, Integer regId) {
+	public void rejectSlnaReqFromDolr(Integer tranId, String remarks, Integer regId, String requestIp) {
 		PprTransaction rejPprTran = pprTransactionRepo.getById(tranId);
 		
 		MPpr mp= mPprRepo.getReferenceById(rejPprTran.getPpr().getPprId());
@@ -67,6 +67,12 @@ public class PprTransactionService {
 		
 		pprTran.setPpr(mp);
 		pprTran.setAction('R');
+		
+		mp.setStatus("R");
+	    mp.setUpdatedBy(requestIp);
+	    mp.setUpdatedDate(new Date());
+	    mPprRepo.save(mp);
+		
 		pprTran.setRemarks(remarks);
 		pprTran.setSentFrom(regfrm);
 		pprTran.setSentTo(regto);
@@ -77,100 +83,51 @@ public class PprTransactionService {
 	
 
 @Transactional
-public void referBackSlnaReqFromDolr(
-        Integer tranId,
-        List<ReferBackMenuItemRequest> items,
-        Integer regId,
-        String userid,
-        String requestIp) {
-
+public void referBackSlnaReqFromDolr(Integer tranId, List<ReferBackMenuItemRequest> items,
+        Integer regId, String userid, String requestIp) {
     if (items == null || items.isEmpty()) {
         throw new IllegalArgumentException(
                 "Please select at least one submenu.");
     }
-
     PprTransaction originalTran = pprTransactionRepo.findById(tranId)
-            .orElseThrow(() ->
-                    new IllegalArgumentException("Invalid transaction ID."));
-
-    MPpr mp = mPprRepo.getReferenceById(
-            originalTran.getPpr().getPprId());
-    
-    Integer lastRound =
-            pprReferbackMenuRepo.getLastReferbackRound(mp.getPprId());
-
+            .orElseThrow(() -> new IllegalArgumentException("Invalid transaction ID."));
+    MPpr mp = mPprRepo.getReferenceById(originalTran.getPpr().getPprId());    
+    Integer lastRound = pprReferbackMenuRepo.getLastReferbackRound(mp.getPprId());
     Integer currentRound = lastRound + 1;
-
-    WdcpmksyUserReg regfrm =
-            userRepo.getReferenceById(regId.longValue());
-
-    WdcpmksyUserReg regto =
-            userRepo.getReferenceById(
-                    originalTran.getSentFrom().getRegId().longValue());
-
+    WdcpmksyUserReg regfrm = userRepo.getReferenceById(regId.longValue());
+    WdcpmksyUserReg regto = userRepo.getReferenceById(originalTran.getSentFrom().getRegId().longValue());
     // Validate all selected items before saving anything.
     java.util.Set<Integer> selectedIds = new java.util.HashSet<>();
-
     for (ReferBackMenuItemRequest item : items) {
-
-        if (item.getSubmenuId() == null ||
-                item.getRemark() == null ||
-                item.getRemark().trim().isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "Every selected submenu must have remarks.");
-        }
-
-        if (item.getRemark().trim().length() > 1000) {
-            throw new IllegalArgumentException(
-                    "Remarks cannot exceed 1000 characters.");
-        }
-
-        if (!selectedIds.add(item.getSubmenuId())) {
-            throw new IllegalArgumentException(
-                    "Duplicate submenu selection is not allowed.");
-        }
+        if (item.getSubmenuId() == null || item.getRemark() == null || item.getRemark().trim().isEmpty()) 
+            throw new IllegalArgumentException( "Every selected submenu must have remarks.");
+        if (item.getRemark().trim().length() > 1000) 
+            throw new IllegalArgumentException("Remarks cannot exceed 1000 characters.");
+        if (!selectedIds.add(item.getSubmenuId())) 
+            throw new IllegalArgumentException( "Duplicate submenu selection is not allowed.");
     }
-
     // Create the Refer Back transaction.
     PprTransaction pprTran = new PprTransaction();
-    
-    
     pprTran.setPpr(mp);
     pprTran.setAction('B');
-
     mp.setStatus("B");
     mp.setUpdatedBy(requestIp);
     mp.setUpdatedDate(new Date());
     mPprRepo.save(mp);
-    
     // Option A: no common remarks in ppr_transaction.
     pprTran.setRemarks(null);
-
     pprTran.setSentFrom(regfrm);
     pprTran.setSentTo(regto);
     pprTran.setSenton(LocalDateTime.now());
-
     pprTransactionRepo.save(pprTran);
 
     // Save one row for each selected submenu.
     List<PprReferbackMenu> referBackList = new ArrayList<>();
-
     for (ReferBackMenuItemRequest item : items) {
-
-        WdcpmksySubmenu submenu =
-                submenuRepository.findById(item.getSubmenuId())
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Invalid submenu selected."));
-
-        if (!Boolean.TRUE.equals(submenu.getIsActive())) {
-            throw new IllegalArgumentException(
-                    "Selected submenu is inactive.");
-        }
-
+        WdcpmksySubmenu submenu = submenuRepository.findById(item.getSubmenuId()).orElseThrow(() -> new IllegalArgumentException("Invalid submenu selected."));
+        if (!Boolean.TRUE.equals(submenu.getIsActive())) 
+            throw new IllegalArgumentException("Selected submenu is inactive.");
         PprReferbackMenu record = new PprReferbackMenu();
-
         record.setPpr(mp);
         record.setSubmenu(submenu);
         record.setReferbackRound(currentRound);
@@ -180,10 +137,8 @@ public void referBackSlnaReqFromDolr(
         record.setCreatedBy(userid);
         record.setCreatedDate(LocalDate.now());
         record.setRequestIp(requestIp);
-
         referBackList.add(record);
     }
-
     pprReferbackMenuRepo.saveAll(referBackList);
 }
 
