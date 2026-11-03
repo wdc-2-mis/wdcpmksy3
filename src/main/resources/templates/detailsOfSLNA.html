@@ -156,21 +156,20 @@
 				if (error) error.textContent = "";
 			}
 
-			// Automatically hide errors when the user enters or selects a value
-			form.querySelectorAll("input:not([type='radio']), select, textarea").forEach(field => {
-			    field.addEventListener("input", function () {
-			        if (this.value.trim() !== "") {
-			            clearError(this);
-			        }
+			// Automatically validate fields when user enters or selects a value
+			form.querySelectorAll("input:not([type='radio']), select, textarea")
+			    .forEach(field => {
+			        field.addEventListener("input", function () {
+			            validateField(this);
+			        });
+			        field.addEventListener("change", function () {
+			            validateField(this);
+			        });
+			        field.addEventListener("blur", function () {
+			            validateField(this);
+			        });
 			    });
-			    field.addEventListener("change", function () {
-			        if (this.value.trim() !== "") {
-			            clearError(this);
-			        }
-			    });
-			});
-
-			// Automatically hide radio button errors when selected
+			// Automatically clear radio button errors when selected
 			form.querySelectorAll("input[type='radio']").forEach(radio => {
 			    radio.addEventListener("change", function () {
 			        const radioName = this.name;
@@ -263,8 +262,8 @@
 						return false;
 					}
 					const tenureValue = parseInt(value);
-					if (tenureValue < 1 || tenureValue > 99) {
-						showError(field, "Tenure Period must be between 1 and 99 years.");
+					if (tenureValue < 1 || tenureValue > 6) {
+						showError(field, "Tenure Period must be between 1 and 6 years.");
 						return false;
 					}
 				}
@@ -582,8 +581,8 @@
 	                <div class="row mb-3 align-items-center">
 	                    <label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 	                    <div class="col-md-3">
-							<input type="text" class="form-control" name="tenure" maxlength="2" inputmode="numeric"
-								oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+							<input type="text" class="form-control" name="tenure" maxlength="1" inputmode="numeric"
+								oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)"> 
 							<div class="field-error" data-error-for="tenure"></div>
 	                    </div>
 	                </div>
@@ -770,7 +769,8 @@
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold"> Tenure Period (in years) <span class="required">*</span></label>
 							<div class="col-md-3">
-								<input type="text" id="tenure" class="form-control" name="tenure">
+								<input type="text" id="tenure" class="form-control" name="tenure" maxlength="1" inputmode="numeric"
+								oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
 								<div class="field-error" data-error-for="tenure"></div>
 							</div>
 						</div>
@@ -787,7 +787,7 @@
 						<div class="row mb-3 align-items-center">
 							<label class="col-md-3 fw-bold"> Email <span class="required">*</span></label>
 							<div class="col-md-5">
-								<input type="email" id="emailId" class="form-control" name="email">
+								<input type="text" id="emailId" class="form-control" name="email">
 								<div class="field-error" data-error-for="email"></div>
 							</div>
 						</div>

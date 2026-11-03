@@ -314,10 +314,24 @@
 			            });
 			    });
 			});
+			
+			const nextBtn = document.getElementById("nextBtn");
+			if (nextBtn) {
+				nextBtn.addEventListener("click", function () {
+					const district = document.getElementById("district");
+					if (!district || !district.value) {
+						alert("Please select District first.");
+						if (district) {
+							district.focus();
+						}
+						return;
+					}
+					const dcode = district.value;
+					window.location.href = "/pprWaterOutcomes?dcode=" + encodeURIComponent(dcode);
+				});
+			}
 
 		});
-
-
 
 
 	</script>
@@ -465,6 +479,12 @@
 							<button type="submit" name="action" value="D" class="btn btn-warning" th:disabled="${!pprCompleted || approvedOrForworded || !projectGlanceCompleted}">
 								<i class="fas fa-save"></i>
 								Save As Draft
+							</button>
+						</div>
+						<div class="text-end mt-2" id="nextBtnContainer" th:if="${selectedDistrict != null}">
+							<button type="button" id="nextBtn" class="btn btn-primary">
+								Average ground water table
+								<i class="fas fa-arrow-right ms-1"></i>
 							</button>
 						</div>
 					</form>
