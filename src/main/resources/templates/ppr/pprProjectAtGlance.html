@@ -320,23 +320,49 @@
 		const editSelectionReason = document.getElementById("editSelectionReason");
 		if (selectionReason) {
 		    selectionReason.addEventListener("blur", function () {
-		        validateSelectionReason(this);
+		        validateSelectionReason(this, "Length of the Reason for Selection of watershed should be more than 3 Characters.");
 		    });
 		}
 		if (editSelectionReason) {
 		    editSelectionReason.addEventListener("blur", function () {
-		        validateSelectionReason(this);
+		        validateSelectionReason(this, "Length of the Reason for Selection of watershed should be more than 3 Characters.");
 		    });
 		}
-		function validateSelectionReason(field) {
+		function validateSelectionReason(field, message) {
 			const value = field.value.trim();
 			if (value === "") {
-				showError(field, "Please enter Reason for Selection of watershed.");
+				showError(field, message);
 				//					field.focus();
 				return false;
 			}
 			if (value.length < 4) {
-				showError(field, "Length of the Reason for Selection of watershed should be more than 3 Characters.");
+				showError(field, message);
+				field.value = "";
+				return false;
+			}
+			removeError(field);
+			return true;
+		}
+		const address = document.getElementById("address");
+		const editAddress = document.getElementById("editAddress");
+		if (address) {
+		    address.addEventListener("blur", function () {
+		        validateAddress(this, "Length of the Address of PIA should be more than 10 Characters.");
+		    });
+		}
+		if (editAddress) {
+		    editAddress.addEventListener("blur", function () {
+		        validateAddress(this, "Length of the Address of PIA should be more than 10 Characters.");
+		    });
+		}
+		function validateAddress(field, message) {
+			const value = field.value.trim();
+			if (value === "") {
+				showError(field, message);
+				return false;
+			}
+			if (value.length < 11) {
+				showError(field, message);
 				field.value = "";
 				return false;
 			}
@@ -470,7 +496,7 @@
 	        if (!validateSelect(document.getElementById("mwId"), "Please select Micro-Watershed.")) {
 	            return false;
 	        }
-	        if (!validateSelectionReason(document.getElementById("selectionReason"))) {
+	        if (!validateSelectionReason(document.getElementById("selectionReason"), "Please enter Reason for Selection of watershed.")) {
 	            return false;
 	        }
 	        if (!validateDecimalField(document.getElementById("projectArea"), "Please enter Area of Project.")) {
@@ -485,7 +511,7 @@
 	        if (!validateRequiredField(document.getElementById("piaName"), "Please enter Name of PIA.")) {
 	            return false;
 	        }
-	        if (!validateRequiredField(document.getElementById("address"), "Please enter Address of PIA.")) {
+	        if (!validateAddress(document.getElementById("address"), "Please enter Address of PIA.")) {
 	            return false;
 	        }
 	        return true;
@@ -510,7 +536,7 @@
 	        if (!validateSelect(document.getElementById("editMicroWatershed"), "Please select Micro-Watershed.")) {
 	            return false;
 	        }
-	        if (!validateSelectionReason(document.getElementById("editSelectionReason"))) {
+	        if (!validateSelectionReason(document.getElementById("editSelectionReason"), "Please enter Reason for Selection of watershed.")) {
 	            return false;
 	        }
 	        if (!validateDecimalField(document.getElementById("editProjectArea"), "Please enter Area of Project.")) {
