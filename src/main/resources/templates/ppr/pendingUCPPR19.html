@@ -280,6 +280,10 @@
 			// ==========================================
 			// Stop form submission if invalid
 			// ==========================================
+			
+			if (!validateDateRange()) {
+			    isValid = false;
+			}
 
 			if (!isValid) {
 
@@ -441,6 +445,10 @@
 			// Stop form submission if invalid
 			// ==========================================
 
+			if (!validateDateRange1()) {
+			    isValide = false;
+			}
+			
 			if (!isValide) {
 
 				e.preventDefault();
@@ -767,6 +775,9 @@ setEditDate("toDate1", end);
 	    document.getElementById("skipForm").submit();
 	}
 	
+	// ==========================================
+	// Validate Pending UC Date Range - Add Form
+	// ==========================================
 	function validateDateRange() {
 
 	    const fromDate = document.getElementById("fromDate");
@@ -774,19 +785,25 @@ setEditDate("toDate1", end);
 
 	    const fromDateError = document.getElementById("fromDateError");
 	    const toDateError = document.getElementById("toDateError");
-		
-	    // Clear previous messages
+
+	    // Clear previous error messages
 	    fromDateError.innerText = "";
 	    toDateError.innerText = "";
-		
+
+	    // Remove previous invalid state
+	    fromDate.classList.remove("is-invalid");
+	    toDate.classList.remove("is-invalid");
+
+	    // Validate only when both dates are selected
 	    if (fromDate.value === "" || toDate.value === "") {
 	        return true;
 	    }
 
+	    // Compare ISO date values (yyyy-MM-dd)
 	    if (fromDate.value > toDate.value) {
-			
-			fromDate.value = "";
-			toDate.value = "";
+
+	        fromDate.classList.add("is-invalid");
+	        toDate.classList.add("is-invalid");
 
 	        fromDateError.innerText =
 	            "From Date cannot be greater than To Date.";
@@ -794,51 +811,62 @@ setEditDate("toDate1", end);
 	        toDateError.innerText =
 	            "To Date must be greater than or equal to From Date.";
 
-	        fromDate.focus();
+	        return false;
+	    }
+
+	    // Valid date range
+	    fromDate.classList.add("is-valid");
+	    toDate.classList.add("is-valid");
+
+	    return true;
+	}
+
+
+	// ==========================================
+	// Validate Pending UC Date Range - Edit Form
+	// ==========================================
+	function validateDateRange1() {
+
+	    const fromDate1 = document.getElementById("fromDate1");
+	    const toDate1 = document.getElementById("toDate1");
+
+	    const fromDate1Error = document.getElementById("fromDate1Error");
+	    const toDate1Error = document.getElementById("toDate1Error");
+
+	    // Clear previous error messages
+	    fromDate1Error.innerText = "";
+	    toDate1Error.innerText = "";
+
+	    // Remove previous invalid state
+	    fromDate1.classList.remove("is-invalid");
+	    toDate1.classList.remove("is-invalid");
+
+	    // Validate only when both dates are selected
+	    if (fromDate1.value === "" || toDate1.value === "") {
+	        return true;
+	    }
+
+	    // Compare ISO date values (yyyy-MM-dd)
+	    if (fromDate1.value > toDate1.value) {
+
+	        fromDate1.classList.add("is-invalid");
+	        toDate1.classList.add("is-invalid");
+
+	        fromDate1Error.innerText =
+	            "From Date cannot be greater than To Date.";
+
+	        toDate1Error.innerText =
+	            "To Date must be greater than or equal to From Date.";
 
 	        return false;
 	    }
-		
+
+	    // Valid date range
+	    fromDate1.classList.add("is-valid");
+	    toDate1.classList.add("is-valid");
+
 	    return true;
 	}
-	
-	function validateDateRange1() {
-
-		    
-			
-			const fromDate1 = document.getElementById("fromDate1");
-			const toDate1 = document.getElementById("toDate1");
-
-			const fromDate1Error = document.getElementById("fromDate1Error");
-			const toDate1Error = document.getElementById("toDate1Error");
-
-		    // Clear previous messages
-			fromDate1Error.innerText = "";
-			toDate1Error.innerText = "";
-
-			if (fromDate1.value === "" || toDate1.value === "") {
-				return true;
-			}
-
-			if (fromDate1.value > toDate1.value) {
-
-				fromDate1.value = "";
-				toDate1.value = "";
-
-				fromDate1Error.innerText =
-					"From Date cannot be greater than To Date.";
-
-				toDate1Error.innerText =
-					"To Date must be greater than or equal to From Date.";
-
-				fromDate1.focus();
-
-				return false;
-			}
-
-		    return true;
-		}
-
 </script>
 
 </head>
@@ -1406,7 +1434,7 @@ setEditDate("toDate1", end);
 							
 								</div>
 							
-								<div class="col-md-6">
+							<!--	<div class="col-md-6">
 									<label class="form-label">
 										Period of pending UC
 									</label>
@@ -1423,7 +1451,69 @@ setEditDate("toDate1", end);
 											<div id="toDate1Error" class="text-danger mt-1"></div>
 									</div>
 							
+								</div>-->
+								
+								
+								<div class="col-md-6">
+
+								    <label class="form-label">
+								        Period of pending UC
+								    </label>
+
+								    <div class="pending-date-range">
+
+								        <!-- From Date -->
+								        <div>
+
+								            <input type="date"
+								                   name="fromDate1"
+								                   id="fromDate1"
+								                   class="form-control date-small"
+								                   min="2026-01-01"
+								                   onkeydown="return false;"
+								                   onchange="validateDateRange1()"
+								                   required>
+
+								            <div class="invalid-feedback">
+								                Please select Period of pending UC From Date.
+								            </div>
+
+								            <div id="fromDate1Error"
+								                 class="text-danger mt-1">
+								            </div>
+
+								        </div>
+
+								     &nbsp;<span>To</span>&nbsp;
+
+								        <!-- To Date -->
+								        <div>
+
+								            <input type="date"
+								                   name="toDate1"
+								                   id="toDate1"
+								                   class="form-control date-small"
+								                   min="2026-01-01"
+								                   onkeydown="return false;"
+								                   onchange="validateDateRange1()"
+								                   required>
+
+								            <div class="invalid-feedback">
+								                Please select Period of pending UC To Date.
+								            </div>
+
+								            <div id="toDate1Error"
+								                 class="text-danger mt-1">
+								            </div>
+
+								        </div>
+
+								    </div>
+
 								</div>
+								
+								
+								
 								<div class="col-md-6">
 									<label class="form-label">
 										Amount (Rs in Lakh)
