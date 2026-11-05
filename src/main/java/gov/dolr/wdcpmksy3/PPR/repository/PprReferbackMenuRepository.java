@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import gov.dolr.wdcpmksy3.PPR.dto.PprReferbackMenuStatusDTO;
 import gov.dolr.wdcpmksy3.PPR.entity.PprReferbackMenu;
 
 public interface PprReferbackMenuRepository
@@ -26,6 +27,22 @@ public interface PprReferbackMenuRepository
     @Query("SELECT m FROM PprReferbackMenu m WHERE m.ppr.pprId = :pprId AND m.referbackRound= (select max(m1.referbackRound) "
     		+ "from PprReferbackMenu m1  where m1.ppr.pprId = m.ppr.pprId) order by referbackId")
     List<PprReferbackMenu> getListPprReferbackMenu(@Param("pprId") Integer pprId);
+    
+    @Query(value = """
+            SELECT
+                ppr_id AS "pprId",
+                submenu_name AS "submenuName",
+                target AS "target",
+                remark AS "remark",
+                ppr_table_name AS "pprTableName",
+                status AS "status"
+            FROM public.get_ppr_referback_menu_status(:pprid)
+            """,
+            nativeQuery = true)
+    List<PprReferbackMenuStatusDTO> getPprReferbackMenuStatus(@Param("pprid") Integer pprid);
+    
+    
+    
     
     
     

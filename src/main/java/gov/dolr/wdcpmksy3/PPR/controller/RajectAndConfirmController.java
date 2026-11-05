@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import gov.dolr.wdcpmksy3.PPR.dto.PprReferbackMenuStatusDTO;
 import gov.dolr.wdcpmksy3.PPR.dto.PprTransactionDto;
 import gov.dolr.wdcpmksy3.PPR.entity.PprDrinkingWater;
 import gov.dolr.wdcpmksy3.PPR.entity.PprReferbackMenu;
 import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
 import gov.dolr.wdcpmksy3.PPR.repository.PprReferbackMenuRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
+import gov.dolr.wdcpmksy3.PPR.service.PprReferbackMenuService;
 import gov.dolr.wdcpmksy3.entity.WdcpmksySubmenu;
 import gov.dolr.wdcpmksy3.repository.MenuRepository;
 import gov.dolr.wdcpmksy3.service.DistrictService;
@@ -39,6 +41,9 @@ public class RajectAndConfirmController {
 	
 	@Autowired
 	private PprReferbackMenuRepository rbmenu;
+	
+	@Autowired
+	private PprReferbackMenuService serv;
 	
 	@GetMapping("/rajectAndConfirm")
     public String rajectAndConfirm(HttpSession session, Model model) 
@@ -69,6 +74,13 @@ public class RajectAndConfirmController {
         model.addAttribute("distList", districtService.getPPRDistrictsByState(stcode));
        // List<WdcpmksySubmenu> submenuList =submenuRepository.findByMenu_MenuNameAndIsActiveTrueOrderBySeqNoAsc("Preliminary Project Report Details", "/pprDistrict");
         List<PprReferbackMenu> submenuList= rbmenu.getListPprReferbackMenu(pprid);
+        boolean allupdated =false;
+        List<PprReferbackMenuStatusDTO> referbackList =serv.getPprReferbackMenuStatus(pprid);
+        model.addAttribute("referbackList", referbackList);
+        
+        allupdated=referbackList.stream().anyMatch(row -> "D".equals(String.valueOf(row.getStatus())));
+      //  System.out.println("kdy"+allupdated);
+        model.addAttribute("allupdated", allupdated);
         model.addAttribute("submenuList", submenuList);
         model.addAttribute("pprid", pprid);
         model.addAttribute("projectname", projectName);

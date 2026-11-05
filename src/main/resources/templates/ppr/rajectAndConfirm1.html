@@ -83,27 +83,38 @@
 			           </thead>
 			           <tbody>
 
-			               <tr th:each="rec, iterStat  : ${submenuList}">
+			               <tr th:each="rec, iterStat  : ${referbackList}">
 								<td th:text="${iterStat.count}"></td>
 								<td class="text-start" th:text="${rec.submenuName}"></td>
 								<td class="text-start" th:text="${rec.remark}"></td>
 							    <td>
-									<!--<a th:href="@{rec.target}"
-									   class="btn btn-primary btn-sm" onclick="return confirm('you want to Modify');">
-									    Modify
-									</a>-->
-									<a th:href="@{${rec.target}(pprid=${pprid})}" class="btn btn-primary btn-sm"
+									<a th:href="@{${rec.target}(pprid=${pprid})}" class="btn btn-primary btn-sm" th:if="${rec.status.toString() == 'D'}"
 										onclick="return confirm('Do you want to Modify/Update Data for Rejected PPR.');">
 										Modify/Update Data
 									</a>
 									
+									<span class="badge bg-success" th:if="${rec.status.toString() == 'C'}">
+										<i class="fas fa-check-circle"></i>
+										Updated
+									</span>
+									
 							   	</td>
 			               </tr>
-			               <tr th:if="${#lists.isEmpty(submenuList)}">
-			                   <td colspan="3" class="text-center text-muted">
+			               <tr th:if="${#lists.isEmpty(referbackList)}">
+			                   <td colspan="4" class="text-center text-muted">
 			                       Data Not Found
 			                   </td>
 			               </tr>
+						   
+						<tr th:if="${!allupdated}">
+							<form id="updatePPRForm" th:action="@{/viewPPR}" method="get">
+							<td colspan="4" class="text-center text-muted">
+								<button type="submit" class="btn btn-primary">
+									Go to Forward
+								</button>
+							</td>
+							</form>
+						</tr>
 
 			           </tbody>
 

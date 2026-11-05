@@ -2434,8 +2434,7 @@
 						You can still view the data, the transaction history and download the PDF.
 					</div>
 
-					<div class="row mb-3 align-items-center">
-
+					<!--<div class="row mb-3 align-items-center">
 						<div class="col-md-2">
 							<label class="form-label fw-semibold">
 								User-ID <span class="text-danger">*</span>
@@ -2456,6 +2455,45 @@
 								Forward
 							</button>
 						</div>
+					</div>-->
+					
+					<div class="row mb-3 align-items-center" th:if="${allSectionsFilled and !alreadyForwarded}">
+
+					    <div class="col-md-2">
+					        <label class="form-label fw-semibold">
+					            User-ID <span class="text-danger">*</span>
+					        </label>
+					    </div>
+
+					    <div class="col-md-4">
+
+					        <select class="form-select"
+					                id="userid"
+					                name="userid"
+					                required>
+
+					            <option value="">--Select User-ID--</option>
+
+					            <option th:each="u : ${userList}"
+					                    th:value="${u.regId}"
+					                    th:text="${u.userId}">
+					            </option>
+
+					        </select>
+
+					        <div class="invalid-feedback">
+					            Please select User-ID.
+					        </div>
+
+					    </div>
+
+					    <div class="col-md-4">
+
+					        <button type="submit" class="btn btn-primary">
+					            Forward
+					        </button>
+
+					    </div>
 
 					</div>
 
