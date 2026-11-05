@@ -24,6 +24,7 @@ import gov.dolr.wdcpmksy3.DPR.repository.ProductionActivityRepo;
 import gov.dolr.wdcpmksy3.DPR.service.DPRELPService;
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.PPR.repository.LivelihoodActivityRepository;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.PPR.repository.PprTransactionRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -49,6 +50,9 @@ public class DPRELPController {
 	@Autowired
 	ProductionActivityRepo prodRepo;
 	
+	@Autowired
+	private MPprRepository mPprRepo;
+	
 	@GetMapping("/epalivproddetails")
 	public String epalivproddetails(
 	        HttpSession session, Model model) {
@@ -73,7 +77,11 @@ public class DPRELPController {
         model.addAttribute("distList", tranrepo.findDistrictsByStCodeAndActionA(stcode));
         model.addAttribute("dprList", list);
         
-        
+        boolean pprApproved = mPprRepo.existsByDistrict_State_StCodeAndStatusIn(stcode, List.of("A"));
+        model.addAttribute("pprApproved", pprApproved);
+	    if (!pprApproved) 
+	        model.addAttribute("warning", "Your PPR is not Approved Yet. First PPR must be Approved. Before Entering DPR NRM Activity Target.");
+	    
          model.addAttribute("allCompleted", allCompleted);
         
 	    return "dpr/epalivproddtls";
