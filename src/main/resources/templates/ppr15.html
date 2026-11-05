@@ -76,6 +76,7 @@
 					errorDiv.textContent = "";
 				}
 			}
+			
 
 			function clearFormErrors(form) {
 				form.querySelectorAll(".is-invalid").forEach(function(field) {
@@ -149,7 +150,6 @@
 				}
 				if (value.length < 4) {
 					showFieldError(field, "Length of the Migration Reason should be more than 3 Characters.");
-					field.value = "";
 					return false;
 				}
 				clearFieldError(field);
