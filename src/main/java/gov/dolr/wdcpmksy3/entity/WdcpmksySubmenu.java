@@ -47,6 +47,9 @@ public class WdcpmksySubmenu {
             fetch = FetchType.LAZY, orphanRemoval = true)
     private List<WdcpmksyRoleMenuMap> roleMenuMappings;
 
+    @Column(name = "ppr_table_name", length = 150)
+    private String pprTableName;
+    
     // Getters and Setters
 
     public Integer getSubmenuId() {
@@ -157,6 +160,14 @@ public class WdcpmksySubmenu {
 
 	public void setIsParent(Integer isParent) {
 		this.isParent = isParent;
+	}
+
+	public String getPprTableName() {
+		return pprTableName;
+	}
+
+	public void setPprTableName(String pprTableName) {
+		this.pprTableName = pprTableName;
 	}
     
     

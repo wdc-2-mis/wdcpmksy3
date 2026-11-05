@@ -10,6 +10,20 @@
 			.required{
 			    color:red;
 			}
+			
+			.refer-menu-remark.is-valid {
+    border-color: #198754;
+    background-color: #f0fff4;
+}
+
+.refer-menu-remark.is-invalid {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+.refer-remark-error {
+    display: block;
+}
 		</style>
 		<script th:inline="javascript">
 			document.addEventListener("DOMContentLoaded", function () {
@@ -277,29 +291,189 @@ document.addEventListener("DOMContentLoaded", function () {
     const referBackError = document.getElementById("referBackError");
 
     // Show or hide remarks when a submenu is selected.
-    document.querySelectorAll(".refer-menu-checkbox").forEach(function (checkbox) {
+   // Checkbox selection and remarks validation
+document.querySelectorAll(".refer-menu-checkbox").forEach(function (checkbox) {
 
-        checkbox.addEventListener("change", function () {
+    checkbox.addEventListener("change", function () {
 
-            const container = checkbox.closest(".form-check");
-            const textarea = container.querySelector(".refer-menu-remark");
+        const container = checkbox.closest(".form-check");
 
-            if (checkbox.checked) {
+        const textarea = container.querySelector(".refer-menu-remark");
 
-                textarea.style.display = "block";
+        const error = container.querySelector(".refer-remark-error");
 
-            } else {
+        if (checkbox.checked) {
 
-                textarea.style.display = "none";
-                textarea.value = "";
-                textarea.classList.remove("is-invalid");
+            textarea.style.display = "block";
 
-            }
+            validateReferRemark(textarea);
 
-            referBackError.textContent = "";
-        });
+        } else {
+
+            textarea.style.display = "none";
+
+            textarea.value = "";
+
+            textarea.classList.remove("is-invalid", "is-valid");
+
+            error.textContent = "";
+        }
+
+        referBackError.textContent = "";
 
     });
+
+});
+
+
+// Validate individual remarks field
+function validateReferRemark(textarea) {
+
+    const container = textarea.closest(".form-check");
+
+    const error = container.querySelector(".refer-remark-error");
+
+    const remark = textarea.value.trim();
+
+    textarea.classList.remove("is-invalid", "is-valid");
+
+    error.textContent = "";
+
+    if (remark.length === 0) {
+
+        textarea.classList.add("is-invalid");
+
+        error.textContent = "Please enter remarks for this section.";
+
+        return false;
+
+    } else if (remark.length < 10) {
+
+        textarea.classList.add("is-invalid");
+
+        error.textContent =
+            "Remarks must contain at least 10 characters.";
+
+        return false;
+
+    } else {
+
+        textarea.classList.add("is-valid");
+
+        return true;
+
+    }
+
+}
+
+
+// Validate while user types
+document.querySelectorAll(".refer-menu-remark").forEach(function (textarea) {
+
+    textarea.addEventListener("input", function () {
+
+        validateReferRemark(textarea);
+
+    });
+
+});
+
+
+// Form submission
+referBackForm.addEventListener("submit", function (event) {
+
+    event.preventDefault();
+
+    referBackError.textContent = "";
+
+    referBackForm.querySelectorAll(".generated-refer-field")
+        .forEach(function (field) {
+            field.remove();
+        });
+
+    const selectedMenus = document.querySelectorAll(
+        ".refer-menu-checkbox:checked"
+    );
+
+    if (selectedMenus.length === 0) {
+
+        referBackError.textContent =
+            "Please select at least one PPR section.";
+
+        return;
+
+    }
+
+    let isValid = true;
+
+    let firstInvalidField = null;
+
+    selectedMenus.forEach(function (checkbox) {
+
+        const container = checkbox.closest(".form-check");
+
+        const textarea = container.querySelector(".refer-menu-remark");
+
+        const valid = validateReferRemark(textarea);
+
+        if (!valid) {
+
+            isValid = false;
+
+            if (firstInvalidField === null) {
+                firstInvalidField = textarea;
+            }
+
+        }
+
+    });
+
+    if (!isValid) {
+
+        firstInvalidField.focus();
+
+        return;
+
+    }
+
+
+    // Create indexed request parameters for Spring MVC.
+    selectedMenus.forEach(function (checkbox, index) {
+
+        const container = checkbox.closest(".form-check");
+
+        const textarea = container.querySelector(".refer-menu-remark");
+
+        const submenuIdField = document.createElement("input");
+
+        submenuIdField.type = "hidden";
+
+        submenuIdField.name = "items[" + index + "].submenuId";
+
+        submenuIdField.value = checkbox.value;
+
+        submenuIdField.className = "generated-refer-field";
+
+        referBackForm.appendChild(submenuIdField);
+
+
+        const remarkField = document.createElement("input");
+
+        remarkField.type = "hidden";
+
+        remarkField.name = "items[" + index + "].remark";
+
+        remarkField.value = textarea.value.trim();
+
+        remarkField.className = "generated-refer-field";
+
+        referBackForm.appendChild(remarkField);
+
+    });
+
+    referBackForm.submit();
+
+});
 
     // Submit Refer Back form.
     referBackForm.addEventListener("submit", function (event) {
@@ -341,29 +515,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
             textarea.classList.remove("is-invalid");
 
-            if (remark === "") {
+            if (remark.length < 10) {
 
-                textarea.classList.add("is-invalid");
+    textarea.classList.add("is-invalid");
 
-                isValid = false;
+    isValid = false;
 
-                if (firstInvalidField === null) {
-                    firstInvalidField = textarea;
-                }
-
-            }
+    if (firstInvalidField === null) {
+        firstInvalidField = textarea;
+    }
+}
 
         });
 
         if (!isValid) {
 
-            referBackError.textContent =
-                "Please enter remarks for every selected PPR section.";
+    referBackError.textContent =
+        "Remarks must contain at least 10 characters for every selected PPR section.";
 
-            firstInvalidField.focus();
+    firstInvalidField.focus();
 
-            return;
-        }
+    return;
+}
 
         // Create indexed request parameters for Spring MVC.
         selectedMenus.forEach(function (checkbox, index) {
@@ -750,9 +923,7 @@ function openReferBackModal(element) {
                                         style="display:none;">
                                     </textarea>
 
-                                    <div class="invalid-feedback">
-                                        Please enter remarks for this section.
-                                    </div>
+                                    <div class="invalid-feedback refer-remark-error"></div>
 
                                 </div>
 
