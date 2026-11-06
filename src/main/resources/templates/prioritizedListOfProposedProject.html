@@ -317,26 +317,48 @@
 				}
 				
 			});
-			// =========================
-			// REMOVE ERROR ON CHANGE
-			// =========================
-			form.addEventListener("input", function(e){
-				if(e.target.classList.contains("is-invalid")){
-					e.target.classList.remove("is-invalid");
-					const error = e.target.parentNode.querySelector(".validation-error");
-					if(error){
-						error.remove();
-					}
-				}
+			// Clear validation errors
+			function clearError(field) {
+			    if (!field) return;
+			    // Remove invalid border
+			    field.classList.remove("is-invalid");
+			    // Remove dynamically created error
+			    const parent = field.parentElement;
+			    if (parent) {
+			        const error = parent.querySelector(".validation-error");
+			        if (error) {
+			            error.remove();
+			        }
+			    }
+			    // Clear field-error message
+			    if (field.id) {
+			        const errorElement = form.querySelector(".validation-error");
+			        if (errorElement) {
+			            errorElement.innerText = "";
+			        }
+			    }
+			}
+			// For text inputs
+			form.addEventListener("input", function (e) {
+			    clearError(e.target);
 			});
-			form.addEventListener("change", function(e){
-				if(e.target.classList.contains("is-invalid")){
-					e.target.classList.remove("is-invalid");
-					const error = e.target.parentNode.querySelector(".validation-error");
-					if(error){
-						error.remove();
-					}
-				}
+			// For dropdowns and radio buttons
+			form.addEventListener("change", function (e) {
+			    clearError(e.target);
+			    // Clear project type error
+			    if (e.target.name === "projectType") {
+			        const error = form.querySelector(".validation-error");
+			        if (error) {
+			            error.innerText = "";
+			        }
+			    }
+			    // Clear criteria error
+			    if (e.target.classList.contains("criteriaCheck") ||e.target.classList.contains("scoreRadio")) {
+			        const error = form.querySelector('[data-error-for="criteriaData"]');
+			        if (error) {
+			            error.innerText = "";
+			        }
+			    }
 			});
 		});
 	
@@ -933,7 +955,7 @@
 					    <div class="col-md-3">
 							<input type="text" name="treatedProjectArea" id="treatedProjectArea" autocomplete="off"
 								class="form-control form-control-sm" oninput="validateDecimal(this,11,4)" />
-							<div class="field-error" data-error-for="treatedProjectArea"></div>
+<!--							<div class="field-error" data-error-for="treatedProjectArea"></div>-->
 					    </div>
 					</div>										
 
@@ -946,7 +968,6 @@
 								<label class="form-check-label" th:for="'project'+${project.projectTypeId}" th:text="${project.projectType}">
 								</label>
 							</div>
-							<div class="field-error" data-error-for="projectType"></div>
 						</div>
 	                </div>
 
@@ -955,7 +976,7 @@
 	                    <div class="col-md-3">
 							<input type="text" name="proposedCost" id="proposedCost" autocomplete="off" class="form-control form-control-sm"
 								oninput="validateDecimal(this,11,4)" />
-							<div class="field-error" data-error-for="proposedCost"></div>
+<!--							<div class="field-error" data-error-for="proposedCost"></div>-->
 	                    </div>
 	                </div>
 					
@@ -966,7 +987,7 @@
 								Total Marks: <span id="criteriaTotal">0</span> 
 							</button>
 							<input type="hidden" id="criteriaData" name="criteriaData">
-							<div class="field-error" data-error-for="criteriaData"></div>
+<!--							<div class="field-error" data-error-for="criteriaData"></div>-->
 	                    </div>
 	                </div>
 
