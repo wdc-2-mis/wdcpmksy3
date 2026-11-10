@@ -26,6 +26,22 @@
 		font-size: 14px;
 		margin-top: 4px;
 	}
+	
+	.field-error,
+	.validation-error {
+	    color: red;
+	    font-size: 14px;
+	    margin-top: 4px;
+	}
+
+	.field-error:empty,
+	.validation-error:empty {
+	    display: none;
+	}
+
+	.is-invalid {
+	    border-color: #dc3545 !important;
+	}
 	</style>
 
 
@@ -54,38 +70,38 @@
 			});
 			
 			function showFieldError(field, message) {
-				field.classList.add("is-invalid");
-
-				let errorDiv = field.parentElement.querySelector(".field-error");
-
-				if (!errorDiv) {
-					errorDiv = document.createElement("div");
-					errorDiv.className = "field-error";
-					field.parentElement.appendChild(errorDiv);
-				}
-
-				errorDiv.textContent = message;
+			    if (!field) return;
+			    field.classList.add("is-invalid");
+			    const parent = field.parentElement;
+			    let errorDiv = parent.querySelector(".field-error, .validation-error");
+			    if (!errorDiv) {
+			        errorDiv = document.createElement("div");
+			        errorDiv.className = "field-error";
+			        parent.appendChild(errorDiv);
+			    }
+			    errorDiv.textContent = message;
+			    errorDiv.style.display = "block";
 			}
 
 			function clearFieldError(field) {
-				field.classList.remove("is-invalid");
-
-				const errorDiv = field.parentElement.querySelector(".field-error");
-
-				if (errorDiv) {
-					errorDiv.textContent = "";
-				}
+			    if (!field) return;
+			    field.classList.remove("is-invalid");
+			    const parent = field.parentElement;
+			    const errorDiv = parent.querySelector(".field-error, .validation-error");
+			    if (errorDiv) {
+			        errorDiv.textContent = "";
+			        errorDiv.style.display = "none";
+			    }
 			}
 			
-
 			function clearFormErrors(form) {
-				form.querySelectorAll(".is-invalid").forEach(function(field) {
-					field.classList.remove("is-invalid");
-				});
-
-				form.querySelectorAll(".field-error").forEach(function(error) {
-					error.textContent = "";
-				});
+			    form.querySelectorAll(".is-invalid").forEach(function(field) {
+			        field.classList.remove("is-invalid");
+			    });
+			    form.querySelectorAll(".field-error, .validation-error").forEach(function(error) {
+			        error.textContent = "";
+			        error.style.display = "none";
+			    });
 			}
 			
 			const daysMigrating = document.getElementById("daysMigrating");
@@ -101,32 +117,29 @@
 			    });
 			}
 			
+			// Required field validation
 			function validateRequiredField(field, message) {
-				if (!field.value || field.value.trim() === "") {
-					showFieldError(field, message);
-					field.focus();
-					return false;
-				}
-
-				clearFieldError(field);
-				return true;
+			    if (!field.value || field.value.trim() === "") {
+			        showFieldError(field, message);
+			        return false;
+			    }
+			    clearFieldError(field);
+			    return true;
 			}
+			// Days migrating validation
 			function validateDaysMigrating(field) {
-				const value = field.value.trim();
-				if (value === "") {
-					showFieldError(field, "Please enter No. of days per year Migrating.");
-//					field.focus();
-					return false;
-				}
-				const days = parseInt(value, 10);
-				if (days < 1 || days > 365) {
-					showFieldError(field, "No. of days per year Migrating cannot be more than 365.");
-//					field.focus();
-					field.value="";
-					return false;
-				}
-				clearFieldError(field);
-				return true;
+			    const value = field.value.trim();
+			    if (value === "") {
+			        showFieldError(field, "Please enter No. of days per year Migrating.");
+			        return false;
+			    }
+			    const days = Number(value);
+			    if (!Number.isInteger(days) || days < 1 || days > 365) {
+			        showFieldError(field, "No. of days per year Migrating must be between 1 and 365.");
+			        return false;
+			    }
+			    clearFieldError(field);
+			    return true;
 			}
 			
 			const migrationReason = document.getElementById("migrationReason");
@@ -141,19 +154,19 @@
 			        validateMigrationReason(this);
 			    });
 			}
+			// Migration reason validation
 			function validateMigrationReason(field) {
-				const value = field.value.trim();
-				if (value === "") {
-					showFieldError(field, "Please enter Major reason for Migration.");
-					//					field.focus();
-					return false;
-				}
-				if (value.length < 4) {
-					showFieldError(field, "Length of the Migration Reason should be more than 3 Characters.");
-					return false;
-				}
-				clearFieldError(field);
-				return true;
+			    const value = field.value.trim();
+			    if (value === "") {
+			        showFieldError(field, "Please enter Major reason for Migration.");
+			        return false;
+			    }
+			    if (value.length < 4) {
+			        showFieldError(field, "Length of the Migration Reason should be more than 3 Characters.");
+			        return false;
+			    }
+			    clearFieldError(field);
+			    return true;
 			}
 			
 			const watershed = document.getElementById("watershed");
@@ -197,7 +210,50 @@
 			    village.addEventListener("change", function () {
 			        checkMigrationExists(village);
 			    });
-			} 
+			}
+			
+			// Automatically remove errors when the user enters valid values
+			const validationFields = [
+			    document.getElementById("district"),
+			    document.getElementById("project"),
+			    document.getElementById("watershed"),
+			    document.getElementById("village"),
+			    document.getElementById("peopleMigrating"),
+			    document.getElementById("daysMigrating"),
+			    document.getElementById("migrationReason"),
+			    document.getElementById("expectedReduction"),
+			    // Edit modal fields
+			    document.getElementById("editMigratingPeopleCount"),
+			    document.getElementById("editMigrationDaysPerYear"),
+			    document.getElementById("editMigrationReason"),
+			    document.getElementById("editExpectedReduction")
+			];
+			validationFields.forEach(function(field) {
+			    if (!field) return;
+			    function validateOnChange() {
+			        if (field.id === "daysMigrating" || field.id === "editMigrationDaysPerYear") {
+			            if (field.value.trim() !== "") {
+			                validateDaysMigrating(field);
+			            } else {
+			                clearFieldError(field);
+			            }
+			        }
+			        else if (field.id === "migrationReason" || field.id === "editMigrationReason") {
+			            if (field.value.trim() !== "") {
+			                validateMigrationReason(field);
+			            } else {
+			                clearFieldError(field);
+			            }
+			        }
+			        else {
+			            if (field.value.trim() !== "") {
+			                clearFieldError(field);
+			            }
+			        }
+			    }
+			    field.addEventListener("input", validateOnChange);
+			    field.addEventListener("change", validateOnChange);
+			}); 
 
 			document.getElementById("ppr15Form").addEventListener("submit", function(event) {
 				event.preventDefault();

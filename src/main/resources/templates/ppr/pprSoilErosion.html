@@ -138,24 +138,36 @@ document.addEventListener("DOMContentLoaded", function () {
 		        ) {
 		            continue;
 		        }
-		        // AFFECTED AREA
-		        if (affectedValue === "") {
-		            showFieldError(affected, "Please enter Affected Area.");
-		            affected.focus();
-		            return;
-		        }
-		        // RUNOFF - required only for Water Erosion
-		        if (erosionCategoryId === 1 && runoffValue === "") {
-		            showFieldError(runoff, "Please enter Runoff.");
-		            runoff.focus();
-		            return;
-		        }
-		        // SOIL LOSS
-		        if (soilLossValue === "") {
-		            showFieldError(soilLoss, "Please enter Average Soil Loss.");
-		            soilLoss.focus();
-		            return;
-		        }
+				if (affectedValue === "") {
+				    showFieldError(affected, "Please enter Affected Area.");
+				    affected.focus();
+				    return;
+				} else if (isNaN(Number(affectedValue)) || Number(affectedValue) <= 0) {
+				    showFieldError(affected, "Affected Area must be greater than zero.");
+				    affected.focus();
+				    return;
+				}
+				if (erosionCategoryId === 1) {
+				    if (runoffValue === "") {
+				        showFieldError(runoff, "Please enter Runoff.");
+				        runoff.focus();
+				        return;
+				    } else if (isNaN(Number(runoffValue)) || Number(runoffValue) <= 0) {
+				        showFieldError(runoff,"Runoff must be greater than zero.");
+				        runoff.focus();
+				        return;
+				    }
+				}
+				if (soilLossValue === "") {
+				    showFieldError(soilLoss, "Please enter Average Soil Loss.");
+				    soilLoss.focus();
+				    return;
+				} else if (isNaN(Number(soilLossValue)) || Number(soilLossValue) <= 0
+				) {
+				    showFieldError(soilLoss, "Average Soil Loss must be greater than zero.");
+				    soilLoss.focus();
+				    return;
+				}
 		        hasCompleteRow = true;
 		    }
 		    // At least one complete row
@@ -183,34 +195,79 @@ document.addEventListener("DOMContentLoaded", function () {
 		});
     }
 	function showFieldError(field, message) {
-		if (!field) {
-			return;
-		}
-		field.classList.add("is-invalid");
-		let errorDiv = null;
-		const parent = field.parentElement;
-		if (parent) {
-			errorDiv = parent.querySelector('.validation-error[data-error-for="' + field.id + '"]');
-		}
-		if (!errorDiv) {
-			const td = field.closest("td");
-			if (td) {
-				errorDiv = td.querySelector(".validation-error");
-			}
-		}
-		if (errorDiv) {
-			errorDiv.textContent = message;
-		}
+	    if (!field) return;
+	    field.classList.add("is-invalid");
+	    const form = field.closest("form");
+	    let errorDiv = null;
+	    if (field.id) {
+	        errorDiv = form.querySelector('.validation-error[data-error-for="' + field.id + '"]');
+	    }
+	    if (!errorDiv) {
+	        errorDiv = field.parentElement.querySelector(".validation-error");
+	    }
+	    if (errorDiv) {
+	        errorDiv.textContent = message;
+	    }
+	}
+
+	function clearFieldError(field) {
+	    if (!field) return;
+	    field.classList.remove("is-invalid");
+	    const form = field.closest("form");
+	    if (!form) return;
+	    let errorDiv = null;
+	    if (field.id) {
+	        errorDiv = form.querySelector('.validation-error[data-error-for="' + field.id + '"]');
+	    }
+	    if (!errorDiv) {
+	        errorDiv = field.parentElement.querySelector(".validation-error");
+	    }
+	    if (errorDiv) {
+	        errorDiv.textContent = "";
+	    }
 	}
 	function clearValidationErrors(form) {
-		form.querySelectorAll(".validation-error").forEach(function (error) {
-			error.textContent = "";
-		});
-		form.querySelectorAll(".is-invalid").forEach(function (field) {
-			field.classList.remove("is-invalid");
-		});
+	    form.querySelectorAll(".validation-error").forEach(function (error) {
+	        error.textContent = "";
+	    });
+	    form.querySelectorAll(".is-invalid").forEach(function (field) {
+	        field.classList.remove("is-invalid");
+	    });
 	}
+	// =====================================
+	// CLEAR ERRORS WHEN USER ENTERS VALUES
+	// =====================================
+	document.addEventListener("input", function (e) {
+	    const field = e.target;
+	    if (field.matches("#editAffectedArea, #editRunoff, #editAvgSoilLoss") || field.matches("#soilErosionEntryBody input")) {
+	        const value = field.value.trim();
+	        if (value !== "" && !isNaN(Number(value)) && Number(value) > 0) {
+	            clearFieldError(field);
+	        }
+	    }
+	});
+	// =====================================
+	// CLEAR ERRORS WHEN DROPDOWN CHANGES
+	// =====================================
+	document.addEventListener("change", function (e) {
+	    const field = e.target;
+	    if (field.matches("#district, #project, #month, #year")) {
+	        if (field.value.trim() !== "") {
+	            clearFieldError(field);
+	        }
+	    }
+	    // Clear erosion radio error
+	    if (field.name === "erosionId") {
+	        const errorDiv = document.querySelector('[data-error-for="erosionId"]');
+	        if (errorDiv) {
+	            errorDiv.textContent = "";
+	        }
+	    }
+	});
     
+	// =====================================
+	// UPDATE FORM VALIDATION
+	// =====================================
 	const editForm = document.getElementById("editSoilForm");
 	if (editForm) {
 	    editForm.addEventListener("submit", function(e) {
@@ -220,25 +277,39 @@ document.addEventListener("DOMContentLoaded", function () {
 	        const affected = document.getElementById("editAffectedArea");
 	        const runoff = document.getElementById("editRunoff");
 	        const soilLoss = document.getElementById("editAvgSoilLoss");
-	        // 1. AFFECTED AREA
-	        if (!affected.value.trim()) {
-	            showFieldError(affected, "Please enter Affected Area.");
-	            affected.focus();
+	        let isValid = true;
+	        let firstInvalidField = null;
+	        function validateField(field, message) {
+	            if (!field.value.trim()) {
+	                showFieldError(field, message);
+	                isValid = false;
+	                if (!firstInvalidField) {
+	                    firstInvalidField = field;
+	                }
+	            } else if (isNaN(Number(field.value)) || Number(field.value) <= 0) {
+	                showFieldError(field,"Value must be greater than zero.");
+	                isValid = false;
+	                if (!firstInvalidField) {
+	                    firstInvalidField = field;
+	                }
+	            }
+	        }
+	        // AFFECTED AREA
+	        validateField(affected,"Please enter Affected Area.");
+	        // RUNOFF - Only for Water Erosion
+	        if (erosionCategory === "Water Erosion") {
+	            validateField(runoff, "Please enter Runoff.");
+	        }
+	        // AVERAGE SOIL LOSS
+	        validateField(soilLoss, "Please enter Average Soil Loss.");
+	        // STOP IF INVALID
+	        if (!isValid) {
+	            if (firstInvalidField) {
+	                firstInvalidField.focus();
+	            }
 	            return;
 	        }
-	        // 2. RUNOFF - required only for Water Erosion
-	        if (erosionCategory === "Water Erosion" && !runoff.value.trim()) {
-	            showFieldError(runoff, "Please enter Runoff.");
-	            runoff.focus();
-	            return;
-	        }
-	        // 3. AVERAGE SOIL LOSS
-	        if (!soilLoss.value.trim()) {
-	            showFieldError(soilLoss, "Please enter Average Soil Loss.");
-	            soilLoss.focus();
-	            return;
-	        }
-	        // All validation passed
+	        // SUBMIT FORM
 	        editForm.submit();
 	    });
 	}
