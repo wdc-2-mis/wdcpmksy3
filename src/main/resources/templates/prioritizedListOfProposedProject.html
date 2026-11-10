@@ -127,6 +127,7 @@
 		    // CRITERIA SAVE
 		    // =========================
 			document.getElementById("criteriaSaveBtn").addEventListener("click", function() {
+				document.querySelector('[data-error-for="criteriaData"]').innerText = "";
 			    const error = document.getElementById("criteriaModalError");
 			    error.textContent = "";
 			    let selected = false;
@@ -152,6 +153,9 @@
 			        error.textContent = "Please select a radio button for each selected criteria.";
 			        return;
 			    }
+				if(selected && valid){
+					error.textContent = "";
+				}
 			    document.getElementById("criteriaData").value = result.join(",");
 				// Calculate total selected marks 
 				updateCriteriaTotal();
@@ -360,6 +364,43 @@
 			        }
 			    }
 			});
+		});
+		
+		document.addEventListener("DOMContentLoaded", function () {
+		    // =====================================
+		    // SAVE FORM - CLEAR CRITERIA ERROR
+		    // =====================================
+		    const criteriaError = document.querySelector('[data-error-for="criteriaData"]');
+		    document.querySelectorAll("#criteriaModal .criteriaCheck, #criteriaModal .scoreRadio")
+		        .forEach(function (element) {
+		            element.addEventListener("change", function () {
+		                if (criteriaError) {
+		                    criteriaError.innerText = "";
+		                }
+		                // Clear modal validation error also
+		                const modalError = document.getElementById("criteriaModalError");
+		                if (modalError) {
+		                    modalError.innerText = "";
+		                }
+		            });
+		        });
+		    // =====================================
+		    // UPDATE FORM - CLEAR CRITERIA ERROR
+		    // =====================================
+		    const editCriteriaError = document.querySelector('[data-error-for="editCriteriaData"]');
+		    document.querySelectorAll("#editCriteriaModal .editCriteriaCheck, #editCriteriaModal .editScoreRadio")
+		        .forEach(function (element) {
+		            element.addEventListener("change", function () {
+		                if (editCriteriaError) {
+		                    editCriteriaError.innerText = "";
+		                }
+		                // Clear modal validation error also
+		                const modalError = document.getElementById("criteriaEditModalError");
+		                if (modalError) {
+		                    modalError.innerText = "";
+		                }
+		            });
+		        });
 		});
 	
 	document.addEventListener("DOMContentLoaded", function () {
@@ -633,112 +674,147 @@
 	        return;
 	    }
 	    editForm.addEventListener("submit", function (e) {
+	        // Prevent submission until validation completes
 	        e.preventDefault();
-	        // =========================
-	        // CLEAR OLD ERRORS
-	        // =========================
+	        // Remove previous validation errors
 	        editForm.querySelectorAll(".field-error").forEach(function (error) {
 	            error.innerText = "";
 	        });
+	        editForm.querySelectorAll(".validation-error").forEach(function (error) {
+	            error.remove();
+	        });
+	        editForm.querySelectorAll(".is-invalid").forEach(function (field) {
+	            field.classList.remove("is-invalid");
+	        });
 	        let isValid = true;
 	        let firstInvalidField = null;
-	        // =========================
-	        // GET VALUES
-	        // =========================
-	        const treatedArea = document.getElementById("editTreatedArea").value.trim();
-	        const proposedCost = document.getElementById("editProposedCost").value.trim();
-	        const projectType = document.querySelector("#editProjectForm input[name='projectType']:checked");
-	        // =========================
-	        // TREATED AREA
-	        // =========================
-	        if (!treatedArea) {
-	            const error = editForm.querySelector('[data-error-for="editTreatedArea"]');
-	            if (error) {
-	                error.innerText = "Treated Area is required.";
-	            }
+	        // =====================================
+	        // VALIDATION FUNCTION
+	        // =====================================
+	        function showError(field, message) {
+	            field.classList.add("is-invalid");
+	            const error = document.createElement("div");
+	            error.className = "validation-error";
+	            error.innerText = message;
+	            field.parentNode.appendChild(error);
 	            isValid = false;
 	            if (!firstInvalidField) {
-	                firstInvalidField = document.getElementById("editTreatedArea");
+	                firstInvalidField = field;
 	            }
 	        }
-	        // =========================
-	        // PROJECT TYPE
-	        // =========================
+	        // =====================================
+	        // GET FIELD VALUES
+	        // =====================================
+	        const treatedArea = document.getElementById("editTreatedArea");
+	        const proposedCost = document.getElementById("editProposedCost");
+	        const projectType = editForm.querySelector(
+	            "input[name='projectType']:checked"
+	        );
+	        // =====================================
+	        // PROJECT AREA VALIDATION
+	        // =====================================
+	        if (treatedArea.value.trim() === "") {
+	            showError(treatedArea, "Please enter Proposed Project Area.");
+	        } else if (isNaN(Number(treatedArea.value)) || Number(treatedArea.value) <= 0) {
+	            showError(treatedArea, "Project Area must be greater than zero.");
+	        }
+	        // =====================================
+	        // PROJECT TYPE VALIDATION
+	        // =====================================
 	        if (!projectType) {
-	            const error = editForm.querySelector('[data-error-for="editProjectType"]');
-	            if (error) {
-	                error.innerText = "Project Type is required.";
-	            }
+	            const projectTypeContainer = editForm.querySelector(".editProjectType").closest(".row").querySelector(".col-md-5");
+	            const error = document.createElement("div");
+	            error.className = "validation-error";
+	            error.innerText = "Please select Project Type.";
+	            projectTypeContainer.appendChild(error);
 	            isValid = false;
 	            if (!firstInvalidField) {
 	                firstInvalidField = editForm.querySelector(".editProjectType");
 	            }
 	        }
-	        // =========================
-	        // PROPOSED COST
-	        // =========================
-	        if (!proposedCost) {
-	            const error = editForm.querySelector('[data-error-for="editProposedCost"]');
-	            if (error) {
-	                error.innerText = "Proposed Cost is required.";
-	            }
-	            isValid = false;
-	            if (!firstInvalidField) {
-	                firstInvalidField = document.getElementById("editProposedCost");
-	            }
+
+	        // =====================================
+	        // PROPOSED COST VALIDATION
+	        // =====================================
+	        if (proposedCost.value.trim() === "") {
+	            showError(proposedCost,"Please enter Proposed Cost.");
+	        } else if (isNaN(Number(proposedCost.value)) || Number(proposedCost.value) <= 0) {
+	            showError(proposedCost,"Proposed Cost must be greater than zero.");
 	        }
-	        // =========================
-	        // EDIT CRITERIA VALIDATION
-	        // =========================
-	        let hasSelectedCriteria = false;
-	        let criteriaMissingRadio = false;
-	        document.querySelectorAll("#editCriteriaModal tbody tr").forEach(function (row) {
-	            const checkbox = row.querySelector(".editCriteriaCheck");
-	            const radio = row.querySelector(".editScoreRadio:checked");
-	            if (checkbox && checkbox.checked) {
-	                hasSelectedCriteria = true;
-	                if (!radio) {
-	                    criteriaMissingRadio = true;
+	        // =====================================
+	        // CRITERIA VALIDATION
+	        // =====================================
+	        let criteriaSelected = false;
+	        let criteriaValid = true;
+	        document.querySelectorAll("#editCriteriaModal tbody tr")
+	            .forEach(function (row) {
+	                const checkbox = row.querySelector(".editCriteriaCheck");
+	                const selectedRadio = row.querySelector(".editScoreRadio:checked");
+	                if (checkbox && checkbox.checked) {
+	                    criteriaSelected = true;
+	                    if (!selectedRadio) {
+	                        criteriaValid = false;
+	                    }
 	                }
-	            }
-	        });
+	            });
 	        const criteriaError = editForm.querySelector('[data-error-for="editCriteriaData"]');
-	        if (!hasSelectedCriteria) {
-	            if (criteriaError) {
-	                criteriaError.innerText = "Please select at least one criteria.";
-	            }
+	        if (!criteriaSelected) {
+	            criteriaError.innerText = "Please select at least one criteria and marks.";
 	            isValid = false;
 	            if (!firstInvalidField) {
 	                firstInvalidField = document.getElementById("editCriteriaLink");
 	            }
-	        } else if (criteriaMissingRadio) {
-	            if (criteriaError) {
-	                criteriaError.innerText = "Please select a radio button for every selected criteria.";
-	            }
+	        } else if (!criteriaValid) {
+	            criteriaError.innerText = "Please select marks for all selected criteria.";
 	            isValid = false;
 	            if (!firstInvalidField) {
 	                firstInvalidField = document.getElementById("editCriteriaLink");
 	            }
 	        }
-	        // =========================
-	        // STOP IF INVALID
-	        // =========================
+	        // =====================================
+	        // STOP IF VALIDATION FAILS
+	        // =====================================
 	        if (!isValid) {
 	            if (firstInvalidField) {
 	                firstInvalidField.focus();
 	            }
 	            return;
 	        }
-	        // =========================
-	        // UPDATE CRITERIA DATA
-	        // =========================
+	        // =====================================
+	        // BUILD CRITERIA DATA
+	        // =====================================
 	        updateEditCriteriaData();
-	        // =========================
+	        // =====================================
 	        // SUBMIT FORM
-	        // =========================
+	        // =====================================
 	        editForm.submit();
 	    });
+
+	    // =====================================
+	    // CLEAR VALIDATION ERRORS
+	    // =====================================
+	    editForm.addEventListener("input", function (e) {
+	        if (e.target.id === "editTreatedArea" || e.target.id === "editProposedCost") {
+	            e.target.classList.remove("is-invalid");
+	            const error = e.target.parentNode.querySelector(".validation-error");
+	            if (error) {
+	                error.remove();
+	            }
+	        }
+	    });
+	    editForm.addEventListener("change", function (e) {
+	        // Clear Project Type error
+	        if (e.target.classList.contains("editProjectType")) {
+	            const error = e.target.closest(".col-md-5")
+	                .querySelector(".validation-error");
+
+	            if (error) {
+	                error.remove();
+	            }
+	        }
+	    });
 	});
+
 
 			
 			let savedEditCriteriaState = [];
@@ -987,7 +1063,7 @@
 								Total Marks: <span id="criteriaTotal">0</span> 
 							</button>
 							<input type="hidden" id="criteriaData" name="criteriaData">
-<!--							<div class="field-error" data-error-for="criteriaData"></div>-->
+							<div class="field-error" data-error-for="criteriaData"></div>
 	                    </div>
 	                </div>
 

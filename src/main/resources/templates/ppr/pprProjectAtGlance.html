@@ -549,9 +549,9 @@
 	        if (!validateRequiredField(document.getElementById("editPiaName"), "Please enter Name of PIA.")) {
 	            return false;
 	        }
-	        if (!validateRequiredField(document.getElementById("editAddress"), "Please enter Address of PIA.")) {
-	            return false;
-	        }
+			if (!validateAddress(document.getElementById("editAddress"), "Length of the Address of PIA should be more than 10 Characters.")) {
+			    return false;
+			}
 	        return true;
 	    }
 	    // =========================
@@ -648,6 +648,73 @@
 					const changedField = editWatershed;
 					checkProjectGlanceExists(changedField, editVillageElement, editWatershed);
 				});
+			}
+			
+			// ============================================
+			// AUTOMATICALLY CLEAR VALIDATION ERRORS
+			// FOR SAVE AND UPDATE FORMS
+			// ============================================
+
+			function clearValidationError(field) {
+
+			    if (!field) {
+			        return;
+			    }
+
+			    // Remove red border
+			    field.classList.remove("is-invalid");
+
+			    // Remove error message from the field's parent
+			    const parent = field.parentElement;
+
+			    if (parent) {
+			        const error = parent.querySelector(".validation-error");
+
+			        if (error) {
+			            error.remove();
+			        }
+			    }
+			}
+
+			// SAVE FORM
+			const saveForm = document.getElementById("projectForm");
+			if (saveForm) {
+			    saveForm.addEventListener("input", function (event) {
+			        clearValidationError(event.target);
+			    });
+			    saveForm.addEventListener("change", function (event) {
+			        clearValidationError(event.target);
+			        // Clear Project Type radio validation
+			        if (event.target.name === "projectType") {
+			            const container = event.target.closest(".col-md-5");
+			            if (container) {
+			                const error = container.querySelector(".validation-error");
+			                if (error) {
+			                    error.remove();
+			                }
+			            }
+			        }
+			    });
+			}
+			// UPDATE FORM
+			const updateForm = document.getElementById("editProjectForm");
+			if (updateForm) {
+			    updateForm.addEventListener("input", function (event) {
+			        clearValidationError(event.target);
+			    });
+			    updateForm.addEventListener("change", function (event) {
+			        clearValidationError(event.target);
+			        // Clear Project Type radio validation
+			        if (event.target.name === "projectType") {
+			            const container = event.target.closest(".col-md-5");
+			            if (container) {
+			                const error = container.querySelector(".validation-error");
+			                if (error) {
+			                    error.remove();
+			                }
+			            }
+			        }
+			    });
 			}
 			
 			const nextBtn = document.getElementById("nextBtn");
