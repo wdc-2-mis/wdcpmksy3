@@ -76,18 +76,21 @@ public class ViewConfirmDPRPlan {
             return "redirect:/login";
         }
         
-        boolean allnrm =false;
-        boolean allelp =false;
-        boolean alloth =false;
+        boolean allnrm =true;
+        boolean allelp =true;
+        boolean alloth =true;
         boolean exists=false;
         if(project!=null) {	
 		List<Object[]> list =plan.getDprNrmProjectPlanComplitedList(project);
+		if(list.size()>0)
 		allnrm = list.stream().anyMatch(row -> "D".equals(String.valueOf(row[5])));
 	//	System.out.println("kdy1"+allnrm);
 		List<Object[]> listelp =plan.getDprELPProjectPlanCompletedList(project);
+		if(listelp.size()>0)
 		allelp = listelp.stream().anyMatch(row -> "D".equals(String.valueOf(row[9])));
 	//	System.out.println("kdy2"+allelp);
 		List<DprOtherDtl> otheract=other.findCompletedOtherDtlByPprId(project);
+		if(otheract.size()>0)
 		alloth= otheract.stream().anyMatch(row -> "D".equals(String.valueOf(row.getStatus())));
 	//	System.out.println("kdy3"+alloth);
 		if(list!=null && !list.isEmpty()) {

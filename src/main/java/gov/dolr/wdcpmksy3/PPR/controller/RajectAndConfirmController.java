@@ -77,9 +77,7 @@ public class RajectAndConfirmController {
         boolean allupdated =false;
         List<PprReferbackMenuStatusDTO> referbackList =serv.getPprReferbackMenuStatus(pprid);
         model.addAttribute("referbackList", referbackList);
-        
         allupdated=referbackList.stream().anyMatch(row -> "D".equals(String.valueOf(row.getStatus())));
-      //  System.out.println("kdy"+allupdated);
         model.addAttribute("allupdated", allupdated);
         model.addAttribute("submenuList", submenuList);
         model.addAttribute("pprid", pprid);
