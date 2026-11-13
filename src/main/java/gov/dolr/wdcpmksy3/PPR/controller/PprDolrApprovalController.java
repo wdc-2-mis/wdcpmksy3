@@ -274,7 +274,7 @@ public String referBackPprReqForAprov(@ModelAttribute ReferBackRequest referBack
         List<Character> statuses = List.of('C');
         List<String> status = List.of("C");
         // ---- PPR-1 ----
-        List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatus(dcode, project, finYrCd, "C");
+        List<MPpr> records = pprRepo.findByDistrict_DcodeAndPprIdAndFinYear_FinYrCdAndStatusIn(dcode, project, finYrCd, List.of("C", "A", "B", "F"));
         data.put("records", records);
         // ---- PPR-2 ----
         List<PprWatershedCoveredArea> areaRecords = area.findByPprPprIdAndStatus(project, "C");
