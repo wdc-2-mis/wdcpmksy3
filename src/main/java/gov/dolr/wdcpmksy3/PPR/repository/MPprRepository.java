@@ -64,5 +64,37 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 	
 	boolean existsByPprIdAndStatusIn(Integer pprId, List<String> statuses);
 	
+	@Query(value = """
+		    SELECT COUNT(*)
+		    FROM m_ppr p
+		    INNER JOIN m_district d
+		        ON d.dcode = p.dcode
+		    WHERE d.st_code = :stcode
+		      AND p.status = 'A'
+		    """, nativeQuery = true)
+		Long countActiveProjectsByState(@Param("stcode") Integer stcode);
+	
+	
+	@Query(value = """
+		    SELECT COUNT(*)
+		    FROM m_ppr p
+		    INNER JOIN m_district d ON d.dcode = p.dcode
+		    WHERE d.st_code = :stcode
+		      AND d.wdcpmksy3 = TRUE
+		      AND p.status IN ('C', 'B', 'F')
+		    """, nativeQuery = true)
+		Long countPendingPprByState(@Param("stcode") Integer stcode);
+
+
+		@Query(value = """
+		    SELECT COUNT(*)
+		    FROM m_ppr p
+		    INNER JOIN m_district d ON d.dcode = p.dcode
+		    WHERE d.st_code = :stcode
+		      AND d.wdcpmksy3 = TRUE
+		      AND p.status = 'A'
+		    """, nativeQuery = true)
+		Long countApprovedPprByState(@Param("stcode") Integer stcode);
+	
 }
 

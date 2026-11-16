@@ -1,42 +1,144 @@
+
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.getElementById("toggleSidebar");
 
-    toggleBtn.addEventListener("click", function () {
-        if(window.innerWidth <= 768){
-            sidebar.classList.toggle("show");
-        } else {
-            sidebar.classList.toggle("collapsed");
-        }
+    if (!sidebar) return;
+
+    const sidebarMenu = sidebar.querySelector(".sidebar-menu");
+    const toggleBtn = document.getElementById("toggleSidebar");
+    const menuItems = sidebar.querySelectorAll(".menu > li");
+
+    if (!sidebarMenu) return;
+
+    // Find the selected submenu for the current page.
+    const activeSubmenu = sidebar.querySelector(".active-submenu");
+
+    // Close all parent menus first.
+    menuItems.forEach(function (item) {
+        item.classList.remove("active");
     });
 
-    const activeSubmenu = document.querySelector(".active-submenu");
-    if(activeSubmenu){
-        activeSubmenu.closest(".menu > li").classList.add("active");
+    // Open only the parent containing the selected submenu.
+    if (activeSubmenu) {
+
+        const activeParent = activeSubmenu.closest(".menu > li");
+
+        if (activeParent) {
+            activeParent.classList.add("active");
+        }
     }
 
-	document.querySelectorAll(".menu-toggle").forEach(menu => {
+    // Scroll the selected submenu into the visible sidebar area.
+    function scrollToSelectedSubmenu() {
 
-	    menu.addEventListener("click", function () {
+        if (!activeSubmenu) return;
 
-	        const current = this.parentElement;
+        if (window.innerWidth <= 768) {
+            if (!sidebar.classList.contains("show")) return;
+        } else {
+            if (sidebar.classList.contains("collapsed")) return;
+        }
 
-	        // Close all other menus
-	        document.querySelectorAll(".menu > li").forEach(item => {
-	            if(item !== current){
-	                item.classList.remove("active");
-	            }
-	        });
+        requestAnimationFrame(function () {
 
-	        // Toggle current menu
-	        current.classList.toggle("active");
+            requestAnimationFrame(function () {
 
-	    });
+                activeSubmenu.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "nearest"
+                });
 
-	});
+            });
+
+        });
+    }
+
+    // Wait until the parent menu has opened and the layout is ready.
+    setTimeout(function () {
+        scrollToSelectedSubmenu();
+    }, 400);
+
+    // Parent menu accordion behaviour.
+    menuItems.forEach(function (item) {
+
+        const menuToggle = item.querySelector(".menu-toggle");
+
+        if (!menuToggle) return;
+
+        menuToggle.addEventListener("click", function () {
+
+            const isAlreadyOpen = item.classList.contains("active");
+
+            // Close all other parent menus.
+            menuItems.forEach(function (otherItem) {
+                if (otherItem !== item) {
+                    otherItem.classList.remove("active");
+                }
+            });
+
+            // Toggle the clicked parent.
+            if (isAlreadyOpen) {
+
+                item.classList.remove("active");
+
+            } else {
+
+                item.classList.add("active");
+
+                // Bring the opened submenu into view.
+                setTimeout(function () {
+
+                    const selectedChild =
+                        item.querySelector(".active-submenu");
+
+                    if (selectedChild) {
+                        selectedChild.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+                    } else {
+                        item.querySelector(".submenu")
+                            ?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "nearest"
+                            });
+                    }
+
+                }, 200);
+            }
+        });
+    });
+
+    // Sidebar toggle button.
+    if (toggleBtn) {
+
+        toggleBtn.addEventListener("click", function () {
+
+            if (window.innerWidth <= 768) {
+
+                sidebar.classList.toggle("show");
+
+                if (sidebar.classList.contains("show")) {
+                    setTimeout(scrollToSelectedSubmenu, 300);
+                }
+
+            } else {
+
+                sidebar.classList.toggle("collapsed");
+
+                if (!sidebar.classList.contains("collapsed")) {
+                    setTimeout(scrollToSelectedSubmenu, 300);
+                }
+            }
+        });
+    }
 
 });
+
+
 
 let sessionDuration = typeof sessionTimeout !== "undefined"
     ? Number(sessionTimeout)

@@ -445,8 +445,7 @@ public class LoginController {
     public String logout(HttpServletRequest request) {
     	System.out.println("session value start");
         HttpSession session = request.getSession(false);
-System.out.println("session value" +session);
-        if (session != null) {
+     if (session != null) {
             System.out.println("Logout Session = " + session.getId());
             session.invalidate();
         }

@@ -23,4 +23,12 @@ public interface MDistrictRepository extends JpaRepository<MDistrict, Integer> {
 	List<MDistrict> getPPRDistrictsByState(Integer stcode);
 
 	List<MDistrict> getDPRDistrictsByState(Integer stcode);
+	
+	@Query(value = """
+		    SELECT COUNT(*)
+		    FROM m_district
+		    WHERE st_code = :stcode
+		    AND wdcpmksy3 = TRUE
+		    """, nativeQuery = true)
+		Long countDistrictsByState(@Param("stcode") Integer stcode);
 }

@@ -69,6 +69,15 @@ public interface UserMapRepository extends JpaRepository<WdcpmksyUserMap, Intege
     void deleteByUser_RegId(Integer regId);
 
 
- 
+    @Query(value = """
+    	    SELECT COUNT(DISTINCT r.reg_id)
+    	    FROM wdcpmksy_user_reg r
+    	    INNER JOIN wdcpmksy_user_map m
+    	        ON m.reg_id = r.reg_id
+    	    WHERE r.user_type = 'PI'
+    	      AND r.status = 'Active'
+    	      AND m.st_code = :stcode
+    	    """, nativeQuery = true)
+    	Long countActivePiaByState(@Param("stcode") Integer stcode);
 
 }

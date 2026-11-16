@@ -1,90 +1,135 @@
 
+/* =========================================
+   DASHBOARD LAYOUT
+========================================= */
 
+.dashboard-layout {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-height: calc(100vh - 80px);
+}
 
-.sidebar{
+/* =========================================
+   SIDEBAR
+========================================= */
 
-    width:320px;
+.sidebar {
+    width: 320px;
+    flex: 0 0 320px;
 
+    display: flex;
+    flex-direction: column;
+
+    align-self: stretch;
+    min-height: 0;
+
+    overflow: hidden;
 }
 
 
 
+/* =========================================
+   COLLAPSED SIDEBAR
+========================================= */
 
-
-.dashboard-card{
-
-    background:#fff;
-
-    border-radius:18px;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-
-    overflow:hidden;
-
+.sidebar.collapsed {
+    width: 80px;
+    flex: 0 0 80px;
 }
 
-.card-header{
 
-    background:linear-gradient(135deg,#0B4F6C,#1E88E5);
 
-    color:#fff;
-
-    padding:25px 30px;
-
+.sidebar-header {
+    flex: 0 0 auto;
 }
 
-.card-header h3{
+/* Only menu area scrolls */
 
-    margin:0;
+.sidebar-menu {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: calc(100vh - 100px);
 
-    font-size:26px;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-    font-weight:600;
+    /* Hide scrollbar but retain scrolling */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain;
 }
 
-.card-header p{
-
-    margin-top:5px;
-
-    opacity:.9;
-
+.sidebar-menu::-webkit-scrollbar {
+    display: none;
 }
 
-.info-section{
+/* =========================================
+   ACCORDION MENU
+========================================= */
 
-    padding:30px;
+/* All submenus closed by default */
 
+sidebar-menu .menu > li > .submenu {
+    display: none;
 }
 
-.info-section h5{
+/* Open submenu when parent has active class */
 
-    color:#0B4F6C;
-
-    margin-bottom:20px;
-
-    font-weight:600;
-
+.sidebar-menu .menu > li.active > .submenu {
+    display: block;
 }
-.page-content{
+/* Parent menu cursor */
 
-    background:#ffffff;
-
-    border-radius:16px;
-
-    padding:25px;
-
-    box-shadow:0 8px 25px rgba(0,0,0,.08);
-
-    min-height:calc(100vh - 220px);
-
+.sidebar-menu .menu > li:has(> .submenu > li.active-submenu) > .submenu {
+    display: block;
 }
 
-@media (max-width: 992px) {
+/* Highlight selected submenu */
+
+.sidebar-menu .submenu li.active-submenu > a {
+    background: #e8f1ff;
+    color: #0B4F6C;
+    font-weight: 600;
+    border-left: 4px solid #0B4F6C;
+}
+
+/* Parent menu cursor */
+
+.sidebar-menu .menu-toggle {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* =========================================
+   PAGE CONTENT
+========================================= */
+
+.content-wrapper {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.main-content {
+    width: 100%;
+}
+
+/* =========================================
+   TABLET VIEW
+   769px to 992px
+========================================= */
+
+@media (min-width: 769px) and (max-width: 992px) {
 
     .sidebar {
-        width: 80px;
+        width: 320px;
+        flex: 0 0 320px;
     }
+
+    /* Hide menu labels in compact sidebar */
 
     .sidebar .sidebar-title,
     .sidebar .menu-toggle span,
@@ -92,9 +137,9 @@
         display: none;
     }
 
-    .sidebar .submenu {
-        display: none !important;
-    }
+    /* Hide submenus in compact tablet mode */
+
+    
 
     .sidebar .menu-toggle {
         justify-content: center;
@@ -111,43 +156,118 @@
     }
 }
 
+/* =========================================
+   MOBILE VIEW
+   768px and below
+========================================= */
+
 @media (max-width: 768px) {
 
-    .sidebar {
+    .dashboard-layout {
+        display: block;
+        min-height: auto;
+    }
 
+    .sidebar {
         position: fixed;
 
         left: -330px;
-
         top: 0;
 
         width: 330px;
-
         height: 100vh;
+        height: 100dvh;
+
+        flex: none;
 
         z-index: 1050;
 
-        transition: left .35s ease;
-
+        transition: left 0.35s ease;
     }
 
+    /* Show sidebar when menu button is clicked */
+
     .sidebar.show {
-
         left: 0;
+    }
 
+    /* Restore menu labels on mobile */
+
+    .sidebar .sidebar-title,
+    .sidebar .menu-toggle span,
+    .sidebar .menu-toggle .fa-chevron-down {
+        display: inline-block;
+    }
+
+    .sidebar .menu-toggle {
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Mobile accordion */
+
+    .sidebar-menu .menu > li > .submenu {
+        display: none;
+    }
+
+    .sidebar-menu .menu > li.active > .submenu {
+        display: block;
     }
 
     .content-wrapper {
-
         width: 100%;
-
     }
 }
 
+/* =========================================
+   DASHBOARD CARD
+========================================= */
 
-/* =========================================================
+.dashboard-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #0B4F6C, #1E88E5);
+    color: #fff;
+    padding: 25px 30px;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.card-header p {
+    margin-top: 5px;
+    opacity: .9;
+}
+
+.info-section {
+    padding: 30px;
+}
+
+.info-section h5 {
+    color: #0B4F6C;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.page-content {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .08);
+    min-height: calc(100vh - 220px);
+}
+
+/* =========================================
    LATEST GLOBAL ALERT
-   ========================================================= */
+========================================= */
 
 .latest-alert-modal {
     border: none;
@@ -188,9 +308,11 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: #e8f1ff;
     color: #0d6efd;
     font-size: 23px;
@@ -214,6 +336,7 @@
     border: none;
     border-radius: 7px;
     padding: 8px 20px;
+
     background: #0d6efd;
     color: #ffffff;
     font-weight: 500;
