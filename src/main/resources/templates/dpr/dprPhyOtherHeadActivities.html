@@ -35,30 +35,14 @@
 		const head = document.getElementById("head");
 	    district.addEventListener("change", function () {
 			if (this.value) {
-			           window.location.href = "/dprPhyOtherHeadActivities?dcode=" + this.value;
-			       } else {
-			           window.location.href = "/dprPhyOtherHeadActivities";
-			       }
+				window.location.href = "/dprPhyOtherHeadActivities?dcode=" + this.value;
+			} else {
+				window.location.href = "/dprPhyOtherHeadActivities";
+			}
 	    });
 		project.addEventListener("change", function () {
 			if (this.value) {
-				let project = this.value;
-				const proj =document.getElementById("project");
-				fetch('/checkDPRProjectDataApproved?pprid=' + encodeURIComponent(project))
-					.then(response => response.text())
-					.then(result => {
-						if (result === "EXISTS") {
-							project = "";
-							showError(proj, "This Project DPR Other Activity already Approved. Please select a different Project.");
-							document.getElementById("saveButton").disabled = true;
-						} else {
-							hideError(proj);
-							document.getElementById("saveButton").disabled = false;
-							window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + this.value;
-						}
-					})
-					.catch(error => console.error(error));
-				
+				window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + this.value;
 			} else {
 				window.location.href = "/dprPhyOtherHeadActivities";
 			}
@@ -84,11 +68,11 @@
 			field.parentNode.appendChild(error);
 			field.focus();
 		}
-		function hideError(field){
+		function hideError(field) {
 			field.classList.remove("is-invalid");
 			const error = field.parentNode.querySelector("validation-error");
-			if (error) 
-			    error.remove();
+			if (error)
+				error.remove();
 		}
 			const form = document.getElementById("projectForm");
 			form.addEventListener("submit", function (e) {
@@ -243,6 +227,28 @@
 				}
 			    editForm.submit();
 			});
+			
+			// =========================
+			// REMOVE ERROR ON CHANGE
+			// =========================
+			editForm.addEventListener("input", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
+			editForm.addEventListener("change", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
 	    }
 	    
 		
@@ -358,6 +364,11 @@
 		            }
 		        );
 		    });
+		}
+		
+		// Remove query parameters from browser URL after page loads
+		if (window.location.search) {
+		    window.history.replaceState({}, document.title, window.location.pathname);
 		}
 	});
 	
