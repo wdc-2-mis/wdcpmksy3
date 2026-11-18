@@ -174,7 +174,7 @@ public class UserRoleProjectMapService {
 
         // WCDC - currently no WCDC user_type in your database
         if ("DI".equals(userType)) {
-            return List.of();
+            return userRepository.findAvailableWCDCUsers(stCode, dcode);
         }
 
         // NGO - currently no NGO user_type in your database

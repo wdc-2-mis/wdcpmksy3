@@ -254,6 +254,27 @@ public interface UserRepository extends JpaRepository<WdcpmksyUserReg, Long> {
     	        @Param("stCode") Integer stCode
     	);
     
-   
+    @Query("""
+    	    SELECT u
+    	    FROM WdcpmksyUserReg u
+    	    WHERE EXISTS (
+    	        SELECT 1
+    	        FROM WdcpmksyUserMap um
+    	        WHERE um.user.regId = u.regId
+    	          AND um.state.stCode = :stCode
+    	          AND um.district.dcode = :dcode
+    	    )
+    	      AND NOT EXISTS (
+    	          SELECT 1
+    	          FROM WdcpmksyUserAppRoleMap urm
+    	          WHERE urm.regId = u.regId
+    	      )
+    	      AND UPPER(u.status) = 'ACTIVE'
+    	      AND UPPER(u.userType) = 'DI'
+    	    ORDER BY UPPER(u.userName)
+    	    """)
+    	List<WdcpmksyUserReg> findAvailableWCDCUsers(
+    	        @Param("stCode") Integer stCode, @Param("dcode") Integer dcode
+    	);
     
 }
