@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title>Approval/Rejection of Plan</title>
+
+    <style>
+        body {
+            background-color: #FFFFFF;
+        }
+
+        .card {
+            border-radius: 0;
+            background: #FFFFFF;
+        }
+
+        /* Page heading */
+        .page-heading {
+            color: #222;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        /* Tabs */
+        .plan-tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 0;
+        }
+
+        .plan-tabs .nav-item {
+            margin-bottom: -1px;
+            flex-shrink: 0;
+        }
+
+        .plan-tabs .nav-link {
+            padding: 12px 18px;
+            font-size: 16px;
+            color: #0066cc;
+            background: #FFFFFF;
+            border: 1px solid #dee2e6;
+            border-radius: 0;
+            white-space: nowrap;
+        }
+
+        .plan-tabs .nav-link.active {
+            background-color: #729BCA;
+            color: #FFFFFF;
+            border-color: #729BCA;
+        }
+
+        .plan-tabs .nav-link:hover:not(.active) {
+            background-color: #f1f5f9;
+            color: #0056cc;
+        }
+
+        /* Tab content */
+        .tab-content {
+            background-color: #FFFFFF;
+            padding: 20px 10px;
+        }
+
+        .tab-heading {
+            font-size: 22px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 15px;
+        }
+
+        /* Tables */
+        .movement,
+        .cplan {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .movement th,
+        .cplan th {
+            background-color: #4D858B;
+            color: #FFFFFF;
+            text-align: center;
+            vertical-align: middle;
+            padding: 12px 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .movement td,
+        .cplan td {
+            background-color: #B0CFD2;
+            color: #000000;
+            text-align: center;
+            vertical-align: middle;
+            padding: 12px 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .action {
+            color: #0047ab;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .action:hover {
+            color: #002f70;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .page-heading {
+                font-size: 23px;
+            }
+
+            .tab-heading {
+                font-size: 19px;
+            }
+
+            .movement,
+            .cplan {
+                min-width: 700px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="container-fluid mt-3">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+              
+				<div class="card-header bg-primary text-white">
+				           <h4 class="mb-0">
+				              Approval/Rejection of Plan
+				           </h4>
+				       </div>
+                <!-- Alerts -->
+                <div th:if="${success}"
+                     class="alert alert-success alert-dismissible fade show"
+                     role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${warning}"
+                     class="alert alert-warning alert-dismissible fade show"
+                     role="alert">
+                    <span th:text="${warning}"></span>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${error}"
+                     class="alert alert-danger alert-dismissible fade show"
+                     role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="container-fluid">
+<br/>
+                    <!-- Navigation Tabs -->
+                    <ul class="nav nav-tabs plan-tabs" role="tablist">
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active"
+                                    id="createPhysicalAnnualActionPlan"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#approvalRejection"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="approvalRejection"
+                                    aria-selected="true">
+                                Approval/Rejection of Plan
+                            </button>
+                        </li>
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link"
+                                    id="viewMovement"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#movement"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="movement"
+                                    aria-selected="false">
+                                View Plan Detail/ Movement
+                            </button>
+                        </li>
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link"
+                                    id="viewCompletePlan"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#cplan"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="cplan"
+                                    aria-selected="false">
+                                Completed Physical Plan
+                            </button>
+                        </li>
+
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+
+                        <!-- TAB 1: Approval/Rejection -->
+                        <div class="tab-pane fade show active"
+                             id="approvalRejection"
+                             role="tabpanel"
+                             aria-labelledby="createPhysicalAnnualActionPlan"
+                             tabindex="0">
+
+                            <h4 class="tab-heading">
+                                Approval/Rejection of Plan
+                            </h4>
+
+                            <hr>
+
+                            <div class="table-responsive">
+
+                                <table class="table table-bordered table-striped"
+                                       id="aapMovement"
+                                       name="aapAchievement">
+
+                                    <thead class="table-primary">
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Year</th>
+                                        <th>Status</th>
+                                        <th>Currently at Level</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody id="tbodyWCDCSLNAMovement">
+
+                                    <tr th:each="projList : ${planList}">
+
+                                        <td th:text="${projList.projectdesc}">
+                                        </td>
+
+                                        <td th:text="${projList.finyr}">
+                                        </td>
+
+                                        <td th:text="${projList.status}">
+                                        </td>
+
+                                        <td th:text="${projList.currentlevel}">
+                                        </td>
+
+                                        <td>
+
+                                            <a href="javascript:void(0)"
+                                               class="action"
+                                               th:if="${projList.currentlevel == projList.usertype
+                                                        and projList.status != 'Completed'}"
+                                               th:attr="data-id=${projList.planid}">
+                                                Approval/Rejection
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+
+                                    <tr th:if="${planList == null or #lists.isEmpty(planList)}">
+                                        <td colspan="5" class="text-center">
+                                            Data not found !
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                        <!-- TAB 2: Movement -->
+                        <div class="tab-pane fade"
+                             id="movement"
+                             role="tabpanel"
+                             aria-labelledby="viewMovement"
+                             tabindex="0">
+
+                            <h4 class="tab-heading">
+                                Movement of Physical Annual Action Plan
+                            </h4>
+
+                            <hr>
+
+                            <div class="table-responsive">
+
+                                <table class="table table-bordered table-striped"
+                                       id="aapMovement"
+                                       name="aapMovement">
+
+                                    <thead class="table-primary">
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Year</th>
+                                        <th>Status</th>
+                                        <th>Currently at Level</th>
+                                        <th>Remarks</th>
+                                        <th>Plan</th>
+                                        <th>Movement</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody id="tbodyMovement">
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                        <!-- TAB 3: Completed Physical Plan -->
+                        <div class="tab-pane fade"
+                             id="cplan"
+                             role="tabpanel"
+                             aria-labelledby="viewCompletePlan"
+                             tabindex="0">
+
+                            <h4 class="tab-heading">
+                                Completed Physical Plan
+                            </h4>
+
+                            <hr>
+
+                            <div class="table-responsive">
+
+                                <table class="table table-bordered table-striped"
+                                       id="aapMovement"
+                                       name="aapMovement">
+
+                                    <thead class="table-primary">
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Year</th>
+                                        <th>Status</th>
+                                        <th>Currently at Level</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody id="tbodyCMovement">
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <!-- End Tab Content -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Existing JavaScript -->
+    <script th:src="@{/js/physicalactionplan.js}"></script>
+
+</div>
+
+</body>
+</html>
