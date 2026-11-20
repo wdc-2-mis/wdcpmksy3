@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{layout/report-layout}">
-	  
 
 <head>
 	<meta charset="UTF-8">
 	<title>Report P1</title>
-
 
 	<script>
 		document.addEventListener("DOMContentLoaded", function () {
@@ -73,16 +71,16 @@
 	</div>
 	<div class="rp-asof">Report as on: <span th:text="${reportOn}"></span></div>
 
-	<!-- ================= SUMMARY VIEW: all State / District / Financial Year = All ================= -->
-	<div class="rp-scroll" th:if="${summaryMode}">
+	<!-- ============ LEVEL 1 : STATE WISE  (viewMode = 'STATE') ============ -->
+	<div class="rp-scroll" th:if="${viewMode == 'STATE'}">
 		<table class="rp-table">
 			<thead>
 				<tr>
-					<th colspan="4" class="rp-note rp-fy-note">Financial Year : All Financial Year</th>
+					<th colspan="4" class="rp-note rp-fy-note">Financial Year : <span th:text="${finYearName ?: 'All Financial Year'}"></span></th>
 					<th colspan="4" class="rp-note">All amounts(in Rs lakhs), All Area in Ha.</th>
 				</tr>
 				<tr>
-					<th>S.No.</th><th>State Name</th><th>District</th><th>Project</th>
+					<th>S.No.</th><th>State Name</th><th>No. of Districts</th><th>No. of Projects</th>
 					<th>Area Sanctioned</th><th>Total Cost</th><th>Central Share</th><th>State Share</th>
 				</tr>
 				<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
@@ -90,7 +88,8 @@
 			<tbody>
 				<tr th:each="r, st : ${summaryRows}">
 					<td class="c" th:text="${st.count}"></td>
-					<td><a class="rp-link" th:href="@{/reports/p1(stateCode=${r.stateCode})}" th:text="${r.stateName}"></a></td>
+					<!-- click state -> district list -->
+					<td><a class="rp-link" th:href="@{/reports/p1(stateCode=${r.stateCode},finYrCd=${finYrCd})}" th:text="${r.stateName}"></a></td>
 					<td class="n" th:text="${r.districtCount}"></td>
 					<td class="n" th:text="${r.projectCount}"></td>
 					<td class="n" th:text="${#numbers.formatDecimal(r.areaSanctioned,1,'COMMA',4,'POINT')}"></td>
@@ -114,8 +113,53 @@
 		</table>
 	</div>
 
-	<!-- ================= PROJECT-LEVEL VIEW: any filter selected ================= -->
-	<div class="rp-scroll" th:unless="${summaryMode}">
+	<!-- ============ LEVEL 2 : DISTRICT WISE of a state  (viewMode = 'DISTRICT') ============ -->
+	<div class="rp-scroll" th:if="${viewMode == 'DISTRICT'}">
+		<table class="rp-table">
+			<thead>
+				<tr>
+					<th colspan="3" class="rp-note rp-fy-note">
+						State Name : <span th:text="${stateName}"></span>
+						&nbsp;|&nbsp; Financial Year : <span th:text="${finYearName ?: 'All Financial Year'}"></span>
+					</th>
+					<th colspan="4" class="rp-note">All amounts(in Rs lakhs), All Area in Ha.</th>
+				</tr>
+				<tr>
+					<th>S.No.</th><th>District Name</th><th>No. of Projects</th>
+					<th>Area Sanctioned</th><th>Total Cost</th><th>Central Share</th><th>State Share</th>
+				</tr>
+				<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
+			</thead>
+			<tbody>
+				<tr th:each="r, st : ${districtRows}">
+					<td class="c" th:text="${st.count}"></td>
+					<!-- click district -> project details -->
+					<td><a class="rp-link"
+						   th:href="@{/reports/p1(stateCode=${stateCode},districtCode=${r.districtCode},finYrCd=${finYrCd})}"
+						   th:text="${r.districtName}"></a></td>
+					<td class="n" th:text="${r.projectCount}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.areaSanctioned,1,'COMMA',4,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.totCost,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.centralShare,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(r.stateShare,1,'COMMA',2,'POINT')}"></td>
+				</tr>
+				<tr th:if="${#lists.isEmpty(districtRows)}">
+					<td colspan="7" class="c text-danger">No records found.</td>
+				</tr>
+				<tr class="rp-total" th:unless="${#lists.isEmpty(districtRows)}">
+					<td colspan="2" class="n">Grand Total</td>
+					<td class="n" th:text="${totProjects}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totArea,1,'COMMA',4,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totCost,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totCentral,1,'COMMA',2,'POINT')}"></td>
+					<td class="n" th:text="${#numbers.formatDecimal(totState,1,'COMMA',2,'POINT')}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<!-- ============ LEVEL 3 : PROJECT DETAILS of a district  (viewMode = 'PROJECT') ============ -->
+	<div class="rp-scroll" th:if="${viewMode == 'PROJECT'}">
 		<table class="rp-table">
 			<thead>
 				<tr><th colspan="10" class="rp-note">All amounts(in Rs lakhs), All Area in Ha.</th></tr>
@@ -150,8 +194,12 @@
 				</tr>
 			</tbody>
 		</table>
+
+		<!-- back link to the district list -->
+		<div style="margin-top:10px">
+			<a class="rp-link" th:href="@{/reports/p1(stateCode=${stateCode},finYrCd=${finYrCd})}">&laquo; Back to District list</a>
+		</div>
 	</div>
- 
-	
+
 </div>
 </html>

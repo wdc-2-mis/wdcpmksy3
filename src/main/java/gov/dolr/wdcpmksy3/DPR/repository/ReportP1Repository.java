@@ -2,14 +2,17 @@ package gov.dolr.wdcpmksy3.DPR.repository;
 
 import java.util.List;
 
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.dto.CodeName;
+import gov.dolr.wdcpmksy3.dto.ReportP1DistrictSummary;
 import gov.dolr.wdcpmksy3.dto.ReportP1Row;
 import gov.dolr.wdcpmksy3.dto.ReportP1StateSummary;
+
 
 /**
  * m_ppr.dcode -> m_district.dcode ; m_district.st_code -> m_state.st_code
@@ -85,9 +88,33 @@ public interface ReportP1Repository extends JpaRepository<MPpr, Integer> {
             JOIN public.m_state st   ON st.st_code = d.st_code
             WHERE (SELECT t.action FROM public.ppr_transaction t
                    WHERE t.ppr_id = p.ppr_id
-                   ORDER BY t.senton DESC, t.tranx_id DESC LIMIT 1) = 'A'
+                   ORDER BY t.senton DESC, t.tranx_id DESC LIMIT 1) = 'A' AND (CAST(:finYrCd AS integer) IS NULL OR p.fin_yr_cd = CAST(:finYrCd AS integer))
             GROUP BY st.st_code, st.st_name
             ORDER BY st.st_name
             """, nativeQuery = true)
-        List<ReportP1StateSummary> findStateSummary();
+    List<ReportP1StateSummary> findStateSummary(@Param("finYrCd") Integer finYrCd);
+    
+    @Query(value = """
+    	    SELECT d.dcode                   AS "districtCode",
+    	           d.dist_name               AS "districtName",
+    	           COUNT(*)                  AS "projectCount",
+    	           SUM(s.area_proposed)      AS "areaSanctioned",
+    	           SUM(s.tot_cost)           AS "totCost",
+    	           SUM(s.central_share_amt)  AS "centralShare",
+    	           SUM(s.state_share_amt)    AS "stateShare"
+    	    FROM public.m_ppr p
+    	    JOIN public.m_sanction_project s
+    	          ON s.sanction_id = (SELECT MAX(s2.sanction_id) FROM public.m_sanction_project s2
+    	                              WHERE s2.ppr_id = p.ppr_id)
+    	    JOIN public.m_district d ON d.dcode = p.dcode
+    	    WHERE (SELECT t.action FROM public.ppr_transaction t
+    	           WHERE t.ppr_id = p.ppr_id
+    	           ORDER BY t.senton DESC, t.tranx_id DESC LIMIT 1) = 'A'
+    	      AND d.st_code = CAST(:stateCode AS integer)
+    	      AND (CAST(:finYrCd AS integer) IS NULL OR p.fin_yr_cd = CAST(:finYrCd AS integer))
+    	    GROUP BY d.dcode, d.dist_name
+    	    ORDER BY d.dist_name
+    	    """, nativeQuery = true)
+    	List<ReportP1DistrictSummary> findDistrictSummary(@Param("stateCode") Integer stateCode,
+    	                                                  @Param("finYrCd") Integer finYrCd);
 }

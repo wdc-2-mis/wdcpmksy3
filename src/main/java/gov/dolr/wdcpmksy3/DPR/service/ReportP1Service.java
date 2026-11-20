@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import gov.dolr.wdcpmksy3.DPR.repository.ReportP1Repository;
 import gov.dolr.wdcpmksy3.dto.CodeName;
+import gov.dolr.wdcpmksy3.dto.ReportP1DistrictSummary;
 import gov.dolr.wdcpmksy3.dto.ReportP1Row;
 import gov.dolr.wdcpmksy3.dto.ReportP1StateSummary;
 
@@ -38,7 +39,13 @@ public class ReportP1Service {
                    .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     
-    public List<ReportP1StateSummary> getStateSummary() {
-        return repo.findStateSummary();
+    public List<ReportP1StateSummary> getStateSummary(Integer finYrCd) {
+        return repo.findStateSummary(isAll(finYrCd) ? null : finYrCd);
     }
+
+    public List<ReportP1DistrictSummary> getDistrictSummary(Integer stateCode, Integer finYrCd) {
+        return repo.findDistrictSummary(stateCode, isAll(finYrCd) ? null : finYrCd);
+    }
+
+    private static boolean isAll(Integer v) { return v == null || v <= 0; }
 }
