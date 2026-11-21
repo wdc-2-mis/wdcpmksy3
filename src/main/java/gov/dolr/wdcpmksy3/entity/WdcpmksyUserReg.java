@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import gov.dolr.wdcpmksy3.DPR.entity.WdcpmksyProjectPhysicalPlanTranx;
 import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
 
 @Entity
@@ -112,6 +113,12 @@ public class WdcpmksyUserReg {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<WdcpmksyUserProjectMap> projectMappings = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "sentTo", fetch = FetchType.LAZY)
+    private List<WdcpmksyProjectPhysicalPlanTranx> physicalPlanTransactionsReceived = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sentFrom", fetch = FetchType.LAZY)
+    private List<WdcpmksyProjectPhysicalPlanTranx> physicalPlanTransactionsSent = new ArrayList<>();
     
     // Getters and Setters
     public Integer getRegId() {
@@ -341,6 +348,20 @@ public class WdcpmksyUserReg {
 	public void setProjectMappings(List<WdcpmksyUserProjectMap> projectMappings) {
 		this.projectMappings = projectMappings;
 	}
+	public List<WdcpmksyProjectPhysicalPlanTranx> getPhysicalPlanTransactionsReceived() {
+		return physicalPlanTransactionsReceived;
+	}
+	public void setPhysicalPlanTransactionsReceived(List<WdcpmksyProjectPhysicalPlanTranx> physicalPlanTransactionsReceived) {
+		this.physicalPlanTransactionsReceived = physicalPlanTransactionsReceived;
+	}
+	public List<WdcpmksyProjectPhysicalPlanTranx> getPhysicalPlanTransactionsSent() {
+		return physicalPlanTransactionsSent;
+	}
+	public void setPhysicalPlanTransactionsSent(List<WdcpmksyProjectPhysicalPlanTranx> physicalPlanTransactionsSent) {
+		this.physicalPlanTransactionsSent = physicalPlanTransactionsSent;
+	}
+	
+	
 	
    
 }

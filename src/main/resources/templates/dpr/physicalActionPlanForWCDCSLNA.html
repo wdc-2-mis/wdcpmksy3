@@ -132,13 +132,38 @@
             }
         }
     </style>
+	
+	
+	<script>	
+	
+		document.addEventListener("DOMContentLoaded", function () {
+			
+			var editModal = document.getElementById('editModal');
+			editModal.addEventListener('show.bs.modal', function (event) {
+				var button = event.relatedTarget;
+
+				// Get data attributes  
+				var planId = button.getAttribute('data-id');
+				var proj = button.getAttribute('data-proj');
+				
+
+				// Populate modal fields  reason1
+				document.getElementById('planid').value = planId;
+				
+
+
+
+			});
+	
+	
+		});
+	</script>
+	
 </head>
 
 <body>
 
 <div layout:fragment="content">
-
-    <div class="container-fluid mt-3">
 
         <div class="card shadow-sm border-0">
 
@@ -235,7 +260,6 @@
                                 Approval/Rejection of Plan
                             </h4>
 
-                            <hr>
 
                             <div class="table-responsive">
 
@@ -245,6 +269,7 @@
 
                                     <thead class="table-primary">
                                     <tr>
+										<th style="width:60px;">S.No.</th>
                                         <th>Project</th>
                                         <th>Year</th>
                                         <th>Status</th>
@@ -255,36 +280,41 @@
 
                                     <tbody id="tbodyWCDCSLNAMovement">
 
-                                    <tr th:each="projList : ${planList}">
+                                    <tr th:each="plan, stat : ${planList}">
+										
+										<td th:text="${stat.count}"></td>
 
-                                        <td th:text="${projList.projectdesc}">
+                                        <td th:text="${plan.projectdesc}">
                                         </td>
 
-                                        <td th:text="${projList.finyr}">
+                                        <td th:text="${plan.finyr}">
                                         </td>
 
-                                        <td th:text="${projList.status}">
+                                        <td th:text="${plan.status}">
                                         </td>
 
-                                        <td th:text="${projList.currentlevel}">
+                                        <td th:text="${plan.currentlevel}">
                                         </td>
 
-                                        <td>
+										<td>
+										    <button type="button"
+										            title="Approval/Rejection"
+										            class="btn btn-primary btn-sm editBtn"
+										            th:if="${plan.currentlevel == plan.usertype and plan.status != 'Completed'}"
+										            th:attr="data-id=${plan.planid},
+										                     data-proj=${plan.projectdesc}"
+										            data-bs-toggle="modal"
+										            data-bs-target="#editModal">
 
-                                            <a href="javascript:void(0)"
-                                               class="action"
-                                               th:if="${projList.currentlevel == projList.usertype
-                                                        and projList.status != 'Completed'}"
-                                               th:attr="data-id=${projList.planid}">
-                                                Approval/Rejection
-                                            </a>
+										        <i class="fas fa-edit"></i> Approval/Rejection
 
-                                        </td>
+										    </button>
+										</td>
 
                                     </tr>
 
-                                    <tr th:if="${planList == null or #lists.isEmpty(planList)}">
-                                        <td colspan="5" class="text-center">
+                                    <tr th:if="${#lists.isEmpty(planList)}">
+                                        <td colspan="6" class="text-center">
                                             Data not found !
                                         </td>
                                     </tr>
@@ -308,8 +338,6 @@
                                 Movement of Physical Annual Action Plan
                             </h4>
 
-                            <hr>
-
                             <div class="table-responsive">
 
                                 <table class="table table-bordered table-striped"
@@ -318,6 +346,7 @@
 
                                     <thead class="table-primary">
                                     <tr>
+										<th style="width:60px;">S.No.</th>
                                         <th>Project</th>
                                         <th>Year</th>
                                         <th>Status</th>
@@ -329,6 +358,46 @@
                                     </thead>
 
                                     <tbody id="tbodyMovement">
+										
+										<tr th:each="plan, stat : ${movementPlanList}">
+										
+											<td th:text="${stat.count}"></td>
+										
+											<td th:text="${plan.projectdesc}">
+											</td>
+										
+											<td th:text="${plan.finyr}">
+											</td>
+										
+											<td th:text="${plan.status}">
+											</td>
+										
+											<td th:text="${plan.currentlevel}">
+											</td>
+											
+											<td th:text="${plan.remarks}"></td>
+										
+											<td>
+												<a href="javascript:void(0)" class="action" 
+													th:attr="data-id=${plan.planid}">
+													View
+												</a>
+											</td>
+											<td>
+												<a href="javascript:void(0)" class="action"
+													 th:attr="data-id=${plan.planid}">
+													View
+												</a>
+											</td>
+										
+										</tr>
+										
+										<tr th:if="${#lists.isEmpty(movementPlanList)}">
+											<td colspan="8" class="text-center">
+												Data not found !
+											</td>
+										</tr>
+										
                                     </tbody>
 
                                 </table>
@@ -345,10 +414,8 @@
                              tabindex="0">
 
                             <h4 class="tab-heading">
-                                Completed Physical Plan
+                              List of Completed Physical Plan
                             </h4>
-
-                            <hr>
 
                             <div class="table-responsive">
 
@@ -358,6 +425,7 @@
 
                                     <thead class="table-primary">
                                     <tr>
+										<th style="width:60px;">S.No.</th>
                                         <th>Project</th>
                                         <th>Year</th>
                                         <th>Status</th>
@@ -367,6 +435,32 @@
                                     </thead>
 
                                     <tbody id="tbodyCMovement">
+										<tr th:each="plan, stat : ${comPlanList}">
+										
+											<td th:text="${stat.count}"></td>
+										
+											<td th:text="${plan.projectdesc}">
+											</td>
+										
+											<td th:text="${plan.finyr}">
+											</td>
+										
+											<td th:text="${plan.status}">
+											</td>
+										
+											<td th:text="${plan.currentlevel}">
+											</td>
+										
+											<td th:text="${plan.remarks}">
+											</td>
+										
+										</tr>
+										
+										<tr th:if="${#lists.isEmpty(comPlanList)}">
+											<td colspan="6" class="text-center">
+												Data not found !
+											</td>
+										</tr>
                                     </tbody>
 
                                 </table>
@@ -377,6 +471,76 @@
 
                     </div>
                     <!-- End Tab Content -->
+					
+					<div class="modal fade" id="editModal">
+
+					    <div class="modal-dialog modal-lg">
+
+					        <div class="modal-content">
+
+					            <div class="modal-header bg-primary text-white">
+
+					                <h5>Approve/Reject Physical Annual Action Plan</h5>
+
+					                <button type="button" class="btn-close" data-bs-dismiss="modal">  </button>
+
+					            </div>
+
+					            <div class="modal-body">
+
+					                <form id="editForm" th:action="@{/approveRejectAAP}"  method="post">
+
+					                    <input type="hidden"  id="planid" name="planid">
+					                    <div class="row mb-3">
+
+					                        <label class="col-md-3 fw-bold">
+					                            Action:
+					                        </label>
+
+					                        <div class="col-md-9">
+												<select id="action" name="action" class="form-select">
+													<option value="F">Approve</option>
+													<option value="R">Reject</option>
+												</select>
+
+					                        </div>
+
+					                    </div>
+
+
+					                    <!-- Project -->
+
+					                    <div class="row mb-3">
+
+					                        <label class="col-md-3 fw-bold">
+					                           Remarks:
+					                        </label>
+
+					                        <div class="col-md-9">
+												<textarea name="remark" id="remark" class="form-control" rows="2" minlength="5"></textarea>
+												
+					                        </div>
+
+					                    </div>
+
+					                    <!-- Update -->
+
+										<div class="text-center mt-4">
+											<button type="submit" name="updateAction" value="D" class="btn btn-warning">
+												<i class="fas fa-save"></i>
+												Submit
+											</button>
+										</div>
+
+					                </form>
+
+					            </div>
+
+					        </div>
+
+					    </div>
+
+					</div>
 
                 </div>
 
@@ -384,10 +548,10 @@
 
         </div>
 
-    </div>
+   
 
-    <!-- Existing JavaScript -->
-    <script th:src="@{/js/physicalactionplan.js}"></script>
+    <!-- Existing JavaScript 
+    <script th:src="@{/js/physicalactionplan.js}"></script>-->
 
 </div>
 
