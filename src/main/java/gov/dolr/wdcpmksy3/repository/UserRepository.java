@@ -277,4 +277,9 @@ public interface UserRepository extends JpaRepository<WdcpmksyUserReg, Long> {
     	        @Param("stCode") Integer stCode, @Param("dcode") Integer dcode
     	);
     
+    @Query(value ="select reg.reg_id from wdcpmksy_user_reg reg, wdcpmksy_user_map map where map.st_code="
+    		+ "(select st_code from wdcpmksy_user_map where reg_id=:regId) and reg.reg_id=map.reg_id and reg.user_type='SL' and "
+    		+ "reg.reg_id in (select reg_id from wdcpmksy_user_app_role_map where role_id=3)", nativeQuery = true)
+    Integer getSentToByRegIdDIF(@Param("regId") Integer regId);
+    
 }

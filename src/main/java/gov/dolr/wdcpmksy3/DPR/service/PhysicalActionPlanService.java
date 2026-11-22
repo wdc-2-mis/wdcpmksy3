@@ -33,6 +33,7 @@ public class PhysicalActionPlanService {
 	@Autowired
 	private UserRepository userrepo;
 	
+	
 	@Autowired
 	private WdcpmksyProjectPhysicalPlanRepository planrepo;
 	
@@ -169,7 +170,7 @@ public class PhysicalActionPlanService {
 					if(action=='F') 
 					{
 						//forward to slna    
-						sentto=maprep.getSentToByRegIdDIF(regId);
+						sentto=userrepo.getSentToByRegIdDIF(regId);
 					}
 					else if(action=='R') 
 					{
@@ -194,7 +195,7 @@ public class PhysicalActionPlanService {
 					if(action=='F') 
 					{
 						//forward to slna
-						sentto=maprep.getSentToByRegIdDIF(regId);
+						sentto=userrepo.getSentToByRegIdDIF(regId);
 					}
 					else if(action=='R') 
 					{}
