@@ -211,7 +211,7 @@ public class PhysicalActionPlanService {
 			return sentto;
 		}
 	 	
-	 	@Transactional
+	 	
 	 	public String forwardByWCDC(Integer sentto, Integer sentfrom, Integer planid, Character action, String remarks,String userType) {
 			
 			String res=null;
