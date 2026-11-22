@@ -27,7 +27,7 @@ public class WdcpmksyProjectPhysicalPlanTranx {
     private WdcpmksyUserReg sentFrom;
 
     @Column(name = "action", length = 1)
-    private String action;
+    private Character action;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "sent_on")
@@ -70,11 +70,11 @@ public class WdcpmksyProjectPhysicalPlanTranx {
         this.sentFrom = sentFrom;
     }
 
-    public String getAction() {
+    public Character getAction() {
         return action;
     }
 
-    public void setAction(String action) {
+    public void setAction(Character action) {
         this.action = action;
     }
 

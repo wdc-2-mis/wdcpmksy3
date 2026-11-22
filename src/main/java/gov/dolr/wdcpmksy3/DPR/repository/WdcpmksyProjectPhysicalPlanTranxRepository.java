@@ -56,4 +56,22 @@ public interface WdcpmksyProjectPhysicalPlanTranxRepository extends JpaRepositor
     		+ "from wdcpmksy_project_physical_plan_tranx where sent_from=:regId or sent_to=:regId) order by tranx.plan_id, tranx.sent_on desc) a, "
     		+ "wdcpmksy_user_reg reg where regid=reg.reg_id order by  projectdesc, finyr", nativeQuery = true)
         List<PhysicalActionPlanTranxProjection> viewAAPMovement( @Param("regId") Integer regId );
+    
+    
+    @Query("select distinct on (sent_from) sent_from from wdcpmksy_project_physical_plan_tranx, wdcpmksy_user_reg where plan_id=:planid "
+    		+ "and sent_to=:regId and sent_from=reg_id and user_type='PI'")
+    Integer getSentToByRegIdDIR(@Param("regId") Integer regId, @Param("planid") Integer planid);
+    
+    @Query("select distinct on (sent_from) sent_from from wdcpmksy_project_physical_plan_tranx, wdcpmksy_user_reg where plan_id=:planid and sent_to=:regId and sent_from=reg_id and "
+    		+ "user_type=(select distinct on (user_type) user_type from wdcpmksy_project_physical_plan_tranx, wdcpmksy_user_reg where plan_id=:planid and sent_to=:regId and sent_from=reg_id) ")
+    Integer getSentToByRegIdSLR(@Param("regId") Integer regId, @Param("planid") Integer planid);
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

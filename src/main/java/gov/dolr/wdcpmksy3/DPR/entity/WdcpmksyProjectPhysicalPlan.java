@@ -26,7 +26,7 @@ public class WdcpmksyProjectPhysicalPlan {
     private MFinYear finYear;
 
     @Column(name = "status", length = 1)
-    private String status;
+    private Character status;
 
     @Column(name = "createdby", length = 20)
     private String createdBy;
@@ -83,11 +83,11 @@ public class WdcpmksyProjectPhysicalPlan {
         this.finYear = finYear;
     }
 
-    public String getStatus() {
+    public Character getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Character status) {
         this.status = status;
     }
 

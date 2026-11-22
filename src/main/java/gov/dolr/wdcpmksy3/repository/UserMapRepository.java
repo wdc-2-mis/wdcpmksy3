@@ -79,5 +79,10 @@ public interface UserMapRepository extends JpaRepository<WdcpmksyUserMap, Intege
     	      AND m.st_code = :stcode
     	    """, nativeQuery = true)
     	Long countActivePiaByState(@Param("stcode") Integer stcode);
+    
+    @Query("select reg.reg_id from wdcpmksy_user_reg reg, wdcpmksy_user_map map where map.st_code="
+    		+ "(select st_code from wdcpmksy_user_map where reg_id=:regId) and reg.reg_id=map.reg_id and reg.user_type='SL' and "
+    		+ "reg.reg_id in (select reg_id from wdcpmksy_user_app_role_map where role_id=3)")
+    Integer getSentToByRegIdDIF(@Param("regId") Integer regId);
 
 }
