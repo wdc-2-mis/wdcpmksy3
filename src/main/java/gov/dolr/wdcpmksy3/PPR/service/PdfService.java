@@ -61,11 +61,12 @@ public class PdfService {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         // Extra top margin (room for the header) and bottom margin (room for the footer).
-        Document document = new Document(PageSize.A4.rotate(), 24, 24, 78, 42);
+        Document document = new Document(PageSize.A4.rotate(), 24, 24, 92, 42);
         PdfWriter writer = PdfWriter.getInstance(document, baos);
 
+		String stateName = safe(data.get("stateName"));
         Image logo = loadLogo();
-        writer.setPageEvent(new PdfHeaderFooterPageEvent(logo, pageHeaderTitleFont, pageHeaderSubFont, footerFont));
+        writer.setPageEvent(new PdfHeaderFooterPageEvent(logo, pageHeaderTitleFont, pageHeaderSubFont, footerFont, stateName));
 
         document.open();
 

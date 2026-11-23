@@ -267,10 +267,12 @@ public class PPRViewController {
             @RequestParam(value = "district", required = false) Integer dcode,
             @RequestParam(value = "project", required = false) Integer project) throws Exception {
 
-        Object userid = session.getAttribute("userid");
-        if (userid == null) {
-            return ResponseEntity.status(302).header(HttpHeaders.LOCATION, "/login").build();
-        }
+    	Object userid = session.getAttribute("userid");
+    	if (userid == null) {
+    	    return ResponseEntity.status(302).header(HttpHeaders.LOCATION, "/login").build();
+    	}
+    	Object stObj = session.getAttribute("statename");
+    	String statename = (stObj == null) ? "" : stObj.toString();	
 
         if (dcode == null || project == null || finYrCd == null) {
             redirectAttributes.addFlashAttribute("validationError",
@@ -278,8 +280,9 @@ public class PPRViewController {
             return ResponseEntity.status(302).header(HttpHeaders.LOCATION, "/viewPPR").build();
         }
 
-        Map<String, Object> data = fetchReportData(dcode, project, finYrCd, false); 
-        
+        Map<String, Object> data = fetchReportData(dcode, project, finYrCd, false);
+        data.put("stateName", statename);   // PdfService reads data.get("stateName")
+
         ByteArrayOutputStream baos = pdfService.generatePprReportPdf(data);
         byte[] pdfBytes = baos.toByteArray();
 
@@ -290,7 +293,8 @@ public class PPRViewController {
 
         return new ResponseEntity<>(pdfBytes, headers, org.springframework.http.HttpStatus.OK);
     }
-
+    
+    
     private String buildDownloadFileName(Map<String, Object> data) {
         String projectName = firstRecordProjectName(data);
         if (projectName == null || projectName.isBlank()) {

@@ -37,15 +37,18 @@ public class PdfHeaderFooterPageEvent extends PdfPageEventHelper {
     private final Font headerTitleFont;
     private final Font headerSubFont;
     private final Font footerFont;
+    private final String stateName;
+
 
     private PdfTemplate totalPagesTemplate;
     private BaseFont baseFont;
 
-    public PdfHeaderFooterPageEvent(Image logo, Font headerTitleFont, Font headerSubFont, Font footerFont) {
+    public PdfHeaderFooterPageEvent(Image logo, Font headerTitleFont, Font headerSubFont, Font footerFont, String stateName) {
         this.logo = logo;
         this.headerTitleFont = headerTitleFont;
         this.headerSubFont = headerSubFont;
         this.footerFont = footerFont;
+        this.stateName = stateName;
     }
 
     @Override
@@ -91,6 +94,11 @@ public class PdfHeaderFooterPageEvent extends PdfPageEventHelper {
             p2.setAlignment(Element.ALIGN_CENTER);
             textCell.addElement(p1);
             textCell.addElement(p2);
+            if (stateName != null && !stateName.isBlank()) {
+                Paragraph p3 = new Paragraph("State: " + stateName, headerSubFont);
+                p3.setAlignment(Element.ALIGN_CENTER);
+                textCell.addElement(p3);
+            }
             header.addCell(textCell);
 
             header.writeSelectedRows(0, -1, document.leftMargin(), pageHeight - 14, cb);
@@ -98,8 +106,8 @@ public class PdfHeaderFooterPageEvent extends PdfPageEventHelper {
             cb.saveState();
             cb.setLineWidth(0.75f);
             cb.setColorStroke(new Color(13, 110, 253));
-            cb.moveTo(document.leftMargin(), pageHeight - 62);
-            cb.lineTo(pageWidth - document.rightMargin(), pageHeight - 62);
+            cb.moveTo(document.leftMargin(), pageHeight - 76);
+            cb.lineTo(pageWidth - document.rightMargin(), pageHeight - 76);
             cb.stroke();
             cb.restoreState();
 
