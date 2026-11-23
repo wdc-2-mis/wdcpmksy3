@@ -94,6 +94,7 @@ public class PprTransactionService {
 
 	    // Only these approved tables can be updated.
 	    Set<String> allowedTables = Set.of(
+	    	"ppr_watershed_covered_area",
 	        "ppr_agro_climate",
 	        "ppr_livelihood",
 	        "ppr_proposed_area",
