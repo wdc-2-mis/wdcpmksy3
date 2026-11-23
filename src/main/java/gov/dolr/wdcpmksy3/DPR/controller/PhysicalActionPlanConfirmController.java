@@ -3,17 +3,26 @@ package gov.dolr.wdcpmksy3.DPR.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import gov.dolr.wdcpmksy3.DPR.entity.WdcpmksyProjectPhysicalPlanTranx;
+import gov.dolr.wdcpmksy3.DPR.repository.WdcpmksyProjectPhysicalPlanTranxRepository;
 import gov.dolr.wdcpmksy3.DPR.service.PhysicalActionPlanService;
+import gov.dolr.wdcpmksy3.PPR.dto.PprTransactionDto;
+import gov.dolr.wdcpmksy3.PPR.entity.PprTransaction;
 import gov.dolr.wdcpmksy3.common.CommonFunctions;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -24,6 +33,9 @@ public class PhysicalActionPlanConfirmController {
 	
 	@Autowired
 	private PhysicalActionPlanService  physicalActionPlanService;
+	
+	@Autowired
+	private WdcpmksyProjectPhysicalPlanTranxRepository tranxRepository;
 	
 	
 	@GetMapping("/wcdcslnaPhyActPlan")
@@ -92,5 +104,81 @@ public class PhysicalActionPlanConfirmController {
 				}
 				return "redirect:/wcdcslnaPhyActPlan";	
 	    }
+	 
+	 	@GetMapping("/getAAPTransaction")
+		@ResponseBody
+		public ResponseEntity<?> getPprTransaction(
+		        @RequestParam("planId") Integer planId) {
+
+		    try {
+
+		        List<WdcpmksyProjectPhysicalPlanTranx> list =tranxRepository.findByPlan_PlanIdOrderBySentOnDesc(planId);
+
+		        List<PprTransactionDto> result = new ArrayList<>();
+
+		        for (WdcpmksyProjectPhysicalPlanTranx t : list) {
+
+		            PprTransactionDto dto = new PprTransactionDto();
+
+		            dto.setTranxId(t.getTranxId());
+
+		            if (t.getPlan() != null) {
+		                dto.setPprId(t.getPlan().getPlanId());
+		            }
+
+		       /*     if (t.getSentFrom() != null) {
+		                dto.setSentFrom(t.getSentFrom().getUserId());
+		            }
+
+		            if (t.getSentTo() != null) {
+		                dto.setSentTo(t.getSentTo().getUserId());
+		            }  */
+		            
+		            if (t.getSentFrom() != null) {
+		                String userId = t.getSentFrom().getUserId();
+
+		                if (userId != null && userId.startsWith("DL")) {
+		                    dto.setSentFrom("DoLR");
+		                } else {
+		                    dto.setSentFrom(userId);
+		                }
+		            }
+
+		            if (t.getSentTo() != null) {
+		                String userId = t.getSentTo().getUserId();
+
+		                if (userId != null && userId.startsWith("DL")) {
+		                    dto.setSentTo("DoLR");
+		                } else {
+		                    dto.setSentTo(userId);
+		                }
+		            }
+
+		            dto.setAction(t.getAction());
+		            dto.setRemarks(t.getRemarks());
+		            dto.setSenton(t.getSentOn());
+
+		            result.add(dto);
+		        }
+
+		        System.out.println("DTO records returned = " + result.size());
+
+		        return ResponseEntity.ok(result);
+
+		    } 
+		    catch (Exception e) {
+
+		        e.printStackTrace();
+
+		        Map<String, Object> error = new HashMap<>();
+
+		        error.put("success", false);
+		        error.put("message", e.getMessage());
+
+		        return ResponseEntity
+		                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+		                .body(error);
+		    }
+		}
 
 }

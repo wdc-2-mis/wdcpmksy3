@@ -1,6 +1,8 @@
 package gov.dolr.wdcpmksy3.DPR.entity;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
@@ -29,9 +31,8 @@ public class WdcpmksyProjectPhysicalPlanTranx {
     @Column(name = "action", length = 1)
     private Character action;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "sent_on")
-    private Date sentOn;
+    private LocalDateTime sentOn;
 
     @Column(name = "remarks", length = 1000)
     private String remarks;
@@ -78,11 +79,11 @@ public class WdcpmksyProjectPhysicalPlanTranx {
         this.action = action;
     }
 
-    public Date getSentOn() {
+    public LocalDateTime getSentOn() {
         return sentOn;
     }
 
-    public void setSentOn(Date sentOn) {
+    public void setSentOn(LocalDateTime sentOn) {
         this.sentOn = sentOn;
     }
 

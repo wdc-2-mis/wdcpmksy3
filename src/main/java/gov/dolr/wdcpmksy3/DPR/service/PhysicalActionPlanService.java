@@ -3,6 +3,7 @@ package gov.dolr.wdcpmksy3.DPR.service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -217,8 +218,8 @@ public class PhysicalActionPlanService {
 			String res=null;
 			try {
 				
-				Timestamp time= Timestamp.from(Instant.now());  
-				
+			//	Timestamp time= Timestamp.from(Instant.now());  
+				LocalDateTime time = Timestamp.from(Instant.now()).toLocalDateTime();
 				WdcpmksyProjectPhysicalPlanTranx tranx = new WdcpmksyProjectPhysicalPlanTranx();
 				
 				WdcpmksyUserReg regfrom = userrepo.findById(sentfrom.longValue()).orElseThrow();

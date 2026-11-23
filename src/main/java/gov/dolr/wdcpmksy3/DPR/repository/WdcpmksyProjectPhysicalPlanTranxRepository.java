@@ -12,14 +12,11 @@ import gov.dolr.wdcpmksy3.DPR.entity.WdcpmksyProjectPhysicalPlanTranx;
 @Repository
 public interface WdcpmksyProjectPhysicalPlanTranxRepository extends JpaRepository<WdcpmksyProjectPhysicalPlanTranx, Integer> {
 
-    List<WdcpmksyProjectPhysicalPlanTranx>
-        findByPlan_PlanIdOrderBySentOnDesc(Integer planId);
+    List<WdcpmksyProjectPhysicalPlanTranx> findByPlan_PlanIdOrderBySentOnDesc(Integer planId);
 
-    List<WdcpmksyProjectPhysicalPlanTranx>
-        findBySentTo_RegIdOrderBySentOnDesc(Integer regId);
+    List<WdcpmksyProjectPhysicalPlanTranx> findBySentTo_RegIdOrderBySentOnDesc(Integer regId);
 
-    List<WdcpmksyProjectPhysicalPlanTranx>
-        findBySentFrom_RegIdOrderBySentOnDesc(Integer regId);
+    List<WdcpmksyProjectPhysicalPlanTranx> findBySentFrom_RegIdOrderBySentOnDesc(Integer regId);
     
     @Query(value = "SELECT a.plan_id AS planid, a.projectdesc AS projectdesc, (CASE WHEN a.status = 'R' THEN 'Rejected' WHEN a.status = 'F' THEN 'Pending' ELSE 'Completed' END) AS status, "
     		+ "( CASE  WHEN reg.user_type = 'PI' THEN 'PIA' WHEN reg.user_type = 'DI' THEN 'District' ELSE 'SLNA' END) AS currentlevel, a.remarks AS remarks, a.finyr AS finyr,"
