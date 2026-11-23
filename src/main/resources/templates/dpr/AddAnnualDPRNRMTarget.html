@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Add DPR Annual Target</title>
+
+	<style>
+		.required {
+			color: red;
+		}
+	
+		.validation-error {
+			color: red;
+			font-size: 14px;
+			margin-top: 4px;
+		}
+	
+		.is-invalid {
+			border-color: #dc3545 !important;
+		}
+		.field-error {
+		    color: red;
+		    font-size: 14px;
+		    margin-top: 4px;
+		}
+	</style>
+<script th:inline="javascript">
+
+	document.addEventListener("DOMContentLoaded", function () {
+	    const district = document.getElementById("district");
+		const project = document.getElementById("project");
+		const head = document.getElementById("head");
+	    district.addEventListener("change", function () {
+			if (this.value) {
+				window.location.href = "/dprPhyOtherHeadActivities?dcode=" + this.value;
+			} else {
+				window.location.href = "/dprPhyOtherHeadActivities";
+			}
+	    });
+		project.addEventListener("change", function () {
+			if (this.value) {
+				window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + this.value;
+			} else {
+				window.location.href = "/dprPhyOtherHeadActivities";
+			}
+		});
+		head.addEventListener("change", function () {
+			if (this.value) {
+				window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + project.value+ "&&head=" +  this.value;
+			} else {
+				window.location.href = "/dprPhyOtherHeadActivities";
+			}
+		});
+	
+		function showError(field, message) {
+			field.classList.add("is-invalid");
+			// Avoid duplicate error messages
+			const oldError = field.parentNode.querySelector(".validation-error");
+			if (oldError) {
+			    oldError.remove();
+			}
+			const error = document.createElement("div");
+			error.className = "validation-error";
+			error.innerText = message;
+			field.parentNode.appendChild(error);
+			field.focus();
+		}
+		function hideError(field) {
+			field.classList.remove("is-invalid");
+			const error = field.parentNode.querySelector("validation-error");
+			if (error)
+				error.remove();
+		}
+			const form = document.getElementById("projectForm");
+			form.addEventListener("submit", function (e) {
+				form.querySelectorAll(".validation-error").forEach(function(error){
+					error.remove();
+				});
+				form.querySelectorAll(".is-invalid").forEach(function(field){
+					field.classList.remove("is-invalid");
+				});
+				
+				// =========================
+				// GET FIELD VALUES
+				// =========================
+				const district = document.getElementById("district");
+				const project = document.getElementById("project");
+				const head = document.getElementById("head");
+				const activity = document.getElementById("activity");
+				const target = document.getElementById("target");
+				// =========================
+				// DISTRICT
+				// =========================
+				if(district.value.trim() === ""){
+					e.preventDefault();
+					showError(district,"Please select District.");
+					return;
+				}
+				// =========================
+				// PROJECT NAME
+				// =========================
+				if(project.value.trim() === ""){
+					e.preventDefault();
+					showError(project,"Project Name is missing.");
+					return;
+				}
+				// =========================
+				// MICRO-WATERSHED
+				// =========================
+				if(head.value.trim() === ""){
+					e.preventDefault();
+					showError(head,"Please select Head Activity.");
+					return;
+				}
+				// =========================
+				// PROJECT AREA
+				// =========================
+				if(activity.value.trim() === ""){
+					e.preventDefault();
+					showError(activity,"Please select Activity.");
+					return;
+				}
+				if(target.value.trim() === ""){
+					e.preventDefault();
+					showError(target,"Please Enter the target.");
+					return;
+				}
+				
+			});
+			// =========================
+			// REMOVE ERROR ON CHANGE
+			// =========================
+			form.addEventListener("input", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
+			form.addEventListener("change", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
+		
+	    document.querySelectorAll(".editBtn").forEach(function (btn) {
+			btn.addEventListener("click", function () {
+				let id = this.getAttribute("data-id");
+				fetch("/getOtherDtlEditById?id=" + id)
+					.then(response => {
+						if (!response.ok) {
+							throw new Error("Failed to fetch edit data");
+						}
+						return response.json();
+					})
+					.then(data => {
+						// Hidden ID
+						document.getElementById("otherId").value = data.id;
+						// Readonly fields
+						document.getElementById("editDistrict").value = data.district ?? "";
+						document.getElementById("editProject").value = data.project ?? "";
+						document.getElementById("editHead").value = data.head ?? "";
+						document.getElementById("editActivity").value = data.activity ?? "";
+						document.getElementById("editUnit").textContent = data.unit ?? "";
+
+						// Editable fields
+						document.getElementById("editTarget").value = data.target ?? "";
+						// Select Project Type Radio
+					})
+					.catch(error => {
+						console.error("Error loading edit data:", error);
+					});
+			});
+		});
+		const targetInput1 = document.getElementById("editTarget");
+		targetInput1.addEventListener("input", function () {
+			const unit1 = document.getElementById("editUnit").textContent.trim().toLowerCase();
+			let value = this.value;
+			if (unit1 === "nos") {
+				// Whole numbers only
+				value = value.replace(/[^0-9]/g, "");
+			} else {
+				// Decimal numbers up to 5 decimal places
+				value = value.replace(/[^0-9.]/g, "");
+				const parts = value.split(".");
+				if (parts.length > 2) {
+					value = parts[0] + "." + parts.slice(1).join("");
+				}
+				const decimalPart = value.split(".");
+				if (decimalPart.length === 2) {
+					value = decimalPart[0] + "." +
+						decimalPart[1].substring(0, 2);
+				}
+			}
+			this.value = value;
+		});
+		
+		
+	    const editForm = document.getElementById("editForm");
+	    if (editForm) {
+			editForm.addEventListener("submit", function (e) {
+			    e.preventDefault();
+			    // =========================
+			    // CLEAR OLD ERRORS
+			    // =========================
+			    editForm.querySelectorAll(".field-error").forEach(function (error) {
+			        error.innerText = "";
+			    });
+			   
+			    // =========================
+			    // GET VALUES
+			    // =========================
+				const editTarget = document.getElementById("editTarget");
+				if(editTarget.value.trim() === ""){
+					e.preventDefault();
+					showError(editTarget,"Please Enter the target.");
+					return;
+				}
+			    editForm.submit();
+			});
+			
+			// =========================
+			// REMOVE ERROR ON CHANGE
+			// =========================
+			editForm.addEventListener("input", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
+			editForm.addEventListener("change", function(e){
+				if(e.target.classList.contains("is-invalid")){
+					e.target.classList.remove("is-invalid");
+					const error = e.target.parentNode.querySelector(".validation-error");
+					if(error){
+						error.remove();
+					}
+				}
+			});
+	    }
+	    
+		
+		const activityElement = document.getElementById("activity");
+		if (activityElement) {
+		    activityElement.addEventListener("change", function () {
+		        console.log("Activity changed:", this.value);
+		        const actId = this.value;
+		        const unitSpan = document.getElementById("unitDesc");
+		        const projectId = document.getElementById("project").value;
+				unitSpan.textContent = "";
+		        document.getElementById("target").value = "";
+		        if (!actId) {
+		            unitSpan.textContent = "";
+		            return;
+		        }
+		        fetch('/getUnitDescByOtherActivity?actId=' + encodeURIComponent(actId))
+		            .then(response => {
+		                if (!response.ok) {
+		                    throw new Error("Unit description not found");
+		                }
+		                return response.text();
+		            })
+		            .then(unitDesc => {
+		                unitSpan.textContent = unitDesc;
+		            })
+		            .catch(error => {
+		                console.error("Error fetching unit description:", error);
+		                unitSpan.textContent = "";
+		            });
+		        // Check whether activity already exists
+		        fetch('/checkProjectActivityExistsOther?pprid='
+		            + encodeURIComponent(projectId)
+		            + '&actId=' + encodeURIComponent(actId))
+		            .then(response => {
+		                if (!response.ok) {
+		                    throw new Error("Failed to check existing activity");
+		                }
+		                return response.text();
+		            })
+		            .then(result => {
+		                if (result.trim() === "EXISTS") {
+		                    activityElement.value = "";
+		                    showError(activityElement, "This Activity data already exists for the selected Project. Please select a different Activity.");
+		                } else {
+		                    hideError(activityElement);
+		                }
+		            })
+		            .catch(error => console.error(error));
+		    });
+		}
+
+		const targetInput = document.getElementById("target");
+		targetInput.addEventListener("input", function () {
+			const unitDesc = document.getElementById("unitDesc").textContent.trim().toLowerCase();
+			let value = this.value;
+			if (unitDesc === "nos") {
+				// Whole numbers only
+				value = value.replace(/[^0-9]/g, "");
+			} else {
+				// Decimal numbers up to 5 decimal places
+				value = value.replace(/[^0-9.]/g, "");
+				const parts = value.split(".");
+				if (parts.length > 2) {
+					value = parts[0] + "." + parts.slice(1).join("");
+				}
+				const decimalParts = value.split(".");
+				if (decimalParts.length === 2) {
+					value = decimalParts[0] + "." + decimalParts[1].substring(0, 2);
+				}
+			}
+			this.value = value;
+		});	
+					
+		const selectAll = document.getElementById('chkSelectAllkd');
+		if (selectAll) {
+			selectAll.addEventListener('change', function () {
+				document.querySelectorAll('.chkIndividualkd').forEach(function (checkbox) {
+					checkbox.checked = selectAll.checked;
+				});
+			});
+		}
+
+		// Individual checkbox changes
+		document.addEventListener('change', function (event) {
+			if (event.target.classList.contains('chkIndividualkd')) {
+				const checkboxes = document.querySelectorAll('.chkIndividualkd');
+				const checkedBoxes = document.querySelectorAll('.chkIndividualkd:checked');
+
+				if (selectAll) {
+					selectAll.checked =
+						checkboxes.length > 0 &&
+						checkboxes.length === checkedBoxes.length;
+				}
+			}
+		});
+						
+		// Complete all selected records
+		const completeBtn = document.getElementById("complete");
+		if (completeBtn) {
+		    completeBtn.addEventListener("click", function () {
+		        const selectedIds = [];
+		        document.querySelectorAll(".chkIndividualkd:checked").forEach(function (checkbox) {
+		            selectedIds.push(checkbox.value);
+		        });
+		        if (selectedIds.length === 0) {
+		            latestAlert("Please select at least one record to complete.");
+		            return;
+		        }
+		        completeAlert("Are you sure you want to complete all selected records?",function () {
+					const url = /*[[@{/completeDprOtherTargetData}]]*/ "/completeDprOtherTargetData";
+					window.location.href = url + "?ids=" + encodeURIComponent(selectedIds.join(","));
+		            }
+		        );
+		    });
+		}
+		
+		// Remove query parameters from browser URL after page loads
+		if (window.location.search) {
+		    window.history.replaceState({}, document.title, window.location.pathname);
+		}
+	});
+	
+			
+		
+</script>
+	
+
+</head>
+<body>
+	<div layout:fragment="content">
+
+	    <div class="card shadow-sm border-0">
+	        <div class="card-header bg-primary text-white">
+	            <h4 class="mb-0"> Add DPR Annual Target </h4>
+	        </div>
+			<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+				<span th:text="${success}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
+				<span th:text="${error}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+	        <div class="card-body">
+	            <form th:action="@{/saveDPRAnnualTarget}" method="post" id="projectForm">
+					<input type="hidden" id="pprId" name="pprId" th:value="${pprId}">
+					<div class="row mb-4">
+						<div class="col-md-2">
+							<label>Super Head Name:</label><span class="required">*</span>
+						</div>
+						<div class="col-md-3">
+							<select class="form-select" id="superHead" name="superHead">
+								<option value="">--Select--</option>
+								<option th:each="sh : ${superHeadMap}" th:value="${sh.key}" th:text="${sh.value}"
+									th:selected="${superHead != null and superHead == sh.key}"> </option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<label>Project Name:</label><span class="required">*</span>
+						</div>
+						<div class="col-md-3">
+							<select class="form-select" id="project" name="project">
+								<option value="">--Select--</option>
+								<option th:each="p : ${pprList}" th:value="${p.pprId}" th:text="${p.projectName}"
+									th:selected="${pprId != null and pprId == p.pprId}"> </option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<label>Financial Year:</label><span class="required">*</span>
+						</div>
+						<div class="col-md-3">
+							<input type="text" name="finyear" id="finyear" class="form-control" style="height:40px; width: 300px;" readonly>
+						</div>
+					</div>
+					<div class="row mb-4">
+						<div class="col-md-2">
+							<label>Name of the Head <span class="required">*</span></label>
+						</div>
+						<div class="col-md-3">
+							<select class="form-select" id="head" name="head">
+								<option value="">--Select--</option>
+								<option th:each="hd : ${headList}" th:value="${hd.otherHeadsId}" th:text="${hd.otherHeadDesc}"
+									th:selected="${selectedHead != null and selectedHead == hd.otherHeadsId}"></option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<label>Name of the Activity <span class="required">*</span></label>
+						</div>
+						<div class="col-md-3">
+							<select class="form-select" id="activity" name="activity">
+								<option value="">--Select--</option>
+								<option th:each="act : ${activityList}" th:value="${act.otherActivityId}" th:text="${act.otherActivityDesc}"></option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<label> Target(<span id="unitDesc" class="fw-bold text-primary">Unit</span>) <span class="required">*</span></label>
+						</div>
+						<div class="col-md-3">
+							<input type="text" name="target" id="target" class="form-control" style="height:40px; width: 300px;" inputmode="decimal" maxlength="9">
+						</div>
+					</div>
+					<div class="text-center mt-4">
+						<button type="submit" id="saveButton" name="action" value="D" class="btn btn-warning">
+					         <i class="fas fa-save"></i>
+					          Save As Draft
+					     </button>
+					</div>
+	            </form>
+			</div>
+		</div>
+		<br/>
+		<div th:if="${dprAnnualTargetList != null}">
+			<h4> <b><center>List of Added DPR Annual Target</center></b> </h4>
+		    <table class="table table-bordered table-striped table-hover">
+		        <thead class="table-primary">
+		        <tr>
+					<th class="table-primary">
+					    <input type="checkbox" id="chkSelectAllkd" name="chkSelectAllkd" th:if="${statusCheck}" />
+					</th>
+					<th>S.No. </th>
+					<th>Project Name</th>
+					<th>Financial Year</th>
+					<th>Head</th>
+					<th>Activity</th>
+					<th>Unit</th>
+					<th>Target</th>
+					<th>Action</th>
+		        </tr>
+		        </thead>
+				<tbody>
+					<tr th:each="data, stat : ${dprAnnualTargetList}">
+						<td><input type="checkbox" class="chkIndividualkd" th:value="${data.otherId}" th:if="${data.status != null and #strings.trim(data.status) == 'D'}"/></td>
+						<td th:text="${stat.count}"></td>
+						<td th:text="${data.dprDetails.ppr.projectName}"></td>
+						<td th:text="${data.finYear}"></td>
+						<td>
+							<span th:if="${data.otherActivity != null}" th:text="${data.otherActivity.otherHeads.otherHeadDesc}"></span>
+						</td>
+						<td>
+							<span th:if="${data.otherActivity != null}" th:text="${data.otherActivity.otherActivityDesc}"></span>
+						</td>
+						<td>
+							<span th:if="${data.otherActivity != null}" th:text="${data.otherActivity.unit.unitDesc}"></span>
+						</td>
+						<td>
+							<span th:if="${data.otherActivity != null}" th:text="${data.otherActivity.unit.unitDesc == 'nos' ? T(java.lang.String).format('%.0f', data.qtyPlanned) : data.qtyPlanned}">
+							</span>
+						</td>
+						<td>
+							<div class="d-flex align-items-center gap-2">
+								<button type="button" class="btn btn-primary btn-sm editBtn" th:data-id="${data.otherId}"
+									data-bs-toggle="modal" data-bs-target="#editModal" th:if="${#strings.trim(data.status) == 'D'}">
+									<i class="fas fa-edit"></i>
+								</button>
+								<a th:if="${#strings.trim(data.status) != 'C'}" class="btn btn-danger btn-sm"
+									th:onclick="'deleteAlert(\'Are you sure you want to delete this record?\', function() { window.location.href = \'/deleteDPROtherTarget?id=' + ${data.otherId} + '\'; }); return false;'">
+									<i class="fas fa-trash"></i>
+								</a>
+								<a th:if="${#strings.trim(data.status) == 'D'}" class="btn btn-success btn-sm"
+									th:onclick="'completeAlert(\'Are you sure you want to complete this record??\', function() { window.location.href = \'/completeDprOtherTargetData?id=' + ${data.otherId} + '\'; }); return false;'">
+									<i class="fas fa-check"></i>
+								</a>
+								<span th:if="${#strings.trim(data.status) == 'C'}" class="badge bg-success">
+									<i class="fas fa-check-circle"></i> Completed
+								</span>
+								<span th:if="${#strings.trim(data.status) == 'S'}" class="badge bg-warning text-dark">
+									<i class="fas fa-forward"></i> Skipped
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr th:if="${statusCheck}">
+						<td colspan="7" class="text-center">
+							<input type="button" class="btn btn-success btn-sm" id="complete" name="complete" value="Complete" />
+						</td>
+					</tr>
+					<tr th:if="${#lists.isEmpty(dprAnnualTargetList)}">
+						<td colspan="7" class="text-center text-danger">
+							No records found.
+						</td>
+					</tr>
+				</tbody>
+		    </table>
+		</div>
+		
+		<!-- =====================================================
+		 EDIT MODAL
+		 ===================================================== -->
+
+		<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title" id="editModalLabel">Edit DPR Other Activity Target</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+					</div>
+					<div class="modal-body">
+						<form id="editForm" th:action="@{/updateDPROtherTargetRecord}" method="post">
+							<input type="hidden" id="otherId" name="otherId">
+							<div class="row mb-3">
+								<div class="col-md-2">
+									<label> District: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editDistrict" class="form-control form-control-sm" readonly>
+								</div>
+								<div class="col-md-2">
+									<label> Project: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editProject" class="form-control form-control-sm" readonly>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<div class="col-md-2">
+									<label> Head: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editHead" class="form-control form-control-sm" readonly>
+								</div>
+								<div class="col-md-2">
+									<label> Activity: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editActivity" class="form-control form-control-sm" readonly>
+								</div>
+							</div>
+							<hr>
+							<div class="row mb-3">
+								<div class="col-md-3">
+									<label><b>Target (<span id="editUnit" class="fw-bold text-primary"></span>)</b> <span class="required">*</span></label>
+								</div>
+								<div class="col-md-6">
+									<input type="text" name="target" id="editTarget" class="form-control" style="height:40px; width: 300px;"
+										inputmode="decimal" maxlength="9">
+								</div>
+							</div>
+							<div class="text-end">
+								<button type="submit" class="btn btn-success">
+									<i class="fas fa-save"></i> Update
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		</div>
+</body>
+</html>
