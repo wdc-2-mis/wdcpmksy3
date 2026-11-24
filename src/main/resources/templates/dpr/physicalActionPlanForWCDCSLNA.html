@@ -650,8 +650,7 @@
 										            title="Approval/Rejection"
 										            class="btn btn-primary btn-sm editBtn"
 										            th:if="${plan.currentlevel == plan.usertype and plan.status != 'Completed'}"
-										            th:attr="data-id=${plan.planid},
-										                     data-proj=${plan.projectdesc}"
+										            th:attr="data-id=${plan.planid},  data-proj=${plan.projectdesc}"
 										            data-bs-toggle="modal"
 										            data-bs-target="#editModal">
 										        <i class="fas fa-edit"></i> Approval/Rejection
@@ -901,8 +900,8 @@
 
 					                <h5 class="modal-title">
 					                    Physical Plan Transaction History <br/>
-										<span id="transactionPprName" class="text-primary"></span>
-										&nbsp; &nbsp; And &nbsp; &nbsp; Financial Year: &nbsp;
+									Project Name: &nbsp;<span id="transactionPprName" class="text-primary"></span>
+										&nbsp; Financial Year: &nbsp;
 										<span id="transactionfinyr" class="text-primary"></span>
 					                </h5>
 
