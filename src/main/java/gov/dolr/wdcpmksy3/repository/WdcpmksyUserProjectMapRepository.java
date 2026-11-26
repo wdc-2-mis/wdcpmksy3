@@ -15,12 +15,12 @@ public interface WdcpmksyUserProjectMapRepository
 
     boolean existsByUser_RegId(Integer regId);
     
-    boolean existsByUser_RegIdAndProject_ProjId(
+    boolean existsByUser_RegIdAndProject_PprId(
             Integer regId,
             Integer projId
     );
 
-    void deleteByUser_RegIdAndProject_ProjId(
+    void deleteByUser_RegIdAndProject_PprId(
             Integer regId,
             Integer projId
     );

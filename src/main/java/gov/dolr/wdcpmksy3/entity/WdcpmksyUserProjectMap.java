@@ -2,6 +2,7 @@ package gov.dolr.wdcpmksy3.entity;
 
 import java.time.LocalDate;
 
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,13 +23,10 @@ public class WdcpmksyUserProjectMap {
     private Integer upMapId;
 
 
-    /*
-     * Foreign Key:
-     * proj_id -> m_project.proj_id
-     */
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proj_id", nullable = false)
-    private MProject project;
+    private MPpr project;
 
 
     /*
@@ -72,15 +70,17 @@ public class WdcpmksyUserProjectMap {
         this.upMapId = upMapId;
     }
 
-    public MProject getProject() {
-        return project;
-    }
+    
 
-    public void setProject(MProject project) {
-        this.project = project;
-    }
+    public MPpr getProject() {
+		return project;
+	}
 
-    public WdcpmksyUserReg getUser() {
+	public void setProject(MPpr project) {
+		this.project = project;
+	}
+
+	public WdcpmksyUserReg getUser() {
         return user;
     }
 

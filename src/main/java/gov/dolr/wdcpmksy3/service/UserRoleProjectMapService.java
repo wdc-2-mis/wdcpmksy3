@@ -10,15 +10,15 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
+import gov.dolr.wdcpmksy3.PPR.repository.MPprRepository;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
-import gov.dolr.wdcpmksy3.entity.MProject;
 import gov.dolr.wdcpmksy3.entity.MState;
 import gov.dolr.wdcpmksy3.entity.MRole;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserAppRoleMap;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserProjectMap;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserReg;
 import gov.dolr.wdcpmksy3.repository.MDistrictRepository;
-import gov.dolr.wdcpmksy3.repository.MProjectRepository;
 import gov.dolr.wdcpmksy3.repository.MStateRepository;
 import gov.dolr.wdcpmksy3.repository.UserRepository;
 import gov.dolr.wdcpmksy3.repository.MRoleRepository;
@@ -30,7 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class UserRoleProjectMapService {
 
     private final UserRepository userRepository;
-    private final MProjectRepository projectRepository;
+    private final MPprRepository projectRepository;
     private final MRoleRepository roleRepository;
     private final WdcpmksyUserAppRoleMapRepository userRoleRepository;
     private final WdcpmksyUserProjectMapRepository userProjectRepository;
@@ -42,7 +42,7 @@ public class UserRoleProjectMapService {
 
     public UserRoleProjectMapService(
             UserRepository userRepository,
-            MProjectRepository projectRepository,
+            MPprRepository projectRepository,
             MRoleRepository roleRepository,
             WdcpmksyUserAppRoleMapRepository userRoleRepository,
             WdcpmksyUserProjectMapRepository userProjectRepository,
@@ -85,14 +85,14 @@ public class UserRoleProjectMapService {
     }
 
 
-    public List<MProject> getProjectsByDistrict(Integer dcode) {
+    public List<MPpr> getProjectsByDistrict(Integer dcode) {
 
         if (dcode == null) {
             return List.of();
         }
 
         return projectRepository
-                .findByDistrict_DcodeOrderByProjNameAsc(dcode);
+                .findUnmappedProjectsByDistrict(dcode, "A");
     }
 
     public static String getClientIpAddr(HttpServletRequest request) {  
@@ -330,7 +330,7 @@ public class UserRoleProjectMapService {
                 continue;
             }
 
-            Optional<MProject> projectOptional =
+            Optional<MPpr> projectOptional =
                     projectRepository.findById(projectId);
 
             if (projectOptional.isEmpty()) {
@@ -339,7 +339,7 @@ public class UserRoleProjectMapService {
 
             boolean alreadyAssigned =
                     userProjectRepository
-                            .existsByUser_RegIdAndProject_ProjId(
+                            .existsByUser_RegIdAndProject_PprId(
                                     regId,
                                     projectId
                             );
@@ -380,7 +380,7 @@ public class UserRoleProjectMapService {
 
         boolean exists =
                 userProjectRepository
-                        .existsByUser_RegIdAndProject_ProjId(
+                        .existsByUser_RegIdAndProject_PprId(
                                 regId,
                                 projectId
                         );
@@ -390,7 +390,7 @@ public class UserRoleProjectMapService {
         }
 
         userProjectRepository
-                .deleteByUser_RegIdAndProject_ProjId(
+                .deleteByUser_RegIdAndProject_PprId(
                         regId,
                         projectId
                 );
@@ -515,7 +515,7 @@ public class UserRoleProjectMapService {
 
         if (projId != null) {
 
-            MProject project =
+            MPpr project =
                     projectRepository.findById(projId)
                             .orElseThrow(() ->
                                     new IllegalArgumentException(
@@ -524,12 +524,12 @@ public class UserRoleProjectMapService {
                             );
 
             projectName =
-                    project.getProjName();
+                    project.getProjectName();
 
 
             boolean alreadyMapped =
             		userProjectRepository
-                            .existsByUser_RegIdAndProject_ProjId(
+                            .existsByUser_RegIdAndProject_PprId(
                                     regId,
                                     projId
                             );

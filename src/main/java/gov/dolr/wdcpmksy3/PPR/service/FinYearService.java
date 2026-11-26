@@ -17,6 +17,10 @@ public class FinYearService {
     public List<MFinYear> getFinYearCdAndDesc() {
         return finYearRepository.findAll(); 
     }
+
+	public String getfinYear() {
+		return finYearRepository.getfinYear();
+	}
     
    
 }

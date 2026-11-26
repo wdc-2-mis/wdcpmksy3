@@ -95,6 +95,23 @@ public interface MPprRepository extends JpaRepository<MPpr, Integer> {
 		      AND p.status = 'A'
 		    """, nativeQuery = true)
 		Long countApprovedPprByState(@Param("stcode") Integer stcode);
+
+		@Query("""
+			    SELECT p
+			    FROM MPpr p
+			    WHERE p.district.dcode = :dcode
+			      AND p.status = :status
+			      AND NOT EXISTS (
+			          SELECT upm.upMapId
+			          FROM WdcpmksyUserProjectMap upm
+			          WHERE upm.project.pprId = p.pprId
+			      )
+			    ORDER BY p.projectName ASC
+			""")
+			List<MPpr> findUnmappedProjectsByDistrict(
+			        @Param("dcode") Integer dcode,
+			        @Param("status") String status
+			);
 	
 }
 

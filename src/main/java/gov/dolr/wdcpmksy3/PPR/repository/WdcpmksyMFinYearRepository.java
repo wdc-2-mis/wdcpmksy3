@@ -14,5 +14,10 @@ public interface WdcpmksyMFinYearRepository extends JpaRepository<MFinYear, Inte
 	List<MFinYear> findAll();
 	
 	List<MFinYear> findAllByOrderByYearDesc();
+
+	@Query(value = """
+		    select fin_yr_desc from m_fin_year limit 1
+		    """, nativeQuery = true)
+	String getfinYear();
 }
 

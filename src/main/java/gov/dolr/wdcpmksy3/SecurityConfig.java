@@ -56,6 +56,11 @@ public class SecurityConfig {
 // DPR 					 
                         "/createDPRNRMPlan", "/saveDPRNRMTarget", "/getProjectsByDistrictDPRNRM", "/getActivitiesByHeadCodeDPRNRM", "/getUnitDescByActivity", "/checkProjectActivityExistsNRM", "/deleteDPRNRMTarget", "/completeDPRNRMTarget", "/editDPRNRMTarget", "/completeDPRNRMTargetAll", "/deleteDPRNRMTargetAll", "/getProjectsByDPRNRMData", "/epalivproddetails", "/getActivitiesByHeadCodeDPRELP", "/getUnitDescByelpActivity", "/saveDPRELPTarget", "/editDPRELPTarget",  "/deleteDprELPTarget", "/completeSelectedDprELPTargets", "/completeDprELPTarget",
                         "/getProjectsByDistrictDPREPA", "/getDprELPByProject", "/getViewConfirmDPRPlan", "/confirmDPR", "/checkDPRProjectDataApproved", "/getDistrictByDPRNRMData", "/downloadDPRActivityPdf", "/getPPRDistrictRecords", "/completeSelectedPPREmployment", "/skipDPRNRMTarget", "/skipDPRELPTarget", "/skipDPROtherHeadActivities", "/completeSelectedCropOutcomes", "/wcdcslnaPhyActPlan", "/approveRejectAAP", "/getAAPTransaction",
+        
+//PI
+                        
+                        "/getProjectBlocks", 
+             
                         
                         "/css/**",
                         "/js/**",

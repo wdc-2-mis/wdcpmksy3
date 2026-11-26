@@ -10,8 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import gov.dolr.wdcpmksy3.PPR.entity.MPpr;
 import gov.dolr.wdcpmksy3.entity.MDistrict;
-import gov.dolr.wdcpmksy3.entity.MProject;
 import gov.dolr.wdcpmksy3.entity.MState;
 import gov.dolr.wdcpmksy3.entity.MRole;
 import gov.dolr.wdcpmksy3.entity.WdcpmksyUserProjectMap;
@@ -128,7 +128,7 @@ public class UserRoleProjectMapController {
     @ResponseBody
     public ResponseEntity<?> getProjects(@RequestParam Integer dcode) {
 
-        List<MProject> projects =
+        List<MPpr> projects =
                 service.getProjectsByDistrict(dcode);
 
         List<Map<String, Object>> result = projects.stream()
@@ -137,9 +137,9 @@ public class UserRoleProjectMapController {
                     Map<String, Object> map =
                             new LinkedHashMap<>();
 
-                    map.put("projId", project.getProjId());
-                    map.put("projName", project.getProjName());
-                    map.put("projectCd", project.getProjectCd());
+                    map.put("projId", project.getPprId());
+                    map.put("projName", project.getProjectName());
+					/* map.put("projectCd", project.getProjectCd()); */
 
                     return map;
                 })
@@ -195,7 +195,7 @@ public class UserRoleProjectMapController {
                           Map<String, Object> map =
                                   new LinkedHashMap<>();
 
-                          MProject project =
+                          MPpr project =
                                   mapping.getProject();
 
                           Map<String, Object> projectMap =
@@ -203,18 +203,15 @@ public class UserRoleProjectMapController {
 
                           projectMap.put(
                                   "projId",
-                                  project.getProjId()
+                                  project.getPprId()
                           );
 
                           projectMap.put(
                                   "projName",
-                                  project.getProjName()
+                                  project.getPprName()
                           );
 
-                          projectMap.put(
-                                  "projectCd",
-                                  project.getProjectCd()
-                          );
+                          
 
                           map.put(
                                   "project",
