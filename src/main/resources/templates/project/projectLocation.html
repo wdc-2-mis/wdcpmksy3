@@ -1,0 +1,368 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add Project Location Details</title>
+
+    <style>
+        .required {
+            color: red;
+        }
+
+        .section-heading {
+            font-weight: 600;
+            color: #24476b;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table thead th {
+            background: #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .validation-error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+    </style>
+    
+    <script th:inline="javascript">
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const project = document.getElementById("project");
+    const multiBlock = document.getElementById("multiblock");
+    const block = document.getElementById("block");
+
+    const blocksUrl = /*[[@{/getProjectBlocks}]]*/ '';
+
+    let loadedBlocks = [];
+
+    // Clear block dropdowns
+    function clearBlockDropdowns() {
+
+        multiBlock.innerHTML = "";
+        block.innerHTML = '<option value="">-- Select Block --</option>';
+
+        multiBlock.disabled = true;
+        block.disabled = true;
+
+        loadedBlocks = [];
+    }
+
+    // Project selection change
+    project.addEventListener("change", function () {
+
+        clearBlockDropdowns();
+
+        if (!this.value) {
+            return;
+        }
+
+        multiBlock.innerHTML =
+            '<option value="">Loading blocks...</option>';
+
+        fetch(blocksUrl + "?pprId=" + encodeURIComponent(this.value))
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Unable to load project blocks.");
+                }
+
+                return response.json();
+            })
+            .then(data => {
+
+                multiBlock.innerHTML = "";
+
+                loadedBlocks = data;
+
+                if (data.length === 0) {
+
+                    multiBlock.innerHTML =
+                        '<option value="">No blocks found</option>';
+
+                    return;
+                }
+
+                data.forEach(function (item) {
+
+                    const option = document.createElement("option");
+
+                    option.value = item.bcode;
+                    option.textContent = item.blockName;
+
+                    multiBlock.appendChild(option);
+
+                });
+
+                multiBlock.disabled = false;
+
+            })
+            .catch(error => {
+
+                console.error(error);
+
+                multiBlock.innerHTML =
+                    '<option value="">Error loading blocks</option>';
+
+            });
+
+    });
+
+
+    // When user selects multiple blocks,
+    // populate the second block dropdown.
+    multiBlock.addEventListener("change", function () {
+
+        block.innerHTML =
+            '<option value="">-- Select Block --</option>';
+
+        const selectedCodes = Array.from(this.selectedOptions)
+            .map(option => option.value);
+
+        if (selectedCodes.length === 0) {
+            block.disabled = true;
+            return;
+        }
+
+        const selectedBlocks = loadedBlocks.filter(item =>
+            selectedCodes.includes(String(item.bcode))
+        );
+
+        selectedBlocks.forEach(function (item) {
+
+            const option = document.createElement("option");
+
+            option.value = item.bcode;
+            option.textContent = item.blockName;
+
+            block.appendChild(option);
+
+        });
+
+        block.disabled = false;
+
+    });
+
+});
+
+</script>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="container-fluid">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Add Project Location Details</h5>
+            </div>
+
+            <div class="card-body">
+
+                <form id="projectLocationForm" novalidate>
+
+                    <!-- Project Selection -->
+                    <h6 class="section-heading">
+                        Project Details
+                    </h6>
+
+                    <div class="row mb-4">
+
+                        <div class="col-md-6">
+
+                            <label for="project" class="form-label fw-bold">
+                                Select Project
+                                <span class="required">*</span>
+                            </label>
+
+                            <select id="project"
+                                    name="pprId"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">-- Select Project --</option>
+
+                                <option th:each="p : ${projectList}"
+                                        th:value="${p.pprId}"
+                                        th:text="${p.projectName}">
+                                </option>
+
+                            </select>
+
+                            <div class="invalid-feedback">
+                                Please select a project.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Location Selection -->
+                    <h6 class="section-heading">
+                        Project Location Selection
+                    </h6>
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-6">
+
+                            <label for="multiblock" class="form-label fw-bold">
+                                Select Blocks
+                                <span class="required">*</span>
+                            </label>
+
+                            <select id="multiblock"
+                                    class="form-select"
+                                    multiple
+                                    size="5"
+                                    disabled>
+                            </select>
+
+                            <div class="form-text">
+                                Select one or more blocks covered under the project.
+                            </div>
+
+                            <div class="invalid-feedback">
+                                Please select at least one block.
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label for="block" class="form-label fw-bold">
+                                Select Block
+                                <span class="required">*</span>
+                            </label>
+
+                            <select id="block"
+                                    class="form-select"
+                                    disabled>
+
+                                <option value="">-- Select Block --</option>
+
+                            </select>
+
+                            <div class="invalid-feedback">
+                                Please select a block.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-4">
+
+                        <div class="col-md-6">
+
+                            <label for="village" class="form-label fw-bold">
+                                Select Villages
+                                <span class="required">*</span>
+                            </label>
+
+                            <select id="village"
+                                    class="form-select"
+                                    multiple
+                                    size="6"
+                                    disabled>
+                            </select>
+
+                            <div class="form-text">
+                                Select multiple villages and click Go.
+                            </div>
+
+                            <div class="invalid-feedback">
+                                Please select at least one village.
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6 d-flex align-items-end">
+
+                            <button type="button"
+                                    id="addVillages"
+                                    class="btn btn-primary"
+                                    disabled>
+                                <i class="fa fa-plus"></i>
+                                Go
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Selected Location Table -->
+                    <h6 class="section-heading">
+                        Project Location Details
+                    </h6>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-striped"
+                               id="locationTable">
+
+                            <thead>
+                                <tr>
+                                    <th width="25%">Block</th>
+                                    <th width="30%">Gram Panchayat</th>
+                                    <th width="35%">Village</th>
+                                    <th width="10%">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="locationTableBody">
+
+                                <tr id="emptyRow">
+                                    <td colspan="4"
+                                        class="text-center text-muted">
+                                        No project location details added.
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="text-center mt-4">
+
+                        <button type="button"
+                                id="saveDraft"
+                                class="btn btn-secondary">
+                            <i class="fa fa-save"></i>
+                            Save as Draft
+                        </button>
+
+                        <button type="button"
+                                id="complete"
+                                class="btn btn-success ms-2">
+                            <i class="fa fa-check"></i>
+                            Complete
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
