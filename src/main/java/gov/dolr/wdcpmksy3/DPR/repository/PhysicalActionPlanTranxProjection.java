@@ -4,7 +4,7 @@ import java.util.Date;
 
 public interface PhysicalActionPlanTranxProjection {
 	
-	 Integer getPlanid();
+	 	Integer getPlanid();
 
 	    String getProjectdesc();
 

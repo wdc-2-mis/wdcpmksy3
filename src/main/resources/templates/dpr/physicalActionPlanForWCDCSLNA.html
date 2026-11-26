@@ -154,6 +154,59 @@
 
 
 			});
+			
+			const action = document.getElementById("action");
+			   const remark = document.getElementById("remark");
+			   const remarkRequired = document.getElementById("remarkRequired");
+			   const remarkError = document.getElementById("remarkError");
+			   const editForm = document.getElementById("editForm");
+
+			   // Show/hide mandatory indicator
+			   action.addEventListener("change", function () {
+
+			       if (this.value === "R") {
+			           remarkRequired.style.display = "inline";
+			       } else {
+			           remarkRequired.style.display = "none";
+			           remarkError.style.display = "none";
+			           remark.classList.remove("is-invalid");
+			       }
+			   });
+
+			   // Form submit validation
+			   editForm.addEventListener("submit", function (event) {
+
+			       const selectedAction = action.value;
+			       const remarks = remark.value.trim();
+
+			       if (selectedAction === "R") {
+
+			           if (remarks.length < 5) {
+
+			               event.preventDefault();
+
+			               remarkError.style.display = "block";
+			               remark.classList.add("is-invalid");
+
+			               remark.focus();
+
+			               return false;
+			           }
+			       }
+
+			       remarkError.style.display = "none";
+			       remark.classList.remove("is-invalid");
+
+			   });
+
+			   // Clear validation when typing
+			   remark.addEventListener("input", function () {
+
+			       if (this.value.trim().length >= 5) {
+			           remarkError.style.display = "none";
+			           remark.classList.remove("is-invalid");
+			       }
+			   });
 	
 	
 		});
@@ -832,51 +885,48 @@
 
 					            <div class="modal-body">
 
-					                <form id="editForm" th:action="@{/approveRejectAAP}"  method="post">
+									<form id="editForm" th:action="@{/approveRejectAAP}" method="post">
 
-					                    <input type="hidden"  id="planid" name="planid">
-					                    <div class="row mb-3">
+									    <input type="hidden" id="planid" name="planid">
 
-					                        <label class="col-md-3 fw-bold">
-					                            Action:
-					                        </label>
+									    <div class="row mb-3">
+									        <label class="col-md-3 fw-bold">
+									            Action:
+									        </label>
 
-					                        <div class="col-md-9">
-												<select id="action" name="action" class="form-select">
-													<option value="F">Approve</option>
-													<option value="R">Reject</option>
-												</select>
+									        <div class="col-md-9">
+									            <select id="action" name="action" class="form-select" required>
+									                <option value="F">Approve</option>
+									                <option value="R">Reject</option>
+									            </select>
+									        </div>
+									    </div>
 
-					                        </div>
+									    <div class="row mb-3">
+									        <label class="col-md-3 fw-bold">
+									            Remarks:
+									            <span id="remarkRequired" class="text-danger" style="display:none;">*</span>
+									        </label>
 
-					                    </div>
+									        <div class="col-md-9">
+									            <textarea name="remark" id="remark"
+									                      class="form-control"
+									                      rows="2"
+									                      minlength="5"></textarea>
 
+									            <small id="remarkError" class="text-danger" style="display:none;">
+									                Remarks are mandatory when rejecting the plan
+									            </small>
+									        </div>
+									    </div>
 
-					                    <!-- Project -->
+									    <div class="text-center mt-4">
+									        <button type="submit" name="updateAction" class="btn btn-warning">
+									            <i class="fas fa-save"></i> Submit
+									        </button>
+									    </div>
 
-					                    <div class="row mb-3">
-
-					                        <label class="col-md-3 fw-bold">
-					                           Remarks:
-					                        </label>
-
-					                        <div class="col-md-9">
-												<textarea name="remark" id="remark" class="form-control" rows="2" minlength="5"></textarea>
-												
-					                        </div>
-
-					                    </div>
-
-					                    <!-- Update -->
-
-										<div class="text-center mt-4">
-											<button type="submit" name="updateAction"  class="btn btn-warning">
-												<i class="fas fa-save"></i>
-												Submit
-											</button>
-										</div>
-
-					                </form>
+									</form>
 
 					            </div>
 

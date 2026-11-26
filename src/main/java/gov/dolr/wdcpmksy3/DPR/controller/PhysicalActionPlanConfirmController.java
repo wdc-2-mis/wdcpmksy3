@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.dolr.wdcpmksy3.DPR.entity.WdcpmksyProjectPhysicalPlanTranx;
+import gov.dolr.wdcpmksy3.DPR.repository.PhysicalActionPlanViewProjection;
+import gov.dolr.wdcpmksy3.DPR.repository.WdcpmksyProjectPhysicalPlanDetailsRepository;
 import gov.dolr.wdcpmksy3.DPR.repository.WdcpmksyProjectPhysicalPlanTranxRepository;
 import gov.dolr.wdcpmksy3.DPR.service.PhysicalActionPlanService;
 import gov.dolr.wdcpmksy3.PPR.dto.PprTransactionDto;
@@ -36,6 +38,9 @@ public class PhysicalActionPlanConfirmController {
 	
 	@Autowired
 	private WdcpmksyProjectPhysicalPlanTranxRepository tranxRepository;
+	
+	@Autowired
+	private WdcpmksyProjectPhysicalPlanDetailsRepository plndtl;
 	
 	
 	@GetMapping("/wcdcslnaPhyActPlan")
@@ -134,19 +139,19 @@ public class PhysicalActionPlanConfirmController {
 		                dto.setSentTo(t.getSentTo().getUserId());
 		            }  */
 		            
-		            if (t.getSentFrom() != null) {
+		            if (t.getSentFrom() != null) 
+		            {
 		                String userId = t.getSentFrom().getUserId();
-
 		                if (userId != null && userId.startsWith("DL")) {
 		                    dto.setSentFrom("DoLR");
-		                } else {
+		                } 
+		                else {
 		                    dto.setSentFrom(userId);
 		                }
 		            }
-
-		            if (t.getSentTo() != null) {
+		            if (t.getSentTo() != null) 
+		            {
 		                String userId = t.getSentTo().getUserId();
-
 		                if (userId != null && userId.startsWith("DL")) {
 		                    dto.setSentTo("DoLR");
 		                } else {
@@ -157,6 +162,51 @@ public class PhysicalActionPlanConfirmController {
 		            dto.setAction(t.getAction());
 		            dto.setRemarks(t.getRemarks());
 		            dto.setSenton(t.getSentOn());
+
+		            result.add(dto);
+		        }
+
+		        System.out.println("DTO records returned = " + result.size());
+
+		        return ResponseEntity.ok(result);
+
+		    } 
+		    catch (Exception e) {
+
+		        e.printStackTrace();
+
+		        Map<String, Object> error = new HashMap<>();
+
+		        error.put("success", false);
+		        error.put("message", e.getMessage());
+
+		        return ResponseEntity
+		                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+		                .body(error);
+		    }
+		}
+	 	
+	 	
+	 	@GetMapping("/getPhysicalActionPlanViewProjection")
+		@ResponseBody
+		public ResponseEntity<?> getPhysicalActionPlanViewProjection(
+		        @RequestParam("planId") Integer planId) {
+
+		    try {
+
+		        List<PhysicalActionPlanViewProjection> list =plndtl.getPhysicalActionPlanViewProjection(planId);
+		        List<PprTransactionDto> result = new ArrayList<>();
+
+		        for (PhysicalActionPlanViewProjection t : list) {
+
+		            PprTransactionDto dto = new PprTransactionDto();
+
+		            dto.setPlanid(t.getPlan_id());
+		            dto.setProject_name(t.getProject_name());
+		            dto.setHead_desc(t.getHead_desc());
+		            dto.setActivity_name(t.getActivity_name());
+		            dto.setUnit_desc(t.getUnit_desc());
+		            dto.setQty_planned(t.getQty_planned());
 
 		            result.add(dto);
 		        }
