@@ -30,28 +30,36 @@
 <script th:inline="javascript">
 
 	document.addEventListener("DOMContentLoaded", function () {
-	    const district = document.getElementById("district");
+	    const superHead = document.getElementById("superHead");
 		const project = document.getElementById("project");
+		const fyear = document.getElementById("fyear");
 		const head = document.getElementById("head");
-	    district.addEventListener("change", function () {
+	    superHead.addEventListener("change", function () {
 			if (this.value) {
-				window.location.href = "/dprPhyOtherHeadActivities?dcode=" + this.value;
+				window.location.href = "/getDPRAnnualTarget?superHead=" + this.value;
 			} else {
-				window.location.href = "/dprPhyOtherHeadActivities";
+				window.location.href = "/getDPRAnnualTarget";
 			}
 	    });
 		project.addEventListener("change", function () {
 			if (this.value) {
-				window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + this.value;
+				window.location.href = "/getDPRAnnualTarget?superHead=" +superHead.value + "&&project=" + this.value;
 			} else {
-				window.location.href = "/dprPhyOtherHeadActivities";
+				window.location.href = "/getDPRAnnualTarget";
+			}
+		});
+		fyear.addEventListener("change", function () {
+			if (this.value) {
+				window.location.href = "/getDPRAnnualTarget?superHead=" +superHead.value + "&&project=" + project.value+ "&&fyear=" +  this.value;
+			} else {
+				window.location.href = "/getDPRAnnualTarget";
 			}
 		});
 		head.addEventListener("change", function () {
 			if (this.value) {
-				window.location.href = "/dprPhyOtherHeadActivities?dcode=" +district.value + "&&project=" + project.value+ "&&head=" +  this.value;
+				window.location.href = "/getDPRAnnualTarget?superHead=" +superHead.value + "&&project=" + project.value+ "&&fyear=" +  fyear.value+ "&&head=" +  this.value;
 			} else {
-				window.location.href = "/dprPhyOtherHeadActivities";
+				window.location.href = "/getDPRAnnualTarget";
 			}
 		});
 	
@@ -421,7 +429,11 @@
 							<label>Financial Year:</label><span class="required">*</span>
 						</div>
 						<div class="col-md-3">
-							<input type="text" name="finyear" id="finyear" class="form-control" style="height:40px; width: 300px;" readonly>
+							<select class="form-select" id="fyear" name="fyear">
+								<option value="">--Select--</option>
+								<option th:each="year : ${finYearList}" th:value="${year.finYrCd}" th:text="${year.finYrDesc}"
+									th:selected="${selectedFinYrCd != null and year.finYrCd == selectedFinYrCd}">
+							</select>
 						</div>
 					</div>
 					<div class="row mb-4">
@@ -551,16 +563,16 @@
 							<input type="hidden" id="otherId" name="otherId">
 							<div class="row mb-3">
 								<div class="col-md-2">
-									<label> District: </label>
-								</div>
-								<div class="col-md-3">
-									<input type="text" id="editDistrict" class="form-control form-control-sm" readonly>
-								</div>
-								<div class="col-md-2">
 									<label> Project: </label>
 								</div>
 								<div class="col-md-3">
 									<input type="text" id="editProject" class="form-control form-control-sm" readonly>
+								</div>
+								<div class="col-md-2">
+									<label> Financial Year: </label>
+								</div>
+								<div class="col-md-3">
+									<input type="text" id="editFyear" class="form-control form-control-sm" readonly>
 								</div>
 							</div>
 							<div class="row mb-3">
