@@ -59,7 +59,7 @@ public class SecurityConfig {
         
 //PI
                         
-                        "/getProjectBlocks", 
+                        "/getProjectBlocks", "/getBlockVillages", "/getProjectLocationData", "/saveProjectLocationDraft", "/deleteProjectLocation", "/completeProjectLocation",
              
                         
                         "/css/**",

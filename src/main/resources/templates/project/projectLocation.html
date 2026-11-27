@@ -35,109 +35,163 @@
     
     <script th:inline="javascript">
 
+
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const project = document.getElementById("project");
-    const multiBlock = document.getElementById("multiblock");
+    
     const block = document.getElementById("block");
+    const village = document.getElementById("village");
 
-    const blocksUrl = /*[[@{/getProjectBlocks}]]*/ '';
+    const addVillages = document.getElementById("addVillages");
+    const locationTableBody = document.getElementById("locationTableBody");
+    const complete = document.getElementById("complete");
+
+   
+    const selectedVillagesText = document.getElementById("selectedVillagesText");
+
+    const projectForm = document.getElementById("projectLocationForm");
+
+    // Thymeleaf URLs
+    const blocksUrl = /*[[@{/getProjectBlocks}]]*/ '/getProjectBlocks';
+    const villagesUrl = /*[[@{/getBlockVillages}]]*/ '/getBlockVillages';
+    const locationDataUrl = /*[[@{/getProjectLocationData}]]*/ '/getProjectLocationData';
+
+    const deleteUrl = /*[[@{/deleteProjectLocation}]]*/ '/deleteProjectLocation';
+    const completeUrl = /*[[@{/completeProjectLocation}]]*/ '/completeProjectLocation';
 
     let loadedBlocks = [];
+    let projectLocations = new Map();
+    let projectCompleted = false;
 
-    // Clear block dropdowns
-    function clearBlockDropdowns() {
+    let projectRequestId = 0;
+    let villageRequestId = 0;
 
-        multiBlock.innerHTML = "";
-        block.innerHTML = '<option value="">-- Select Block --</option>';
+    // --------------------------------------------------
+    // INITIALIZATION
+    // --------------------------------------------------
 
-        multiBlock.disabled = true;
-        block.disabled = true;
+    clearBlockDropdowns();
+    clearVillageDropdown();
+    updateButtons();
 
-        loadedBlocks = [];
+    // Important: after redirect, automatically reload the
+    // previously selected project.
+    if (project.value) {
+        loadSelectedProject(project.value);
     }
 
-    // Project selection change
-    project.addEventListener("change", function () {
+    // --------------------------------------------------
+    // CLEAR FUNCTIONS
+    // --------------------------------------------------
 
-        clearBlockDropdowns();
+    function clearBlockDropdowns() {
 
-        if (!this.value) {
+    block.innerHTML =
+        '<option value="">-- Select Block --</option>';
+
+    block.disabled = true;
+
+    loadedBlocks = [];
+}
+
+    function clearVillageDropdown() {
+
+        village.innerHTML = "";
+        village.disabled = true;
+
+        selectedVillagesText.innerHTML = "";
+
+        addVillages.style.display = "none";
+    }
+
+    function clearLocationTable() {
+
+        projectLocations.clear();
+
+        locationTableBody.innerHTML = "";
+
+        renderEmptyRow();
+        updateButtons();
+    }
+
+    function renderEmptyRow() {
+
+        if (locationTableBody.querySelector("tr")) {
             return;
         }
 
-        multiBlock.innerHTML =
-            '<option value="">Loading blocks...</option>';
+        locationTableBody.innerHTML = `
+            <tr id="emptyRow">
+                <td colspan="6" class="text-center text-muted">
+                    No project location details added.
+                </td>
+            </tr>
+        `;
+    }
 
-        fetch(blocksUrl + "?pprId=" + encodeURIComponent(this.value))
-            .then(response => {
+    // --------------------------------------------------
+    // PROJECT SELECTION
+    // --------------------------------------------------
 
-                if (!response.ok) {
-                    throw new Error("Unable to load project blocks.");
-                }
+    project.addEventListener("change", function () {
 
-                return response.json();
-            })
-            .then(data => {
-
-                multiBlock.innerHTML = "";
-
-                loadedBlocks = data;
-
-                if (data.length === 0) {
-
-                    multiBlock.innerHTML =
-                        '<option value="">No blocks found</option>';
-
-                    return;
-                }
-
-                data.forEach(function (item) {
-
-                    const option = document.createElement("option");
-
-                    option.value = item.bcode;
-                    option.textContent = item.blockName;
-
-                    multiBlock.appendChild(option);
-
-                });
-
-                multiBlock.disabled = false;
-
-            })
-            .catch(error => {
-
-                console.error(error);
-
-                multiBlock.innerHTML =
-                    '<option value="">Error loading blocks</option>';
-
-            });
+        loadSelectedProject(this.value);
 
     });
 
+    function loadSelectedProject(pprId) {
 
-    // When user selects multiple blocks,
-    // populate the second block dropdown.
-    multiBlock.addEventListener("change", function () {
+        const requestId = ++projectRequestId;
+
+        projectCompleted = false;
+
+        clearBlockDropdowns();
+        clearVillageDropdown();
+        clearLocationTable();
+
+        if (!pprId) {
+            return;
+        }
+
+        // Load saved database records.
+        loadProjectLocations(pprId, requestId);
+
+        // Load project blocks
+fetch(blocksUrl + "?pprId=" + encodeURIComponent(pprId))
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("Unable to load project blocks.");
+        }
+
+        return response.json();
+    })
+
+    .then(data => {
+
+        if (requestId !== projectRequestId ||
+            project.value !== pprId) {
+            return;
+        }
+
+        loadedBlocks = data || [];
 
         block.innerHTML =
             '<option value="">-- Select Block --</option>';
 
-        const selectedCodes = Array.from(this.selectedOptions)
-            .map(option => option.value);
+        if (loadedBlocks.length === 0) {
 
-        if (selectedCodes.length === 0) {
+            block.innerHTML =
+                '<option value="">No blocks found</option>';
+
             block.disabled = true;
             return;
         }
 
-        const selectedBlocks = loadedBlocks.filter(item =>
-            selectedCodes.includes(String(item.bcode))
-        );
-
-        selectedBlocks.forEach(function (item) {
+        loadedBlocks.forEach(item => {
 
             const option = document.createElement("option");
 
@@ -145,21 +199,532 @@ document.addEventListener("DOMContentLoaded", function () {
             option.textContent = item.blockName;
 
             block.appendChild(option);
+        });
+
+        block.disabled = projectCompleted;
+
+    })
+
+    .catch(error => {
+
+        console.error("Block loading error:", error);
+
+        if (requestId === projectRequestId) {
+
+            block.innerHTML =
+                '<option value="">Error loading blocks</option>';
+
+            block.disabled = true;
+        }
+
+    });
+        
+    }
+
+    
+
+    // --------------------------------------------------
+    // SHOW SELECTED NAMES OUTSIDE DROPDOWN
+    // --------------------------------------------------
+
+    function showSelectedNames(container, names, emptyMessage) {
+
+        container.innerHTML = "";
+
+        if (!names || names.length === 0) {
+
+            container.innerHTML = `
+                <small class="text-muted">${emptyMessage}</small>
+            `;
+
+            return;
+        }
+
+        const heading = document.createElement("div");
+
+        heading.className = "small fw-bold text-secondary mb-2";
+        heading.textContent = "Selected:";
+
+        container.appendChild(heading);
+
+        const wrapper = document.createElement("div");
+
+        wrapper.className = "d-flex flex-wrap gap-2";
+
+        names.forEach(name => {
+
+            const badge = document.createElement("span");
+
+            badge.className = "badge bg-info text-dark";
+            badge.textContent = name;
+
+            wrapper.appendChild(badge);
+        });
+
+        container.appendChild(wrapper);
+    }
+
+    // --------------------------------------------------
+    // LOAD VILLAGES WHEN ONE BLOCK IS SELECTED
+    // --------------------------------------------------
+
+    block.addEventListener("change", function () {
+
+        clearVillageDropdown();
+
+        const bcode = this.value;
+        const pprId = project.value;
+
+        if (!bcode || !pprId || projectCompleted) {
+            return;
+        }
+
+        const requestId = ++villageRequestId;
+
+        village.innerHTML =
+            '<option value="">Loading villages...</option>';
+
+        fetch(
+            villagesUrl +
+            "?bcode=" + encodeURIComponent(bcode) +
+            "&pprId=" + encodeURIComponent(pprId)
+        )
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Unable to load villages.");
+            }
+
+            return response.json();
+        })
+
+        .then(data => {
+
+            if (requestId !== villageRequestId ||
+                project.value !== pprId ||
+                block.value !== bcode) {
+                return;
+            }
+
+            village.innerHTML = "";
+
+            if (!data || data.length === 0) {
+
+                village.innerHTML =
+                    '<option value="">No available villages found</option>';
+
+                return;
+            }
+
+            data.forEach(item => {
+
+                // Do not show already saved villages.
+                if (projectLocations.has(String(item.vcode))) {
+                    return;
+                }
+
+                const option = document.createElement("option");
+
+                option.value = item.vcode;
+                option.textContent = item.villageName;
+
+                option.dataset.villageName = item.villageName;
+                option.dataset.blockName = item.blockName;
+                option.dataset.gpName = item.gramPanchayatName;
+
+                village.appendChild(option);
+            });
+
+            if (village.options.length > 0) {
+
+                village.disabled = false;
+
+            } else {
+
+                village.innerHTML =
+                    '<option value="">No available villages found</option>';
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            if (requestId === villageRequestId) {
+
+                village.innerHTML =
+                    '<option value="">Error loading villages</option>';
+            }
+
+        });
+    });
+
+    // --------------------------------------------------
+    // SELECTED VILLAGE NAMES OUTSIDE DROPDOWN
+    // --------------------------------------------------
+
+    village.addEventListener("change", function () {
+
+        const selectedOptions = Array.from(this.selectedOptions);
+
+        const names = selectedOptions
+            .filter(option => option.value)
+            .map(option => option.dataset.villageName);
+
+        showSelectedNames(
+            selectedVillagesText,
+            names,
+            "No village selected"
+        );
+
+        addVillages.style.display =
+            names.length > 0 && !projectCompleted
+                ? "inline-block"
+                : "none";
+    });
+
+  
+    async function loadProjectLocations(pprId, requestId) {
+
+    try {
+
+        const response = await fetch(
+            locationDataUrl + "?pprId=" + encodeURIComponent(pprId)
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to load saved project locations.");
+        }
+
+        const data = await response.json();
+
+        if (requestId !== projectRequestId ||
+            project.value !== pprId) {
+            return;
+        }
+
+        projectLocations.clear();
+
+        locationTableBody.innerHTML = "";
+
+        // Check whether project location details are completed
+        projectCompleted = data.some(item =>
+            String(item.status).trim() === "C"
+        );
+
+        // Show completion message for an already completed project
+        showProjectLocationStatusMessage(projectCompleted);
+
+        // Load saved project location records
+        data.forEach(item => {
+
+            const vcode = String(item.vcode);
+
+            projectLocations.set(vcode, item);
+
+            addLocationRow(item);
 
         });
 
-        block.disabled = false;
+        renderEmptyRow();
 
-    });
+        if (projectCompleted) {
+
+            // Disable all location selection controls
+
+            block.disabled = true;
+
+            village.disabled = true;
+
+            addVillages.style.display = "none";
+
+            
+
+            selectedVillagesText.innerHTML = "";
+
+        }
+
+        updateButtons();
+
+    } catch (error) {
+
+        console.error(error);
+
+        if (requestId === projectRequestId) {
+
+            locationTableBody.innerHTML = "";
+
+            renderEmptyRow();
+
+            showProjectLocationStatusMessage(false);
+
+            updateButtons();
+
+        }
+
+    }
+
+}
+
+    // --------------------------------------------------
+    // ADD DATABASE RECORD TO TABLE
+    // --------------------------------------------------
+
+    function addLocationRow(item) {
+
+        const row = document.createElement("tr");
+
+        const status = String(item.status || "D").trim();
+        const locationId = item.locationId;
+
+        row.dataset.vcode = item.vcode;
+        row.dataset.locationId = locationId || "";
+
+        const serialNumber =
+            locationTableBody.querySelectorAll("tr").length + 1;
+
+        row.innerHTML = `
+            <td>${serialNumber}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+        `;
+
+        row.cells[1].textContent = item.blockName || "";
+        row.cells[2].textContent = item.gramPanchayatName || "";
+        row.cells[3].textContent = item.villageName || "";
+
+        if (status === "C") {
+
+            row.cells[4].innerHTML =
+                '<span class="badge bg-success">Complete</span>';
+
+        } else {
+
+            row.cells[4].innerHTML =
+                '<span class="badge bg-warning text-dark">Draft</span>';
+
+            if (!projectCompleted && locationId) {
+
+                const deleteButton = document.createElement("button");
+
+                deleteButton.type = "button";
+                deleteButton.className = "btn btn-danger btn-sm delete-location";
+                deleteButton.innerHTML = '<i class="fa fa-trash"></i> Delete';
+
+                row.cells[5].appendChild(deleteButton);
+            }
+        }
+
+        locationTableBody.appendChild(row);
+    }
+
+    // --------------------------------------------------
+    // DELETE ONE SAVED DRAFT RECORD
+    // --------------------------------------------------
+
+    locationTableBody.addEventListener("click", function (event) {
+
+    const button = event.target.closest(".delete-location");
+
+    if (!button || projectCompleted) {
+        return;
+    }
+
+    const row = button.closest("tr");
+
+    if (!row) {
+        return;
+    }
+
+    const locationId = row.dataset.locationId;
+
+    if (!locationId) {
+        return;
+    }
+
+    deleteAlert(
+        "Are you sure you want to delete this village?",
+        function () {
+
+            submitPostForm(deleteUrl, {
+                pprId: project.value,
+                locationId: locationId
+            });
+
+        }
+    );
 
 });
+
+    // --------------------------------------------------
+    // COMPLETE ALL DRAFT RECORDS
+    // --------------------------------------------------
+
+    if (complete) {
+
+        complete.addEventListener("click", function () {
+
+    completeAlert(
+        "Are you sure you want to complete all project location details?",
+        function () {
+            submitPostForm(completeUrl, {
+                pprId: project.value
+            });
+        }
+    );
+
+});
+    }
+
+    // --------------------------------------------------
+    // SUBMIT POST FORM
+    // --------------------------------------------------
+
+    function submitPostForm(url, values) {
+
+        const form = document.createElement("form");
+
+        form.method = "POST";
+        form.action = url;
+        form.style.display = "none";
+
+        Object.keys(values).forEach(key => {
+
+            const input = document.createElement("input");
+
+            input.type = "hidden";
+            input.name = key;
+            input.value = values[key];
+
+            form.appendChild(input);
+        });
+
+        // Copy Spring Security CSRF token from the main form.
+        const csrfInput = projectForm.querySelector(
+            'input[name="_csrf"]'
+        );
+
+        if (csrfInput) {
+
+            const csrf = document.createElement("input");
+
+            csrf.type = "hidden";
+            csrf.name = csrfInput.name;
+            csrf.value = csrfInput.value;
+
+            form.appendChild(csrf);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // --------------------------------------------------
+    // BUTTON VISIBILITY
+    // --------------------------------------------------
+
+    function updateButtons() {
+
+        const hasDraftData = Array.from(projectLocations.values())
+            .some(item => String(item.status).trim() === "D");
+
+        if (complete) {
+
+            complete.style.display =
+                !projectCompleted && hasDraftData
+                    ? "inline-block"
+                    : "none";
+        }
+
+        addVillages.style.display = "none";
+    }
+
+function showProjectLocationStatusMessage(completed) {
+
+    const messageDiv = document.getElementById("projectLocationStatusMessage");
+
+    if (completed) {
+
+        messageDiv.className = "alert alert-info mt-2";
+
+        messageDiv.textContent =
+            "This project's location details are already completed.";
+
+        messageDiv.style.display = "block";
+
+    } else {
+
+        messageDiv.style.display = "none";
+        messageDiv.textContent = "";
+
+    }
+}
+
+});
+
+
+
 
 </script>
 </head>
 
+
 <body>
 
+
+
 <div layout:fragment="content">
+
+<ul class="nav nav-tabs" id="projectLocationTabs" role="tablist">
+
+    <li class="nav-item">
+        <a class="nav-link active"
+           id="addProjectLocation"
+           data-bs-toggle="tab"
+           href="#addLocation"
+           role="tab"
+           aria-controls="addLocation"
+           aria-selected="true">
+            Add Project Location
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link"
+           id="addWatershedCommittee"
+           data-bs-toggle="tab"
+           href="#watershedCommittee"
+           role="tab"
+           aria-controls="watershedCommittee"
+           aria-selected="false">
+            Add Watershed Committee
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link"
+           id="mappingOfVillageWatershedCommittee"
+           data-bs-toggle="tab"
+           href="#villageWatershedMapping"
+           role="tab"
+           aria-controls="villageWatershedMapping"
+           aria-selected="false">
+            Mapping of Village and Watershed Committee
+        </a>
+    </li>
+
+</ul>
+
+<div class="tab-content">
+
+    <!-- TAB 1 -->
+    <div class="tab-pane fade show active"
+         id="addLocation">
 
     <div class="container-fluid">
 
@@ -171,9 +736,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
             <div class="card-body">
 
-                <form id="projectLocationForm" novalidate>
+                <!-- Success Message -->
+                <div th:if="${success}"
+                     class="alert alert-success alert-dismissible fade show"
+                     role="alert">
+
+                    <span th:text="${success}"></span>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert">
+                    </button>
+                </div>
+
+                <!-- Error Message -->
+                <div th:if="${error}"
+                     class="alert alert-danger alert-dismissible fade show"
+                     role="alert">
+
+                    <span th:text="${error}"></span>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert">
+                    </button>
+                </div>
+
+
+                <form id="projectLocationForm" th:action="@{/saveProjectLocationDraft}" method="post" novalidate>
 
                     <!-- Project Selection -->
+
                     <h6 class="section-heading">
                         Project Details
                     </h6>
@@ -182,9 +775,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         <div class="col-md-6">
 
-                            <label for="project" class="form-label fw-bold">
+                            <label for="project"
+                                   class="form-label fw-bold">
+
                                 Select Project
                                 <span class="required">*</span>
+
                             </label>
 
                             <select id="project"
@@ -196,7 +792,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                 <option th:each="p : ${projectList}"
                                         th:value="${p.pprId}"
-                                        th:text="${p.projectName}">
+                                        th:text="${p.projectName}" 
+                                        th:selected="${selectedPprId != null and selectedPprId == p.pprId}">
                                 </option>
 
                             </select>
@@ -204,83 +801,60 @@ document.addEventListener("DOMContentLoaded", function () {
                             <div class="invalid-feedback">
                                 Please select a project.
                             </div>
-
+<div id="projectLocationStatusMessage" class="mt-2" style="display:none;"></div>
                         </div>
 
                     </div>
 
+
                     <!-- Location Selection -->
+
                     <h6 class="section-heading">
                         Project Location Selection
                     </h6>
 
-                    <div class="row mb-3">
+                   <div class="row mb-3">
+    <div class="col-md-6">
 
-                        <div class="col-md-6">
+        <label for="block" class="form-label fw-bold">
+            Select Block <span class="required">*</span>
+        </label>
 
-                            <label for="multiblock" class="form-label fw-bold">
-                                Select Blocks
-                                <span class="required">*</span>
-                            </label>
+        <select id="block" name="bcode" class="form-select" disabled>
+            <option value="">-- Select Block --</option>
+        </select>
 
-                            <select id="multiblock"
-                                    class="form-select"
-                                    multiple
-                                    size="5"
-                                    disabled>
-                            </select>
+        <div class="invalid-feedback">
+            Please select a block.
+        </div>
 
-                            <div class="form-text">
-                                Select one or more blocks covered under the project.
-                            </div>
+    </div>
+</div>
 
-                            <div class="invalid-feedback">
-                                Please select at least one block.
-                            </div>
 
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <label for="block" class="form-label fw-bold">
-                                Select Block
-                                <span class="required">*</span>
-                            </label>
-
-                            <select id="block"
-                                    class="form-select"
-                                    disabled>
-
-                                <option value="">-- Select Block --</option>
-
-                            </select>
-
-                            <div class="invalid-feedback">
-                                Please select a block.
-                            </div>
-
-                        </div>
-
-                    </div>
+                    <!-- Village Selection -->
 
                     <div class="row mb-4">
 
                         <div class="col-md-6">
 
-                            <label for="village" class="form-label fw-bold">
+                            <label for="village"
+                                   class="form-label fw-bold">
+
                                 Select Villages
                                 <span class="required">*</span>
+
                             </label>
 
-                            <select id="village"
+                            <select id="village" name="villageCodes"
                                     class="form-select"
                                     multiple
                                     size="6"
                                     disabled>
                             </select>
-
+<div id="selectedVillagesText" class="mt-2"></div>
                             <div class="form-text">
-                                Select multiple villages and click Go.
+                                Select one or more villages and click Save as Draft.
                             </div>
 
                             <div class="invalid-feedback">
@@ -289,23 +863,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         </div>
 
+
+                        <!-- Save as Draft Button -->
+
                         <div class="col-md-6 d-flex align-items-end">
 
-                            <button type="button"
-                                    id="addVillages"
-                                    class="btn btn-primary"
-                                    disabled>
-                                <i class="fa fa-plus"></i>
-                                Go
-                            </button>
+                            <button type="submit" id="addVillages"
+        class="btn btn-primary"
+        style="display:none;">
+    <i class="fa fa-save"></i> Save as Draft
+</button>
 
                         </div>
 
                     </div>
 
-                    <!-- Selected Location Table -->
+
+                    <!-- Project Location List -->
+
                     <h6 class="section-heading">
-                        Project Location Details
+                        List of Project Location Details
                     </h6>
 
                     <div class="table-responsive">
@@ -313,22 +890,44 @@ document.addEventListener("DOMContentLoaded", function () {
                         <table class="table table-bordered table-striped"
                                id="locationTable">
 
-                            <thead>
+                            <thead class="table-light">
+
                                 <tr>
-                                    <th width="25%">Block</th>
-                                    <th width="30%">Gram Panchayat</th>
-                                    <th width="35%">Village</th>
-                                    <th width="10%">Action</th>
+
+                                   <th>S.No.</th>
+
+                                    <th width="20%">
+                                        Block
+                                    </th>
+
+                                    <th width="23%">
+                                        Gram Panchayat
+                                    </th>
+
+                                    <th width="25%">
+                                        Village
+                                    </th>
+<th>Status</th>
+
+                                    <th width="12%" class="text-center">
+                                        Action
+                                    </th>
+
                                 </tr>
+
                             </thead>
 
                             <tbody id="locationTableBody">
 
                                 <tr id="emptyRow">
-                                    <td colspan="4"
+
+                                    <td colspan="6"
                                         class="text-center text-muted">
-                                        No project location details added.
+
+                                        No project location details found.
+
                                     </td>
+
                                 </tr>
 
                             </tbody>
@@ -337,25 +936,184 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     </div>
 
+
+                    <!-- Complete Button -->
+
                     <div class="text-center mt-4">
 
                         <button type="button"
-                                id="saveDraft"
-                                class="btn btn-secondary">
-                            <i class="fa fa-save"></i>
-                            Save as Draft
-                        </button>
-
-                        <button type="button"
                                 id="complete"
-                                class="btn btn-success ms-2">
+                                class="btn btn-success"
+                                style="display:none;">
+
                             <i class="fa fa-check"></i>
                             Complete
+
                         </button>
 
                     </div>
 
                 </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="tab-pane fade"
+     id="watershedCommittee"
+     role="tabpanel"
+     aria-labelledby="addWatershedCommittee">
+
+    <div class="container-fluid">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Add / View Watershed Committee</h5>
+            </div>
+
+            <div class="card-body">
+
+                <!-- Project Selection -->
+                <h6 class="section-heading">Project Details</h6>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+
+                        <label for="committeeProject"
+                               class="form-label fw-bold">
+                            Select Project
+                            <span class="required">*</span>
+                        </label>
+
+                        <select id="committeeProject"
+                                name="committeePprId"
+                                class="form-select"
+                                required>
+
+                            <option value="">-- Select Project --</option>
+
+                            <option th:each="p : ${projectList}"
+                                    th:value="${p.pprId}"
+                                    th:text="${p.projectName}"
+                                    th:selected="${selectedPprId != null and selectedPprId == p.pprId}">
+                            </option>
+
+                        </select>
+
+                        <div class="invalid-feedback">
+                            Please select a project.
+                        </div>
+
+                        <div id="committeeProjectStatusMessage"
+                             class="mt-2"
+                             style="display:none;">
+                        </div>
+
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Watershed Committee Form -->
+                <form id="watershedCommitteeForm"
+                      th:action="@{/piaListWSComittee}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="pprId"
+                           id="committeePprId">
+
+                    <input type="hidden"
+                           name="wcId"
+                           id="wcId">
+
+                    <h6 class="section-heading">
+                        Watershed Committee Details
+                    </h6>
+
+                    <div class="row align-items-end mb-4">
+
+                        <div class="col-md-5">
+
+                            <label for="wscname"
+                                   class="form-label fw-bold">
+
+                                Enter Watershed Committee
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <input type="text"
+                                   name="wcname"
+                                   id="wscname"
+                                   class="form-control"
+                                   maxlength="150"
+                                   placeholder="Enter Watershed Committee Name"
+                                   required>
+
+                            <div class="invalid-feedback">
+                                Please enter Watershed Committee name.
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <button type="submit"
+                                    name="savewc"
+                                    id="savewc"
+                                    class="btn btn-primary">
+
+                                <i class="fa fa-save"></i> Save
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+                <hr>
+
+                <!-- Committee List -->
+                <h6 class="mb-3">
+                    List of Watershed Committees Added
+                </h6>
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-striped"
+                           id="wcCommittee">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th width="10%">S.No.</th>
+                                <th>Watershed Committee Name</th>
+                                <th width="15%">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="wcCommitteeTableBody">
+
+                            <tr>
+                                <td colspan="3"
+                                    class="text-center text-muted">
+                                    No Watershed Committee added.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
             </div>
         </div>
@@ -364,5 +1122,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </div>
 
+</div>
+</div>
+
+
+
+<div class="tab-pane fade"
+         id="villageWatershedMapping">
+         
+         
+</div>                  
+
 </body>
 </html>
+

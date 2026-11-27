@@ -198,6 +198,8 @@ public class ViewConfirmDPRPlan {
 	 public ResponseEntity<byte[]> downloadPPRPdf(
 	         HttpSession session,
 	         @RequestParam(required = false) Integer project) {
+		 
+		 String statename = session.getAttribute("statename").toString(); 
 
 	     if (session.getAttribute("userid") == null) {
 	         return ResponseEntity.status(HttpStatus.FOUND)
@@ -445,8 +447,9 @@ public class ViewConfirmDPRPlan {
 	         info.setSpacingAfter(0);
 
 	         PdfPCell infoCell = new PdfPCell(new Phrase(
+	        		 "State : " +statename + "    " +
 	                 "District : " + districtName
-	                         + "          Project : " + projectName,
+	                         + "      Project : " + projectName,
 	                 infoFont));
 
 	         infoCell.setBackgroundColor(new Color(25, 135, 84));

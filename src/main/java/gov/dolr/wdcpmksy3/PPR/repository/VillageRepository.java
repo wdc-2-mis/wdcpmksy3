@@ -1,12 +1,15 @@
 package gov.dolr.wdcpmksy3.PPR.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import gov.dolr.wdcpmksy3.entity.MVillage;
+import gov.dolr.wdcpmksy3.entity.WdcpmksyUserProjectMap;
 
 @Repository
 public interface VillageRepository extends JpaRepository<MVillage,Integer>{
@@ -27,6 +30,35 @@ public interface VillageRepository extends JpaRepository<MVillage,Integer>{
     MVillage findByVcode(Integer vcode);
     
     
-    
+    @Query("""
+    	    SELECT v
+    	    FROM MVillage v
+    	    WHERE v.gramPanchayat.block.bcode = :bcode
+    	      AND v.gramPanchayat.block.active = true
+    	      AND v.gramPanchayat.active = true
+    	      AND v.active = true
+    	    ORDER BY v.villageName ASC
+    	    """)
+    	List<MVillage> findActiveVillagesByBlock(@Param("bcode") Integer bcode);
+
+    @Query("""
+    	    SELECT v
+    	    FROM MVillage v
+    	    WHERE v.gramPanchayat.block.bcode = :bcode
+    	      AND v.gramPanchayat.block.active = true
+    	      AND v.gramPanchayat.active = true
+    	      AND v.active = true
+    	      AND NOT EXISTS (
+    	          SELECT l.locationId
+    	          FROM WdcpmksyProjectLocation l
+    	          WHERE l.project.pprId = :pprId
+    	            AND l.village.vcode = v.vcode
+    	      )
+    	    ORDER BY v.villageName ASC
+    	    """)
+    	List<MVillage> findAvailableVillagesByBlockAndProject(
+    	        @Param("bcode") Integer bcode,
+    	        @Param("pprId") Integer pprId
+    	);
 
 }
